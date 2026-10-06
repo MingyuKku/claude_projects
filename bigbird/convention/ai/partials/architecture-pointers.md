@@ -6,7 +6,10 @@
 - 상태 관리 (Zustand) & 데이터 패칭 (SWR): `.claude/rules/state-management.md`
 - UI 시스템 (shadcn/ui & Tailwind CSS & CVA): `.claude/rules/styling.md`
 - API 통신 (OpenAPI & SWR & Zod & 트랜스포머): `.claude/rules/api-integration.md`
-- Figma MCP 디자인 연동 규칙: `.claude/rules/figma-design.md`
+- Figma 디자인 → 코드 절차: `.claude/skills/figma-to-component/` (Codex는 `.agents/skills/`에 동기화된 사본)
+- 컴포넌트 스캐폴딩 절차: `.claude/skills/scaffold-component/`
+- 라우팅 (React Router · FSD): `.claude/rules/routing.md`
 - 에러 핸들링 및 에러 바운더리: `.claude/rules/error-handling.md`
 - 테스트 작성 가이드라인 (Vitest): `.claude/rules/testing.md`
 - 성능 최적화 및 렌더링 가이드: `.claude/rules/performance.md`
+- FSD 경계 린트 강제: 루트 `eslint.config.js`

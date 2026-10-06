@@ -1,46 +1,27 @@
 ---
 paths:
-  - "src/**/components/**/*.tsx"
-  - "src/**/*.tsx"
+  - "src/**/ui/**/*.tsx"
+  - "src/pages/**/*.tsx"
 ---
 
-# React 컴포넌트 설계 및 모범 사례
+# React 컴포넌트 설계
 
-## 1. 명시적 Props 인터페이스 정의
+## Props
 
-모든 컴포넌트에는 명시적인 `Props` 인터페이스를 선언하십시오. 인라인 익명 타입을 지양합니다:
+모든 컴포넌트는 이름 있는 `Props` 인터페이스를 선언합니다. 스타일을 받는 컴포넌트는 `className`을 열고 `cn`으로 병합합니다.
 
-```tsx
-// ✅ 좋은 예
-interface UserCardProps {
-  user: TransformedUserData;
-  onSelect?: (userId: string) => void;
-  className?: string;
-}
+## 컨테이너와 프레젠테이션
 
-export function UserCard({ user, onSelect, className }: UserCardProps) {
-  return (
-    <article className={clsx("rounded-2xl p-4 transition-all hover:shadow-lg", className)}>
-      <h3>{user.displayName}</h3>
-    </article>
-  );
-}
-```
+데이터 페칭, 스토어 연동, 이벤트 조율은 컨테이너(페이지·위젯)가 맡고, 하위 컴포넌트는 props만으로 렌더링하게 둡니다. 이유는 네트워크 없이 테스트할 수 있고 재사용이 쉽기 때문입니다. 작은 컴포넌트에서 이 분리가 오히려 간접 층만 늘린다면 합치는 쪽을 택합니다.
 
-## 2. 프레젠테이션 vs 컨테이너 분리
+## React 19
 
-- **컨테이너 / 페이지 컴포넌트**: 데이터 페칭(`useQuery`), 스토어 연동, 이벤트 핸들링 조율 후 하위 컴포넌트로 데이터 전달.
-- **프레젠테이션 컴포넌트**: Props에만 의존하는 순수 함수 컴포넌트. 직접적인 네트워크 호출이 없으므로 테스트 및 스토리북 작성이 용이함.
+- 폼 제출과 변경 요청은 Actions와 `useActionState`를 우선 고려합니다. 이미 SWR 뮤테이션으로 캐시를 관리하는 흐름이면 그 패턴을 따릅니다.
+- 비동기 값이나 Context 구독에는 `use()`로 충분한지 먼저 봅니다.
+- `ref`는 일반 prop으로 받습니다. `forwardRef`는 쓰지 않습니다.
 
-## 3. React 19 최신 패턴
+## 상태와 크기
 
-- **Actions 및 useActionState**: 폼 제출 및 뮤테이션 처리에 최신 React 19 액션 훅을 우선 사용.
-- **use() 훅**: 비동기 데이터나 Context 구독 시 장황한 래퍼 대신 `use(Promise)` / `use(Context)` 활용.
-- **Direct ref 전달**: React 19에서는 `forwardRef` 보일러플레이트 없이 일반 prop으로 `ref` 직접 전달 가능.
-
-## 4. 지양해야 할 안티패턴
-
-- ❌ Props 또는 상태에 `any` 타입 사용 금지.
-- ❌ 트랜스포머 없이 raw API 페이로드를 UI 컴포넌트 prop으로 직접 주입 금지.
-- ❌ 상태 직접 변경(Mutation) 및 계산 가능한 파생 상태를 불필요하게 `useState`로 복제 금지.
-- ❌ 400줄 이상의 거대 단일 컴포넌트 지양 (작은 하위 컴포넌트로 분할).
+- 렌더 중에 계산할 수 있는 값은 `useState`로 복제하지 않습니다. 복제본은 원본과 어긋납니다.
+- 상태를 직접 변경(mutation)하지 않습니다.
+- 한 컴포넌트가 여러 책임을 지거나 읽기 어려울 만큼 커지면(대략 수백 줄) 책임 단위로 나눕니다. 줄 수 자체가 목표는 아닙니다.

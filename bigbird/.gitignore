@@ -1,0 +1,13 @@
+node_modules
+dist
+coverage
+*.tsbuildinfo
+.env
+.env.*
+!.env.example
+CLAUDE.local.md
+.claude/settings.local.json
+.claude/hook-log.tsv
+.claude/.last-format-check
+.claude/.last-verified
+.claude/.stop-attempts

@@ -6,41 +6,18 @@ paths:
   - "src/**/*.test.ts"
 ---
 
-# 테스트 작성 컨벤션 (Vitest + Testing Library)
+# 테스트 (Vitest · Testing Library)
 
-## 테스트 우선순위
+## 우선순위
 
-1. **최우선 순위 (High)**: 복잡한 비즈니스 로직, 데이터 트랜스포머, 상태 머신이 포함된 커스텀 훅.
-2. **중간 순위 (Medium)**: 인터랙티브 피처 컨테이너, 폼 검증 및 제출 흐름, 에러 상태 UI.
-3. **낮은 순위 (Low)**: 로직이 전혀 없는 순수 스타일 래퍼 컴포넌트.
+1. **높음**: 트랜스포머, 상태 로직이 있는 커스텀 훅, 비즈니스 규칙
+2. **중간**: 폼 검증·제출 흐름, 인터랙티브 피처, 에러 상태 UI
+3. **낮음**: 로직 없는 스타일 래퍼 (테스트하지 않아도 됩니다)
 
-## Vitest + React Testing Library 작성 예시
+## 작성 원칙
 
-```typescript
-import { render, screen } from '@testing-library/react';
-import userEvent from '@testing-library/user-event';
-import { describe, it, expect, vi } from 'vitest';
-import { UserCard } from '../components/UserCard';
-
-describe('UserCard 컴포넌트', () => {
-  it('사용자 정보를 정상 렌더링하고 클릭 시 onSelect 콜백을 호출한다', async () => {
-    const user = userEvent.setup();
-    const handleSelect = vi.fn();
-
-    render(
-      <UserCard
-        user={{
-          id: 'user-1',
-          displayName: '홍길동',
-          displayJoinedDate: '2026. 02. 26',
-        }}
-        onSelect={handleSelect}
-      />
-    );
-
-    expect(screen.getByText('홍길동')).toBeInTheDocument();
-    await user.click(screen.getByRole('article'));
-    expect(handleSelect).toHaveBeenCalledWith('user-1');
-  });
-});
-```
+- 사용자가 보고 하는 것을 검증합니다. `getByRole`/`getByText`로 찾고, 상호작용은 `userEvent`를 씁니다. 내부 state나 구현 세부는 단언하지 않습니다.
+- 모킹은 네트워크 경계(`apiClient`, fetcher)에서만 합니다. 같은 슬라이스의 내부 모듈은 모킹하지 않습니다.
+- 슬라이스 내부 파일은 상대 경로로, 다른 슬라이스는 Public API(`index.ts`)로 임포트합니다.
+- `shared/`·`entities/` 변경 시 소비처의 테스트까지 통과해야 합니다.
+- 버그를 고칠 때는 먼저 실패하는 테스트로 재현합니다.

@@ -2,96 +2,35 @@
 paths:
   - "src/**/api/**/*.ts"
   - "src/**/model/**/*.ts"
-  - "src/**/*.ts"
 ---
 
-# API 연동 (OpenAPI & Zod & SWR) 컨벤션
+# API 연동 (OpenAPI · Zod · SWR)
 
-## 1. 데이터 파이프라인
+## 데이터 파이프라인
 
-```
-OpenAPI 정의 / 엔드포인트
-    ↓ (타입 안전한 Fetcher로 요청)
-Raw 네트워크 응답
-    ↓ (Zod 스키마 런타임 검증)
-타입 보장 도메인 모델 (Entities)
-    ↓ (트랜스포머 뷰모델 가공)
-SWR 훅 (`useSWR`, `useSWRMutation`)
-    ↓
-React UI 컴포넌트
-```
+OpenAPI 응답 → **Zod 검증** → 트랜스포머(뷰모델) → SWR 훅 → UI. 이 순서를 건너뛰지 않는 이유: 서버 응답은 런타임에서 타입과 다를 수 있고, UI가 raw 필드명(`first_name`)에 묶이면 API 변경이 화면 전체로 번지기 때문입니다.
 
-## 2. Zod 스키마 정의 및 타입 추론
+## 규칙
 
-FSD `entities/{domain}/model/types.ts`에 Zod 스키마를 선언하고 타입을 추출합니다:
+- **스키마**: `entities/{domain}/model/types.ts`에 Zod 스키마를 선언하고 `z.infer`로 타입을 얻습니다. 손으로 쓴 타입과 스키마를 병행하지 않습니다.
+- **뷰모델 타입**: UI가 쓰는 형태(표시용 이름, 포맷된 날짜 등)는 별도 `ViewModel` 인터페이스로 둡니다.
+- **트랜스포머**: `entities/{domain}/lib/`의 순수 함수입니다. 스키마 타입을 받아 뷰모델을 반환하며, 기본값·포맷 처리는 여기서 합니다.
+- **SWR 훅**: `entities/{domain}/api/`에 둡니다. 키는 배열 튜플(`['user', id]`), 조건부 페칭은 `null` 키로 표현합니다. 검증과 변환은 fetcher 안에서 끝내고, 컴포넌트에는 뷰모델만 노출합니다.
+- **명세에 없는 응답·에러 형태**는 추측하지 말고 질문합니다.
+
+## 표준 훅 형태
 
 ```typescript
-// src/entities/user/model/types.ts
-import { z } from 'zod';
-
-export const userSchema = z.object({
-  id: z.string().uuid(),
-  email: z.string().email(),
-  first_name: z.string(),
-  last_name: z.string(),
-  avatar_url: z.string().url().nullable().optional(),
-  created_at: z.string().datetime(),
-  is_vip: z.boolean().default(false),
-});
-
-export type User = z.infer<typeof userSchema>;
-
-// UI View Model 타입
-export interface UserViewModel {
-  id: string;
-  fullName: string;
-  avatarUrl: string;
-  joinedDate: string;
-  badgeText: string;
-}
-```
-
-## 3. 트랜스포머 함수
-
-```typescript
-// src/entities/user/lib/transformUser.ts
-import type { User, UserViewModel } from '../model/types';
-
-export function transformUserToViewModel(user: User): UserViewModel {
-  return {
-    id: user.id,
-    fullName: `${user.first_name} ${user.last_name}`.trim(),
-    avatarUrl: user.avatar_url || '/assets/default-avatar.svg',
-    joinedDate: new Intl.DateTimeFormat('ko-KR', { dateStyle: 'medium' }).format(new Date(user.created_at)),
-    badgeText: user.is_vip ? 'VIP' : '일반',
-  };
-}
-```
-
-## 4. OpenAPI 클라이언트 기반 SWR 훅
-
-```typescript
-// src/entities/user/api/useUser.ts
-import useSWR from 'swr';
-import { apiClient } from '@/shared/api';
-import { userSchema } from '../model/types';
-import { transformUserToViewModel } from '../lib/transformUser';
-
 export function useUser(userId: string) {
   const { data, error, isLoading, mutate } = useSWR(
-    userId ? ['user', userId] : null,
+    userId ? ["user", userId] : null,
     async () => {
       const response = await apiClient.getUser({ pathParams: { id: userId } });
-      const validated = userSchema.parse(response);
-      return transformUserToViewModel(validated);
-    }
+      return transformUserToViewModel(userSchema.parse(response));
+    },
   );
-
-  return {
-    user: data,
-    isLoading,
-    isError: Boolean(error),
-    mutate,
-  };
+  return { user: data, isLoading, isError: Boolean(error), mutate };
 }
 ```
+
+낙관적 업데이트 패턴은 `state-management.md`를 따릅니다.

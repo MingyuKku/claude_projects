@@ -26,14 +26,14 @@ src/
 app ──> pages ──> widgets ──> features ──> entities ──> shared
 ```
 
-| 레이어 (Layer) | 임포트 가능한 하위 레이어 | 절대 금지 대상 |
-| :--- | :--- | :--- |
-| **`app/`** | `pages`, `widgets`, `features`, `entities`, `shared` | — |
-| **`pages/`** | `widgets`, `features`, `entities`, `shared` | `app`, 다른 `pages/*` |
-| **`widgets/`** | `features`, `entities`, `shared` | `app`, `pages`, 다른 `widgets/*` |
-| **`features/`** | `entities`, `shared` | `app`, `pages`, `widgets`, 다른 `features/*` (**피처 간 교차 임포트 금지**) |
-| **`entities/`** | `shared` | `app`, `pages`, `widgets`, `features`, 다른 `entities/*` |
-| **`shared/`** | 외부 라이브러리 (Radix, Lucide, SWR, Zustand 등) | 상위 모든 레이어 (`app`, `pages`, `widgets`, `features`, `entities`) |
+| 레이어 (Layer)  | 임포트 가능한 하위 레이어                            | 절대 금지 대상                                                              |
+| :-------------- | :--------------------------------------------------- | :-------------------------------------------------------------------------- |
+| **`app/`**      | `pages`, `widgets`, `features`, `entities`, `shared` | —                                                                           |
+| **`pages/`**    | `widgets`, `features`, `entities`, `shared`          | `app`, 다른 `pages/*`                                                       |
+| **`widgets/`**  | `features`, `entities`, `shared`                     | `app`, `pages`, 다른 `widgets/*`                                            |
+| **`features/`** | `entities`, `shared`                                 | `app`, `pages`, `widgets`, 다른 `features/*` (**피처 간 교차 임포트 금지**) |
+| **`entities/`** | `shared`                                             | `app`, `pages`, `widgets`, `features`, 다른 `entities/*`                    |
+| **`shared/`**   | 외부 라이브러리 (Radix, Lucide, SWR, Zustand 등)     | 상위 모든 레이어 (`app`, `pages`, `widgets`, `features`, `entities`)        |
 
 ## 3. 슬라이스 내부 세그먼트 구성 (Slice Segments)
 
@@ -53,3 +53,13 @@ src/{layer}/{slice}/
 - 외부 레이어는 항상 슬라이스의 `index.ts`를 통해서만 임포트해야 합니다.
 - ❌ **나쁜 예**: `import { UserCard } from '@/entities/user/ui/UserCard'`
 - ✅ **좋은 예**: `import { UserCard } from '@/entities/user'`
+
+## 5. 린트 강제
+
+위 의존성 규칙과 Public API 원칙은 문서가 아니라 ESLint(루트 `eslint.config.js`)가 집행합니다.
+
+- 레이어 역류와 같은 레이어의 다른 슬라이스 임포트: `boundaries/dependencies`
+- 다른 슬라이스의 내부 세그먼트 직접 임포트(`@/entities/user/model/types`): `no-restricted-imports`
+- `entities` 간 `@x` 참조 같은 예외가 필요하면 팀 합의 후 설정의 `LAYERS` 표에 추가합니다.
+
+규칙을 바꿀 때는 이 문서와 `eslint.config.js`를 함께 고칩니다. 위반이 보고되면 린트를 끄지 말고 레이어 구조를 고칩니다.

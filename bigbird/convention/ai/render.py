@@ -20,8 +20,6 @@ class Job:
 JOBS = [
     Job("templates/AGENTS.md.tmpl", "../../AGENTS.md"),
     Job("templates/CLAUDE.md.tmpl", "../../CLAUDE.md"),
-    Job("templates/copilot-instructions.md.tmpl", "../../.github/copilot-instructions.md"),
-    Job("templates/gemini-settings.json.tmpl", "../../.gemini/settings.json"),
 ]
 
 

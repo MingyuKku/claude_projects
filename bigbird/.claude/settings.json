@@ -1,0 +1,68 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(pnpm dev:*)",
+      "Bash(pnpm build:*)",
+      "Bash(pnpm test:*)",
+      "Bash(pnpm lint:*)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(pnpm format:*)",
+      "Bash(python convention/ai/render.py:*)",
+      "Bash(python3 convention/ai/render.py:*)",
+      "Bash(git status:*)",
+      "Bash(git diff:*)",
+      "Bash(git log:*)"
+    ],
+    "deny": [
+      "Read(./.env)",
+      "Read(./.env.*)",
+      "Read(./**/.env)",
+      "Read(./**/.env.*)",
+      "Edit(./pnpm-lock.yaml)",
+      "Edit(./src/shared/api/generated/**)",
+      "Bash(cat .env*)",
+      "Bash(git push --force:*)",
+      "Bash(git push -f:*)",
+      "Bash(git reset --hard:*)"
+    ],
+    "ask": [
+      "Bash(git push:*)",
+      "Bash(pnpm add:*)",
+      "Bash(pnpm remove:*)",
+      "Bash(rm -rf:*)",
+      "Edit(./eslint.config.*)",
+      "Edit(./.prettierrc*)",
+      "Edit(./.prettierignore)",
+      "Edit(./tsconfig*.json)",
+      "Edit(./.claude/settings.json)",
+      "Edit(./.claude/hooks/**)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh .claude/hooks/format-and-check.sh",
+            "timeout": 60,
+            "statusMessage": "컨벤션 자동 교정"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "sh .claude/hooks/verify-on-stop.sh",
+            "timeout": 180,
+            "statusMessage": "타입체크 · 테스트"
+          }
+        ]
+      }
+    ]
+  }
+}

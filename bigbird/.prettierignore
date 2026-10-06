@@ -1,0 +1,13 @@
+dist
+coverage
+pnpm-lock.yaml
+src/shared/api/generated
+src/shared/ui
+# 생성 파일과 AI 설정 원본은 Prettier 가 건드리지 않는다 (render.py --check 와 어긋난다).
+AGENTS.md
+CLAUDE.md
+.claude
+.codex
+.agents
+ai
+convention

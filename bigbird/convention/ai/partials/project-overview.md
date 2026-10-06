@@ -1,4 +1,4 @@
 ## 프로젝트 개요
 
-`bigbird`는 React 19, TypeScript, **Feature-Sliced Design(FSD)** 아키텍처를 기반으로 구축된 고성능 모던 웹 애플리케이션입니다.
-상태 관리는 **Zustand**, 비동기 데이터 통신은 **SWR**, 런타임 스키마 검증은 **Zod**, UI는 **shadcn/ui + Tailwind CSS**, API는 **OpenAPI** 규격을 따르며, **Figma MCP** 서버와의 연동을 통해 디자인과 코드 간의 무결성을 실시간으로 보장합니다.
+`bigbird`는 React 19 + TypeScript 웹 애플리케이션입니다. 설계의 핵심 목표는 **한 기능의 변경이 다른 기능으로 번지지 않게 하는 것**이며, 이를 위해 Feature-Sliced Design(FSD)으로 기능 단위를 격리합니다.
+디자인의 원본은 Figma, API 계약의 원본은 OpenAPI 명세입니다.

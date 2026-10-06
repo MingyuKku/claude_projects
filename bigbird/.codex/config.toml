@@ -1,0 +1,4 @@
+# Codex 프로젝트 설정 (신뢰된 프로젝트에서만 적용됨).
+# Claude Code 의 .mcp.json 과 같은 Figma 원격 MCP 서버. 최초 1회 `codex mcp login figma` 로 OAuth 로그인한다.
+[mcp_servers.figma]
+url = "https://mcp.figma.com/mcp"
