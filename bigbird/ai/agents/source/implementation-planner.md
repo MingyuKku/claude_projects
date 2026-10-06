@@ -3,8 +3,8 @@ name: implementation-planner
 description: "신규 기능이나 Figma 시안을 구현하기 전에 FSD 레이어별 단계 계획과 영향도 분석이 필요할 때 사용합니다. 계획만 수립하고 코드는 수정하지 않습니다."
 claude_model: opus
 codex_model: gpt-5.4
+codex_sandbox: read-only
 claude_color: cyan
-claude_memory: project
 claude_tools: Glob, Grep, Read, WebFetch, WebSearch, mcp__figma__get_design_context, mcp__figma__get_metadata
 ---
 

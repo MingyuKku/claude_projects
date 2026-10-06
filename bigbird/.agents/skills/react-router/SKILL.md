@@ -9,6 +9,14 @@ license: MIT
 
 React Router is mode-specific. Before changing an app, identify the mode, load the matching reference, then read the installed docs for the installed package version.
 
+## Project Override (bigbird)
+
+This project uses **Data Mode** (`createBrowserRouter` + `RouterProvider`), configured only in the `app` layer. Where this skill and `.claude/rules/routing.md` disagree, the project rule wins:
+
+- Server data and mutations are owned by per-slice **SWR hooks**, not route `loader`/`action`.
+- Use `loader` only for entry control (redirects, auth guards). Keep URL state in `useSearchParams`.
+- Framework Mode is not used. Generic loader/action examples below are reference material, not project guidance.
+
 ## Identify the Mode
 
 Do not apply Framework/Data patterns to a Declarative app unless you are intentionally migrating modes.

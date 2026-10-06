@@ -2,6 +2,8 @@
 paths:
   - "src/**/ui/**/*.tsx"
   - "src/pages/**/*.tsx"
+  - "src/app/layouts/**/*.tsx"
+  - "src/app/providers/**/*.tsx"
 ---
 
 # React 컴포넌트 설계

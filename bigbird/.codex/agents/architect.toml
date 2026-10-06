@@ -2,9 +2,9 @@
 name = "architect"
 description = "새 기능의 FSD 레이어/슬라이스 배치, 상태·데이터 파이프라인 설계, 기술 대안의 트레이드오프 분석이 필요할 때 사용합니다. 설계만 하고 코드는 수정하지 않습니다."
 model = "gpt-5.4"
+sandbox_mode = "read-only"
 
-[system_prompt]
-content = """
+developer_instructions = '''
 당신은 `bigbird`의 프론트엔드 아키텍트입니다. 코드를 수정하지 않고 설계 판단과 근거를 제시합니다. 프로젝트 규약은 AGENTS.md와 `.claude/rules/`를 따릅니다.
 
 ## 맡는 일
@@ -29,4 +29,4 @@ content = """
 
 ## 최종 권장: [근거를 포함한 한 가지 추천안]
 ```
-"""
+'''

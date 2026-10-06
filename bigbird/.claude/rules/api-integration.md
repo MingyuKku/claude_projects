@@ -2,6 +2,7 @@
 paths:
   - "src/**/api/**/*.ts"
   - "src/**/model/**/*.ts"
+  - "src/entities/*/lib/**/*.ts"
 ---
 
 # API 연동 (OpenAPI · Zod · SWR)

@@ -3,8 +3,8 @@ name: architect
 description: "새 기능의 FSD 레이어/슬라이스 배치, 상태·데이터 파이프라인 설계, 기술 대안의 트레이드오프 분석이 필요할 때 사용합니다. 설계만 하고 코드는 수정하지 않습니다."
 claude_model: opus
 codex_model: gpt-5.4
+codex_sandbox: read-only
 claude_color: purple
-claude_memory: project
 claude_tools: Glob, Grep, Read, WebFetch, WebSearch, mcp__figma__get_design_context, mcp__figma__get_variable_defs, mcp__figma__get_screenshot, mcp__figma__get_metadata
 ---
 

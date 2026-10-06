@@ -9,6 +9,7 @@ Renders ai/agents/source/*.md into:
 from __future__ import annotations
 
 import argparse
+import json
 import pathlib
 import re
 import sys
@@ -50,7 +51,11 @@ def parse_frontmatter(content: str) -> tuple[dict[str, str], str]:
             current_key = match.group(1).strip()
             val_part = match.group(2).strip()
             if val_part.startswith('"') and val_part.endswith('"') and len(val_part) > 1:
-                val_part = val_part[1:-1]
+                # Double-quoted scalars use JSON-compatible escapes (\n, \", \\).
+                try:
+                    val_part = json.loads(val_part)
+                except json.JSONDecodeError as exc:
+                    raise ValueError(f"invalid quoted frontmatter value for '{match.group(1)}': {exc}") from exc
             current_val = [val_part]
         elif current_key:
             current_val.append(line)
@@ -65,7 +70,8 @@ def parse_frontmatter(content: str) -> tuple[dict[str, str], str]:
 def render_claude(tmpl: str, name: str, desc: str, tools: str, model: str, color: str, memory: str, body: str) -> str:
     memory_line = f"memory: {memory}" if memory else ""
     res = tmpl.replace("{name}", name)
-    res = res.replace("{description}", f'"{desc}"' if "\n" in desc or '"' not in desc else desc)
+    # A JSON string is a valid YAML double-quoted scalar, so quotes/newlines/backslashes stay safe.
+    res = res.replace("{description}", json.dumps(desc, ensure_ascii=False))
     res = res.replace("{claude_tools}", tools or "Glob, Grep, Read, Edit, Write")
     res = res.replace("{claude_model}", model or "sonnet")
     res = res.replace("{claude_color}", color or "blue")
@@ -76,15 +82,93 @@ def render_claude(tmpl: str, name: str, desc: str, tools: str, model: str, color
     return res.rstrip() + "\n"
 
 
-def render_codex(tmpl: str, name: str, desc: str, codex_model: str, body: str) -> str:
-    # Clean description for TOML
-    clean_desc = desc.replace("\n", " ").replace('"', '\\"')
-    model_line = f'model = "{codex_model}"' if codex_model else ""
-    res = tmpl.replace("{name}", name)
-    res = res.replace("{description}", clean_desc)
+def render_codex(tmpl: str, name: str, desc: str, codex_model: str, body: str, codex_sandbox: str = "") -> str:
+    # A JSON string is a valid TOML basic string.
+    model_line = f"model = {json.dumps(codex_model)}" if codex_model else ""
+    # TOML multi-line literal strings take the body verbatim; fall back to an escaped basic string.
+    if "'''" in body:
+        instructions = json.dumps(body, ensure_ascii=False)
+    else:
+        instructions = f"'''\n{body}\n'''"
+    res = tmpl.replace("{name_toml}", json.dumps(name))
+    res = res.replace("{name}", name)
+    res = res.replace("{description}", json.dumps(desc, ensure_ascii=False))
     res = res.replace("{codex_model}", model_line)
-    res = res.replace("{body}", body)
+    # Omitted sandbox_mode inherits from the parent session.
+    res = res.replace("{codex_sandbox}", f"sandbox_mode = {json.dumps(codex_sandbox)}" if codex_sandbox else "")
+    res = res.replace("{body}", instructions)
     return res.rstrip() + "\n"
+
+
+def validate_rendered(path: pathlib.Path, text: str, adapter: str) -> list[str]:
+    """Check that a generated agent file is parseable and has the fields its consumer requires."""
+    errors: list[str] = []
+    if adapter == "codex":
+        try:
+            import tomllib  # Python 3.11+
+        except ImportError:
+            tomllib = None
+        if tomllib is not None:
+            try:
+                data = tomllib.loads(text)
+            except tomllib.TOMLDecodeError as exc:
+                return [f"{path.name}: invalid TOML: {exc}"]
+            for key in ("name", "description", "developer_instructions"):
+                if not isinstance(data.get(key), str) or not data[key].strip():
+                    errors.append(f"{path.name}: missing required field '{key}'")
+            return errors
+        # Fallback without a TOML parser: structural checks on the keys we generate.
+        for key in ("name", "description", "developer_instructions"):
+            if not re.search(rf"^{key}\s*=", text, re.MULTILINE):
+                errors.append(f"{path.name}: missing required field '{key}'")
+        for key in ("name", "description"):
+            m = re.search(rf"^{key}\s*=\s*(.+)$", text, re.MULTILINE)
+            if m:
+                try:
+                    json.loads(m.group(1))
+                except json.JSONDecodeError as exc:
+                    errors.append(f"{path.name}: '{key}' is not a valid quoted string: {exc}")
+        if re.search(r"^\[system_prompt\]", text, re.MULTILINE):
+            errors.append(f"{path.name}: legacy [system_prompt] table is not supported")
+        return errors
+
+    # claude: frontmatter scalars must be single-line, and quoted ones must decode.
+    lines = text.splitlines()
+    if not lines or lines[0] != "---" or "---" not in lines[1:]:
+        return [f"{path.name}: missing frontmatter"]
+    fm = lines[1 : lines.index("---", 1)]
+    keys: dict[str, str] = {}
+    for line in fm:
+        m = re.match(r"^([a-zA-Z0-9_-]+):\s*(.*)$", line)
+        if not m:
+            errors.append(f"{path.name}: unparseable frontmatter line: {line!r}")
+            continue
+        keys[m.group(1)] = m.group(2)
+        if m.group(2).startswith('"'):
+            try:
+                json.loads(m.group(2))
+            except json.JSONDecodeError as exc:
+                errors.append(f"{path.name}: '{m.group(1)}' is not a valid quoted string: {exc}")
+    for key in ("name", "description"):
+        if not keys.get(key):
+            errors.append(f"{path.name}: missing required field '{key}'")
+    return errors
+
+
+GENERATED_MARKER = "GENERATED FILE"
+
+
+def find_stale_agents(out_dir: pathlib.Path, suffix: str, names: set[str]) -> list[pathlib.Path]:
+    """Generated agent files whose source was deleted or renamed. Hand-written files (no marker) are never touched."""
+    if not out_dir.exists():
+        return []
+    stale = []
+    for path in sorted(out_dir.glob(f"*{suffix}")):
+        if path.stem in names:
+            continue
+        if GENERATED_MARKER in path.read_text(encoding="utf-8")[:400]:
+            stale.append(path)
+    return stale
 
 
 SKILL_HEADER = "<!-- GENERATED FILE: 직접 수정 금지. 원본은 .claude/skills/{skill}/SKILL.md 이며, 수정 후 `python ai/scripts/render_agents.py` 를 실행하세요. -->\n"
@@ -154,21 +238,29 @@ def main() -> int:
 
     changed = 0
     unchanged = 0
+    validation_errors: list[str] = []
+    source_names: list[str] = []
 
-    for src_file in source_dir.glob("*.md"):
+    for src_file in sorted(source_dir.glob("*.md")):
         content = src_file.read_text(encoding="utf-8")
-        meta, body = parse_frontmatter(content)
+        try:
+            meta, body = parse_frontmatter(content)
+        except ValueError as exc:
+            print(f"[Agent Invalid] {src_file.name}: {exc}")
+            return 1
         name = meta.get("name", src_file.stem)
+        source_names.append(name)
         desc = meta.get("description", "")
         claude_model = meta.get("claude_model", "sonnet")
         claude_color = meta.get("claude_color", "blue")
         claude_memory = meta.get("claude_memory", "")
         claude_tools = meta.get("claude_tools", "")
         codex_model = meta.get("codex_model", "gpt-5.4")
+        codex_sandbox = meta.get("codex_sandbox", "")
 
         # Render outputs
         claude_rendered = render_claude(claude_tmpl, name, desc, claude_tools, claude_model, claude_color, claude_memory, body)
-        codex_rendered = render_codex(codex_tmpl, name, desc, codex_model, body)
+        codex_rendered = render_codex(codex_tmpl, name, desc, codex_model, body, codex_sandbox)
 
         targets = [
             (claude_out / f"{name}.md", claude_rendered, "claude"),
@@ -176,6 +268,7 @@ def main() -> int:
         ]
 
         for path, text, adapter in targets:
+            validation_errors.extend(validate_rendered(path, text, adapter))
             existing = path.read_text(encoding="utf-8") if path.exists() else ""
             if existing == text:
                 unchanged += 1
@@ -187,6 +280,21 @@ def main() -> int:
                     print(f"[Agent Render] {adapter} wrote: {path.name}")
                 else:
                     print(f"[Agent Drift] {adapter} out of sync: {path.name}")
+
+    names = {meta_name for meta_name in source_names}
+    for out_dir, suffix in ((claude_out, ".md"), (codex_out, ".toml")):
+        for stale in find_stale_agents(out_dir, suffix, names):
+            changed += 1
+            if args.check:
+                print(f"[Agent Drift] stale generated file (source removed): {stale.relative_to(root_dir)}")
+            else:
+                stale.unlink()
+                print(f"[Agent Render] removed stale: {stale.relative_to(root_dir)}")
+
+    if validation_errors:
+        for err in validation_errors:
+            print(f"[Agent Invalid] {err}")
+        return 1
 
     s_changed, s_unchanged = sync_skills(root_dir, args.check)
     changed += s_changed

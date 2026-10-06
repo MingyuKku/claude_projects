@@ -1,6 +1,7 @@
 ---
 paths:
   - "src/**/ui/**/*.tsx"
+  - "src/app/layouts/**/*.tsx"
   - "src/**/*.css"
 ---
 

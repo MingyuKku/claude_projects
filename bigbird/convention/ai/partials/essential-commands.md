@@ -8,5 +8,5 @@ pnpm test:ui          # Vitest 인터랙티브 UI 실행
 pnpm lint             # ESLint 린트 검사
 pnpm typecheck        # tsc --noEmit 타입 검사
 pnpm format           # Prettier 코드 포맷팅
-python convention/ai/render.py --check  # AI 규칙/템플릿 동기화 검증
+pnpm ai:check        # AI 규칙·에이전트·skill 동기화 검증 (생성물 구문 검사 포함)
 ```

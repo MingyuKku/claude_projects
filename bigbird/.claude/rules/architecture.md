@@ -42,8 +42,8 @@ app ──> pages ──> widgets ──> features ──> entities ──> shar
 ```
 src/{layer}/{slice}/
 ├── ui/              # 프레젠테이션 React 컴포넌트
-├── model/           # Zustand 스토어, SWR 훅, Zod 스키마, 비즈니스 로직
-├── api/             # OpenAPI 연동 엔드포인트 및 Fetcher
+├── model/           # Zustand 스토어, Zod 스키마, 비즈니스 로직
+├── api/             # OpenAPI 연동 엔드포인트, Fetcher, SWR 훅
 ├── lib/             # 슬라이스 전용 유틸리티 및 헬퍼
 └── index.ts         # [Public API] 외부로 공개할 컴포넌트, 훅, 타입만 선별적 re-export
 ```

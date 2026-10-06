@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: 작성/수정된 React + TypeScript 코드를 FSD 규칙, 타입 안정성, 회귀 위험 관점에서 읽기 전용으로 리뷰할 때 이 에이전트를 사용합니다. 코드를 수정하지 않고 발견 사항만 보고합니다.\n\n예시:\n\n- 사용자: \"방금 작업한 변경사항 리뷰해줘\"\n  어시스턴트: \"reviewer 에이전트로 git diff 기준 리뷰를 수행하겠습니다.\"\n  (Task 도구를 사용하여 reviewer 실행)
+description: "작성/수정된 React + TypeScript 코드를 FSD 규칙, 타입 안정성, 회귀 위험 관점에서 읽기 전용으로 리뷰할 때 이 에이전트를 사용합니다. 코드를 수정하지 않고 발견 사항만 보고합니다."
 tools: Glob, Grep, Read, Bash, LSP
 model: sonnet
 color: red

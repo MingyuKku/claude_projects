@@ -11,6 +11,7 @@
 
 `bigbird`는 React 19 + TypeScript 웹 애플리케이션입니다. 설계의 핵심 목표는 **한 기능의 변경이 다른 기능으로 번지지 않게 하는 것**이며, 이를 위해 Feature-Sliced Design(FSD)으로 기능 단위를 격리합니다.
 디자인의 원본은 Figma, API 계약의 원본은 OpenAPI 명세입니다.
+서비스의 목적·사용자·기능 범위·용어는 `docs/prd.md`가 기준이며, 기능 단위 상세는 `specs/<feature>.md`에 있습니다. 작업 전에 읽고, PRD에 "미정"인 항목은 추측하지 말고 질문합니다.
 
 ## 기술 스택
 
@@ -33,7 +34,7 @@ pnpm test:ui          # Vitest 인터랙티브 UI 실행
 pnpm lint             # ESLint 린트 검사
 pnpm typecheck        # tsc --noEmit 타입 검사
 pnpm format           # Prettier 코드 포맷팅
-python convention/ai/render.py --check  # AI 규칙/템플릿 동기화 검증
+pnpm ai:check        # AI 규칙·에이전트·skill 동기화 검증 (생성물 구문 검사 포함)
 ```
 
 ## 공통 컨벤션 및 개발 규칙
@@ -47,6 +48,6 @@ python convention/ai/render.py --check  # AI 규칙/템플릿 동기화 검증
 
 ## 아키텍처 가이드 포인터
 
-- 경로별 상세 규칙은 `.claude/rules/`에 있습니다. Claude Code는 해당 경로를 편집할 때 자동 로드하고, Codex는 영역 작업 전에 직접 읽습니다: `architecture`(FSD), `react-components`, `state-management`(Zustand·SWR), `styling`(shadcn·Tailwind·CVA), `api-integration`(OpenAPI·Zod·트랜스포머), `routing`, `error-handling`, `testing`, `performance`, `dependencies`
+- 경로별 상세 규칙은 `.claude/rules/`에 있습니다. Claude Code는 해당 경로를 편집할 때 자동 로드하고, Codex는 영역 작업 전에 직접 읽습니다: `architecture`(FSD), `react-components`, `code-style`(네이밍·상수·훅·타입 스타일), `state-management`(Zustand·SWR), `styling`(shadcn·Tailwind·CVA), `api-integration`(OpenAPI·Zod·트랜스포머), `routing`, `error-handling`, `testing`, `performance`, `dependencies`
 - 절차형 skill (필요할 때만 로드): Figma 디자인 → 코드 `.claude/skills/figma-to-component/`, 컴포넌트 스캐폴딩 `.claude/skills/scaffold-component/`, React Router `.claude/skills/react-router/` (Codex는 `.agents/skills/`의 생성 사본)
 - FSD 경계 린트 강제: 루트 `eslint.config.js`

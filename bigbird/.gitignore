@@ -10,4 +10,5 @@ CLAUDE.local.md
 .claude/hook-log.tsv
 .claude/.last-format-check
 .claude/.last-verified
-.claude/.stop-attempts
+.claude/.stop-attempts*
+.claude/.last-verify.log

@@ -93,7 +93,9 @@ react-router/docs/start/data/data-loading.md
 react-router/docs/start/data/actions.md
 ```
 
-Rules:
+> **bigbird override:** the generic rules below do not apply to server data. This project fetches and mutates server data through per-slice SWR hooks (`.claude/rules/routing.md`, `.claude/rules/api-integration.md`). Use `loader` only for redirects and auth guards, and never fetch in route-level `useEffect`.
+
+Generic Data Mode rules (not project guidance for server data):
 
 - Load route data with route `loader` functions.
 - Mutate route data with route `action` functions.
