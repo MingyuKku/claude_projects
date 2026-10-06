@@ -2,3 +2,8 @@
 # Claude Code 의 .mcp.json 과 같은 Figma 원격 MCP 서버. 최초 1회 `codex mcp login figma` 로 OAuth 로그인한다.
 [mcp_servers.figma]
 url = "https://mcp.figma.com/mcp"
+
+# 시각 검증용 브라우저 MCP (Claude Code 의 .mcp.json 과 동일).
+[mcp_servers.playwright]
+command = "npx"
+args = ["@playwright/mcp@latest"]

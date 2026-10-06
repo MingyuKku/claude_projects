@@ -23,6 +23,7 @@ Figma가 디자인의 원본입니다. 값은 Figma MCP 서버(`figma`)의 도�
    - Component Variants → `cva`의 `variant`/`size`
    - 상태(Default/Hover/Active/Focus/Disabled)와 반응형을 함께 구현
 5. **마크업**: `<div>` 대신 의미에 맞는 태그(`header`, `nav`, `main`, `section`, `article`, `button`)를 씁니다.
-6. **검증**: 구현 결과를 Figma 스크린샷과 비교해 차이를 나열하고 고칩니다. `pnpm typecheck`, `pnpm lint`, `pnpm test` 결과를 보고합니다.
+6. **시각 검증**: `pnpm dev`로 띄운 화면을 브라우저 MCP(`playwright`)로 열어 Figma 프레임과 같은 뷰포트에서 스크린샷을 찍고, Figma 스크린샷과 비교해 차이(간격, 색, 타이포, 상태)를 나열한 뒤 고칩니다. 차이가 없을 때까지 반복하고, 브라우저 MCP를 쓸 수 없으면 비교하지 못했다는 사실을 보고합니다(통과로 간주하지 않습니다).
+7. **정적 검증**: `pnpm typecheck`, `pnpm lint`, `pnpm test` 결과를 보고합니다.
 
 스타일 토큰과 임의 값(`w-[347px]`) 규칙은 `.claude/rules/styling.md`, 슬라이스 구조는 `.claude/rules/architecture.md`를 따릅니다.

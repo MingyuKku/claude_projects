@@ -1,15 +1,5 @@
 ## 아키텍처 가이드 포인터
 
-- Feature-Sliced Design (FSD) 계층 및 슬라이스 규칙: `.claude/rules/architecture.md`
-- 회귀 방지 및 외부 의존성 관리 규칙: `.claude/rules/dependencies.md`
-- React 19 및 컴포넌트 설계 패턴: `.claude/rules/react-components.md`
-- 상태 관리 (Zustand) & 데이터 패칭 (SWR): `.claude/rules/state-management.md`
-- UI 시스템 (shadcn/ui & Tailwind CSS & CVA): `.claude/rules/styling.md`
-- API 통신 (OpenAPI & SWR & Zod & 트랜스포머): `.claude/rules/api-integration.md`
-- Figma 디자인 → 코드 절차: `.claude/skills/figma-to-component/` (Codex는 `.agents/skills/`에 동기화된 사본)
-- 컴포넌트 스캐폴딩 절차: `.claude/skills/scaffold-component/`
-- 라우팅 (React Router · FSD): `.claude/rules/routing.md`
-- 에러 핸들링 및 에러 바운더리: `.claude/rules/error-handling.md`
-- 테스트 작성 가이드라인 (Vitest): `.claude/rules/testing.md`
-- 성능 최적화 및 렌더링 가이드: `.claude/rules/performance.md`
+- 경로별 상세 규칙은 `.claude/rules/`에 있습니다. Claude Code는 해당 경로를 편집할 때 자동 로드하고, Codex는 영역 작업 전에 직접 읽습니다: `architecture`(FSD), `react-components`, `state-management`(Zustand·SWR), `styling`(shadcn·Tailwind·CVA), `api-integration`(OpenAPI·Zod·트랜스포머), `routing`, `error-handling`, `testing`, `performance`, `dependencies`
+- 절차형 skill (필요할 때만 로드): Figma 디자인 → 코드 `.claude/skills/figma-to-component/`, 컴포넌트 스캐폴딩 `.claude/skills/scaffold-component/`, React Router `.claude/skills/react-router/` (Codex는 `.agents/skills/`의 생성 사본)
 - FSD 경계 린트 강제: 루트 `eslint.config.js`

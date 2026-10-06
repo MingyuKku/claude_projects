@@ -11,7 +11,9 @@
       "Bash(python3 convention/ai/render.py:*)",
       "Bash(git status:*)",
       "Bash(git diff:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ],
     "deny": [
       "Read(./.env)",
@@ -23,7 +25,9 @@
       "Bash(cat .env*)",
       "Bash(git push --force:*)",
       "Bash(git push -f:*)",
-      "Bash(git reset --hard:*)"
+      "Bash(git reset --hard:*)",
+      "Bash(git commit --no-verify:*)",
+      "Bash(git commit -n:*)"
     ],
     "ask": [
       "Bash(git push:*)",

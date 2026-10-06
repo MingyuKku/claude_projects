@@ -3,7 +3,7 @@
 ## 핵심 원칙
 
 LLM은 상태를 유지하지 않습니다(Stateless). `CLAUDE.md`와 `AGENTS.md`는 매 세션마다 코드베이스를 소개하는 핵심 온보딩 문서입니다.
-루트 문서는 **WHAT(구조)**과 **WHY(설계 의도)**에 집중하고, 세부 규칙은 경로별 파일(`.claude/rules/*.md`)로, 심층 명세는 `docs/conventions/`로 위임하십시오. `.claude/rules/`는 직접 수정하는 원본이고, `AGENTS.md`/`CLAUDE.md`는 `convention/ai/partials`에서 생성되는 파일입니다 (`convention/ai/README.md` 참조).
+루트 문서는 **WHAT(구조)**과 **WHY(설계 의도)**에 집중하고, 세부 규칙은 경로별 파일(`.claude/rules/*.md`)로, 절차형 지식은 `.claude/skills/`로 위임하십시오. `.claude/rules/`는 직접 수정하는 원본이고, `AGENTS.md`/`CLAUDE.md`는 `convention/ai/partials`에서 생성되는 파일입니다 (`convention/ai/README.md` 참조).
 
 ## 문서 구조: WHAT, WHY, HOW
 
@@ -38,7 +38,7 @@ export const Button = ({ children, variant, size, ...props }) => {
 
 ```markdown
 패턴: 명시적 Props 인터페이스를 갖춘 피처 기반 컴포넌트
-참조 코드: src/shared/components/ui/Button.tsx:12-45
+참조 코드: src/shared/ui/button.tsx:12-45 (실제 경로를 확인해 기재)
 ```
 
 ### 2. 지양: 프롬프트에 린팅/포맷팅 규칙 강제
@@ -69,16 +69,16 @@ pnpm run test:coverage
 ## 점진적 컨텍스트 노출 구조 (Progressive Disclosure)
 
 ```
-CLAUDE.md                    # 항상 로드됨 (~30줄, AGENTS.md 임포트)
-├── AGENTS.md                # 공유 표준 명세 (~80줄)
-├── .claude/rules/           # 일치하는 파일 경로 편집 시 자동 로드
-│   ├── architecture.md      # 피처 중심 레이어 경계
+CLAUDE.md                    # 항상 로드됨 (~15줄, AGENTS.md 임포트)
+├── AGENTS.md                # 공유 표준 명세 (~60줄, Codex도 읽음)
+├── .claude/rules/           # 일치하는 파일 경로 편집 시 자동 로드 (paths 프론트매터)
+│   ├── architecture.md      # FSD 레이어 경계
 │   ├── react-components.md  # React 19 / 컴포넌트 설계 패턴
-│   ├── state-management.md  # Zustand 및 React Query 규칙
+│   ├── state-management.md  # Zustand 및 SWR 규칙
 │   ├── styling.md           # Tailwind CSS 및 디자인 토큰
-│   ├── api-integration.md   # API 트랜스포머 및 클라이언트 훅
-│   └── error-handling.md    # 에러 바운더리 및 tryit 에러 처리
-└── docs/conventions/        # 필요 시 온디맨드로 조회
+│   ├── api-integration.md   # OpenAPI·Zod·트랜스포머·SWR 훅
+│   └── error-handling.md    # 에러 바운더리 및 에러 처리
+└── .claude/skills/          # 절차형 지식, 관련 작업일 때만 on-demand 로드
 ```
 
 ## 커밋 전 체크리스트

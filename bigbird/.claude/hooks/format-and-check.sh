@@ -69,8 +69,20 @@ printf '%s' "$report" |
 
 # 린트·타입 에러를 억제 주석으로 덮는 우회를 되먹인다. 규칙을 끄지 말고 코드를 고쳐야 한다.
 # (@ts-expect-error 는 사유를 적는 정당한 용법이 있어 제외한다.)
-# shellcheck disable=SC2086
-suppressed=$(grep -nE 'eslint-disable|@ts-ignore|@ts-nocheck' $checked 2>/dev/null | head -5)
+# 추적 중인 파일은 이번 변경(diff)에서 추가된 줄만, 새 파일은 전체를 본다. 기존 주석으로 매번 경고하지 않기 위해서다.
+SUPPRESS_RE='eslint-disable|@ts-ignore|@ts-nocheck'
+suppressed=""
+for f in $checked; do
+  if git ls-files --error-unmatch -- "$f" >/dev/null 2>&1; then
+    hits=$(git diff -U0 HEAD -- "$f" 2>/dev/null | grep -E "^\+[^+].*($SUPPRESS_RE)" | head -3)
+    [ -n "$hits" ] && hits=$(printf '%s\n' "$hits" | sed "s|^+|  $f: |")
+  else
+    hits=$(grep -nE "$SUPPRESS_RE" "$f" 2>/dev/null | head -3 | sed "s|^|  $f:|")
+  fi
+  [ -n "$hits" ] && suppressed="${suppressed:+$suppressed
+}$hits"
+done
+suppressed=$(printf '%s' "$suppressed" | head -5)
 
 msg=""
 [ -n "$remaining" ] && msg="자동 교정으로 해결되지 않은 ESLint 오류가 남았습니다. AGENTS.md 와 .claude/rules 의 규약에 맞게 고치세요:
