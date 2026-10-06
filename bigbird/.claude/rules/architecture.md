@@ -1,6 +1,7 @@
 ---
 paths:
-  - "src/{pages,widgets,features,entities}/**/*.{ts,tsx}"
+  - "src/**/*.tsx"
+  - "src/**/*.ts"
 ---
 
 # Feature-Sliced Design (FSD) 아키텍처 규칙

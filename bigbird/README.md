@@ -4,7 +4,7 @@ React 19 + TypeScript + Feature-Sliced Design(FSD) 웹 애플리케이션입니�
 
 ## 시작하기
 
-필요한 것: Node.js 22 (`.nvmrc` 참고).
+필요한 것: Node.js 24 (`.nvmrc` 참고).
 
 pnpm은 Node에 포함된 corepack으로 사용합니다. 프로젝트가 요구하는 버전(`package.json`의 `packageManager`)이 자동으로 쓰이므로, 새 컴퓨터에서 **처음 한 번만** 아래를 실행합니다.
 

@@ -28,32 +28,14 @@ python convention/ai/render.py --check
 python ai/scripts/render_agents.py --check
 ```
 
-## CI 예시 (GitLab CI)
+## CI
 
-```yaml
-ai-config-sync:
-  stage: test
-  image: python:3.12-slim
-  script:
-    - python convention/ai/render.py --check
-    - python ai/scripts/render_agents.py --check
-  rules:
-    - changes:
-        [
-          AGENTS.md,
-          CLAUDE.md,
-          .claude/**/*,
-          .codex/**/*,
-          .agents/**/*,
-          ai/**/*,
-          convention/ai/**/*,
-        ]
-```
+루트 `.gitlab-ci.yml`이 `ai-sync` 잡으로 위 두 `--check`를 실행합니다. 병합 차단은 GitLab 프로젝트 설정(Pipelines must succeed, protected branch)으로 켭니다.
 
 ## 리뷰 규칙
 
 `CODEOWNERS`가 AI 동작을 바꾸는 경로(`.claude/`, `ai/`, `convention/`, `AGENTS.md`, `CLAUDE.md`, `.mcp.json`)를 지정합니다.
-레포 호스팅에 맞게 위치(GitLab: 루트 또는 `.gitlab/CODEOWNERS`, GitHub: `.github/CODEOWNERS`)와 소유자 이름을 조정하세요.
+레포 호스팅에 맞게 위치(GitLab: 루트 또는 `.gitlab/CODEOWNERS`)와 소유자 이름을 조정하세요.
 
 ## Codex 설정 메모
 

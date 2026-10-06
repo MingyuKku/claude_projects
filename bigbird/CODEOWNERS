@@ -8,3 +8,17 @@
 /CLAUDE.md       @frontend-teams
 /.codex/         @frontend-teams
 /.agents/        @frontend-teams
+
+# 품질 게이트와 팀 공통 설정: 규칙을 사람마다 바꾸지 못하게 한다.
+/.gitlab-ci.yml          @frontend-teams
+/.gitlab/                @frontend-teams
+/.githooks/              @frontend-teams
+/eslint.config.js        @frontend-teams
+/tsconfig*.json          @frontend-teams
+/.prettierrc             @frontend-teams
+/.prettierignore         @frontend-teams
+/vitest.config.ts        @frontend-teams
+/package.json            @frontend-teams
+/pnpm-lock.yaml          @frontend-teams
+/.npmrc                  @frontend-teams
+/.nvmrc                  @frontend-teams
