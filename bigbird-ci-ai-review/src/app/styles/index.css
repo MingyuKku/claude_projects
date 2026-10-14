@@ -1,0 +1,194 @@
+@import "tailwindcss";
+@import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
+
+/* Design tokens: Figma system A (shadcn variables), light theme only. */
+:root {
+  --background: #ffffff;
+  --foreground: #020617;
+  --card: #ffffff;
+  --card-foreground: #020617;
+  --popover: #ffffff;
+  --popover-foreground: #020617;
+  --primary: #2563eb;
+  --primary-foreground: #f8fafc;
+  --secondary: #f1f5f9;
+  --secondary-foreground: #0f172a;
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+  --accent: #f1f5f9;
+  --accent-foreground: #0f172a;
+  --destructive: #dc2626;
+  --destructive-foreground: #f8fafc;
+  --success: #16a34a;
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #64748b;
+  --radius: 0.625rem;
+
+  /* Auth screens (login, join, find, verification) keep the palette that passed
+     design QA instead of being repainted with the slate tokens. The old
+     `--primary` (#4b80c2) is therefore exposed as `--brand`. */
+  --brand: #4b80c2;
+  --brand-soft: #f1f3ff;
+  --light: #ffffff;
+  --dark: #000000;
+  --hover: #f7f7f7;
+  --selected: #e8e8e8;
+  --disabled: #adb5bd;
+  --icon-lined: #868e96;
+  --line1: #adb5bd;
+  --heading: #343a40;
+
+  --gray-100: #f0f1f1;
+  --gray-200: #c8c9cc;
+  --gray-250: #bbbbbb;
+  --gray-300: #a1a3a7;
+  --gray-400: #7b7d81;
+  --gray-500: #595a5d;
+  --gray-600: #38393b;
+  --gray-700: #1a1b1c;
+
+  --positive: #4b80c2;
+  --negative-10: #ffcac7;
+  --negative-20: #ff9087;
+  --negative: #ff4211;
+  --negative-40: #c12d00;
+
+  /* Social login buttons follow each platform's brand guideline. */
+  --kakao-bg: #ffeb00;
+  --kakao-text: #191919;
+  --naver-bg: #03c75a;
+  --naver-text: #ffffff;
+  --apple-bg: #000000;
+  --apple-text: #ffffff;
+  --google-bg: #ffffff;
+  --google-text: #1f1f1f;
+  --google-border: #747775;
+
+  --shadow-normal: 1px 1px 10px 0 rgba(0, 0, 0, 0.05);
+  --shadow-emphasize: 2px 2px 14px 0 rgba(0, 0, 0, 0.15);
+  --shadow-strong: 3px 3px 18px 0 rgba(0, 0, 0, 0.2);
+}
+
+@theme inline {
+  --font-sans:
+    "Pretendard Variable", Pretendard, -apple-system, system-ui, sans-serif;
+
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-light: var(--light);
+  --color-dark: var(--dark);
+  --color-hover: var(--hover);
+  --color-selected: var(--selected);
+  --color-disabled: var(--disabled);
+  --color-icon-lined: var(--icon-lined);
+  --color-line1: var(--line1);
+  --color-heading: var(--heading);
+  --color-gray-100: var(--gray-100);
+  --color-gray-200: var(--gray-200);
+  --color-gray-250: var(--gray-250);
+  --color-gray-300: var(--gray-300);
+  --color-gray-400: var(--gray-400);
+  --color-gray-500: var(--gray-500);
+  --color-gray-600: var(--gray-600);
+  --color-gray-700: var(--gray-700);
+  --color-positive: var(--positive);
+  --color-negative-10: var(--negative-10);
+  --color-negative-20: var(--negative-20);
+  --color-negative: var(--negative);
+  --color-negative-40: var(--negative-40);
+  --color-kakao-bg: var(--kakao-bg);
+  --color-kakao-text: var(--kakao-text);
+  --color-naver-bg: var(--naver-bg);
+  --color-naver-text: var(--naver-text);
+  --color-apple-bg: var(--apple-bg);
+  --color-apple-text: var(--apple-text);
+  --color-google-bg: var(--google-bg);
+  --color-google-text: var(--google-text);
+  --color-google-border: var(--google-border);
+  --shadow-normal: var(--shadow-normal);
+  --shadow-emphasize: var(--shadow-emphasize);
+  --shadow-strong: var(--shadow-strong);
+
+  --radius-sm: calc(var(--radius) * 0.6);
+  --radius-md: calc(var(--radius) * 0.8);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) * 1.4);
+  --radius-2xl: calc(var(--radius) * 1.8);
+  --radius-3xl: calc(var(--radius) * 2.2);
+  --radius-4xl: calc(var(--radius) * 2.6);
+}
+
+/* Product breakpoints, aligned with the design frames (360 / 768 / 1440).
+   `mo:` and `tab:` are max-width style names kept for the landing page;
+   `tablet:` and `desktop:` are the min-width names the mobile-first auth
+   screens use. They name the same two boundaries from opposite sides. */
+@theme {
+  --breakpoint-mo: 768px;
+  --breakpoint-tab: 1440px;
+  --breakpoint-mobile: 360px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1440px;
+  /* Landing page only: the old landing used 1240px. */
+  --breakpoint-introtab: 1240px;
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background font-sans text-foreground antialiased;
+  }
+}
+
+/* Landing page (/introduction) keyframes. Tailwind has no scoped keyframes, so the
+   names carry an intro- prefix; remove this block together with the page. */
+@keyframes intro-s3-left {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -1308.6px 0;
+  }
+}
+
+@keyframes intro-s3-right {
+  from {
+    background-position: -1769.6px 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@keyframes intro-s1-screen-scroll {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(var(--s1-scroll-dist));
+  }
+}

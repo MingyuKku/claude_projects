@@ -1,0 +1,25 @@
+# AI 동작(규칙·훅·권한·에이전트)을 바꾸는 변경은 리뷰를 거친다.
+# TODO: 아래 소유자를 실제 사용자/그룹으로 교체하고, 호스팅에 맞는 위치로 옮긴다.
+/.claude/        @frontend-teams
+/.mcp.json       @frontend-teams
+/ai/             @frontend-teams
+/convention/     @frontend-teams
+/AGENTS.md       @frontend-teams
+/CLAUDE.md       @frontend-teams
+/.codex/         @frontend-teams
+/.agents/        @frontend-teams
+
+# 품질 게이트와 팀 공통 설정: 규칙을 사람마다 바꾸지 못하게 한다.
+/.gitlab-ci.yml          @frontend-teams
+/.gitlab/                @frontend-teams
+/.githooks/              @frontend-teams
+/scripts/                @frontend-teams
+/eslint.config.js        @frontend-teams
+/tsconfig*.json          @frontend-teams
+/.prettierrc             @frontend-teams
+/.prettierignore         @frontend-teams
+/vitest.config.ts        @frontend-teams
+/package.json            @frontend-teams
+/pnpm-lock.yaml          @frontend-teams
+/.npmrc                  @frontend-teams
+/.nvmrc                  @frontend-teams
