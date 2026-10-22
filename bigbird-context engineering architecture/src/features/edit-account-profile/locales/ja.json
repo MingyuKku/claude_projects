@@ -1,0 +1,51 @@
+{
+  "info": {
+    "title": "基本情報",
+    "id": "ID",
+    "name": "担当者名",
+    "phone": "携帯番号",
+    "email": "メールアドレス",
+    "joinedAt": "登録日"
+  },
+  "form": {
+    "title": "情報修正",
+    "profileImage": {
+      "label": "プロフィール画像",
+      "edit": "プロフィール画像を変更",
+      "alt": "プロフィール画像",
+      "error": {
+        "extension": "JPG・PNGのみアップロードできます。",
+        "size": "最大10MBまでです。"
+      }
+    },
+    "password": {
+      "label": "パスワード変更",
+      "error": {
+        "format": "英数字・記号を組み合わせた8〜20文字",
+        "containsId": "IDを含むパスワードは不可",
+        "repeated": "同一・連続した文字は不可"
+      }
+    },
+    "passwordCheck": {
+      "label": "パスワード確認",
+      "mismatch": "パスワードが一致しません。"
+    },
+    "phone": {
+      "label": "携帯番号",
+      "verify": "認証"
+    },
+    "email": {
+      "label": "メールアドレス",
+      "error": {
+        "format": "メール形式が正しくありません。"
+      }
+    },
+    "withdraw": "退会"
+  },
+  "toast": {
+    "save": {
+      "tooManyRequests": "5分後にもう一度お試しください。",
+      "personalInfo": "個人情報を含むパスワードは使用できません。"
+    }
+  }
+}

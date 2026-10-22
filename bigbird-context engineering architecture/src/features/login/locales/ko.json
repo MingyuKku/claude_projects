@@ -1,0 +1,21 @@
+{
+  "brand": {
+    "bigbird": {
+      "loginTitle": "빅버드 파트너센터 로그인"
+    },
+    "petplay": {
+      "loginTitle": "펫플레이 파트너센터 로그인"
+    }
+  },
+  "submitting": "로그인 중",
+  "error": {
+    "idRequired": "아이디를 입력해 주세요.",
+    "passwordRequired": "비밀번호를 입력해 주세요.",
+    "mismatch": "아이디 또는 비밀번호가 일치하지 않습니다.",
+    "unknown": "오류가 발생했습니다. 잠시후 다시 시도해 주세요.",
+    "exited": "탈퇴한 회원입니다.",
+    "noAccount": "계정이 없거나 탈퇴한 회원입니다.",
+    "destroyed": "안녕하세요. 빅버드(BIGBIRD)입니다.\n빅버드 계정명 [{{userId}}]은 정보통신망 이용촉진 및 정보보호 등에 관한 법률 제29조에 의거하여 1년 이상 접속하지 않아 {{year}}년 {{month}}월 {{day}}일 {{hour}}시 {{minute}}분에 계정이 만료되었습니다. 다음에 더 좋은 서비스로 만나뵙겠습니다.",
+    "lockedTemporarily_other": "계정이 잠김 상태입니다. {{count}}분 뒤에 다시 로그인을 시도해주세요."
+  }
+}

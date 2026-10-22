@@ -1,0 +1,51 @@
+{
+  "info": {
+    "title": "基本信息",
+    "id": "账号",
+    "name": "负责人姓名",
+    "phone": "手机号",
+    "email": "邮箱",
+    "joinedAt": "注册日"
+  },
+  "form": {
+    "title": "修改信息",
+    "profileImage": {
+      "label": "头像",
+      "edit": "更换头像",
+      "alt": "头像",
+      "error": {
+        "extension": "仅支持 JPG、PNG 文件。",
+        "size": "最大 10MB。"
+      }
+    },
+    "password": {
+      "label": "修改密码",
+      "error": {
+        "format": "8-20 位字母、数字、特殊字符组合",
+        "containsId": "密码不能包含账号",
+        "repeated": "不能有重复或连续字符"
+      }
+    },
+    "passwordCheck": {
+      "label": "确认密码",
+      "mismatch": "密码不一致。"
+    },
+    "phone": {
+      "label": "手机号",
+      "verify": "验证"
+    },
+    "email": {
+      "label": "邮箱",
+      "error": {
+        "format": "邮箱格式不正确。"
+      }
+    },
+    "withdraw": "退出会员"
+  },
+  "toast": {
+    "save": {
+      "tooManyRequests": "请 5 分钟后重试。",
+      "personalInfo": "密码不能包含个人信息。"
+    }
+  }
+}

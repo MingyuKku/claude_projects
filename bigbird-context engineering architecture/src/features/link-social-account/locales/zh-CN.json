@@ -1,0 +1,16 @@
+{
+  "title": "快捷登录绑定",
+  "provider": {
+    "kakao": "Kakao",
+    "naver": "Naver",
+    "facebook": "Facebook",
+    "google": "Google",
+    "apple": "Apple"
+  },
+  "switchLabel": "{{provider}}快捷登录绑定",
+  "unlink": {
+    "title": "解除快捷登录",
+    "description": "要解除{{provider}}快捷登录绑定吗？解除后将无法使用{{provider}}账号登录。",
+    "action": "解除"
+  }
+}

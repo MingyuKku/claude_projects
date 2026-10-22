@@ -1,7 +1,47 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+
+/* 다크모드는 지원하지 않음. Tailwind v4의 dark:는 기본값이 OS 설정(prefers-color-scheme)이라
+   shadcn 원본의 dark: 클래스가 다크 OS에서 적용되므로, 쓰지 않는 .dark 클래스에만 걸리게 막음. */
+@custom-variant dark (&:where(.dark, .dark *));
+
+/* 개발용 미리보기(/dev/ui)에서 Figma 문서처럼 hover·focus 상태를 고정해 보여 주기 위해
+   data-preview-state="hover|focus" 속성에도 같은 스타일을 적용함. 실제 화면은 이 속성을 쓰지 않음. */
+@custom-variant hover {
+  @media (hover: hover) {
+    &:hover {
+      @slot;
+    }
+  }
+  &[data-preview-state~="hover"] {
+    @slot;
+  }
+}
+@custom-variant focus-visible {
+  &:focus-visible {
+    @slot;
+  }
+  &[data-preview-state~="focus"] {
+    @slot;
+  }
+}
+/* word-break: keep-all 은 ja·zh-CN 에서 줄바꿈 지점을 없애 문구가 넘침. 한국어에만 적용할 때 ko:break-keep 으로 씀. */
+@custom-variant ko (&:lang(ko));
 @import "pretendard/dist/web/variable/pretendardvariable-dynamic-subset.css";
 
-/* Design tokens: Figma system A (shadcn variables), light theme only. */
+/* 모바일 폼 스크롤바는 스크롤 영역의 너비를 줄이지 않도록 숨기되 터치 스크롤은 유지함. */
+@media (max-width: 767px) {
+  .customer-center-form-scroll {
+    scrollbar-width: none;
+  }
+
+  .customer-center-form-scroll::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+/* Design tokens: Figma 디자인 시스템 Variables 표의 light/slate 열만 사용함 (zinc·dark 열은 미사용).
+   muted/40, accent/50, destructive/10 같은 Figma 투명도 변수는 Tailwind 투명도 수식어(bg-muted/40)로 씀. */
 :root {
   --background: #ffffff;
   --foreground: #020617;
@@ -11,23 +51,92 @@
   --popover-foreground: #020617;
   --primary: #2563eb;
   --primary-foreground: #f8fafc;
+  --primary-hover: #3b82f6;
   --secondary: #f1f5f9;
   --secondary-foreground: #0f172a;
+  --secondary-hover: #e2e8f0;
   --muted: #f1f5f9;
   --muted-foreground: #64748b;
   --accent: #f1f5f9;
   --accent-foreground: #0f172a;
   --destructive: #dc2626;
   --destructive-foreground: #f8fafc;
+  --destructive-hover: #ef4444;
+  /* Figma "border-destructive-50". 이름과 달리 투명도가 아니라 red-200 고정값. */
+  --destructive-subtle: #fecaca;
   --success: #16a34a;
+  --success-hover: #15803d;
   --border: #e2e8f0;
   --input: #e2e8f0;
   --ring: #64748b;
+  --radius: 0.5rem;
+  --sidebar-foreground: #334155;
+  --sidebar-border: #e2e8f0;
+
+  /* Auth screens (login, join, find, verification) keep the palette that passed
+     design QA instead of being repainted with the slate tokens. The old
+     `--primary` (#4b80c2) is therefore exposed as `--brand`. */
+  --brand: #4b80c2;
+  --brand-soft: #f1f3ff;
+  --light: #ffffff;
+  --dark: #000000;
+  --hover: #f7f7f7;
+  --selected: #e8e8e8;
+  --disabled: #adb5bd;
+  --icon-lined: #868e96;
+  --line1: #adb5bd;
+  --heading: #343a40;
+
+  --gray-100: #f0f1f1;
+  --gray-200: #c8c9cc;
+  --gray-250: #bbbbbb;
+  --gray-300: #a1a3a7;
+  --gray-400: #7b7d81;
+  --gray-500: #595a5d;
+  --gray-600: #38393b;
+  --gray-700: #1a1b1c;
+
+  --positive: #4b80c2;
+  --negative-10: #ffcac7;
+  --negative-20: #ff9087;
+  --negative: #ff4211;
+  --negative-40: #c12d00;
+
+  /* Social login buttons follow each platform's brand guideline. */
+  --kakao-bg: #ffeb00;
+  --kakao-text: #191919;
+  --naver-bg: #03c75a;
+  --naver-text: #ffffff;
+  --apple-bg: #000000;
+  --apple-text: #ffffff;
+  --google-bg: #ffffff;
+  --google-text: #1f1f1f;
+  --google-border: #747775;
+
+  --shadow-normal: 1px 1px 10px 0 rgba(0, 0, 0, 0.05);
+  --shadow-emphasize: 2px 2px 14px 0 rgba(0, 0, 0, 0.15);
+  --shadow-strong: 3px 3px 18px 0 rgba(0, 0, 0, 0.2);
+
+  --font-family-base:
+    "Pretendard Variable", Pretendard, -apple-system, system-ui, sans-serif;
+}
+
+/* 일본어·중국어 폰트는 해당 언어일 때만 불러옴(src/app/i18n/fonts.ts). */
+:root:lang(ja) {
+  --font-family-base:
+    "Pretendard JP Variable", "Pretendard Variable", Pretendard, -apple-system,
+    system-ui, sans-serif;
+}
+
+/* 라틴 글자는 Pretendard 로 맞추고, 한자는 Noto Sans SC 로 그림. */
+:root:lang(zh-CN) {
+  --font-family-base:
+    "Pretendard Variable", Pretendard, "Noto Sans SC", "PingFang SC",
+    "Microsoft YaHei", -apple-system, system-ui, sans-serif;
 }
 
 @theme inline {
-  --font-sans:
-    "Pretendard Variable", Pretendard, -apple-system, system-ui, sans-serif;
+  --font-sans: var(--font-family-base);
 
   --color-background: var(--background);
   --color-foreground: var(--foreground);
@@ -37,18 +146,230 @@
   --color-popover-foreground: var(--popover-foreground);
   --color-primary: var(--primary);
   --color-primary-foreground: var(--primary-foreground);
+  --color-primary-hover: var(--primary-hover);
   --color-secondary: var(--secondary);
   --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary-hover: var(--secondary-hover);
   --color-muted: var(--muted);
   --color-muted-foreground: var(--muted-foreground);
   --color-accent: var(--accent);
   --color-accent-foreground: var(--accent-foreground);
   --color-destructive: var(--destructive);
   --color-destructive-foreground: var(--destructive-foreground);
+  --color-destructive-hover: var(--destructive-hover);
+  --color-destructive-subtle: var(--destructive-subtle);
   --color-success: var(--success);
+  --color-success-hover: var(--success-hover);
   --color-border: var(--border);
   --color-input: var(--input);
   --color-ring: var(--ring);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar-border: var(--sidebar-border);
+
+  --color-brand: var(--brand);
+  --color-brand-soft: var(--brand-soft);
+  --color-light: var(--light);
+  --color-dark: var(--dark);
+  --color-hover: var(--hover);
+  --color-selected: var(--selected);
+  --color-disabled: var(--disabled);
+  --color-icon-lined: var(--icon-lined);
+  --color-line1: var(--line1);
+  --color-heading: var(--heading);
+  --color-gray-100: var(--gray-100);
+  --color-gray-200: var(--gray-200);
+  --color-gray-250: var(--gray-250);
+  --color-gray-300: var(--gray-300);
+  --color-gray-400: var(--gray-400);
+  --color-gray-500: var(--gray-500);
+  --color-gray-600: var(--gray-600);
+  --color-gray-700: var(--gray-700);
+  --color-positive: var(--positive);
+  --color-negative-10: var(--negative-10);
+  --color-negative-20: var(--negative-20);
+  --color-negative: var(--negative);
+  --color-negative-40: var(--negative-40);
+  --color-kakao-bg: var(--kakao-bg);
+  --color-kakao-text: var(--kakao-text);
+  --color-naver-bg: var(--naver-bg);
+  --color-naver-text: var(--naver-text);
+  --color-apple-bg: var(--apple-bg);
+  --color-apple-text: var(--apple-text);
+  --color-google-bg: var(--google-bg);
+  --color-google-text: var(--google-text);
+  --color-google-border: var(--google-border);
+  --shadow-normal: var(--shadow-normal);
+  --shadow-emphasize: var(--shadow-emphasize);
+  --shadow-strong: var(--shadow-strong);
+
+  /* Figma 디자인 시스템: --radius 8px 기준 가감 (rounded-md 6, rounded-sm 4, rounded-xl 12). */
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+
+  /* 인증 화면은 디자인 QA를 통과한 이전 반경(10px 기준)을 유지함. */
+  --radius-auth-lg: 0.625rem;
+  --radius-auth-xl: 0.875rem;
+}
+
+/* Product breakpoints, aligned with the design frames (360 / 768 / 1440).
+   `mo:` and `tab:` are max-width style names kept for the landing page;
+   `tablet:` and `desktop:` are the min-width names the mobile-first auth
+   screens use. They name the same two boundaries from opposite sides. */
+@theme {
+  --breakpoint-mo: 768px;
+  --breakpoint-tab: 1440px;
+  --breakpoint-mobile: 360px;
+  --breakpoint-tablet: 768px;
+  --breakpoint-desktop: 1440px;
+  /* Landing page only: the old landing used 1240px. */
+  --breakpoint-introtab: 1240px;
+}
+
+/* Skeleton 빛 줄기. Figma Skeleton(4733:6553)에 모션 정의가 없어 코드에서 정함(디자인 확인 대기).
+   배경을 뷰포트에 고정(fixed)해 모든 막대가 그라데이션 하나를 나눠 씀. 막대마다 따로 움직이면 폭에 따라 속도가
+   달라 보이기 때문. 줄기는 그림(300vw) 가운데 30vw 폭이고, 화면 왼쪽 밖에서 오른쪽 밖까지 이동함. */
+@utility skeleton-shimmer {
+  background-image: linear-gradient(
+    105deg,
+    transparent 45%,
+    color-mix(in oklab, var(--background) 80%, transparent) 50%,
+    transparent 55%
+  );
+  background-size: 300vw 100vh;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  animation: skeleton-shimmer 1.8s ease-in-out infinite;
+  @media (prefers-reduced-motion: reduce) {
+    background-image: none;
+    animation: none;
+  }
+}
+
+@keyframes skeleton-shimmer {
+  from {
+    background-position: -165vw 0;
+  }
+  to {
+    background-position: -35vw 0;
+  }
+}
+
+/* Figma 디자인 시스템 Typography. 모바일 기준 값에 tablet(768)·desktop(1440)에서 크기만 바뀜. */
+@utility typo-h1 {
+  font-size: 2rem;
+  font-weight: 800;
+  line-height: 3rem;
+  letter-spacing: -1.25px;
+  @variant tablet {
+    font-size: 2.5rem;
+  }
+  @variant desktop {
+    font-size: 3rem;
+  }
+}
+
+@utility typo-h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  line-height: 2.25rem;
+  letter-spacing: -0.75px;
+  @variant tablet {
+    font-size: 1.75rem;
+  }
+  @variant desktop {
+    font-size: 1.875rem;
+  }
+}
+
+@utility typo-h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 2rem;
+  letter-spacing: -0.6px;
+  @variant tablet {
+    font-size: 1.375rem;
+  }
+  @variant desktop {
+    font-size: 1.5rem;
+  }
+}
+
+@utility typo-h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.75rem;
+  letter-spacing: -0.5px;
+  @variant tablet {
+    font-size: 1.25rem;
+  }
+}
+
+@utility typo-lead {
+  font-size: 1.125rem;
+  font-weight: 400;
+  line-height: 1.75rem;
+  @variant tablet {
+    font-size: 1.25rem;
+  }
+}
+
+@utility typo-large {
+  font-size: 1.125rem;
+  font-weight: 600;
+  line-height: 1.75rem;
+}
+
+@utility typo-p {
+  font-size: 1rem;
+  font-weight: 400;
+  line-height: 1.5rem;
+}
+
+@utility typo-body {
+  font-size: 0.875rem;
+  font-weight: 400;
+  line-height: 1.5rem;
+}
+
+@utility typo-body-medium {
+  font-size: 0.875rem;
+  font-weight: 500;
+  line-height: 1.5rem;
+}
+
+/* 네이티브 스크롤 영역용 얇은 스크롤바. Figma Scroll-area Base / Scrollbar(트랙 10px, thumb 6px, 안쪽 여백 2px)를 따라
+   트랙은 투명하게 두고 thumb만 border 색으로 보임. */
+@utility scrollbar-slim {
+  /* Chrome 121+는 표준 속성이 있으면 ::-webkit-scrollbar를 무시하므로 WebKit 미지원 브라우저(Firefox)에만 걺. */
+  @supports not selector(::-webkit-scrollbar) {
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+  }
+
+  &::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  &::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    background-clip: content-box;
+    border: 2px solid transparent;
+    border-radius: 9999px;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(
+      in srgb,
+      var(--muted-foreground) 40%,
+      transparent
+    );
+  }
 }
 
 @layer base {
@@ -58,5 +379,65 @@
 
   body {
     @apply bg-background font-sans text-foreground antialiased;
+  }
+
+  /* Tailwind v4 preflight는 button 커서를 default로 둠. 눌러서 동작하는 요소는 포인터로 보이게 하고,
+     비활성(disabled·aria-disabled·data-disabled)은 제외함. :where()로 특이도를 0으로 두어
+     컴포넌트의 cursor-not-allowed 같은 개별 지정이 그대로 이김. */
+  :where(
+    button,
+    summary,
+    select,
+    [role="button"],
+    [role="tab"],
+    [role="menuitem"],
+    [role="menuitemcheckbox"],
+    [role="menuitemradio"],
+    [role="option"],
+    [role="checkbox"],
+    [role="radio"],
+    [role="switch"],
+    [role="combobox"]
+  ):not(:disabled, [aria-disabled="true"], [data-disabled]) {
+    cursor: pointer;
+  }
+}
+
+/* sonner 기본 트랜지션(이동·투명도·높이 400ms, 사라질 때 이동 500ms)이 느려서 250ms로 줄임. 속성 목록은
+   sonner가 정하므로 지속 시간만 바꿈. sonner 스타일이 런타임에 뒤늦게 붙어 순서로는 못 이겨 important를 씀.
+   모션 줄이기 설정에서는 sonner의 transition: none이 이겨야 해서 no-preference일 때만 적용함. */
+@media (prefers-reduced-motion: no-preference) {
+  [data-sonner-toast],
+  [data-sonner-toast] > * {
+    transition-duration: 250ms !important;
+  }
+}
+
+/* Landing page (/introduction) keyframes. Tailwind has no scoped keyframes, so the
+   names carry an intro- prefix; remove this block together with the page. */
+@keyframes intro-s3-left {
+  from {
+    background-position: 0 0;
+  }
+  to {
+    background-position: -1308.6px 0;
+  }
+}
+
+@keyframes intro-s3-right {
+  from {
+    background-position: -1769.6px 0;
+  }
+  to {
+    background-position: 0 0;
+  }
+}
+
+@keyframes intro-s1-screen-scroll {
+  from {
+    transform: translateY(0);
+  }
+  to {
+    transform: translateY(var(--s1-scroll-dist));
   }
 }

@@ -1,0 +1,21 @@
+{
+  "title": "Edit info",
+  "form": {
+    "bank": "Bank",
+    "accountNumber": "Account number",
+    "accountHolder": "Account holder",
+    "bankBook": "Bankbook copy"
+  },
+  "file": {
+    "upload": "Upload",
+    "uploadFor": "Upload {{label}}",
+    "registered": "Registered",
+    "error": {
+      "extension": "Only JPG, PNG and PDF files are allowed.",
+      "size": "Max file size is 10MB."
+    }
+  },
+  "toast": {
+    "denied": "Account info can't be changed during settlement (5th–10th of each month)."
+  }
+}

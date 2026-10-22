@@ -1,0 +1,145 @@
+{
+  "list": {
+    "label": "サブID一覧",
+    "search": {
+      "label": "サブID検索",
+      "placeholder": "ID・担当者名・メールで検索"
+    },
+    "create": "サブID作成",
+    "column": {
+      "identifier": "ID",
+      "name": "担当者名",
+      "email": "メールアドレス",
+      "createdAt": "作成日",
+      "manage": "管理"
+    },
+    "action": {
+      "permission": "権限付与",
+      "delete": "削除"
+    },
+    "empty": {
+      "none": {
+        "title": "サブIDがありません。",
+        "description": "サブIDが必要な場合は追加アカウントを作成してください。"
+      },
+      "search": {
+        "title": "「{{keyword}}」の検索結果がありません。"
+      }
+    }
+  },
+  "create": {
+    "title": "サブID作成",
+    "submit": "サブIDを作成",
+    "profileImage": {
+      "label": "プロフィール画像(任意)",
+      "edit": "プロフィール画像を選択",
+      "alt": "プロフィール画像",
+      "error": {
+        "extension": "JPG・PNGのみアップロードできます。",
+        "size": "最大10MBまでです。"
+      }
+    },
+    "field": {
+      "name": {
+        "label": "担当者名",
+        "placeholder": "担当者名を入力"
+      },
+      "identifier": {
+        "label": "ID",
+        "placeholder": "IDを入力",
+        "check": "重複確認"
+      },
+      "password": {
+        "label": "パスワード",
+        "placeholder": "パスワードを入力"
+      },
+      "passwordCheck": {
+        "label": "パスワード確認",
+        "placeholder": "パスワードを入力"
+      },
+      "phone": {
+        "label": "携帯番号",
+        "placeholder": "携帯番号を入力"
+      },
+      "email": {
+        "label": "メールアドレス",
+        "placeholder": "メールアドレスを入力"
+      }
+    },
+    "status": {
+      "identifier": {
+        "available": "使用できるIDです。"
+      }
+    },
+    "error": {
+      "identifier": {
+        "format": "英数字・アンダースコア・ドットで6〜20文字",
+        "taken": "すでに使用されているIDです。",
+        "needCheck": "ID重複確認が必要です。",
+        "check": "IDを確認できませんでした。"
+      },
+      "password": {
+        "format": "英数字・記号を組み合わせた8〜20文字",
+        "containsId": "IDを含むパスワードは不可",
+        "repeated": "同一・連続した文字は不可"
+      },
+      "passwordCheck": {
+        "mismatch": "パスワードが一致しません。"
+      },
+      "email": {
+        "format": "メール形式が正しくありません。"
+      }
+    },
+    "toast": {
+      "created": "サブIDを作成しました。"
+    }
+  },
+  "delete": {
+    "title": "サブID削除",
+    "description": "「{{identifier}}」を削除しますか？削除したデータは復元できません。"
+  },
+  "access": {
+    "screen": "権限付与",
+    "permission": {
+      "title": "サブID権限",
+      "column": {
+        "name": "権限名",
+        "granted": "権限"
+      },
+      "name": {
+        "campaign": "キャンペーン",
+        "influencerMatching": "マッチング",
+        "influencerMarket": "マーケット",
+        "commerce": "コマース管理",
+        "buyerInquiry": "購入者問合せ",
+        "bigbirdMoney": "ビッグバードマネー"
+      },
+      "switchLabel": "{{name}}の権限"
+    },
+    "campaign": {
+      "title": "サブIDキャンペーン割当",
+      "column": {
+        "name": "キャンペーン名",
+        "productType": "商品タイプ",
+        "detailType": "詳細商品",
+        "status": "キャンペーン進行状況",
+        "statusShort": "進行状況",
+        "assigned": "担当"
+      },
+      "productType": {
+        "recruit": "募集型",
+        "pick": "PICK型"
+      },
+      "detailType": {
+        "brand": "ブランド型",
+        "groupBuy": "共同購入型"
+      },
+      "status": {
+        "completed": "完了",
+        "waiting": "待機中",
+        "running": "進行中"
+      },
+      "switchLabel": "{{name}}の担当"
+    }
+  }
+}

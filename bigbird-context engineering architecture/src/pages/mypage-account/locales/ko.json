@@ -1,0 +1,15 @@
+{
+  "title": "계정 설정",
+  "tabs": {
+    "master": "Master ID 관리",
+    "company": "회사정보",
+    "bank": "계좌정보",
+    "sub": "Sub ID 관리",
+    "self": "Sub ID 관리",
+    "notification": "알림 설정"
+  },
+  "bankGuard": {
+    "title": "회사 정보 등록 필요",
+    "description": "계좌 정보를 등록하려면 회사 정보를 먼저 등록해 주세요."
+  }
+}

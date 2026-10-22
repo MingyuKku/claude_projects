@@ -1,0 +1,16 @@
+{
+  "title": "簡単ログイン連携",
+  "provider": {
+    "kakao": "カカオ",
+    "naver": "ネイバー",
+    "facebook": "フェイスブック",
+    "google": "グーグル",
+    "apple": "アップル"
+  },
+  "switchLabel": "{{provider}}簡単ログイン連携",
+  "unlink": {
+    "title": "簡単ログイン解除",
+    "description": "{{provider}}の簡単ログイン連携を解除しますか？解除すると{{provider}}アカウントでログインできません。",
+    "action": "解除"
+  }
+}

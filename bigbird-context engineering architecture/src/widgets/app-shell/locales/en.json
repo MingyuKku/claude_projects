@@ -1,0 +1,56 @@
+{
+  "nav": {
+    "home": "Home",
+    "campaign": "Campaigns",
+    "influencerMatching": "Influencer matching",
+    "influencerMarket": "Influencer market",
+    "commerce": "Commerce sales",
+    "mypage": "My page",
+    "support": "Support",
+    "search": "Search",
+    "bigbird": "Ask Bigbird",
+    "buyer": "Buyer Q&A",
+    "subscribe": "Subscription",
+    "money": "Bigbird Money",
+    "account": "Account Settings"
+  },
+  "comingSoon": "Coming soon",
+  "logo": {
+    "alt": "Bigbird",
+    "adminLinkLabel": "Bigbird · Switch account",
+    "homeLinkLabel": "Bigbird · Home"
+  },
+  "registerCampaign": "New campaign",
+  "guide": "Guide",
+  "menu": {
+    "main": "Main menu",
+    "collapsed": "Collapsed menu",
+    "full": "Full menu",
+    "collapse": "Collapse menu",
+    "expand": "Expand menu",
+    "openFull": "Open full menu",
+    "close": "Close menu",
+    "open": "Open menu"
+  },
+  "header": {
+    "points": "Points (coming soon)",
+    "alerts": "Notifications",
+    "alertsUnread": "Notifications, unread available",
+    "profile": "My profile",
+    "settings": "Account Settings",
+    "logout": "Log out",
+    "loggingOut": "Logging out…",
+    "login": "Log in"
+  },
+  "alertPanel": {
+    "title": "Notifications",
+    "close": "Close notifications",
+    "emptyTitle": "No new notifications",
+    "emptyDescription": "Important updates from the service will appear here."
+  },
+  "logoutFailed": "Couldn't log out. Please try again.",
+  "session": {
+    "checking": "Checking sign-in status",
+    "checkFailed": "Couldn't check sign-in status. Try again."
+  }
+}

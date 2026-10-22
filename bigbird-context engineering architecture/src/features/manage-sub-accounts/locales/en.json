@@ -1,0 +1,145 @@
+{
+  "list": {
+    "label": "Sub ID list",
+    "search": {
+      "label": "Search Sub IDs",
+      "placeholder": "Search by ID, name or email."
+    },
+    "create": "Create Sub ID",
+    "column": {
+      "identifier": "ID",
+      "name": "Name",
+      "email": "Email",
+      "createdAt": "Created",
+      "manage": "Manage"
+    },
+    "action": {
+      "permission": "Permissions",
+      "delete": "Delete"
+    },
+    "empty": {
+      "none": {
+        "title": "No Sub IDs.",
+        "description": "Create an account if you need a Sub ID."
+      },
+      "search": {
+        "title": "No results for ‘{{keyword}}’."
+      }
+    }
+  },
+  "create": {
+    "title": "Create Sub ID",
+    "submit": "Create Sub ID",
+    "profileImage": {
+      "label": "Profile image (optional)",
+      "edit": "Choose profile image",
+      "alt": "Profile image",
+      "error": {
+        "extension": "Only JPG and PNG files are allowed.",
+        "size": "Max file size is 10MB."
+      }
+    },
+    "field": {
+      "name": {
+        "label": "Contact name",
+        "placeholder": "Enter contact name."
+      },
+      "identifier": {
+        "label": "ID",
+        "placeholder": "Enter ID.",
+        "check": "Check"
+      },
+      "password": {
+        "label": "Password",
+        "placeholder": "Enter password."
+      },
+      "passwordCheck": {
+        "label": "Confirm password",
+        "placeholder": "Enter password."
+      },
+      "phone": {
+        "label": "Phone",
+        "placeholder": "Enter phone number."
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "Enter email."
+      }
+    },
+    "status": {
+      "identifier": {
+        "available": "This ID is available."
+      }
+    },
+    "error": {
+      "identifier": {
+        "format": "6–20 characters: letters, numbers, underscores, dots.",
+        "taken": "This ID is already taken.",
+        "needCheck": "Check ID availability.",
+        "check": "Couldn't check the ID."
+      },
+      "password": {
+        "format": "8–20 characters with letters, numbers and symbols.",
+        "containsId": "Must not contain your ID",
+        "repeated": "No repeated or sequential characters"
+      },
+      "passwordCheck": {
+        "mismatch": "Passwords don't match."
+      },
+      "email": {
+        "format": "Enter a valid email address."
+      }
+    },
+    "toast": {
+      "created": "Sub ID created."
+    }
+  },
+  "delete": {
+    "title": "Delete Sub ID",
+    "description": "Delete ‘{{identifier}}’? Deleted data can't be recovered."
+  },
+  "access": {
+    "screen": "Permissions",
+    "permission": {
+      "title": "Sub ID permissions",
+      "column": {
+        "name": "Permission",
+        "granted": "Allowed"
+      },
+      "name": {
+        "campaign": "Campaigns",
+        "influencerMatching": "Influencer matching",
+        "influencerMarket": "Influencer market",
+        "commerce": "Commerce management",
+        "buyerInquiry": "Buyer Q&A",
+        "bigbirdMoney": "Bigbird Money"
+      },
+      "switchLabel": "{{name}} permission"
+    },
+    "campaign": {
+      "title": "Sub ID campaign assignment",
+      "column": {
+        "name": "Campaign",
+        "productType": "Product type",
+        "detailType": "Product detail",
+        "status": "Campaign status",
+        "statusShort": "Status",
+        "assigned": "Assigned"
+      },
+      "productType": {
+        "recruit": "Recruitment",
+        "pick": "PICK"
+      },
+      "detailType": {
+        "brand": "Brand",
+        "groupBuy": "Group Buy"
+      },
+      "status": {
+        "completed": "Completed",
+        "waiting": "Pending",
+        "running": "In progress"
+      },
+      "switchLabel": "{{name}} assigned"
+    }
+  }
+}

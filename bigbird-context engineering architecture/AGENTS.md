@@ -11,7 +11,8 @@
 
 `bigbird`는 React 19 + TypeScript 웹 애플리케이션입니다. 설계의 핵심 목표는 **한 기능의 변경이 다른 기능으로 번지지 않게 하는 것**이며, 이를 위해 Feature-Sliced Design(FSD)으로 기능 단위를 격리합니다.
 디자인의 원본은 Figma, API 계약의 원본은 OpenAPI 명세입니다.
-서비스의 목적·사용자·기능 범위·용어는 `docs/prd.md`가 기준이며, 기능 단위 상세는 `specs/<feature>.md`에 있습니다. 작업 전에 읽고, PRD에 "미정"인 항목은 추측하지 말고 질문합니다.
+서비스의 목적·사용자·기능 범위·용어는 `docs/prd.md`가 기준이며, 기능 단위 상세는 `specs/[<그룹>/]<feature>.md`에 있습니다. 작업 전에 읽고, PRD에 "미정"인 항목은 추측하지 말고 질문합니다.
+화면(라우트)을 추가·변경·삭제하면 `docs/pages.md`의 화면 표와 해당 `specs/[<그룹>/]<feature>.md`도 같은 변경에서 갱신합니다.
 
 ## 기술 스택
 
@@ -28,26 +29,32 @@
 
 ```bash
 pnpm dev              # 로컬 개발 서버 실행
+pnpm verify           # 완료 전 검증: typecheck · lint · i18n:check · test (통과한 검사는 한 줄, 실패는 전체 출력)
 pnpm build            # TypeScript 타입 검사 및 프로덕션 번들 빌드
 pnpm test             # Vitest 기반 단위/컴포넌트 테스트 실행
 pnpm test:ui          # Vitest 인터랙티브 UI 실행
 pnpm lint             # ESLint 린트 검사
 pnpm typecheck        # tsc --noEmit 타입 검사
 pnpm format           # Prettier 코드 포맷팅
+pnpm i18n             # 번역 키 타입(src/app/i18n/resources.gen.d.ts) 생성. ko.json 키를 바꾸면 실행
+pnpm i18n:check       # 번역 파일 검사 (언어별 키 구성·빈 값·locales 위치·생성 타입 최신 여부)
 pnpm ai:check        # AI 규칙·에이전트·skill 동기화 검증 (생성물 구문 검사 포함)
+pnpm ai:review       # MR 을 열기 전 CI 와 같은 기준으로 AI 리뷰 (터미널 출력만, --base <ref> 로 비교 대상 변경)
 ```
 
 ## 공통 컨벤션 및 개발 규칙
 
-- **의사소통 언어**: 사용자와의 대화·설명은 한국어, 코드·주석·커밋 메시지·심볼 이름은 영어를 사용합니다.
+- **의사소통 언어**: 사용자와의 대화·설명, 코드 주석, 커밋 메시지는 한국어, 심볼 이름은 영어를 사용합니다.
 - **구조와 격리**: 의존 방향은 FSD 단방향이고 슬라이스는 서로 격리됩니다. 규칙은 `.claude/rules/architecture.md`에, 집행은 ESLint에 있습니다. `shared/`·`entities/`를 수정하기 전에는 Grep으로 소비처를 확인합니다.
 - **데이터 흐름**: OpenAPI 응답 → Zod 검증 → 트랜스포머 → SWR 훅 → UI. UI는 raw API 타입에 의존하지 않습니다. 타입은 Zod 스키마에서 추론하고 단언으로 맞추지 않습니다.
-- **완료 기준**: 작업을 끝내기 전에 `pnpm typecheck`, `pnpm lint`, `pnpm test`, `pnpm build`를 통과시키고, 실행하지 못한 검사가 있으면 그 사실을 명시합니다. 훅이 일부를 자동 실행하지만 최종 확인 책임은 에이전트에게 있습니다.
+- **다국어**: 지원 언어는 `ko`(기본)·`en`·`ja`·`zh-CN`이고, 화면에 보이는 문구는 모두 번역 키로 씁니다. 스펙 단위 화면 작업에서 `ko` 원문과 3개 언어 번역을 함께 작성하며, Figma가 한국어 기준이므로 번역은 한국어와 비슷한 길이로 간결하게 씁니다. 미확정 서비스 고유 용어는 `docs/glossary-questions.md`에 모아 일괄 확인하며, 답변 전까지 모든 언어에서 해당 용어의 한국어 원문을 유지합니다. 서버가 주는 상태·유형 같은 값은 코드(enum)로 받아 프론트가 번역 키로 보여 주고, 은행명·카테고리명처럼 DB에 쌓이는 목록 값은 그대로 표시합니다. 규칙은 `.claude/rules/i18n.md`에 있습니다.
+- **완료 기준**: 작업을 끝내기 전에 `pnpm verify`(typecheck·lint·i18n:check·test)를 통과시키고, CSS·`index.html`·`public/`·Vite 설정·의존성을 바꿨으면 `pnpm build`도 통과시킵니다(그 밖의 번들 검사는 CI `build` job이 합니다). 실행하지 못한 검사가 있으면 그 사실을 명시합니다. 훅이 일부를 자동 실행하지만 최종 확인 책임은 에이전트에게 있습니다.
 - **추측 금지 및 질문**: 스택·아키텍처 결정을 벗어나는 변경(신규 라이브러리, 레이어 규칙 예외 등)과 명세에 없는 API 응답·에러 형태, Figma에 없는 디자인 값은 추측하지 않고 먼저 질문합니다. Figma MCP 연결이 안 되면 멈추고 보고합니다.
 - **린트·스타일 처리**: 포맷과 import 정렬은 훅이 ESLint/Prettier로 자동 교정하므로 직접 맞추지 않습니다. 린트·타입 에러는 `eslint-disable`, `@ts-ignore`, 규칙 완화로 덮지 말고 근본 원인을 고칩니다. 린트·Prettier·tsconfig 설정 변경은 사용자 승인이 필요한 팀 결정입니다.
 
 ## 아키텍처 가이드 포인터
 
-- 경로별 상세 규칙은 `.claude/rules/`에 있습니다. Claude Code는 해당 경로를 편집할 때 자동 로드하고, Codex는 영역 작업 전에 직접 읽습니다: `architecture`(FSD), `react-components`, `code-style`(네이밍·상수·훅·타입 스타일), `state-management`(Zustand·SWR), `styling`(shadcn·Tailwind·CVA), `api-integration`(OpenAPI·Zod·트랜스포머), `routing`, `error-handling`, `testing`, `performance`, `dependencies`
-- 절차형 skill (필요할 때만 로드): Figma 디자인 → 코드 `.claude/skills/figma-to-component/`, 컴포넌트 스캐폴딩 `.claude/skills/scaffold-component/`, React Router `.claude/skills/react-router/` (Codex는 `.agents/skills/`의 생성 사본)
+- 경로별 상세 규칙은 `.claude/rules/`에 있습니다. Claude Code는 해당 경로를 편집할 때 자동 로드하고, Codex는 영역 작업 전에 직접 읽습니다: `architecture`(FSD), `react-components`, `code-style`(네이밍·상수·훅·타입 스타일), `state-management`(Zustand·SWR), `styling`(shadcn·Tailwind·CVA), `api-integration`(OpenAPI·Zod·트랜스포머), `routing`, `i18n`(다국어 키·번역 파일·포맷), `i18n-translation`(번역 작성 흐름·간결한 번역), `error-handling`, `testing`, `performance`, `dependencies`
+- 절차형 skill (필요할 때만 로드): Figma 디자인 → 코드 `.claude/skills/figma-to-component/`, 컴포넌트 스캐폴딩 `.claude/skills/scaffold-component/`, React Router `.claude/skills/react-router/`, 모바일 가상 키보드·iOS Safari 입력 동작 `.claude/skills/mobile-keyboard/`(추측 금지, 공식 문서·버그 트래커 근거와 실기기 측정 필수) (Codex는 `.agents/skills/`의 생성 사본)
+- Figma 스캔 결과 로컬 캐시(git 제외): `.claude/figma-cache/`. 작업 전에 먼저 읽고, 만드는 규칙은 `figma-to-component` skill에 있습니다.
 - FSD 경계 린트 강제: 루트 `eslint.config.js`

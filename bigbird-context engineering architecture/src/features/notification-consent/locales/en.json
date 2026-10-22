@@ -1,0 +1,23 @@
+{
+  "alimtalk": {
+    "title": "KakaoTalk notifications",
+    "marketing": {
+      "description": "Receive notifications about promotions."
+    },
+    "night": {
+      "description": "Receive promotional KakaoTalk messages at night (9 PM–8 AM)."
+    }
+  },
+  "push": {
+    "title": "Push notifications",
+    "marketing": {
+      "description": "Receive notifications about promotions."
+    },
+    "night": {
+      "description": "Receive promotional push notifications at night (9 PM–8 AM)."
+    }
+  },
+  "marketing": { "label": "Marketing consent" },
+  "night": { "label": "Night-time consent" },
+  "notice": "Essential service and security notices are sent regardless of consent."
+}

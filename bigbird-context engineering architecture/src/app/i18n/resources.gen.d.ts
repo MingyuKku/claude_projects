@@ -1,0 +1,94 @@
+// pnpm i18n 이 생성하는 파일입니다. 직접 수정하지 않습니다.
+// 각 namespace 의 ko.json 을 키 원본으로 삼아 t() 의 키를 타입 검사합니다.
+import type featuresChangePassword from "../../features/change-password/locales/ko.json";
+import type featuresEditAccountProfile from "../../features/edit-account-profile/locales/ko.json";
+import type featuresEditBankAccount from "../../features/edit-bank-account/locales/ko.json";
+import type featuresEditCompanyInfo from "../../features/edit-company-info/locales/ko.json";
+import type featuresExpiredPassword from "../../features/expired-password/locales/ko.json";
+import type featuresFindAccount from "../../features/find-account/locales/ko.json";
+import type featuresJoin from "../../features/join/locales/ko.json";
+import type featuresLinkSocialAccount from "../../features/link-social-account/locales/ko.json";
+import type featuresLogin from "../../features/login/locales/ko.json";
+import type featuresManageSubAccounts from "../../features/manage-sub-accounts/locales/ko.json";
+import type featuresNewBigbirdInquiry from "../../features/new-bigbird-inquiry/locales/ko.json";
+import type featuresNotificationConsent from "../../features/notification-consent/locales/ko.json";
+import type featuresRealtimeConsultation from "../../features/realtime-consultation/locales/ko.json";
+import type featuresSearchInfluencer from "../../features/search-influencer/locales/ko.json";
+import type featuresSocialLogin from "../../features/social-login/locales/ko.json";
+import type featuresSwitchAccount from "../../features/switch-account/locales/ko.json";
+import type featuresWithdrawAccount from "../../features/withdraw-account/locales/ko.json";
+import type pagesCertSuccess from "../../pages/cert-success/locales/ko.json";
+import type pagesChangePassword from "../../pages/change-password/locales/ko.json";
+import type pagesComingSoon from "../../pages/coming-soon/locales/ko.json";
+import type pagesCustomerCenterBigbirdNew from "../../pages/customer-center-bigbird-new/locales/ko.json";
+import type pagesCustomerCenterBigbird from "../../pages/customer-center-bigbird/locales/ko.json";
+import type pagesCustomerCenterBuyer from "../../pages/customer-center-buyer/locales/ko.json";
+import type pagesExpired from "../../pages/expired/locales/ko.json";
+import type pagesFindEmailSent from "../../pages/find-email-sent/locales/ko.json";
+import type pagesFind from "../../pages/find/locales/ko.json";
+import type pagesHome from "../../pages/home/locales/ko.json";
+import type pagesIntroduction from "../../pages/introduction/locales/ko.json";
+import type pagesJoin from "../../pages/join/locales/ko.json";
+import type pagesLogin from "../../pages/login/locales/ko.json";
+import type pagesMypageAccount from "../../pages/mypage-account/locales/ko.json";
+import type pagesMypageMoney from "../../pages/mypage-money/locales/ko.json";
+import type pagesMypageSubscribe from "../../pages/mypage-subscribe/locales/ko.json";
+import type pagesNotFound from "../../pages/not-found/locales/ko.json";
+import type pagesSnsLink from "../../pages/sns-link/locales/ko.json";
+import type pagesSwitchAccount from "../../pages/switch-account/locales/ko.json";
+import type pagesTerms from "../../pages/terms/locales/ko.json";
+import type pagesWelcome from "../../pages/welcome/locales/ko.json";
+import type common from "../../shared/i18n/locales/ko.json";
+import type widgetsAppShell from "../../widgets/app-shell/locales/ko.json";
+import type widgetsBigbirdInquiryWorkspace from "../../widgets/bigbird-inquiry-workspace/locales/ko.json";
+import type widgetsBuyerInquiryWorkspace from "../../widgets/buyer-inquiry-workspace/locales/ko.json";
+
+declare module "i18next" {
+  interface CustomTypeOptions {
+    defaultNS: "common";
+    resources: {
+      common: typeof common;
+      "features/change-password": typeof featuresChangePassword;
+      "features/edit-account-profile": typeof featuresEditAccountProfile;
+      "features/edit-bank-account": typeof featuresEditBankAccount;
+      "features/edit-company-info": typeof featuresEditCompanyInfo;
+      "features/expired-password": typeof featuresExpiredPassword;
+      "features/find-account": typeof featuresFindAccount;
+      "features/join": typeof featuresJoin;
+      "features/link-social-account": typeof featuresLinkSocialAccount;
+      "features/login": typeof featuresLogin;
+      "features/manage-sub-accounts": typeof featuresManageSubAccounts;
+      "features/new-bigbird-inquiry": typeof featuresNewBigbirdInquiry;
+      "features/notification-consent": typeof featuresNotificationConsent;
+      "features/realtime-consultation": typeof featuresRealtimeConsultation;
+      "features/search-influencer": typeof featuresSearchInfluencer;
+      "features/social-login": typeof featuresSocialLogin;
+      "features/switch-account": typeof featuresSwitchAccount;
+      "features/withdraw-account": typeof featuresWithdrawAccount;
+      "pages/cert-success": typeof pagesCertSuccess;
+      "pages/change-password": typeof pagesChangePassword;
+      "pages/coming-soon": typeof pagesComingSoon;
+      "pages/customer-center-bigbird": typeof pagesCustomerCenterBigbird;
+      "pages/customer-center-bigbird-new": typeof pagesCustomerCenterBigbirdNew;
+      "pages/customer-center-buyer": typeof pagesCustomerCenterBuyer;
+      "pages/expired": typeof pagesExpired;
+      "pages/find": typeof pagesFind;
+      "pages/find-email-sent": typeof pagesFindEmailSent;
+      "pages/home": typeof pagesHome;
+      "pages/introduction": typeof pagesIntroduction;
+      "pages/join": typeof pagesJoin;
+      "pages/login": typeof pagesLogin;
+      "pages/mypage-account": typeof pagesMypageAccount;
+      "pages/mypage-money": typeof pagesMypageMoney;
+      "pages/mypage-subscribe": typeof pagesMypageSubscribe;
+      "pages/not-found": typeof pagesNotFound;
+      "pages/sns-link": typeof pagesSnsLink;
+      "pages/switch-account": typeof pagesSwitchAccount;
+      "pages/terms": typeof pagesTerms;
+      "pages/welcome": typeof pagesWelcome;
+      "widgets/app-shell": typeof widgetsAppShell;
+      "widgets/bigbird-inquiry-workspace": typeof widgetsBigbirdInquiryWorkspace;
+      "widgets/buyer-inquiry-workspace": typeof widgetsBuyerInquiryWorkspace;
+    };
+  }
+}

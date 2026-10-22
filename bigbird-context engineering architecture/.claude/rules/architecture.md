@@ -26,14 +26,9 @@ src/
 app ──> pages ──> widgets ──> features ──> entities ──> shared
 ```
 
-| 레이어 (Layer)  | 임포트 가능한 하위 레이어                            | 절대 금지 대상                                                              |
-| :-------------- | :--------------------------------------------------- | :-------------------------------------------------------------------------- |
-| **`app/`**      | `pages`, `widgets`, `features`, `entities`, `shared` | —                                                                           |
-| **`pages/`**    | `widgets`, `features`, `entities`, `shared`          | `app`, 다른 `pages/*`                                                       |
-| **`widgets/`**  | `features`, `entities`, `shared`                     | `app`, `pages`, 다른 `widgets/*`                                            |
-| **`features/`** | `entities`, `shared`                                 | `app`, `pages`, `widgets`, 다른 `features/*` (**피처 간 교차 임포트 금지**) |
-| **`entities/`** | `shared`                                             | `app`, `pages`, `widgets`, `features`, 다른 `entities/*`                    |
-| **`shared/`**   | 외부 라이브러리 (Radix, Lucide, SWR, Zustand 등)     | 상위 모든 레이어 (`app`, `pages`, `widgets`, `features`, `entities`)        |
+- 위 레이어는 아래 레이어만 임포트합니다. 중간 레이어를 건너뛰는 것은 허용합니다(`pages` → `entities`). `app`은 모든 레이어를 임포트할 수 있습니다.
+- 같은 레이어의 다른 슬라이스는 임포트하지 않습니다(`features/a` → `features/b` 금지). 공유가 필요하면 아래 레이어로 내립니다.
+- `shared`는 외부 라이브러리와 `shared` 내부만 임포트합니다.
 
 ## 3. 슬라이스 내부 세그먼트 구성 (Slice Segments)
 

@@ -1,0 +1,93 @@
+{
+  "action": {
+    "close": "닫기",
+    "back": "뒤로가기",
+    "retry": "다시 시도",
+    "confirm": "확인",
+    "login": "로그인",
+    "goBack": "되돌아가기",
+    "cancel": "취소",
+    "save": "저장"
+  },
+  "status": {
+    "loading": "불러오는 중…",
+    "checking": "확인 중",
+    "comingSoon": "준비 중인 기능입니다."
+  },
+  "error": {
+    "title": "문제가 발생했습니다",
+    "unexpected": "예상하지 못한 오류가 발생했습니다."
+  },
+  "password": {
+    "show": "{{label}} 보기",
+    "hide": "{{label}} 숨기기"
+  },
+  "sns": {
+    "start": {
+      "kakao": "카카오로 시작하기",
+      "naver": "네이버로 시작하기",
+      "apple": "애플로 시작하기",
+      "google": "구글로 시작하기"
+    }
+  },
+  "field": {
+    "id": "아이디",
+    "password": "비밀번호"
+  },
+  "link": {
+    "privacy": "개인정보처리방침",
+    "terms": "이용약관",
+    "findId": "아이디 찾기",
+    "findPassword": "비밀번호 찾기",
+    "signup": "회원가입"
+  },
+  "attachment": {
+    "error": {
+      "format": {
+        "title": "첨부파일 형식 불일치",
+        "description": "이미지 또는 동영상 파일만 첨부 가능합니다."
+      },
+      "imageSize": {
+        "title": "이미지 첨부파일 용량 초과",
+        "description": "이미지 파일은 최대 30MB까지 첨부할 수 있습니다."
+      },
+      "videoSize": {
+        "title": "동영상 첨부파일 용량 초과",
+        "description": "동영상 파일은 최대 50MB까지 첨부할 수 있습니다."
+      },
+      "imageCount": {
+        "title": "이미지 최대 업로드 개수 초과",
+        "description": "파일은 최대 10개까지 첨부할 수 있습니다."
+      },
+      "videoCount": {
+        "title": "동영상 최대 업로드 개수 초과",
+        "description": "파일은 최대 5개까지 첨부할 수 있습니다."
+      }
+    },
+    "dropTitle": "파일을 여기에 드롭하세요",
+    "dropDescription": "30MB 이하, JPG·JPEG·PNG·WebP·MP4",
+    "attach": "첨부",
+    "remove": "첨부 삭제",
+    "viewer": {
+      "title": "이미지 다운로드",
+      "download": "다운로드",
+      "prev": "이전",
+      "next": "다음"
+    },
+    "upload": {
+      "progress": "첨부 업로드 중 ({{sent}}/{{total}})",
+      "failed": "첨부 {{count}}개를 보내지 못했습니다.",
+      "retry": "다시 시도"
+    }
+  },
+  "feedback": {
+    "saved": "저장되었습니다.",
+    "saveFailed": "저장하지 못했습니다. 다시 시도해 주세요."
+  },
+  "pagination": {
+    "navigation": "페이지 이동",
+    "previous": "이전",
+    "next": "다음",
+    "page": "{{page}}쪽"
+  }
+}

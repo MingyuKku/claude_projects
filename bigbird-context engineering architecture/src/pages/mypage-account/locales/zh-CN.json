@@ -1,0 +1,15 @@
+{
+  "title": "账号设置",
+  "tabs": {
+    "master": "主账号管理",
+    "company": "公司信息",
+    "bank": "银行账户",
+    "sub": "子账号管理",
+    "self": "子账号管理",
+    "notification": "通知设置"
+  },
+  "bankGuard": {
+    "title": "需先登记公司信息",
+    "description": "要登记账户信息，请先登记公司信息。"
+  }
+}

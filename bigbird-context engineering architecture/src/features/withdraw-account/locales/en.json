@@ -1,0 +1,15 @@
+{
+  "title": "Close account",
+  "agree": "Agree & close",
+  "password": {
+    "description": "Enter your password to close your account.",
+    "submit": "Close account",
+    "error": {
+      "mismatch": "Incorrect password.",
+      "failed": "Couldn't close your account. Please try again."
+    }
+  },
+  "done": {
+    "title": "Your account has been closed."
+  }
+}

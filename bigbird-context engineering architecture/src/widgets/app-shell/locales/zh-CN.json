@@ -1,0 +1,56 @@
+{
+  "nav": {
+    "home": "首页",
+    "campaign": "广告活动",
+    "influencerMatching": "网红匹配",
+    "influencerMarket": "网红市场",
+    "commerce": "电商销售情况",
+    "mypage": "个人中心",
+    "support": "客服",
+    "search": "搜索",
+    "bigbird": "Bigbird咨询",
+    "buyer": "买家咨询",
+    "subscribe": "订阅",
+    "money": "Bigbird 余额",
+    "account": "账号设置"
+  },
+  "comingSoon": "准备中",
+  "logo": {
+    "alt": "Bigbird",
+    "adminLinkLabel": "Bigbird · 切换账号",
+    "homeLinkLabel": "Bigbird · 首页"
+  },
+  "registerCampaign": "注册广告活动",
+  "guide": "使用指南",
+  "menu": {
+    "main": "主菜单",
+    "collapsed": "收起的菜单",
+    "full": "完整菜单",
+    "collapse": "收起菜单",
+    "expand": "展开菜单",
+    "openFull": "打开完整菜单",
+    "close": "关闭菜单",
+    "open": "打开菜单"
+  },
+  "header": {
+    "points": "积分查询（准备中）",
+    "alerts": "通知",
+    "alertsUnread": "通知，有未读通知",
+    "profile": "我的资料",
+    "settings": "账号设置",
+    "logout": "退出登录",
+    "loggingOut": "正在退出登录…",
+    "login": "登录"
+  },
+  "alertPanel": {
+    "title": "通知",
+    "close": "关闭通知",
+    "emptyTitle": "暂无新通知",
+    "emptyDescription": "服务使用中的重要通知会显示在这里。"
+  },
+  "logoutFailed": "退出登录失败，请重试。",
+  "session": {
+    "checking": "正在确认登录状态",
+    "checkFailed": "无法确认登录状态，请重试。"
+  }
+}

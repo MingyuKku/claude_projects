@@ -1,0 +1,38 @@
+{
+  "header": "Change your password",
+  "intro": "Changing your password is required to protect your personal information.<br />It has been 6 months since your last change. If you choose “Change later”, you'll be reminded in 6 months.",
+  "current": {
+    "label": "Current password",
+    "placeholder": "8+ characters, letters and numbers",
+    "wrong": "Not your current password. Re-enter."
+  },
+  "new": {
+    "label": "New password",
+    "placeholder": "8+ characters, letters and numbers"
+  },
+  "check": {
+    "label": "Confirm new password",
+    "placeholder": "Confirm password"
+  },
+  "hint": "8–20 characters with letters, numbers and symbols.",
+  "formatError": "Min. 8 characters (8–20 with letters, numbers, symbols)",
+  "mismatch": "Passwords don't match. Re-enter.",
+  "delay": "Change later",
+  "submit": "Change",
+  "submitError": {
+    "submitRequired": "Enter a password.",
+    "unknown": "An unknown error occurred.",
+    "delay": "Try again shortly.",
+    "containsPersonalInfo": "Passwords containing personal info are not allowed.",
+    "passwordsDiffer": "New and confirm passwords must match.",
+    "notReachedSemiAnnual": "6 months have not passed.",
+    "sameAsOriginal": "New password can't be the same as the old one.",
+    "originalInvalid": "Current password is incorrect.",
+    "fallback": "An error occurred. Contact the administrator."
+  },
+  "done": {
+    "title": "Password changed",
+    "message": "Your password has been changed.<br />For account security, previously logged-in devices were logged out.<br />Please log in again.",
+    "login": "Log in"
+  }
+}

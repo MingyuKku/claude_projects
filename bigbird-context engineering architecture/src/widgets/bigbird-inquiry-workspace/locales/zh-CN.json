@@ -1,0 +1,55 @@
+{
+  "listTitle": "咨询列表",
+  "refresh": "刷新",
+  "newInquiry": "新建咨询",
+  "all": "全部",
+  "waiting": "待回复",
+  "consulting": "咨询中",
+  "done": "已回复",
+  "empty": {
+    "title": "暂无咨询。",
+    "description": "请创建新咨询。"
+  },
+  "loadError": "无法加载咨询列表。",
+  "inquiryTitle": {
+    "campaign": "{{name}}咨询",
+    "campaignUnknown": "活动咨询",
+    "other": "其他咨询"
+  },
+  "consultDate": "咨询日",
+  "bigbirdManager": "Bigbird客服",
+  "completed": {
+    "title": "已结束",
+    "description": "该咨询已结束。如有新问题，请创建新咨询。",
+    "caption": "留言后我们将核实并依次回复。"
+  },
+  "realtimeHistory": "暂无咨询消息。",
+  "realtimeLoadError": "无法加载咨询消息。",
+  "campaignCode": "活动代码",
+  "copyCode": "复制活动代码",
+  "copied": "已复制到剪贴板。",
+  "backToList": "返回列表",
+  "filterEmpty": "没有符合条件的咨询。",
+  "copyFailed": "复制失败。",
+  "deletedMessage": "消息已删除。",
+  "failed": "请求失败",
+  "realtime": {
+    "requesting": {
+      "title": "咨询请求中",
+      "description": "工作人员接入后将开始实时咨询。",
+      "caption": "连接最多可能需要5分钟。"
+    },
+    "failed": {
+      "title": "咨询请求失败",
+      "description": "请留言,我们确认后将依次回复。",
+      "caption": "留言回复可能因咨询情况而延迟。"
+    },
+    "retry": "重试",
+    "leaveMessage": "留言咨询",
+    "end": "结束咨询",
+    "composer": "实时咨询消息",
+    "composerPlaceholder": "请输入咨询内容。（最多3,000字）",
+    "attach": "附件",
+    "send": "发送"
+  }
+}

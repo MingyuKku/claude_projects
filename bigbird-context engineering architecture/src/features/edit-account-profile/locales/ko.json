@@ -1,0 +1,51 @@
+{
+  "info": {
+    "title": "기본 정보",
+    "id": "아이디",
+    "name": "담당자명",
+    "phone": "휴대폰 번호",
+    "email": "이메일",
+    "joinedAt": "가입일"
+  },
+  "form": {
+    "title": "정보 수정",
+    "profileImage": {
+      "label": "프로필 이미지",
+      "edit": "프로필 이미지 변경",
+      "alt": "프로필 이미지",
+      "error": {
+        "extension": "JPG, PNG 파일만 업로드할 수 있습니다.",
+        "size": "최대 10MB까지 업로드할 수 있습니다."
+      }
+    },
+    "password": {
+      "label": "비밀번호 변경",
+      "error": {
+        "format": "영문, 숫자, 특수문자를 조합 8-20자로 입력해주세요.",
+        "containsId": "아이디를 포함한 비밀번호 불가",
+        "repeated": "동일∙연속적 숫자,문자 반복 불가"
+      }
+    },
+    "passwordCheck": {
+      "label": "비밀번호 확인",
+      "mismatch": "비밀번호가 일치하지 않습니다."
+    },
+    "phone": {
+      "label": "휴대폰 번호",
+      "verify": "인증"
+    },
+    "email": {
+      "label": "이메일",
+      "error": {
+        "format": "올바른 이메일 형식이 아닙니다."
+      }
+    },
+    "withdraw": "회원 탈퇴"
+  },
+  "toast": {
+    "save": {
+      "tooManyRequests": "5분 뒤에 다시 변경 요청해주세요",
+      "personalInfo": "개인 신상정보를 포함한 비밀번호는 사용을 금지합니다"
+    }
+  }
+}

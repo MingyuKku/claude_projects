@@ -2,7 +2,17 @@
 <html lang="ko">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- interactive-widget=resizes-content: 가상 키보드가 뜨면 보이는 창뿐 아니라 레이아웃 뷰포트(dvh)도 줄입니다. 기본값은 resizes-visual(보이는 창만 줄어 창이 페이지 위를 움직임).
+         Chrome for Android 108+·Firefox for Android 132+가 지원하고, iOS Safari는 지원하지 않아 OS 기본 동작을 따릅니다.
+         근거: MDN https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/meta/name/viewport ,
+         Chrome https://developer.chrome.com/blog/viewport-resize-behavior , WebKit 미지원 https://bugs.webkit.org/show_bug.cgi?id=230225
+         규칙: .claude/skills/mobile-keyboard/SKILL.md -->
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content"
+    />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <link rel="icon" href="/favicon.ico" sizes="any" />
     <title>bigbird</title>
   </head>
   <body>

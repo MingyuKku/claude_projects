@@ -12,5 +12,6 @@ description: "Launch read-only reviewer subagent to review React & TypeScript ch
 4. React 19 패턴 및 측정 가능한 렌더링 성능 문제
 5. 에러/로딩/빈 상태 처리의 완성도
 6. `shared/`·`entities/` 수정 시 소비처 영향도
+7. 수정한 컴포넌트·훅 파일 전체의 책임과 크기, 이름 없는 복잡한 조건(`react-components.md`, `code-style.md`)
 
 $ARGUMENTS

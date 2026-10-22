@@ -1,6 +1,6 @@
 ---
 name: frontend-tech-lead
-description: "bigbird의 React/TypeScript 코드를 구현하거나 리팩토링할 때 사용합니다. FSD 규약, Zod·SWR 파이프라인, shadcn/ui 구현을 담당하며 완료 시 typecheck/lint/test 결과를 보고합니다."
+description: "bigbird의 React/TypeScript 코드를 구현하거나 리팩토링할 때 사용합니다. FSD 규약, Zod·SWR 파이프라인, shadcn/ui 구현을 담당하며 완료 시 `pnpm verify` 결과를 보고합니다."
 tools: Glob, Grep, Read, Edit, Write, Bash, WebFetch, WebSearch, LSP, Skill, mcp__figma__get_design_context, mcp__figma__get_variable_defs, mcp__figma__get_metadata, mcp__figma__get_screenshot, mcp__playwright__browser_navigate, mcp__playwright__browser_resize, mcp__playwright__browser_take_screenshot, mcp__playwright__browser_snapshot
 model: sonnet
 color: orange
@@ -20,4 +20,4 @@ memory: project
 
 ## 완료 보고
 
-`pnpm typecheck`, `pnpm lint`, `pnpm test`를 실행하고, 실제 결과(통과/실패, 실행하지 못한 항목과 사유)를 변경 요약과 함께 보고합니다.
+`pnpm verify`(typecheck·lint·i18n:check·test)를 실행하고, 실제 결과(통과/실패, 실행하지 못한 항목과 사유)를 변경 요약과 함께 보고합니다.

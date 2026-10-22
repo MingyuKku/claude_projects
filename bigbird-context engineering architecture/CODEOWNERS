@@ -13,6 +13,7 @@
 /.gitlab-ci.yml          @frontend-teams
 /.gitlab/                @frontend-teams
 /.githooks/              @frontend-teams
+/scripts/                @frontend-teams
 /eslint.config.js        @frontend-teams
 /tsconfig*.json          @frontend-teams
 /.prettierrc             @frontend-teams

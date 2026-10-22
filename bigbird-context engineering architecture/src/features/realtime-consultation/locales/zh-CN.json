@@ -1,0 +1,23 @@
+{
+  "composer": "实时咨询消息",
+  "composerPlaceholder": "请输入咨询内容。(最多3,000字)",
+  "send": "发送",
+  "lock": {
+    "title": "咨询正在进行中。",
+    "description": "目前其他客服正在处理该咨询,请在咨询结束后再使用。",
+    "cancel": "取消",
+    "confirm": "确认"
+  },
+  "requestFailed": "咨询请求失败,请稍后重试。",
+  "sendFailed": "消息发送失败,请重试。",
+  "endFailed": "结束咨询失败,请重试。",
+  "retryFailed": "重新请求咨询失败。",
+  "cancelFailed": "取消请求失败,请重试。",
+  "closed": "该咨询已结束。",
+  "closing": "正在结束咨询。",
+  "notConnected": "客服连接后才能发送。",
+  "lockLost": "其他账号正在处理该咨询。",
+  "alreadyConnected": "客服已连接。",
+  "failed": "无法确认咨询信息。",
+  "lockCheckFailed": "无法确认咨询状态,稍后将自动重试。"
+}

@@ -1,0 +1,20 @@
+{
+  "typeLabel": "お問い合わせの種類を選択",
+  "campaignType": "キャンペーンに関するお問い合わせ",
+  "campaignDescription": "キャンペーンの進行状況、成果、精算などについてお問い合わせいただけます。",
+  "otherType": "その他のお問い合わせ",
+  "otherDescription": "ポリシー、システム、利用方法などについてお問い合わせいただけます。",
+  "campaignListLabel": "キャンペーンを選択",
+  "campaignName": "キャンペーン名",
+  "submit": "問い合わせ",
+  "methodLabel": "お問い合わせ方法を選択",
+  "board": "メッセージを残す",
+  "boardDescription": "お問い合わせ内容を残していただくと、担当者が確認後に回答します。",
+  "realtime": "リアルタイム相談",
+  "realtimeDescription": "担当者との接続後、リアルタイムでチャットを行います。",
+  "campaignPeriod": "期間",
+  "select": "選択",
+  "send": "送信",
+  "messagePlaceholder": "お問い合わせ内容を入力してください。（最大3,000文字）",
+  "noCampaign": "お申し込みいただいたキャンペーンはありません。"
+}

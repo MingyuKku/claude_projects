@@ -1,0 +1,15 @@
+{
+  "title": "Account Settings",
+  "tabs": {
+    "master": "Master ID",
+    "company": "Company Info",
+    "bank": "Bank Account",
+    "sub": "Sub IDs",
+    "self": "Sub ID",
+    "notification": "Notifications"
+  },
+  "bankGuard": {
+    "title": "Company info required",
+    "description": "Please register your company info before adding bank account details."
+  }
+}

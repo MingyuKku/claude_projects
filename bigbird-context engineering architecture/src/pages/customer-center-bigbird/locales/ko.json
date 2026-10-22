@@ -1,0 +1,8 @@
+{
+  "title": "빅버드 문의",
+  "noSelection": "선택한 문의가 없습니다.",
+  "notFound": "문의를 찾을 수 없습니다.",
+  "loadError": "문의를 불러오지 못했습니다.",
+  "backToList": "문의 목록으로",
+  "conversation": "문의 대화"
+}

@@ -1,0 +1,20 @@
+{
+  "typeLabel": "选择咨询类型",
+  "campaignType": "活动咨询",
+  "campaignDescription": "咨询活动进度、效果、结算等相关问题。",
+  "otherType": "其他咨询",
+  "otherDescription": "咨询政策、系统、使用方法等其他问题。",
+  "campaignListLabel": "选择活动",
+  "campaignName": "活动名称",
+  "submit": "提交咨询",
+  "methodLabel": "选择咨询方式",
+  "board": "留言咨询",
+  "boardDescription": "留下咨询内容后，工作人员将确认并回复。",
+  "realtime": "实时咨询",
+  "realtimeDescription": "匹配工作人员后进行实时聊天。",
+  "campaignPeriod": "期间",
+  "select": "选择",
+  "send": "发送",
+  "messagePlaceholder": "请输入咨询内容。（最多3,000字）",
+  "noCampaign": "您还没有申请的活动。"
+}

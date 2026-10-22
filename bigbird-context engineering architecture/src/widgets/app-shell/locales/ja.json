@@ -1,0 +1,56 @@
+{
+  "nav": {
+    "home": "ホーム",
+    "campaign": "キャンペーン",
+    "influencerMatching": "マッチング",
+    "influencerMarket": "マーケット",
+    "commerce": "コマース販売状況",
+    "mypage": "マイページ",
+    "support": "サポート",
+    "search": "検索",
+    "bigbird": "Bigbird問合せ",
+    "buyer": "購入者問合せ",
+    "subscribe": "サブスクリプション",
+    "money": "ビッグバードマネー",
+    "account": "アカウント設定"
+  },
+  "comingSoon": "準備中",
+  "logo": {
+    "alt": "Bigbird",
+    "adminLinkLabel": "Bigbird · アカウント切り替え",
+    "homeLinkLabel": "Bigbird · ホーム"
+  },
+  "registerCampaign": "キャンペーン登録",
+  "guide": "利用ガイド",
+  "menu": {
+    "main": "メインメニュー",
+    "collapsed": "縮小メニュー",
+    "full": "全メニュー",
+    "collapse": "メニューを折りたたむ",
+    "expand": "メニューを展開",
+    "openFull": "全メニューを開く",
+    "close": "メニューを閉じる",
+    "open": "メニューを開く"
+  },
+  "header": {
+    "points": "ポイント照会（準備中）",
+    "alerts": "通知",
+    "alertsUnread": "通知、未読あり",
+    "profile": "マイプロフィール",
+    "settings": "アカウント設定",
+    "logout": "ログアウト",
+    "loggingOut": "ログアウト中…",
+    "login": "ログイン"
+  },
+  "alertPanel": {
+    "title": "通知",
+    "close": "通知を閉じる",
+    "emptyTitle": "新しい通知はありません",
+    "emptyDescription": "サービス利用中の主な通知がここに表示されます。"
+  },
+  "logoutFailed": "ログアウトできませんでした。もう一度お試しください。",
+  "session": {
+    "checking": "ログイン状態を確認中",
+    "checkFailed": "ログイン状態を確認できませんでした。もう一度お試しください。"
+  }
+}

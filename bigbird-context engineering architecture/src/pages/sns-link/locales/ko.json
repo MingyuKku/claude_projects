@@ -1,0 +1,23 @@
+{
+  "title": "SNS 계정 연동",
+  "tab": {
+    "signup": "가입하기",
+    "link": "SNS 계정 연동"
+  },
+  "signup": {
+    "heading": "반가워요.",
+    "message": "빅버드 파트너가 되어주시겠어요?<br />회원가입 이후에는 SNS 계정으로<br />로그인이 가능해요.",
+    "submit": "가입하기"
+  },
+  "link": {
+    "heading": "빅버드 기업회원 로그인",
+    "message": "기존 빅버드 파트너라면 로그인 시<br />SNS계정이 자동으로 연동돼요."
+  },
+  "error": {
+    "credentialRequired": "아이디/비밀번호를 모두 입력해 주세요",
+    "credentialMismatch": "입력하신 아이디와 비밀번호가 등록된 정보와 일치하지 않습니다",
+    "missingSnsData": "SNS 연동 정보가 없습니다",
+    "linkFailed": "연동되지 않았습니다. 관리자에게 문의해주세요",
+    "loginError": "로그인 중 오류가 발생했습니다"
+  }
+}

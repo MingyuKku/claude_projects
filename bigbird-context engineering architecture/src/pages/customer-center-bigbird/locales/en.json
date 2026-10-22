@@ -1,0 +1,8 @@
+{
+  "title": "Ask Bigbird",
+  "noSelection": "No inquiry selected.",
+  "notFound": "Inquiry not found.",
+  "loadError": "Couldn't load the inquiry.",
+  "backToList": "Back to list",
+  "conversation": "Conversation"
+}

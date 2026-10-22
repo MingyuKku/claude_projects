@@ -1,0 +1,55 @@
+{
+  "listTitle": "お問い合わせ一覧",
+  "refresh": "更新",
+  "newInquiry": "新しいお問い合わせ",
+  "all": "すべて",
+  "waiting": "返信待ち",
+  "consulting": "相談中",
+  "done": "回答済み",
+  "empty": {
+    "title": "お問い合わせはありません。",
+    "description": "新しいお問い合わせを登録してください。"
+  },
+  "loadError": "お問い合わせ一覧を読み込めませんでした。",
+  "inquiryTitle": {
+    "campaign": "{{name}}の問合せ",
+    "campaignUnknown": "キャンペーン問合せ",
+    "other": "その他問合せ"
+  },
+  "consultDate": "相談日",
+  "bigbirdManager": "Bigbird担当者",
+  "completed": {
+    "title": "完了した相談",
+    "description": "この相談は完了しています。新しいご質問は新規問合せで登録してください。",
+    "caption": "メッセージを残していただければ、確認後に順次回答します。"
+  },
+  "realtimeHistory": "相談メッセージはありません。",
+  "realtimeLoadError": "相談メッセージを読み込めませんでした。",
+  "campaignCode": "キャンペーンコード",
+  "copyCode": "キャンペーンコードをコピー",
+  "copied": "クリップボードにコピーしました。",
+  "backToList": "一覧へ",
+  "filterEmpty": "該当する問合せはありません。",
+  "copyFailed": "コピーできませんでした。",
+  "deletedMessage": "メッセージが削除されました。",
+  "failed": "リクエスト失敗",
+  "realtime": {
+    "requesting": {
+      "title": "相談リクエスト中",
+      "description": "担当者が接続するとリアルタイム相談が始まります。",
+      "caption": "接続には最大5分かかる場合があります。"
+    },
+    "failed": {
+      "title": "相談リクエスト失敗",
+      "description": "お問い合わせを残していただければ、確認後に順次ご回答します。",
+      "caption": "メッセージへの回答は、お問い合わせ状況により遅れる場合があります。"
+    },
+    "retry": "再試行",
+    "leaveMessage": "メッセージを残す",
+    "end": "相談終了",
+    "composer": "リアルタイム相談メッセージ",
+    "composerPlaceholder": "お問い合わせ内容を入力してください。（最大3,000文字）",
+    "attach": "添付",
+    "send": "送信"
+  }
+}

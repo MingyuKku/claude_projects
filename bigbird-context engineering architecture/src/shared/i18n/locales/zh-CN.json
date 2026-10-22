@@ -1,0 +1,93 @@
+{
+  "action": {
+    "close": "关闭",
+    "back": "返回",
+    "retry": "重试",
+    "confirm": "确认",
+    "login": "登录",
+    "goBack": "返回",
+    "cancel": "取消",
+    "save": "保存"
+  },
+  "status": {
+    "loading": "加载中…",
+    "checking": "确认中",
+    "comingSoon": "功能准备中。"
+  },
+  "error": {
+    "title": "出现问题",
+    "unexpected": "发生意外错误。"
+  },
+  "password": {
+    "show": "显示{{label}}",
+    "hide": "隐藏{{label}}"
+  },
+  "sns": {
+    "start": {
+      "kakao": "用 Kakao 开始",
+      "naver": "用 Naver 开始",
+      "apple": "用 Apple 开始",
+      "google": "用 Google 开始"
+    }
+  },
+  "field": {
+    "id": "账号",
+    "password": "密码"
+  },
+  "link": {
+    "privacy": "隐私政策",
+    "terms": "服务条款",
+    "findId": "找回账号",
+    "findPassword": "找回密码",
+    "signup": "注册"
+  },
+  "attachment": {
+    "error": {
+      "format": {
+        "title": "文件格式不符",
+        "description": "仅可添加图片或视频。"
+      },
+      "imageSize": {
+        "title": "图片超出大小",
+        "description": "图片最大30MB。"
+      },
+      "videoSize": {
+        "title": "视频超出大小",
+        "description": "视频最大50MB。"
+      },
+      "imageCount": {
+        "title": "图片数量超限",
+        "description": "最多添加10个文件。"
+      },
+      "videoCount": {
+        "title": "视频数量超限",
+        "description": "最多添加5个文件。"
+      }
+    },
+    "dropTitle": "将文件拖到此处",
+    "dropDescription": "30MB以内，JPG·JPEG·PNG·WebP·MP4",
+    "attach": "附件",
+    "remove": "删除附件",
+    "viewer": {
+      "title": "下载图片",
+      "download": "下载",
+      "prev": "上一个",
+      "next": "下一个"
+    },
+    "upload": {
+      "progress": "正在上传附件 ({{sent}}/{{total}})",
+      "failed": "有{{count}}个附件未能发送。",
+      "retry": "重试"
+    }
+  },
+  "feedback": {
+    "saved": "已保存。",
+    "saveFailed": "保存失败，请重试。"
+  },
+  "pagination": {
+    "navigation": "分页",
+    "previous": "上一页",
+    "next": "下一页",
+    "page": "第 {{page}} 页"
+  }
+}

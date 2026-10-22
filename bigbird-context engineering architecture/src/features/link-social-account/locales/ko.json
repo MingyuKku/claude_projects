@@ -1,0 +1,16 @@
+{
+  "title": "간편 로그인 연동",
+  "provider": {
+    "kakao": "카카오",
+    "naver": "네이버",
+    "facebook": "페이스북",
+    "google": "구글",
+    "apple": "애플"
+  },
+  "switchLabel": "{{provider}} 간편 로그인 연동",
+  "unlink": {
+    "title": "간편 로그인 해제",
+    "description": "{{provider}} 간편 로그인 연동을 해제하시겠습니까? 해제하면 {{provider}} 계정으로 로그인할 수 없습니다.",
+    "action": "해제"
+  }
+}

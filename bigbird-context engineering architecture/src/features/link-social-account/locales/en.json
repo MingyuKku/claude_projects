@@ -1,0 +1,16 @@
+{
+  "title": "Social login",
+  "provider": {
+    "kakao": "Kakao",
+    "naver": "Naver",
+    "facebook": "Facebook",
+    "google": "Google",
+    "apple": "Apple"
+  },
+  "switchLabel": "{{provider}} social login",
+  "unlink": {
+    "title": "Unlink social login",
+    "description": "Unlink {{provider}} social login? You won't be able to log in with your {{provider}} account.",
+    "action": "Unlink"
+  }
+}

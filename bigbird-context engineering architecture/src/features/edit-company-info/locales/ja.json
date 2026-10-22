@@ -1,0 +1,26 @@
+{
+  "title": "情報修正",
+  "form": {
+    "companyName": "会社名",
+    "contact": "連絡先",
+    "businessNumber": "事業者登録番号",
+    "businessFile": "事業者登録証",
+    "mailorderNumber": "通信販売番号",
+    "mailorderFile": "通信販売業申告証",
+    "category": "会社分類",
+    "url": "会社URL"
+  },
+  "file": {
+    "upload": "アップロード",
+    "uploadFor": "{{label}}をアップロード",
+    "registered": "登録済み",
+    "error": {
+      "extension": "JPG・PNG・PDFのみアップロードできます。",
+      "size": "最大10MBまでです。"
+    }
+  },
+  "inform": {
+    "required": "必須項目をすべて入力すると保存できます。",
+    "file": "ファイルはJPG・PNG・PDF形式、最大10MBまでアップロードできます。"
+  }
+}

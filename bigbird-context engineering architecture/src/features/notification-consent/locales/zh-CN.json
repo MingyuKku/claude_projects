@@ -1,0 +1,23 @@
+{
+  "alimtalk": {
+    "title": "Alimtalk 通知",
+    "marketing": {
+      "description": "可接收广告类通知。"
+    },
+    "night": {
+      "description": "夜间（21:00~次日8:00）可接收广告类 Alimtalk。"
+    }
+  },
+  "push": {
+    "title": "推送通知",
+    "marketing": {
+      "description": "可接收广告类通知。"
+    },
+    "night": {
+      "description": "夜间（21:00~次日8:00）可接收广告类推送通知。"
+    }
+  },
+  "marketing": { "label": "同意接收广告信息" },
+  "night": { "label": "同意夜间接收" },
+  "notice": "服务运营及重要通知等必要通知，无论是否同意均会发送。"
+}

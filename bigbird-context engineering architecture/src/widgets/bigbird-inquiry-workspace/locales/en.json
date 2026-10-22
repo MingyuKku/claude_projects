@@ -1,0 +1,55 @@
+{
+  "listTitle": "Inquiry list",
+  "refresh": "Refresh",
+  "newInquiry": "New inquiry",
+  "all": "All",
+  "waiting": "Waiting",
+  "consulting": "Consulting",
+  "done": "Answered",
+  "empty": {
+    "title": "No inquiries yet.",
+    "description": "Create a new inquiry."
+  },
+  "loadError": "Couldn't load inquiries.",
+  "inquiryTitle": {
+    "campaign": "{{name}} inquiry",
+    "campaignUnknown": "Campaign inquiry",
+    "other": "Other inquiry"
+  },
+  "consultDate": "Opened",
+  "bigbirdManager": "Bigbird team",
+  "completed": {
+    "title": "Closed",
+    "description": "This inquiry is closed. For a new question, create a new inquiry.",
+    "caption": "Leave a message and we'll reply in order after review."
+  },
+  "realtimeHistory": "There are no consultation messages.",
+  "realtimeLoadError": "Could not load consultation messages.",
+  "campaignCode": "Campaign code",
+  "copyCode": "Copy campaign code",
+  "copied": "Copied to clipboard.",
+  "backToList": "Back to list",
+  "filterEmpty": "No matching inquiries.",
+  "copyFailed": "Couldn't copy.",
+  "deletedMessage": "Message deleted.",
+  "failed": "Failed",
+  "realtime": {
+    "requesting": {
+      "title": "Requesting chat",
+      "description": "The live chat starts when an operator joins.",
+      "caption": "Connecting can take up to 5 minutes."
+    },
+    "failed": {
+      "title": "Chat request failed",
+      "description": "Leave a message and we'll reply in order after reviewing it.",
+      "caption": "Replies to messages may be delayed depending on inquiry volume."
+    },
+    "retry": "Retry",
+    "leaveMessage": "Leave a message",
+    "end": "End chat",
+    "composer": "Live chat message",
+    "composerPlaceholder": "Enter your inquiry. (Up to 3,000 characters)",
+    "attach": "Attach",
+    "send": "Send"
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "typeLabel": "Select inquiry type",
+  "campaignType": "Campaign inquiry",
+  "campaignDescription": "Ask about campaign progress, performance, settlement, and related topics.",
+  "otherType": "Other inquiry",
+  "otherDescription": "Ask about policies, the system, account usage, and other topics.",
+  "campaignListLabel": "Select a campaign",
+  "campaignName": "Campaign name",
+  "submit": "Submit inquiry",
+  "methodLabel": "Select inquiry method",
+  "board": "Leave a message",
+  "boardDescription": "Leave your inquiry and an operator will review it and reply.",
+  "realtime": "Live chat",
+  "realtimeDescription": "Chat in real time after being connected to an operator.",
+  "campaignPeriod": "Period",
+  "select": "Select",
+  "send": "Send",
+  "messagePlaceholder": "Enter your inquiry. (Up to 3,000 characters)",
+  "noCampaign": "You haven't applied for any campaigns."
+}

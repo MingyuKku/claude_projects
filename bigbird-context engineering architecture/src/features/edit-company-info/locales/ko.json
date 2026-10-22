@@ -1,0 +1,26 @@
+{
+  "title": "정보 수정",
+  "form": {
+    "companyName": "회사명",
+    "contact": "연락처",
+    "businessNumber": "사업자 등록 번호",
+    "businessFile": "사업자 등록증",
+    "mailorderNumber": "통신판매번호",
+    "mailorderFile": "통신판매업 신고증",
+    "category": "회사 분류",
+    "url": "회사 URL"
+  },
+  "file": {
+    "upload": "업로드",
+    "uploadFor": "{{label}} 업로드",
+    "registered": "등록됨",
+    "error": {
+      "extension": "JPG, PNG, PDF 파일만 업로드할 수 있습니다.",
+      "size": "최대 10MB까지 업로드할 수 있습니다."
+    }
+  },
+  "inform": {
+    "required": "필수 항목을 모두 입력해야 수정할 수 있습니다.",
+    "file": "파일은 JPG, PNG, PDF 형식만 가능하며 최대 10MB까지 업로드할 수 있습니다."
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "title": "アカウント設定",
+  "tabs": {
+    "master": "マスターID管理",
+    "company": "会社情報",
+    "bank": "口座情報",
+    "sub": "サブID管理",
+    "self": "サブID管理",
+    "notification": "通知設定"
+  },
+  "bankGuard": {
+    "title": "会社情報の登録が必要です",
+    "description": "口座情報を登録するには、先に会社情報を登録してください。"
+  }
+}

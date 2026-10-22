@@ -1,0 +1,26 @@
+{
+  "title": "修改信息",
+  "form": {
+    "companyName": "公司名称",
+    "contact": "联系方式",
+    "businessNumber": "营业执照号码",
+    "businessFile": "营业执照",
+    "mailorderNumber": "通信销售编号",
+    "mailorderFile": "通信销售申报证",
+    "category": "公司分类",
+    "url": "公司网址"
+  },
+  "file": {
+    "upload": "上传",
+    "uploadFor": "上传{{label}}",
+    "registered": "已登记",
+    "error": {
+      "extension": "仅支持 JPG、PNG、PDF 文件。",
+      "size": "最大 10MB。"
+    }
+  },
+  "inform": {
+    "required": "需填写所有必填项才能保存。",
+    "file": "文件仅支持 JPG、PNG、PDF 格式，最大 10MB。"
+  }
+}

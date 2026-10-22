@@ -1,0 +1,21 @@
+{
+  "title": "情報修正",
+  "form": {
+    "bank": "銀行",
+    "accountNumber": "口座番号",
+    "accountHolder": "口座名義",
+    "bankBook": "通帳コピー"
+  },
+  "file": {
+    "upload": "アップロード",
+    "uploadFor": "{{label}}をアップロード",
+    "registered": "登録済み",
+    "error": {
+      "extension": "JPG・PNG・PDFのみアップロードできます。",
+      "size": "最大10MBまでです。"
+    }
+  },
+  "toast": {
+    "denied": "毎月5日〜10日の精算期間中は口座情報を修正できません。"
+  }
+}

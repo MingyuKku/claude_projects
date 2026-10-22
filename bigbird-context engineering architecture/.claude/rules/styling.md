@@ -7,7 +7,8 @@ paths:
 
 # UI 시스템 (shadcn/ui · Tailwind · CVA)
 
-- **배치**: shadcn/ui 컴포넌트는 `src/shared/ui/`에 둡니다. 원본이라 직접 수정하지 않고, 커스터마이즈는 이를 감싸는 상위 컴포넌트에서 합니다 (훅과 린트가 이 폴더를 검사하지 않는 이유).
+- **배치**: shadcn/ui 컴포넌트는 `src/shared/ui/`에 둡니다. Figma 디자인 시스템이 shadcn 키트를 회사 디자인으로 바꾼 것이므로, Figma와 다른 부분은 래퍼를 만들지 않고 이 폴더의 파일을 직접 고칩니다. 기능 전용 변형은 여기 넣지 않고 상위 컴포넌트에서 감쌉니다.
+- **shadcn CLI 재설치 주의**: `shadcn add --overwrite`는 직접 고친 내용을 덮어씁니다. 업데이트가 필요하면 diff를 보고 수동으로 합칩니다. CLI 출력 형식(따옴표·세미콜론)을 유지하기 위해 이 폴더는 Prettier 검사에서만 제외되어 있습니다. 직접 고치는 파일이므로 ESLint(import 정렬·훅·접근성 규칙)는 검사합니다.
 - **클래스 병합**: `src/shared/lib/utils.ts`의 `cn`(`clsx` + `tailwind-merge`)만 씁니다.
 - **변형**: variant, size 같은 변형은 `cva`로 선언해 타입으로 노출합니다. 문자열 삼항 연산으로 클래스를 조립하지 않습니다.
 - **ref**: React 19에서는 `ref`가 일반 prop이므로 `forwardRef`를 쓰지 않습니다.

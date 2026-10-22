@@ -1,2 +1,5 @@
 allowBuilds:
   unrs-resolver: false
+  # firebase 하위 패키지. postinstall은 FIREBASE_WEBAPP_CONFIG 기본값 생성·버전 확인용이라 쓰지 않음
+  "@firebase/util": false
+  protobufjs: false

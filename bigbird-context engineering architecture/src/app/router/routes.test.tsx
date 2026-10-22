@@ -1,6 +1,8 @@
 import { render, screen } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 
+import { ROUTES } from "@/shared/config";
+
 import { RouteErrorBoundary } from "../providers/ErrorBoundary";
 import { routes } from "./routes";
 
@@ -10,10 +12,37 @@ function renderAt(path: string) {
 }
 
 describe("app router", () => {
-  it("/ 는 홈 페이지를 보여준다", async () => {
-    renderAt("/");
+  it("/welcome 은 가입 완료 화면을 보여준다", async () => {
+    renderAt(ROUTES.welcome);
     expect(
-      await screen.findByRole("heading", { name: "bigbird" }),
+      await screen.findByText("광고주 회원가입을 검토 중입니다.", {
+        exact: false,
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("/find/email-sent 는 재설정 링크 안내를 보여준다", async () => {
+    renderAt(ROUTES.findEmailSent);
+    expect(
+      await screen.findByText("등록된 이메일로 비밀번호 재설정 링크를", {
+        exact: false,
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("/join 은 가입 화면을 보여준다", async () => {
+    renderAt(ROUTES.join);
+    expect(
+      await screen.findByText("기업 담당자 본인인증이 필요합니다.", {
+        exact: false,
+      }),
+    ).toBeInTheDocument();
+  });
+
+  it("/logout 은 로그인 화면을 보여준다", async () => {
+    renderAt(ROUTES.logout);
+    expect(
+      await screen.findByRole("button", { name: "로그인" }),
     ).toBeInTheDocument();
   });
 

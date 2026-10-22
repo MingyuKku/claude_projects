@@ -1,0 +1,6 @@
+{
+  "title": "New inquiry",
+  "createFailed": "Couldn't create the inquiry. Please try again.",
+  "messageFailed": "The inquiry was created, but the message wasn't sent. Please try again.",
+  "requestFailed": "Couldn't request a chat. Please try again."
+}

@@ -1,0 +1,23 @@
+{
+  "composer": "Live chat message",
+  "composerPlaceholder": "Enter your message. (up to 3,000 characters)",
+  "send": "Send",
+  "lock": {
+    "title": "A chat is already in progress.",
+    "description": "Another agent is handling this inquiry. Please try again after the chat ends.",
+    "cancel": "Cancel",
+    "confirm": "OK"
+  },
+  "requestFailed": "Couldn't request a chat. Please try again shortly.",
+  "sendFailed": "Couldn't send the message. Please try again.",
+  "endFailed": "Couldn't end the chat. Please try again.",
+  "retryFailed": "Couldn't request the chat again.",
+  "cancelFailed": "Couldn't cancel the request. Please try again.",
+  "closed": "This chat has already ended.",
+  "closing": "The chat is ending.",
+  "notConnected": "You can send messages after an agent connects.",
+  "lockLost": "Another account is handling this chat.",
+  "alreadyConnected": "An agent is already connected.",
+  "failed": "Couldn't check the chat.",
+  "lockCheckFailed": "Couldn't check the chat status. We'll try again shortly."
+}

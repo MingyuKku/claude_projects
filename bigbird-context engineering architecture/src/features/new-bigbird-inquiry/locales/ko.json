@@ -1,0 +1,20 @@
+{
+  "typeLabel": "문의 유형 선택",
+  "campaignType": "캠페인 문의",
+  "campaignDescription": "캠페인 진행, 성과, 정산 등 캠페인 관련 문의를 진행합니다.",
+  "otherType": "기타 문의",
+  "otherDescription": "정책, 시스템, 이용 문의 등 기타 문의를 진행합니다.",
+  "campaignListLabel": "캠페인 선택",
+  "campaignName": "캠페인명",
+  "submit": "문의하기",
+  "methodLabel": "문의 방식 선택",
+  "board": "문의 남기기",
+  "boardDescription": "문의 내용을 남겨주시면 운영자가 확인 후 답변드립니다.",
+  "realtime": "실시간 상담하기",
+  "realtimeDescription": "운영자 상담 매칭 후 실시간으로 채팅을 진행합니다.",
+  "campaignPeriod": "기간",
+  "select": "선택",
+  "send": "전송",
+  "messagePlaceholder": "문의 내용을 입력하세요. (최대 3,000자)",
+  "noCampaign": "신청하신 캠페인이 없습니다."
+}

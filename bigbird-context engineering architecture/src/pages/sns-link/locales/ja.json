@@ -1,0 +1,23 @@
+{
+  "title": "SNSアカウント連携",
+  "tab": {
+    "signup": "登録",
+    "link": "SNS連携"
+  },
+  "signup": {
+    "heading": "ようこそ。",
+    "message": "Bigbirdのパートナーになりませんか？<br />会員登録後はSNSアカウントで<br />ログインできます。",
+    "submit": "登録"
+  },
+  "link": {
+    "heading": "Bigbird 法人会員ログイン",
+    "message": "既存のBigbirdパートナーの方は、ログインすると<br />SNSアカウントが自動で連携されます。"
+  },
+  "error": {
+    "credentialRequired": "IDとパスワードを入力",
+    "credentialMismatch": "入力されたIDとパスワードが登録情報と一致しません",
+    "missingSnsData": "SNS連携情報がありません",
+    "linkFailed": "連携されませんでした。管理者にお問い合わせください",
+    "loginError": "ログイン中にエラーが発生しました"
+  }
+}

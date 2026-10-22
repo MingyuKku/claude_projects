@@ -1,0 +1,9 @@
+{
+  "loading": "正在加载账号列表。",
+  "loadFailed": "无法加载账号列表。",
+  "empty": "没有可切换的账号。",
+  "listLabel": "要切换的账号",
+  "switch": "切换",
+  "switchLabel": "切换到账号 {{identifier}}",
+  "switchFailed": "切换账号失败，请重试。"
+}

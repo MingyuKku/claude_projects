@@ -1,0 +1,93 @@
+{
+  "action": {
+    "close": "Close",
+    "back": "Back",
+    "retry": "Retry",
+    "confirm": "OK",
+    "login": "Log in",
+    "goBack": "Back",
+    "cancel": "Cancel",
+    "save": "Save"
+  },
+  "status": {
+    "loading": "Loading…",
+    "checking": "Checking…",
+    "comingSoon": "Coming soon."
+  },
+  "error": {
+    "title": "Something went wrong",
+    "unexpected": "Unexpected error."
+  },
+  "password": {
+    "show": "Show {{label}}",
+    "hide": "Hide {{label}}"
+  },
+  "sns": {
+    "start": {
+      "kakao": "Start with Kakao",
+      "naver": "Start with Naver",
+      "apple": "Start with Apple",
+      "google": "Start with Google"
+    }
+  },
+  "field": {
+    "id": "ID",
+    "password": "Password"
+  },
+  "link": {
+    "privacy": "Privacy Policy",
+    "terms": "Terms",
+    "findId": "Find ID",
+    "findPassword": "Find password",
+    "signup": "Sign up"
+  },
+  "attachment": {
+    "error": {
+      "format": {
+        "title": "Unsupported file type",
+        "description": "Only image or video files can be attached."
+      },
+      "imageSize": {
+        "title": "Image too large",
+        "description": "Images can be up to 30MB."
+      },
+      "videoSize": {
+        "title": "Video too large",
+        "description": "Videos can be up to 50MB."
+      },
+      "imageCount": {
+        "title": "Too many images",
+        "description": "You can attach up to 10 files."
+      },
+      "videoCount": {
+        "title": "Too many videos",
+        "description": "You can attach up to 5 files."
+      }
+    },
+    "dropTitle": "Drop files here",
+    "dropDescription": "Up to 30MB, JPG·JPEG·PNG·WebP·MP4",
+    "attach": "Attach",
+    "remove": "Remove attachment",
+    "viewer": {
+      "title": "Download image",
+      "download": "Download",
+      "prev": "Previous",
+      "next": "Next"
+    },
+    "upload": {
+      "progress": "Uploading attachments ({{sent}}/{{total}})",
+      "failed": "Couldn't send {{count}} attachment(s).",
+      "retry": "Retry"
+    }
+  },
+  "feedback": {
+    "saved": "Saved.",
+    "saveFailed": "Couldn't save. Try again."
+  },
+  "pagination": {
+    "navigation": "Pagination",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {{page}}"
+  }
+}

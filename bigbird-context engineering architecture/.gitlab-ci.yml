@@ -2,15 +2,18 @@
 # GitLab 프로젝트 설정 > Merge requests 에서 "Pipelines must succeed" 를 켜고,
 # 기본 브랜치를 protected 로 두어 직접 push 를 막는다. (CI 파일만으로는 강제되지 않는다)
 
-stages: [verify]
+stages: [verify, review]
 
 default:
-  image: node:24
+  # 같은 커밋은 언제 돌려도 같은 Node 로 검사하도록 패치 버전까지 고정한다. 올릴 때는 package.json engines(>=24 <25) 범위 안에서 바꾼다.
+  image: node:24.22.0-bookworm
   interruptible: true
-  cache:
+  # 캐시는 받기만 한다. 검사만 하는 job 은 패키지를 바꾸지 않아 다시 올려도 똑같다(job 당 약 20초 낭비).
+  cache: &pnpm-cache
     key:
       files: [pnpm-lock.yaml]
     paths: [.pnpm-store]
+    policy: pull
   before_script:
     - corepack enable
     - pnpm config set store-dir .pnpm-store
@@ -19,30 +22,68 @@ default:
 workflow:
   rules:
     - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    # 이 브랜치를 소스로 하는 열린 MR(예: stage → prod)이 있으면 브랜치 파이프라인은 만들지 않는다.
+    # 같은 커밋을 MR 파이프라인이 검사하므로, 두 번 돌리지 않는다.
+    - if: $CI_COMMIT_BRANCH && $CI_OPEN_MERGE_REQUESTS
+      when: never
     - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    # MR 은 각자 소스 브랜치만 검사하므로(CE 는 merged-results 미지원), 여러 MR 이 합쳐진 stage 는 병합 후 다시 검사한다.
+    # 실패 알림은 병합한 사람에게 간다. stage 가 실패하면 다음 병합보다 복구를 먼저 한다.
+    - if: $CI_COMMIT_BRANCH == "stage"
 
 .verify:
   stage: verify
+  # 멈춘 테스트가 기본값(60분)까지 러너를 붙잡지 않게 한다. 평소 job 은 4분 안에 끝난다.
+  timeout: 10m
+  # 러너·GitLab 인프라 오류만 한 번 재시도한다. 검사 실패와 시간 초과는 재시도하지 않는다(불안정한 테스트를 가리지 않게).
+  retry:
+    max: 1
+    when: [runner_system_failure, api_failure, scheduler_failure]
 
-typecheck:
+# 가벼운 정적 검사는 한 job 에서 모두 실행한다. job 마다 러너 준비·캐시·설치에 1~2분이 드는데 검사는 5~30초라,
+# 따로 두면 준비 시간만 늘고 러너 동시 실행 한도에 걸려 다른 job 이 기다린다.
+# 하나가 실패해도 나머지를 끝까지 실행하고, 실패한 검사를 마지막에 모아 보여 준다.
+static:
   extends: .verify
-  script: [pnpm typecheck]
+  # pnpm-lock.yaml 이 바뀐 파이프라인에서만 새 키의 캐시를 올린다. 매번 올리면 job 당 약 35초가 든다.
+  cache:
+    <<: *pnpm-cache
+    policy: $PNPM_CACHE_POLICY
+  variables:
+    PNPM_CACHE_POLICY: pull
+  rules:
+    - changes: [pnpm-lock.yaml]
+      variables:
+        PNPM_CACHE_POLICY: pull-push
+    - when: on_success
+  script:
+    # i18n:check 는 번역 파일의 언어별 키 구성·빈 값·위치와 생성 타입(resources.gen.d.ts)이 최신인지 검사한다.
+    - |
+      failed=""
+      for check in typecheck lint format:check i18n:check; do
+        echo "\$ pnpm $check"
+        pnpm "$check" || failed="$failed $check"
+      done
+      if [ -n "$failed" ]; then
+        echo "실패한 검사:$failed"
+        exit 1
+      fi
 
-lint:
-  extends: .verify
-  script: [pnpm lint]
-
-format:
-  extends: .verify
-  script: ["pnpm format:check"]
-
+# 결과를 MR 위젯의 테스트 리포트로 보여 준다(실패·느린 테스트 확인용).
 test:
   extends: .verify
-  script: [pnpm test]
+  script:
+    - pnpm test --reporter=default --reporter=junit --outputFile.junit=reports/junit.xml
+  artifacts:
+    when: always
+    expire_in: 1 week
+    reports:
+      junit: reports/junit.xml
 
+# 타입 검사는 static job 이 하므로 번들만 만든다(pnpm build 는 tsc 를 한 번 더 돌린다).
 build:
   extends: .verify
-  script: [pnpm build]
+  script: [pnpm exec vite build]
 
 # AI 규칙/에이전트 생성물이 원본과 일치하는지 검증한다. node 설치가 필요 없다.
 ai-sync:
@@ -62,3 +103,37 @@ ai-sync:
         - .agents/**/*
         - ai/**/*
         - convention/ai/**/*
+
+# [MR 전용] AI 코드 리뷰: MR 에 요약 노트 1개를 게시/갱신한다. job 자체는 머지를 막지 않는다(allow_failure).
+# 대신 필수 수정은 열린 스레드로 달려, 프로젝트 설정 "All threads must be resolved" 가 켜져 있으면 해결 처리 전까지 병합을 막는다.
+# 필요한 CI 변수(masked): GITLAB_REVIEW_TOKEN(Project Access Token, api scope)과
+#   ANTHROPIC_API_KEY 또는 CLAUDE_CODE_OAUTH_TOKEN 중 하나. 없으면 리뷰를 건너뛴다.
+# 선택: CLAUDE_MODEL, AI_REVIEW_API_BASE(러너에서 GitLab 외부 URL 의 /api/v4 가 503 일 때 내부 GitLab 주소). 리뷰 기준은 ai/review/criteria.md, checklist.md 와 .claude/rules/*.md 이다.
+# Draft MR 은 작업 중이라 자동으로 돌지 않고 수동 실행(파이프라인의 ▶ 버튼)으로 둔다. Ready 로 바꾼 뒤 다음 푸시부터 자동 실행된다.
+# 작업 중 리뷰는 로컬에서 `pnpm ai:review` 로 원할 때 실행한다.
+ai-review:
+  stage: review
+  needs: []
+  # 큰 MR 은 묶음 리뷰(4개 동시, 각 10분)가 두 번 돌 수 있다(scripts/ai-review.sh 의 MAX_CHUNKS·MAX_PARALLEL).
+  timeout: 30m
+  cache: []
+  variables:
+    GIT_DEPTH: "0"
+    CLAUDE_CODE_VERSION: "2.1.296"
+  before_script:
+    - apt-get update -qq && apt-get install -y -qq --no-install-recommends jq
+    # npm 이 설치 후 스크립트를 기본 차단하므로 claude-code 만 허용한다(경고가 안내하는 옵션). 설치가 제대로 됐는지 바로 확인한다.
+    - npm install --global --allow-scripts=@anthropic-ai/claude-code "@anthropic-ai/claude-code@${CLAUDE_CODE_VERSION}"
+    - claude --version
+  script:
+    # merged-results 파이프라인은 (대상 브랜치 + MR) 합성 커밋을 체크아웃하므로 MR Changes 탭과 같은 코드(소스 head)로 바꿔 리뷰한다.
+    # 리뷰한 코드와 인라인 코멘트 줄번호가 Changes 탭과 일치해야 한다. 일반 MR 파이프라인은 이 변수가 없어 그대로다.
+    - if [ -n "${CI_MERGE_REQUEST_SOURCE_BRANCH_SHA:-}" ]; then git checkout -q --detach "$CI_MERGE_REQUEST_SOURCE_BRANCH_SHA"; fi
+    - bash scripts/ai-review.sh
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "merge_request_event"
+      when: never
+    - if: $CI_MERGE_REQUEST_DRAFT == "true" || $CI_MERGE_REQUEST_TITLE =~ /^(\[draft\]|\(draft\)|draft:)/i
+      when: manual
+    - when: on_success
+  allow_failure: true

@@ -1,0 +1,21 @@
+{
+  "brand": {
+    "bigbird": {
+      "loginTitle": "Bigbird パートナーセンター ログイン"
+    },
+    "petplay": {
+      "loginTitle": "Petplay パートナーセンター ログイン"
+    }
+  },
+  "submitting": "ログイン中",
+  "error": {
+    "idRequired": "IDを入力してください。",
+    "passwordRequired": "パスワードを入力してください。",
+    "mismatch": "IDまたはパスワードが一致しません。",
+    "unknown": "エラーが発生しました。しばらくしてからもう一度お試しください。",
+    "exited": "退会済みの会員です。",
+    "noAccount": "アカウントが存在しないか、退会した会員です。",
+    "destroyed": "こんにちは。Bigbird(BIGBIRD)です。\n情報通信網利用促進及び情報保護等に関する法律(「정보통신망 이용촉진 및 정보보호 등에 관한 법률」)第29条に基づき、Bigbirdのアカウント[{{userId}}]は1年以上ログインがなかったため、{{at, datetime(dateStyle: long; timeStyle: short)}}に失効しました。今後はより良いサービスで再びお会いできることを願っております。",
+    "lockedTemporarily_other": "アカウントがロックされています。{{count}}分後にもう一度ログインをお試しください。"
+  }
+}

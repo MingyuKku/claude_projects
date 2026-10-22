@@ -1,0 +1,145 @@
+{
+  "list": {
+    "label": "Sub ID 목록",
+    "search": {
+      "label": "Sub ID 검색",
+      "placeholder": "아이디, 담당자명, 이메일을 검색하세요."
+    },
+    "create": "Sub ID 생성",
+    "column": {
+      "identifier": "아이디",
+      "name": "담당자명",
+      "email": "이메일",
+      "createdAt": "생성일",
+      "manage": "관리"
+    },
+    "action": {
+      "permission": "권한 부여",
+      "delete": "삭제"
+    },
+    "empty": {
+      "none": {
+        "title": "Sub ID가 없습니다.",
+        "description": "Sub ID가 필요하다면 추가 계정을 생성해주세요."
+      },
+      "search": {
+        "title": "‘{{keyword}}’에 대한 결과가 없습니다."
+      }
+    }
+  },
+  "create": {
+    "title": "Sub ID 생성",
+    "submit": "Sub ID 생성하기",
+    "profileImage": {
+      "label": "프로필 이미지(선택)",
+      "edit": "프로필 이미지 선택",
+      "alt": "프로필 이미지",
+      "error": {
+        "extension": "JPG, PNG 파일만 업로드할 수 있습니다.",
+        "size": "최대 10MB까지 업로드할 수 있습니다."
+      }
+    },
+    "field": {
+      "name": {
+        "label": "담당자명",
+        "placeholder": "담당자 이름을 작성하세요."
+      },
+      "identifier": {
+        "label": "아이디",
+        "placeholder": "아이디를 입력하세요.",
+        "check": "중복 확인"
+      },
+      "password": {
+        "label": "비밀번호",
+        "placeholder": "비밀번호를 입력하세요."
+      },
+      "passwordCheck": {
+        "label": "비밀번호 확인",
+        "placeholder": "비밀번호를 입력하세요."
+      },
+      "phone": {
+        "label": "휴대폰 번호",
+        "placeholder": "휴대폰 번호를 입력하세요."
+      },
+      "email": {
+        "label": "이메일",
+        "placeholder": "이메일을 입력하세요."
+      }
+    },
+    "status": {
+      "identifier": {
+        "available": "사용할 수 있는 아이디입니다."
+      }
+    },
+    "error": {
+      "identifier": {
+        "format": "영문, 숫자, 밑줄, 점을 이용하여 6-20자로 입력해 주세요.",
+        "taken": "중복된 아이디가 있습니다.",
+        "needCheck": "아이디 중복 확인이 필요합니다.",
+        "check": "아이디 확인 중 오류가 발생했습니다."
+      },
+      "password": {
+        "format": "영문, 숫자, 특수문자를 조합 8-20자로 입력해주세요.",
+        "containsId": "아이디를 포함한 비밀번호 불가",
+        "repeated": "동일∙연속적 숫자,문자 반복 불가"
+      },
+      "passwordCheck": {
+        "mismatch": "비밀번호가 일치하지 않습니다."
+      },
+      "email": {
+        "format": "올바른 이메일 형식이 아닙니다."
+      }
+    },
+    "toast": {
+      "created": "Sub ID가 생성되었습니다."
+    }
+  },
+  "delete": {
+    "title": "Sub ID 삭제",
+    "description": "‘{{identifier}}’를 삭제하시겠습니까? 삭제된 데이터는 복구되지 않습니다."
+  },
+  "access": {
+    "screen": "권한 부여",
+    "permission": {
+      "title": "Sub ID 권한부여",
+      "column": {
+        "name": "권한명",
+        "granted": "권한 여부"
+      },
+      "name": {
+        "campaign": "캠페인",
+        "influencerMatching": "인플루언서 매칭",
+        "influencerMarket": "인플루언서 마켓",
+        "commerce": "커머스 관리",
+        "buyerInquiry": "구매자 문의",
+        "bigbirdMoney": "빅버드 머니"
+      },
+      "switchLabel": "{{name}} 권한"
+    },
+    "campaign": {
+      "title": "Sub ID 캠페인 할당",
+      "column": {
+        "name": "캠페인명",
+        "productType": "상품 유형",
+        "detailType": "세부 상품",
+        "status": "캠페인 진행 상태",
+        "statusShort": "진행 상태",
+        "assigned": "담당 여부"
+      },
+      "productType": {
+        "recruit": "모집형",
+        "pick": "PICK형"
+      },
+      "detailType": {
+        "brand": "브랜드형",
+        "groupBuy": "공구형"
+      },
+      "status": {
+        "completed": "진행 완료",
+        "waiting": "대기중",
+        "running": "진행중"
+      },
+      "switchLabel": "{{name}} 담당 여부"
+    }
+  }
+}

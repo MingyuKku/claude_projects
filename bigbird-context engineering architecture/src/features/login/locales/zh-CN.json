@@ -1,0 +1,21 @@
+{
+  "brand": {
+    "bigbird": {
+      "loginTitle": "Bigbird 合作伙伴中心登录"
+    },
+    "petplay": {
+      "loginTitle": "Petplay 合作伙伴中心登录"
+    }
+  },
+  "submitting": "正在登录",
+  "error": {
+    "idRequired": "输入账号。",
+    "passwordRequired": "输入密码。",
+    "mismatch": "账号或密码不匹配。",
+    "unknown": "发生错误，请稍后重试。",
+    "exited": "该会员已注销。",
+    "noAccount": "账号不存在或该会员已退出。",
+    "destroyed": "您好，这里是 Bigbird（BIGBIRD）。\n根据《信息通信网利用促进及信息保护等相关法律》（「정보통신망 이용촉진 및 정보보호 등에 관한 법률」）第29条，您的 Bigbird 账号 [{{userId}}] 因超过1年未登录，已于{{at, datetime(dateStyle: long; timeStyle: short)}}失效。期待日后以更好的服务与您再会。",
+    "lockedTemporarily_other": "账号已被锁定，请在 {{count}} 分钟后重新尝试登录。"
+  }
+}

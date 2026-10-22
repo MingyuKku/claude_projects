@@ -1,0 +1,21 @@
+{
+  "title": "修改信息",
+  "form": {
+    "bank": "银行",
+    "accountNumber": "账户号码",
+    "accountHolder": "户名",
+    "bankBook": "存折复印件"
+  },
+  "file": {
+    "upload": "上传",
+    "uploadFor": "上传{{label}}",
+    "registered": "已登记",
+    "error": {
+      "extension": "仅支持 JPG、PNG、PDF 文件。",
+      "size": "最大 10MB。"
+    }
+  },
+  "toast": {
+    "denied": "每月 5 日至 10 日结算期间无法修改账户信息。"
+  }
+}

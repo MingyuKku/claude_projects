@@ -1,0 +1,23 @@
+{
+  "title": "Link SNS account",
+  "tab": {
+    "signup": "Sign up",
+    "link": "Link SNS"
+  },
+  "signup": {
+    "heading": "Welcome.",
+    "message": "Would you like to become a Bigbird partner?<br />After signing up, you can log in<br />with your SNS account.",
+    "submit": "Sign up"
+  },
+  "link": {
+    "heading": "Bigbird corporate member login",
+    "message": "If you are already a Bigbird partner, your SNS account<br />will be linked automatically when you log in."
+  },
+  "error": {
+    "credentialRequired": "Enter ID and password",
+    "credentialMismatch": "ID and password don't match our records",
+    "missingSnsData": "No SNS link info",
+    "linkFailed": "Linking failed. Contact the administrator",
+    "loginError": "Login error occurred"
+  }
+}

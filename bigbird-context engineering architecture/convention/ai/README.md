@@ -32,6 +32,8 @@ python ai/scripts/render_agents.py --check
 
 루트 `.gitlab-ci.yml`이 `ai-sync` 잡으로 위 두 `--check`를 실행합니다. 병합 차단은 GitLab 프로젝트 설정(Pipelines must succeed, protected branch)으로 켭니다.
 
+MR 자동 AI 리뷰(`ai-review` 잡)의 설정, 토큰 갱신, 인증 방식 전환은 `ai/review/README.md`를 봅니다.
+
 ## 리뷰 규칙
 
 `CODEOWNERS`가 AI 동작을 바꾸는 경로(`.claude/`, `ai/`, `convention/`, `AGENTS.md`, `CLAUDE.md`, `.mcp.json`)를 지정합니다.

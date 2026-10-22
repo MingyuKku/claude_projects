@@ -1,0 +1,93 @@
+{
+  "action": {
+    "close": "閉じる",
+    "back": "戻る",
+    "retry": "再試行",
+    "confirm": "確認",
+    "login": "ログイン",
+    "goBack": "戻る",
+    "cancel": "キャンセル",
+    "save": "保存"
+  },
+  "status": {
+    "loading": "読み込み中…",
+    "checking": "確認中",
+    "comingSoon": "準備中の機能です。"
+  },
+  "error": {
+    "title": "問題が発生しました",
+    "unexpected": "予期しないエラーです。"
+  },
+  "password": {
+    "show": "{{label}}を表示",
+    "hide": "{{label}}を非表示"
+  },
+  "sns": {
+    "start": {
+      "kakao": "Kakaoで始める",
+      "naver": "Naverで始める",
+      "apple": "Appleで始める",
+      "google": "Googleで始める"
+    }
+  },
+  "field": {
+    "id": "ID",
+    "password": "パスワード"
+  },
+  "link": {
+    "privacy": "プライバシーポリシー",
+    "terms": "利用規約",
+    "findId": "ID検索",
+    "findPassword": "パスワード検索",
+    "signup": "会員登録"
+  },
+  "attachment": {
+    "error": {
+      "format": {
+        "title": "ファイル形式エラー",
+        "description": "画像または動画のみ添付できます。"
+      },
+      "imageSize": {
+        "title": "画像の容量超過",
+        "description": "画像は最大30MBまでです。"
+      },
+      "videoSize": {
+        "title": "動画の容量超過",
+        "description": "動画は最大50MBまでです。"
+      },
+      "imageCount": {
+        "title": "画像の数超過",
+        "description": "ファイルは最大10個までです。"
+      },
+      "videoCount": {
+        "title": "動画の数超過",
+        "description": "ファイルは最大5個までです。"
+      }
+    },
+    "dropTitle": "ここにファイルをドロップ",
+    "dropDescription": "30MB以下、JPG·JPEG·PNG·WebP·MP4",
+    "attach": "添付",
+    "remove": "添付を削除",
+    "viewer": {
+      "title": "画像ダウンロード",
+      "download": "ダウンロード",
+      "prev": "前へ",
+      "next": "次へ"
+    },
+    "upload": {
+      "progress": "添付をアップロード中 ({{sent}}/{{total}})",
+      "failed": "{{count}}件の添付を送信できませんでした。",
+      "retry": "再試行"
+    }
+  },
+  "feedback": {
+    "saved": "保存しました。",
+    "saveFailed": "保存できませんでした。もう一度お試しください。"
+  },
+  "pagination": {
+    "navigation": "ページ移動",
+    "previous": "前へ",
+    "next": "次へ",
+    "page": "{{page}}ページ"
+  }
+}

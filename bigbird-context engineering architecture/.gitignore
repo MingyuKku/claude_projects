@@ -12,3 +12,7 @@ CLAUDE.local.md
 .claude/.last-verified
 .claude/.stop-attempts*
 .claude/.last-verify.log
+.playwright-mcp/
+.DS_Store
+.pnpm-store/
+.claude/figma-cache/
