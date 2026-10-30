@@ -1,0 +1,121 @@
+{
+  "won": "{{amount}} KRW",
+  "usage": {
+    "title": "Usage history",
+    "list": {
+      "label": "Usage history"
+    },
+    "column": {
+      "campaignName": "Campaign",
+      "usedAt": "Date",
+      "usage": "Usage",
+      "amount": "Amount",
+      "campaignCode": "Campaign code",
+      "detail": "Details"
+    },
+    "card": {
+      "usedAt": "Date",
+      "campaignName": "Campaign",
+      "campaignType": "Campaign type",
+      "campaignCode": "Campaign code",
+      "usage": "Usage",
+      "amount": "Amount",
+      "remaining": "Balance after"
+    },
+    "action": {
+      "detail": "View details"
+    },
+    "detail": {
+      "title": "Details",
+      "usedAt": "Date",
+      "campaignName": "Campaign",
+      "campaignType": "Campaign type",
+      "campaignCode": "Campaign code",
+      "usage": "Usage",
+      "amount": "Amount",
+      "remaining": "Balance after"
+    },
+    "filter": {
+      "date": {
+        "label": "Date",
+        "placeholder": "Select dates."
+      },
+      "campaign": {
+        "label": "Campaign",
+        "placeholder": "Select a campaign."
+      },
+      "usage": {
+        "label": "Usage",
+        "placeholder": "Select a usage."
+      }
+    },
+    "empty": {
+      "none": "No Bigbird Money usage yet."
+    }
+  },
+  "charge": {
+    "title": "Charge history",
+    "list": {
+      "label": "Charge history"
+    },
+    "column": {
+      "requestedAt": "Date",
+      "amount": "Requested amount",
+      "method": "Method",
+      "status": "Status",
+      "receipt": "Receipt",
+      "detail": "Details"
+    },
+    "card": {
+      "requestedAt": "Date",
+      "amount": "Requested amount",
+      "method": "Method",
+      "status": "Status"
+    },
+    "action": {
+      "detail": "View details",
+      "receipt": "Receipt",
+      "receiptShort": "Receipt"
+    },
+    "method": {
+      "vbank": "Bank transfer"
+    },
+    "detail": {
+      "title": "Transaction details",
+      "approvedAt": "Approved",
+      "requestedAt": "Requested",
+      "amount": "Requested amount",
+      "method": "Method",
+      "bank": "Bank",
+      "account": "Virtual account no.",
+      "depositedAt": "Deposited",
+      "status": "Deposit status",
+      "receipt": "Get receipt"
+    },
+    "filter": {
+      "date": {
+        "label": "Date",
+        "placeholder": "Select dates."
+      },
+      "status": {
+        "label": "Status",
+        "placeholder": "Select a status.",
+        "option": {
+          "paid": "Paid",
+          "pending": "Pending",
+          "canceled": "Canceled"
+        }
+      }
+    },
+    "empty": {
+      "none": "No Bigbird Money charges yet."
+    },
+    "notice": {
+      "title": "Notice",
+      "method": "Bigbird Money is charged by bank transfer.",
+      "validity": "The virtual account is valid until midnight in 2 days.",
+      "instant": "Bigbird Money is credited once the deposit is confirmed.",
+      "delay": "The balance may take up to 5 minutes to update after the deposit."
+    }
+  }
+}

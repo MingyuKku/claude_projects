@@ -1,11 +1,4 @@
-import {
-  act,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-  within,
-} from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createMemoryRouter, RouterProvider, useLocation } from "react-router";
 
@@ -110,53 +103,22 @@ describe("InfluencerSearchForm", () => {
     expect(router.state.location.pathname).toBe("/");
   });
 
-  describe("플랫폼과 wide 전환", () => {
-    function stubOverflow() {
-      vi.spyOn(
-        HTMLTextAreaElement.prototype,
-        "scrollHeight",
-        "get",
-      ).mockReturnValue(40);
-      vi.spyOn(
-        HTMLTextAreaElement.prototype,
-        "clientHeight",
-        "get",
-      ).mockReturnValue(20);
-    }
-
-    it("플랫폼을 골라도 한 줄을 유지하고 쿼리에 platform이 붙는다", async () => {
+  describe("플랫폼", () => {
+    it("항상 버튼에 이름이 보이고 플랫폼을 고르면 쿼리에 platform이 붙는다", async () => {
       const user = userEvent.setup();
       const router = renderForm();
-      expect(getSubmit()).toHaveTextContent("");
+      expect(getSubmit()).toHaveTextContent("인플루언서 탐색");
       await user.click(screen.getByRole("button", { name: "플랫폼" }));
       await user.click(
         await screen.findByRole("menuitemcheckbox", { name: "인스타그램" }),
       );
-      expect(getSubmit()).toHaveTextContent("");
+      expect(getSubmit()).toHaveTextContent("인플루언서 탐색");
       expect(
         screen.getByRole("button", { name: "인스타그램" }),
       ).toBeInTheDocument();
       await user.type(screen.getByRole("textbox"), "hi");
       await user.click(getSubmit());
       expect(router.state.location.search).toBe("?q=hi&platform=instagram");
-    });
-
-    it("문구를 모두 지우면 플랫폼을 고른 상태여도 한 줄로 돌아간다", async () => {
-      const user = userEvent.setup();
-      renderForm();
-      stubOverflow();
-      await user.click(screen.getByRole("button", { name: "플랫폼" }));
-      await user.click(
-        await screen.findByRole("menuitemcheckbox", { name: "네이버" }),
-      );
-      const textbox = screen.getByRole("textbox");
-      await user.type(textbox, "ab");
-      expect(getSubmit()).toHaveTextContent("인플루언서 탐색");
-      await user.clear(textbox);
-      expect(getSubmit()).toHaveTextContent("");
-      expect(
-        screen.getByRole("button", { name: "네이버" }),
-      ).toBeInTheDocument();
     });
 
     it("선택한 플랫폼을 다시 눌러도 해제되지 않는다", async () => {
@@ -172,186 +134,129 @@ describe("InfluencerSearchForm", () => {
       );
       expect(screen.getByRole("button", { name: "틱톡" })).toBeInTheDocument();
     });
-
-    it("문구가 한 줄을 넘으면 wide가 되고 입력 포커스를 유지한다", async () => {
-      const user = userEvent.setup();
-      renderForm();
-      const textbox = screen.getByRole("textbox");
-      vi.spyOn(
-        HTMLTextAreaElement.prototype,
-        "scrollHeight",
-        "get",
-      ).mockReturnValue(40);
-      vi.spyOn(
-        HTMLTextAreaElement.prototype,
-        "clientHeight",
-        "get",
-      ).mockReturnValue(20);
-      await user.type(textbox, "a");
-      expect(getSubmit()).toHaveTextContent("인플루언서 탐색");
-      expect(screen.getByRole("textbox")).toBe(textbox);
-      expect(textbox).toHaveFocus();
-    });
-
-    it("모바일은 항상 wide이다", () => {
-      stubMedia("(max-width: 767px)");
-      renderForm();
-      expect(getSubmit()).toHaveTextContent("인플루언서 탐색");
-    });
   });
 
   describe("긴 글 펼치기", () => {
-    function mockOverflow(isOverflowing: boolean) {
+    const LINE_HEIGHT = 20;
+
+    // 글의 줄 수를 scrollHeight로 흉내 냄(jsdom은 레이아웃이 없음).
+    function mockLines(lines: number) {
       vi.spyOn(
         HTMLTextAreaElement.prototype,
         "scrollHeight",
         "get",
-      ).mockReturnValue(isOverflowing ? 120 : 20);
-      vi.spyOn(
-        HTMLTextAreaElement.prototype,
-        "clientHeight",
-        "get",
-      ).mockReturnValue(isOverflowing ? 68 : 20);
+      ).mockReturnValue(lines * LINE_HEIGHT);
     }
 
-    async function openDialog() {
+    async function typeLines(lines: number) {
       const user = userEvent.setup();
-      stubMedia("(max-width: 767px)");
-      mockOverflow(true);
-      const router = renderForm();
-      await user.type(screen.getByRole("textbox"), "긴 글");
-      await user.click(await screen.findByRole("button", { name: "펼치기" }));
-      return { user, router, dialog: await screen.findByRole("dialog") };
-    }
-
-    it("글이 최대 높이를 넘을 때만 펼치기 아이콘을 보여 준다", async () => {
-      const user = userEvent.setup();
-      stubMedia("(max-width: 767px)");
-      mockOverflow(false);
-      renderForm();
-      await user.type(screen.getByRole("textbox"), "짧은 글");
-      expect(
-        screen.queryByRole("button", { name: "펼치기" }),
-      ).not.toBeInTheDocument();
-      mockOverflow(true);
-      await user.type(screen.getByRole("textbox"), "더");
-      expect(
-        screen.getByRole("button", { name: "펼치기" }),
-      ).toBeInTheDocument();
-      mockOverflow(false);
-      await user.clear(screen.getByRole("textbox"));
-      expect(
-        screen.queryByRole("button", { name: "펼치기" }),
-      ).not.toBeInTheDocument();
-    });
-
-    it("펼치면 같은 값을 보여 주는 모달이 열리고 입력에 포커스한다", async () => {
-      const { dialog } = await openDialog();
-      const textbox = within(dialog).getByRole("textbox");
-      expect(textbox).toHaveValue("긴 글");
-      expect(textbox).toHaveFocus();
-    });
-
-    it("모달에서 고친 글은 축소로 닫은 뒤에도 남고 기존 입력창에 포커스가 돌아온다", async () => {
-      const { user, dialog } = await openDialog();
-      await user.type(within(dialog).getByRole("textbox"), " 추가");
-      await user.click(within(dialog).getByRole("button", { name: "축소" }));
-      // iOS 키보드 유지를 위해 닫는 같은 이벤트 안에서 동기로 포커스가 돌아와야 한다.
-      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-      const textbox = screen.getByRole("textbox");
-      expect(textbox).toHaveValue("긴 글 추가");
-      expect(textbox).toHaveFocus();
-    });
-
-    it("Esc로 닫는다", async () => {
-      const { user } = await openDialog();
-      await user.keyboard("{Escape}");
-      await waitFor(() =>
-        expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
-      );
-      expect(screen.getByRole("textbox")).toHaveValue("긴 글");
-    });
-
-    it("뒤로가기로 닫는다", async () => {
-      await openDialog();
-      act(() => window.history.back());
-      await waitFor(() =>
-        expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
-      );
-      expect(screen.getByRole("textbox")).toHaveValue("긴 글");
-    });
-
-    it("모달에서 제출하면 이동하면서 닫힌다", async () => {
-      const { user, router, dialog } = await openDialog();
-      await user.click(
-        within(dialog).getByRole("button", { name: "인플루언서 탐색" }),
-      );
-      await waitFor(() =>
-        expect(router.state.location.pathname).toBe("/influencers/search"),
-      );
-      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-    });
-
-    it("모달에서도 PC는 Enter로 제출한다", async () => {
-      const { user, router, dialog } = await openDialog();
-      await user.type(within(dialog).getByRole("textbox"), "{Enter}");
-      await waitFor(() =>
-        expect(router.state.location.search).toBe(
-          `?${new URLSearchParams({ q: "긴 글" })}`,
-        ),
-      );
-    });
-  });
-
-  describe("PC 인라인 펼치기", () => {
-    async function typeLongOnDesktop() {
-      const user = userEvent.setup();
-      stubMedia("(min-width: 1440px)");
-      vi.spyOn(
-        HTMLTextAreaElement.prototype,
-        "scrollHeight",
-        "get",
-      ).mockReturnValue(120);
-      vi.spyOn(
-        HTMLTextAreaElement.prototype,
-        "clientHeight",
-        "get",
-      ).mockReturnValue(68);
+      mockLines(lines);
       renderForm();
       await user.type(screen.getByRole("textbox"), "긴 글");
       return user;
     }
 
-    it("모달 없이 입력창 높이만 키우고 축소로 되돌린다", async () => {
-      const user = await typeLongOnDesktop();
-      await user.click(await screen.findByRole("button", { name: "펼치기" }));
-      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-      expect(screen.getByRole("textbox").className).toContain(
-        "h-[min(50dvh,24rem)]",
-      );
-      await user.click(screen.getByRole("button", { name: "축소" }));
-      expect(screen.getByRole("textbox").className).not.toContain(
-        "h-[min(50dvh,24rem)]",
-      );
+    it("글이 4줄까지는 펼치기 아이콘이 없고 5줄부터 보인다", async () => {
+      const user = await typeLines(4);
+      expect(
+        screen.queryByRole("button", { name: "펼치기" }),
+      ).not.toBeInTheDocument();
+      mockLines(5);
+      await user.type(screen.getByRole("textbox"), "더");
+      expect(
+        screen.getByRole("button", { name: "펼치기" }),
+      ).toBeInTheDocument();
+      mockLines(4);
+      await user.type(screen.getByRole("textbox"), "x");
+      expect(
+        screen.queryByRole("button", { name: "펼치기" }),
+      ).not.toBeInTheDocument();
+    });
+
+    it("모바일은 8줄을 넘어 입력창 안에서 스크롤이 생길 때만 펼치기 아이콘을 보여 준다", async () => {
+      stubMedia("(max-width: 767px)");
+      const user = await typeLines(8);
+      expect(
+        screen.queryByRole("button", { name: "펼치기" }),
+      ).not.toBeInTheDocument();
+      mockLines(9);
+      await user.type(screen.getByRole("textbox"), "더");
       expect(
         screen.getByRole("button", { name: "펼치기" }),
       ).toBeInTheDocument();
     });
 
-    it("펼친 상태에서 글을 모두 지우면 접힌다", async () => {
-      const user = await typeLongOnDesktop();
-      await user.click(await screen.findByRole("button", { name: "펼치기" }));
-      await user.clear(screen.getByRole("textbox"));
-      expect(screen.getByRole("textbox").className).not.toContain(
-        "h-[min(50dvh,24rem)]",
-      );
+    it("펼치기 버튼은 mousedown에서 포커스를 가져가지 않아 모바일 키보드가 유지된다", async () => {
+      const user = await typeLines(6);
+      const textbox = screen.getByRole("textbox");
+      textbox.focus();
+      const button = await screen.findByRole("button", { name: "펼치기" });
+      // preventDefault가 호출되면 fireEvent는 false를 돌려줌.
+      expect(fireEvent.mouseDown(button)).toBe(false);
+      expect(textbox).toHaveFocus();
+      await user.click(button);
+      expect(textbox).toHaveFocus();
     });
 
-    it("펼쳐도 같은 입력창이고 포커스를 유지한다", async () => {
-      const user = await typeLongOnDesktop();
+    it("펼치기 전에는 최소 4줄에서 8줄까지 늘어난다", async () => {
+      await typeLines(6);
+      const { className } = screen.getByRole("textbox");
+      expect(className).toContain("min-h-[4lh]");
+      expect(className).toContain("max-h-[8lh]");
+    });
+
+    it("펼치면 모달 없이 같은 입력창이 고정 높이로 커지고 포커스를 유지한다", async () => {
+      const user = await typeLines(6);
       const textbox = screen.getByRole("textbox");
       await user.click(await screen.findByRole("button", { name: "펼치기" }));
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
       expect(screen.getByRole("textbox")).toBe(textbox);
+      expect(textbox).toHaveFocus();
+      expect(textbox.className).toContain("flex-1");
+      expect(textbox.className).not.toContain("max-h-[8lh]");
+      expect(
+        textbox
+          .closest("form")
+          ?.style.getPropertyValue("--search-expanded-height"),
+      ).not.toBe("");
+    });
+
+    it("축소 아이콘으로 접고 글은 그대로 남는다", async () => {
+      const user = await typeLines(6);
+      await user.click(await screen.findByRole("button", { name: "펼치기" }));
+      await user.click(screen.getByRole("button", { name: "축소" }));
+      const textbox = screen.getByRole("textbox");
+      expect(textbox.className).toContain("max-h-[8lh]");
+      expect(textbox).toHaveValue("긴 글");
+      expect(
+        screen.getByRole("button", { name: "펼치기" }),
+      ).toBeInTheDocument();
+    });
+
+    it("Esc로 접는다", async () => {
+      const user = await typeLines(6);
+      await user.click(await screen.findByRole("button", { name: "펼치기" }));
+      await user.keyboard("{Escape}");
+      expect(screen.getByRole("textbox").className).toContain("max-h-[8lh]");
+      expect(screen.getByRole("textbox")).toHaveValue("긴 글");
+    });
+
+    it("펼친 상태에서 글을 모두 지우면 접힌다", async () => {
+      const user = await typeLines(6);
+      await user.click(await screen.findByRole("button", { name: "펼치기" }));
+      await user.clear(screen.getByRole("textbox"));
+      expect(screen.getByRole("textbox").className).toContain("max-h-[8lh]");
+    });
+
+    it("펼친 입력창에서도 제출한다", async () => {
+      const user = await typeLines(6);
+      await user.click(await screen.findByRole("button", { name: "펼치기" }));
+      await user.click(getSubmit());
+      await waitFor(() =>
+        expect(screen.getByTestId("location")).toHaveTextContent(
+          "/influencers/search?q=",
+        ),
+      );
     });
   });
 });

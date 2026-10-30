@@ -44,17 +44,20 @@ export interface ProfileSavePlan {
   hasPasswordChange: boolean;
   hasEmailChange: boolean;
   hasImageChange: boolean;
+  /** 휴대폰 본인인증을 마쳐 새 번호가 있음. */
+  hasPhoneChange: boolean;
 }
 
 export function getProfileSavePlan(
   values: ProfileFormValues,
   initialEmail: string,
-  hasNewImage: boolean,
+  changes: { hasNewImage: boolean; hasVerifiedPhone: boolean },
 ): ProfileSavePlan {
   return {
     hasPasswordChange: values.password !== "",
     hasEmailChange: values.email !== initialEmail,
-    hasImageChange: hasNewImage,
+    hasImageChange: changes.hasNewImage,
+    hasPhoneChange: changes.hasVerifiedPhone,
   };
 }
 
@@ -65,7 +68,10 @@ export function canSaveProfile(
   plan: ProfileSavePlan,
 ) {
   const hasChange =
-    plan.hasPasswordChange || plan.hasEmailChange || plan.hasImageChange;
+    plan.hasPasswordChange ||
+    plan.hasEmailChange ||
+    plan.hasImageChange ||
+    plan.hasPhoneChange;
   const hasError = Boolean(
     errors.password || errors.passwordCheck || errors.email,
   );

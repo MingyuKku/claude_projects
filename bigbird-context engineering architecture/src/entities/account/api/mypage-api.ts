@@ -1,9 +1,13 @@
 import { serverApiV3 } from "@/shared/api";
 
-import { transformMasterToViewModel } from "../lib/transform-master";
+import {
+  transformMasterToViewModel,
+  transformSubSelfToViewModel,
+} from "../lib/transform-master";
 import {
   accountMasterSchema,
   simpleResultSchema,
+  subSelfAccountSchema,
 } from "../model/mypage-schema";
 
 export type DuplicateCheckType = "id" | "email";
@@ -13,6 +17,12 @@ export type DuplicateCheckResult = "available" | "taken";
 export async function fetchMasterAccount() {
   const response = await serverApiV3.get("/mypage/account/master");
   return transformMasterToViewModel(accountMasterSchema.parse(response));
+}
+
+/** `GET /v3/mypage/account/sub/self`. Master는 403이라 Sub ID 화면에서만 호출함. */
+export async function fetchSubSelfAccount() {
+  const response = await serverApiV3.get("/mypage/account/sub/self");
+  return transformSubSelfToViewModel(subSelfAccountSchema.parse(response));
 }
 
 /**

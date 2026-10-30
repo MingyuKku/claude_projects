@@ -14,10 +14,13 @@ export function changeMasterPassword(password: string) {
 }
 
 /**
- * 이메일 변경. 서버는 본인인증(`certIdx`)을 함께 요구하고, `email`을 비워 보내면 기존
- * 이메일이 지워지므로 항상 값을 채워 보냄.
+ * 휴대폰(본인인증 `certIdx`)·이메일 변경. 서버는 둘을 한 요청으로 받고, `email`을 비워 보내면 기존
+ * 이메일이 지워지므로 휴대폰만 바꿀 때도 현재 이메일을 채워 보냄.
  */
-export function changeMasterEmail(params: { certIdx: number; email: string }) {
+export function modifyMasterAccount(params: {
+  certIdx: number;
+  email: string;
+}) {
   return serverApiV3.put("/mypage/account/modify", params);
 }
 
@@ -32,7 +35,6 @@ export function uploadProfileImage(file: File, hasExistingImage: boolean) {
 
 /**
  * Sub ID 본인 변경은 Master와 경로가 달라(`/sub/*`, 서로 상대 경로는 403) 따로 둠. 이메일은 본인인증 없이 값만 보냄.
- * 휴대폰 변경(`/sub/phone`)은 본인인증 경로 확인 전(스펙 §7 B-12)이라 연결하지 않음.
  */
 export function changeSubPassword(password: string) {
   return serverApiV3.put("/mypage/account/sub/pw", { pw: password });
@@ -40,6 +42,14 @@ export function changeSubPassword(password: string) {
 
 export function changeSubEmail(email: string) {
   return serverApiV3.put("/mypage/account/sub/email", { email });
+}
+
+/**
+ * 화면은 KMC 인증을 마친 번호만 보냄. 서버는 아직 번호만 받고 인증 증명(`certIdx`)을 받지 않음
+ * (docs/mypage-api.md §4-13 ⑤, 받게 되면 함께 보냄).
+ */
+export function changeSubPhone(phone: string) {
+  return serverApiV3.put("/mypage/account/sub/phone", { phone });
 }
 
 export function uploadSubProfileImage(file: File, hasExistingImage: boolean) {

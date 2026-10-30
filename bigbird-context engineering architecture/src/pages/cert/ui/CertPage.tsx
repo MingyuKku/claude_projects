@@ -1,6 +1,7 @@
 import { useEffect, useRef } from "react";
 
-import { KMC_CERT_URL, useCertInit } from "@/features/join";
+import { useCertInit } from "@/features/join";
+import { KMC_CERT_URL } from "@/shared/lib";
 
 const CERT_SERVICE_MOBILE = "mobile";
 const DEFAULT_TR_ADD = "Y";

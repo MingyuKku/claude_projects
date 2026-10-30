@@ -3,9 +3,11 @@ import { SOCIAL_PROVIDERS } from "../model/mypage-schema";
 import type {
   AccountMaster,
   CompanyInfoViewModel,
+  AccountProfileViewModel,
   MasterAccountViewModel,
   SocialLinkViewModel,
   SocialProvider,
+  SubSelfAccount,
 } from "../model/mypage-schema";
 
 /** 서버 날짜 형식은 `yyyy-MM-dd HH:mm`(시간대 표기 없음). 로컬 시각으로 읽음. */
@@ -41,28 +43,28 @@ function toSocialLinks(user: AccountMaster["user"]) {
 }
 
 function toCompanyInfo(
-  extra: NonNullable<AccountMaster["extraInformation"]>,
+  company: NonNullable<AccountMaster["companyInformation"]>,
 ): CompanyInfoViewModel {
   return {
-    companyName: extra.companyName ?? "",
-    contact: extra.contact ?? "",
-    businessNumber: extra.companyRegistrationNumber ?? "",
-    mailorderNumber: extra.mailorderBusinessNumber ?? "",
-    categoryIdx: extra.companyClassification ?? null,
-    categoryName: extra.companyClassificationName ?? null,
-    companyUrl: extra.companyUrl ?? "",
-    hasBusinessRegistrationFile: extra.companyRegistrationFileNum != null,
-    businessRegistrationFileName: extra.companyRegistrationFileName || null,
-    hasMailorderFile: extra.mailorderBusinessFileNum != null,
-    mailorderFileName: extra.mailorderBusinessFileName || null,
-    hasBankBookFile: extra.bankBookFileNum != null,
+    companyName: company.companyName ?? "",
+    contact: company.contact ?? "",
+    businessNumber: company.companyRegistrationNumber ?? "",
+    mailorderNumber: company.mailorderBusinessNumber ?? "",
+    categoryIdx: company.companyClassification ?? null,
+    categoryName: company.companyClassificationName ?? null,
+    companyUrl: company.companyUrl ?? "",
+    hasBusinessRegistrationFile: company.companyRegistrationFileNum != null,
+    businessRegistrationFileName: company.companyRegistrationFileName || null,
+    hasMailorderFile: company.mailorderBusinessFileNum != null,
+    mailorderFileName: company.mailorderBusinessFileName || null,
+    hasBankBookFile: company.bankBookFileNum != null,
   };
 }
 
 export function transformMasterToViewModel(
   master: AccountMaster,
 ): MasterAccountViewModel {
-  const { user, extraInformation } = master;
+  const { user, companyInformation } = master;
   return {
     profile: {
       identifier: user.identifier,
@@ -72,7 +74,21 @@ export function transformMasterToViewModel(
       joinedAt: parseServerDate(user.created),
       certIdx: user.certification?.certIdx ?? null,
     },
-    company: extraInformation ? toCompanyInfo(extraInformation) : null,
+    company: companyInformation ? toCompanyInfo(companyInformation) : null,
     socialLinks: toSocialLinks(user),
+  };
+}
+
+/** Sub ID 본인 정보. 응답에 가입일이 없어 비워 두고, Sub는 본인인증을 쓰지 않아 `certIdx`가 없음. */
+export function transformSubSelfToViewModel(
+  account: SubSelfAccount,
+): AccountProfileViewModel {
+  return {
+    identifier: account.identifier,
+    name: account.name,
+    phone: account.phone,
+    email: account.email,
+    joinedAt: null,
+    certIdx: null,
   };
 }

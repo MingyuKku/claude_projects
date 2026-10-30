@@ -8,7 +8,7 @@ import { cn } from "@/shared/lib/utils"
 // Figma 디자인 시스템 Button(2718:8237)·Icon Button(2718:8839) 기준.
 // variant = Figma Type, destructive = Figma Destructive, size: default = Figma md, icon = Figma md 아이콘 버튼.
 const buttonVariants = cva(
-  "inline-flex shrink-0 items-center justify-center rounded-md font-medium whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+  "inline-flex shrink-0 items-center justify-center rounded-md font-medium whitespace-nowrap transition-[color,background-color,border-color,transform] outline-none active:not-aria-[haspopup]:translate-y-px focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 aria-invalid:border-destructive [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
   {
     variants: {
       variant: {

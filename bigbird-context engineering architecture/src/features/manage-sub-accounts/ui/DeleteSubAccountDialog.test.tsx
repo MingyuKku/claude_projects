@@ -13,15 +13,17 @@ const account: SubAccountViewModel = {
   createdAt: new Date(2024, 4, 9),
 };
 
-function setup(target: SubAccountViewModel | null = account) {
+function setup(open = true) {
   const handlers = { onCancel: vi.fn(), onConfirm: vi.fn() };
-  render(<DeleteSubAccountDialog account={target} {...handlers} />);
-  return { handlers, user: userEvent.setup() };
+  const view = render(
+    <DeleteSubAccountDialog open={open} account={account} {...handlers} />,
+  );
+  return { handlers, rerender: view.rerender, user: userEvent.setup() };
 }
 
 describe("DeleteSubAccountDialog", () => {
-  it("대상이 없으면 열리지 않는다", () => {
-    setup(null);
+  it("열지 않았으면 보이지 않는다", () => {
+    setup(false);
     expect(screen.queryByRole("alertdialog")).toBeNull();
   });
 

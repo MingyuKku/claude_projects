@@ -1,5 +1,5 @@
 import {
-  CompanyInfoForm,
+  CompanyInfoCard,
   CompanyInfoFormSkeleton,
 } from "@/features/edit-company-info";
 import { SkeletonGroup } from "@/shared/components/skeleton-presets";
@@ -16,7 +16,7 @@ export function CompanyInfoTab() {
       }
     >
       {(master, refresh) => (
-        <CompanyInfoForm company={master.company} onSaved={refresh} />
+        <CompanyInfoCard company={master.company} onSaved={refresh} />
       )}
     </MasterAccountGate>
   );

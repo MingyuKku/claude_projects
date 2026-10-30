@@ -95,7 +95,11 @@ export function Stepper({
               {step.label && (
                 <span
                   className={cn(
-                    "max-w-[60px] text-center text-xs leading-4 font-medium whitespace-nowrap",
+                    "text-center text-xs leading-4 font-medium",
+                    // sm는 단계 간격(약 53px)보다 라벨이 길 수 있어 줄바꿈함. ko만 단어 단위로 끊음(ja·zh-CN은 break-keep이 줄바꿈 지점을 없앰).
+                    size === "sm"
+                      ? "max-w-[52px] [&:lang(ko)]:break-keep"
+                      : "max-w-[60px] whitespace-nowrap",
                     isActive ? "text-foreground" : "text-muted-foreground",
                   )}
                 >

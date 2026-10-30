@@ -1,3 +1,5 @@
+import { parseContentDispositionFileName } from "./content-disposition";
+
 export interface RequestOptions {
   params?: Record<string, string | number | boolean | undefined>;
   headers?: Record<string, string>;
@@ -21,12 +23,20 @@ export function isApiError(error: unknown): error is ApiError {
   return error instanceof ApiError;
 }
 
+/** 파일 응답. `fileName`은 서버가 `Content-Disposition`으로 준 이름이고 없으면 null. */
+export interface DownloadedFile {
+  blob: Blob;
+  fileName: string | null;
+}
+
 export interface HttpClient {
   get<T>(path: string, options?: RequestOptions): Promise<T>;
   post<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T>;
   put<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T>;
   patch<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T>;
   delete<T>(path: string, options?: RequestOptions): Promise<T>;
+  /** 파일(이진 응답)을 받음. 본문을 글자로 읽는 다른 메서드와 달리 이진 데이터를 그대로 보존함. */
+  download(path: string, options?: RequestOptions): Promise<DownloadedFile>;
 }
 
 function buildUrl(
@@ -70,7 +80,10 @@ function buildBody(body: unknown): {
  * The session is cookie based, so every request sends credentials and the
  * client never stores or reads a token.
  */
-export function createHttpClient(baseUrl: string): HttpClient {
+export function createHttpClient(
+  baseUrl: string,
+  { credentials = "include" }: { credentials?: RequestCredentials } = {},
+): HttpClient {
   async function request<T>(
     method: string,
     path: string,
@@ -80,7 +93,7 @@ export function createHttpClient(baseUrl: string): HttpClient {
     const { payload, headers } = buildBody(body);
     const response = await fetch(buildUrl(baseUrl, path, options.params), {
       method,
-      credentials: "include",
+      credentials,
       headers: { ...headers, ...options.headers },
       body: payload,
       signal: options.signal,
@@ -90,7 +103,25 @@ export function createHttpClient(baseUrl: string): HttpClient {
     return data as T;
   }
 
+  async function download(path: string, options: RequestOptions = {}) {
+    const response = await fetch(buildUrl(baseUrl, path, options.params), {
+      method: "GET",
+      credentials,
+      headers: options.headers,
+      signal: options.signal,
+    });
+    if (!response.ok)
+      throw new ApiError(response.status, await parseBody(response));
+    return {
+      blob: await response.blob(),
+      fileName: parseContentDispositionFileName(
+        response.headers.get("Content-Disposition"),
+      ),
+    };
+  }
+
   return {
+    download,
     get: (path, options) => request("GET", path, undefined, options),
     post: (path, body, options) => request("POST", path, body, options),
     put: (path, body, options) => request("PUT", path, body, options),

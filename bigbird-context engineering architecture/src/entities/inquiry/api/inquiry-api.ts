@@ -1,4 +1,5 @@
-import useSWR from "swr";
+import { useCallback } from "react";
+import useSWR, { useSWRConfig } from "swr";
 import useSWRInfinite from "swr/infinite";
 
 import { ApiError, isApiError, serverApiV3 } from "@/shared/api";
@@ -11,10 +12,12 @@ import {
   transformPurchaserQuestionInfoToViewModel,
   transformQnaListToViewModel,
   transformInquiryCampaignToViewModel,
+  transformInquiryMessagesToViewModels,
   transformInquiryThreadToViewModel,
 } from "../lib/transform-inquiry";
 import {
   buyerInquiryDetailSchema,
+  campaignTimelineSchema,
   buyerInquiryListSchema,
   buyerInfluencerOptionsSchema,
   createInquiryThreadResultSchema,
@@ -28,12 +31,19 @@ import {
   simpleResultSchema,
   uploadInquiryAttachmentResultSchema,
 } from "../model/schema";
+import { useInquirySummaryChanges } from "./helpdesk-changes";
+import { useCoalescedRefresh } from "./use-coalesced-refresh";
 import { useLiveInquiries } from "./use-live-inquiries";
 
-import type { BuyerInquiryViewModel, InquiryThread } from "../model/schema";
+import type {
+  BigbirdInquiryViewModel,
+  BuyerInquiryViewModel,
+  InquiryThread,
+} from "../model/schema";
 
 // 첨부 업로드 경로의 {service} 값. v2는 문자열 "undefined"를 보냈고 V3 명세는 허용 값을 적지 않아 백엔드 답변 전 임시값.
 // ponytail: 답변이 오면 이 상수만 바꿈(경로의 {type}은 파일 종류 image|video).
+// 문서는 전용 {type}이 없어(file·document·pdf 모두 400) image 경로로 올림. image 경로는 확장자를 그대로 저장함(2026-10-29 확인).
 export const ATTACHMENT_UPLOAD_SERVICE = "help";
 
 export type InquiryThreadStatusFilter = "ALL" | InquiryThread["status"];
@@ -54,10 +64,12 @@ export async function fetchBigbirdInquiries(
       params: { threadUserIdx, status },
     });
     const { data } = ensureSucceeded(inquiryThreadListSchema.parse(response));
-    // 목록과 LNB 진입 시 자동 선택이 최신 문의 기준.
+    // 마지막 문의·답변 일시가 최근인 순(REQ-23-0003·0005). 자동 선택도 이 순서의 첫 문의.
+    const lastActivity = (inquiry: BigbirdInquiryViewModel) =>
+      (inquiry.messages.at(-1)?.createdAt ?? inquiry.createdAt).getTime();
     return data
       .map(transformInquiryThreadToViewModel)
-      .sort((a, b) => b.createdAt.getTime() - a.createdAt.getTime());
+      .sort((a, b) => lastActivity(b) - lastActivity(a));
   } catch (error) {
     // 명세상 404는 "유저가 없거나 대화 내역이 없음". 세션의 내 threadUserIdx로
     // 조회하므로 문의가 없는 것으로 봄. 다른 오류는 문의 없음으로 바꾸지 않음.
@@ -80,9 +92,52 @@ export function useBigbirdInquiries(
     // 앱 전체 기본은 꺼져 있어서(SWRProvider) 이 화면만 켬.
     { revalidateOnFocus: true },
   );
+  // 대화 화면이 쓰는 캠페인 타임라인도 같은 시점에 다시 받음.
+  const { mutate: mutateGlobal } = useSWRConfig();
+  const refreshAll = useCallback(
+    () =>
+      Promise.all([
+        mutate(),
+        mutateGlobal(
+          (key) => Array.isArray(key) && key[0] === CAMPAIGN_TIMELINE_KEY,
+        ),
+      ]),
+    [mutate, mutateGlobal],
+  );
+  // 전송 직후 재조회와 Firestore 변경 신호가 겹쳐도 요청은 한 번만 보냄. 단순 재조회는 이것을 씀.
+  const refresh = useCoalescedRefresh(refreshAll);
+  // 운영자 답장·상태 변경이 summary에 반영되면 목록(대화 포함)을 다시 받음.
+  useInquirySummaryChanges(threadUserIdx, refresh);
   // 실시간 상담의 연결·종료 상태를 합침(상담 중·요청 실패 표시).
   const inquiries = useLiveInquiries(threadUserIdx, data);
-  return { inquiries, isLoading, isError: Boolean(error), mutate };
+  return { inquiries, isLoading, isError: Boolean(error), mutate, refresh };
+}
+
+const CAMPAIGN_TIMELINE_KEY = "campaign-timeline";
+
+/** 캠페인에 걸린 모든 스레드(종료 뒤 다시 열린 것, 실시간 상담 구간 포함)의 메시지를 시간순으로 합친 대화. */
+export async function fetchCampaignTimeline(campaignIdx: number) {
+  try {
+    const response = await serverApiV3.get("/help/thread/campaign-timeline", {
+      params: { campaignIdx },
+    });
+    const { data } = ensureSucceeded(campaignTimelineSchema.parse(response));
+    return transformInquiryMessagesToViewModels(data);
+  } catch (error) {
+    // 명세상 404는 이 계정이 문의를 한 번도 하지 않은 경우뿐이라 빈 대화로 봄.
+    if (isApiError(error) && error.status === 404) return [];
+    throw error;
+  }
+}
+
+/** 선택한 캠페인 문의의 합쳐진 대화. 캠페인이 없는 기타 문의는 조회하지 않음. */
+export function useCampaignTimeline(campaignIdx: number | null | undefined) {
+  const { data, isLoading, error } = useSWR(
+    campaignIdx == null ? null : [CAMPAIGN_TIMELINE_KEY, campaignIdx],
+    ([, idx]) => fetchCampaignTimeline(idx),
+    { revalidateOnFocus: true },
+  );
+  return { messages: data, isLoading, isError: Boolean(error) };
 }
 
 export async function fetchInquiryCampaigns() {
@@ -165,7 +220,7 @@ export async function uploadInquiryAttachment(file: File) {
   const form = new FormData();
   form.append("file", file);
   const response = await serverApiV3.post(
-    `/help/message/${kind}/${ATTACHMENT_UPLOAD_SERVICE}`,
+    `/help/message/${kind === "file" ? "image" : kind}/${ATTACHMENT_UPLOAD_SERVICE}`,
     form,
   );
   const { url, attachmentIdx, fileName, fileSize } = ensureSucceeded(
@@ -189,6 +244,9 @@ export interface BuyerInquiryFilters {
   influencerThreadUserIdx?: number;
   /** 검색어(이름 또는 주문번호). 비어 있으면 검색하지 않음. */
   keyword?: string;
+  /** 등록일 범위(포함), `yyyy-MM-dd`. 둘 다 있을 때만 씁니다. */
+  startDate?: string;
+  endDate?: string;
 }
 
 /**
@@ -229,6 +287,9 @@ export async function fetchBuyerInquiryPage(
             keyword: filters.keyword,
           }
         : {}),
+      ...(filters.startDate && filters.endDate
+        ? { startDate: filters.startDate, endDate: filters.endDate }
+        : {}),
       page,
       entrySize: BUYER_INQUIRY_PAGE_SIZE,
     },
@@ -261,6 +322,8 @@ export function useBuyerInquiries(
               filters.campaignIdx,
               filters.influencerThreadUserIdx,
               filters.keyword,
+              filters.startDate,
+              filters.endDate,
               index + 1,
             ],
       ([
@@ -270,6 +333,8 @@ export function useBuyerInquiries(
         campaignIdx,
         influencerThreadUserIdx,
         keyword,
+        startDate,
+        endDate,
         page,
       ]: readonly [
         string,
@@ -278,6 +343,8 @@ export function useBuyerInquiries(
         number | undefined,
         number | undefined,
         string | undefined,
+        string | undefined,
+        string | undefined,
         number,
       ]) =>
         fetchBuyerInquiryPage(filter, page, {
@@ -285,6 +352,8 @@ export function useBuyerInquiries(
           campaignIdx,
           influencerThreadUserIdx,
           keyword,
+          startDate,
+          endDate,
         }),
       { revalidateFirstPage: true },
     );
@@ -314,21 +383,28 @@ export async function fetchBuyerInquiryDetail(
   );
 }
 
-/** 문의자 프로필(`GET /v3/help/user/{threadUserIdx}`). 비회원·이미지 없음이면 `null`이라 기본 아바타를 씀. */
-export async function fetchInquiryUserImage(threadUserIdx: number) {
+/** 문의 유저 정보(`GET /v3/help/user/{threadUserIdx}`). 광고주면 `nickname`이 회사명. */
+export async function fetchInquiryUser(threadUserIdx: number) {
   const response = await serverApiV3.get(`/help/user/${threadUserIdx}`);
-  return (
-    ensureSucceeded(inquiryUserSchema.parse(response)).data.profileImage ?? null
+  return ensureSucceeded(inquiryUserSchema.parse(response)).data;
+}
+
+function useInquiryUser(threadUserIdx: number | null) {
+  const { data } = useSWR(
+    threadUserIdx === null ? null : ["inquiry-user", threadUserIdx],
+    ([, idx]) => fetchInquiryUser(idx),
   );
+  return data;
 }
 
 /** 문의자 프로필 이미지 주소. 받지 못하면(실패·없음) 기본 아바타를 쓰도록 `undefined`. */
 export function useInquiryUserImage(threadUserIdx: number | null) {
-  const { data } = useSWR(
-    threadUserIdx === null ? null : ["inquiry-user-image", threadUserIdx],
-    ([, idx]) => fetchInquiryUserImage(idx),
-  );
-  return data ?? undefined;
+  return useInquiryUser(threadUserIdx)?.profileImage ?? undefined;
+}
+
+/** 문의 유저의 회사명(광고주 말풍선 이름). 받지 못하면 `undefined`. */
+export function useInquiryUserName(threadUserIdx: number | null) {
+  return useInquiryUser(threadUserIdx)?.nickname ?? undefined;
 }
 
 /** 구매자 문의 상세의 상품(`GET /v3/help/c-purchaser-questionInfo/{orderNumber}`). 상품 Q&A처럼 주문번호가 없으면 조회하지 않음. */
@@ -458,6 +534,23 @@ export async function createQnaReply(inquiryIdx: number, body: string) {
 /** Q&A 답변 수정(`PUT /v3/help/reply`). 구매자가 이미 읽은 답변은 409. */
 export async function editQnaReply(replyIdx: number, body: string) {
   const response = await serverApiV3.put("/help/reply", { replyIdx, body });
+  ensureSucceeded(simpleResultSchema.parse(response));
+}
+
+/** 보낸 메시지 수정(`PUT /v3/help/thread/message`). 본인 메시지만, 상대가 읽기 전에만 가능(읽었으면 409, 남의 메시지는 403, 없으면 404) */
+export async function editInquiryMessage(messageIdx: number, body: string) {
+  const response = await serverApiV3.put("/help/thread/message", {
+    messageIdx,
+    body,
+  });
+  ensureSucceeded(simpleResultSchema.parse(response));
+}
+
+/** 보낸 메시지 삭제(`DELETE /v3/help/thread/message/{messageIdx}`, 하드삭제). 수정과 같은 조건·오류 코드 */
+export async function deleteInquiryMessage(messageIdx: number) {
+  const response = await serverApiV3.delete(
+    `/help/thread/message/${messageIdx}`,
+  );
   ensureSucceeded(simpleResultSchema.parse(response));
 }
 

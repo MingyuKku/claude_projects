@@ -13,6 +13,9 @@ export default defineConfig({
     // 2026-10 기준 전체 테스트를 worker 1개로 실행할 때 최대 약 700MB였다. 이보다 낮추면 재시작이 잦아진다.
     vmMemoryLimit: "1GB",
     globals: true,
+    // 테스트별 제한 기본값(5초)은 로그인 → 여러 화면 이동처럼 단계가 많은 라우터 통합 테스트가 CI 러너(로컬의 약 5~7배 느림)에서
+    // 넘기기 쉬움(고객센터 LNB 이동 테스트가 로컬 약 1초, CI 5.03초로 실패). 조회 대기(asyncUtilTimeout 4초)가 여러 번 쌓여도 버티도록 늘림.
+    testTimeout: 15_000,
     setupFiles: [
       "./src/shared/config/test-setup.ts",
       "./src/app/i18n/test-setup.ts",

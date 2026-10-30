@@ -6,6 +6,10 @@ afterEach(() => {
 });
 
 describe("useSidebarStore", () => {
+  it("저장된 값이 없으면 접힌 상태가 기본이다", () => {
+    expect(useSidebarStore.getInitialState().isCollapsed).toBe(true);
+  });
+
   it("접힘 여부를 토글하고 localStorage에 저장한다", () => {
     useSidebarStore.getState().toggleCollapsed();
     expect(useSidebarStore.getState().isCollapsed).toBe(true);

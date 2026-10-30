@@ -15,6 +15,7 @@
     },
     "action": {
       "permission": "Permissions",
+      "edit": "Edit",
       "delete": "Delete"
     },
     "empty": {
@@ -57,10 +58,6 @@
         "label": "Confirm password",
         "placeholder": "Enter password."
       },
-      "phone": {
-        "label": "Phone",
-        "placeholder": "Enter phone number."
-      },
       "email": {
         "label": "Email",
         "placeholder": "Enter email."
@@ -94,18 +91,27 @@
       "created": "Sub ID created."
     }
   },
+  "edit": {
+    "title": "Edit Sub ID",
+    "submit": "Save changes",
+    "toast": {
+      "updated": "Sub ID details have been updated."
+    }
+  },
   "delete": {
     "title": "Delete Sub ID",
-    "description": "Delete ‘{{identifier}}’? Deleted data can't be recovered."
+    "description": "Delete ‘{{identifier}}’? Deleted data can't be recovered.",
+    "toast": {
+      "deleted": "Sub ID deleted."
+    }
   },
   "access": {
-    "screen": "Permissions",
+    "tab": {
+      "service": "Services",
+      "campaign": "Campaigns"
+    },
     "permission": {
       "title": "Sub ID permissions",
-      "column": {
-        "name": "Permission",
-        "granted": "Allowed"
-      },
       "name": {
         "campaign": "Campaigns",
         "influencerMatching": "Influencer matching",
@@ -114,7 +120,11 @@
         "buyerInquiry": "Buyer Q&A",
         "bigbirdMoney": "Bigbird Money"
       },
-      "switchLabel": "{{name}} permission"
+      "switchLabel": "{{name}} permission",
+      "toast": {
+        "granted": "‘{{name}}’ permission granted.",
+        "revoked": "‘{{name}}’ permission removed."
+      }
     },
     "campaign": {
       "title": "Sub ID campaign assignment",
@@ -123,7 +133,6 @@
         "productType": "Product type",
         "detailType": "Product detail",
         "status": "Campaign status",
-        "statusShort": "Status",
         "assigned": "Assigned"
       },
       "productType": {
@@ -139,7 +148,8 @@
         "waiting": "Pending",
         "running": "In progress"
       },
-      "switchLabel": "{{name}} assigned"
+      "switchLabel": "{{name}} assigned",
+      "empty": "No campaigns to assign."
     }
   }
 }

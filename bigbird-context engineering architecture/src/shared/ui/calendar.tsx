@@ -74,7 +74,7 @@ function Calendar({
           "relative flex w-full flex-col gap-4 tablet:flex-row",
           defaultClassNames.months
         ),
-        month: cn("flex w-full flex-col gap-1", defaultClassNames.month),
+        month: cn("flex w-full flex-col items-center gap-1", defaultClassNames.month),
         nav: cn(
           "absolute inset-x-0 top-0 flex h-9 items-center justify-between px-2.5",
           defaultClassNames.nav

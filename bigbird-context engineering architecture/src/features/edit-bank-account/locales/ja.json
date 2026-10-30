@@ -1,5 +1,5 @@
 {
-  "title": "情報修正",
+  "title": "口座情報",
   "form": {
     "bank": "銀行",
     "accountNumber": "口座番号",
@@ -12,10 +12,16 @@
     "registered": "登録済み",
     "error": {
       "extension": "JPG・PNG・PDFのみアップロードできます。",
-      "size": "最大10MBまでです。"
-    }
+      "size": "最大10MBまでです。",
+      "download": "ファイルをダウンロードできませんでした。もう一度お試しください。"
+    },
+    "none": "ファイルなし",
+    "download": "{{name}}をダウンロード"
   },
   "toast": {
     "denied": "毎月5日〜10日の精算期間中は口座情報を修正できません。"
+  },
+  "view": {
+    "register": "登録"
   }
 }

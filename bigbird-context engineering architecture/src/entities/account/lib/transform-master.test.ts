@@ -1,7 +1,11 @@
-import { accountMasterSchema } from "../model/mypage-schema";
+import {
+  accountMasterSchema,
+  subSelfAccountSchema,
+} from "../model/mypage-schema";
 import {
   parseServerDate,
   transformMasterToViewModel,
+  transformSubSelfToViewModel,
 } from "./transform-master";
 
 const masterResponse = {
@@ -20,7 +24,7 @@ const masterResponse = {
     idNaver: null,
     emailNaver: null,
   },
-  extraInformation: {
+  companyInformation: {
     companyName: "주식회사 빅버드",
     contact: "01012345678",
     companyRegistrationNumber: "123-45-67890",
@@ -95,5 +99,28 @@ describe("parseServerDate", () => {
     expect(parseServerDate(null)).toBeNull();
     expect(parseServerDate("")).toBeNull();
     expect(parseServerDate("not a date")).toBeNull();
+  });
+});
+
+describe("transformSubSelfToViewModel", () => {
+  it("Sub 본인 정보를 읽고, 응답에 없는 가입일·본인인증은 비운다", () => {
+    const profile = transformSubSelfToViewModel(
+      subSelfAccountSchema.parse({
+        accountIdx: 101,
+        identifier: "sub01",
+        name: "김서브",
+        email: "sub01@bigbird.local",
+        phone: "01011112222",
+        profileImageUrl: null,
+      }),
+    );
+    expect(profile).toEqual({
+      identifier: "sub01",
+      name: "김서브",
+      phone: "01011112222",
+      email: "sub01@bigbird.local",
+      joinedAt: null,
+      certIdx: null,
+    });
   });
 });

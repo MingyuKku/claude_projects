@@ -46,7 +46,7 @@ function consultation(
 describe("getRealtimePhase", () => {
   const base = { isFinished: false, isConnect: false, requestedAt };
 
-  it("요청 뒤 5분 안에는 연결 대기, 5분이 지나면 요청 실패", () => {
+  it("요청 뒤 3분 안에는 연결 대기, 3분이 지나면 요청 실패", () => {
     expect(getRealtimePhase({ ...base, now: start })).toBe("requesting");
     expect(
       getRealtimePhase({
@@ -59,7 +59,7 @@ describe("getRealtimePhase", () => {
     ).toBe("failed");
   });
 
-  it("운영자가 연결하면 5분이 지나도 상담 중", () => {
+  it("운영자가 연결하면 대기 시간이 지나도 상담 중", () => {
     expect(
       getRealtimePhase({
         ...base,
@@ -106,7 +106,7 @@ describe("applyRealtimeConsultation", () => {
         consultation(),
         start + REALTIME_CONNECT_TIMEOUT_MS,
       ),
-    ).toMatchObject({ realtimePhase: "failed", status: "failed" });
+    ).toMatchObject({ realtimePhase: "failed", status: "waiting" });
   });
 
   it("Firestore에서 종료되면 REST가 아직 열려 있어도 완료로 본다", () => {
@@ -188,19 +188,58 @@ describe("applyRealtimeConsultation: 재시도·취소·무응답", () => {
     });
   });
 
-  it("연결 뒤 3분 무응답 종료 시각을 계산하고, 광고주가 말하면 없앤다", () => {
+  it("연결 뒤에는 마지막 메시지로 누구의 답을 기다리는지 정한다", () => {
     const connected = applyRealtimeConsultation(
       inquiry(),
       consultation({ isConnect: true, seqResponseDate: "2026-10-19 10:00:30" }),
       start + 1000,
     );
-    expect(connected.idleDeadlineAt).toBe(start + 30_000 + 3 * 60_000);
-    const talked = applyRealtimeConsultation(
+    expect(connected.idleTurn).toEqual({
+      waitingFor: "advertiser",
+      since: start + 30_000,
+    });
+    const card = {
+      auto: true,
+      attachmentIdx: null,
+      identifier: null,
+      isUserMessage: false,
+      body: '{"campaignIdx":1}',
+      created: "2026-10-19 10:00:00",
+    };
+    const advertiserSpoke = applyRealtimeConsultation(
       inquiry(),
-      consultation({ isConnect: true, seqResponseDate: null }),
+      consultation({
+        isConnect: true,
+        seqResponseDate: null,
+        messages: [
+          card,
+          {
+            ...card,
+            auto: true,
+            body: "상담원과 연결되었습니다.",
+            created: "2026-10-19 10:00:30",
+          },
+          {
+            ...card,
+            auto: false,
+            isUserMessage: true,
+            body: "질문",
+            created: "2026-10-19 10:01:00",
+          },
+        ],
+      }),
       start + 1000,
     );
-    expect(talked.idleDeadlineAt).toBeNull();
+    expect(advertiserSpoke.idleTurn).toEqual({
+      waitingFor: "operator",
+      since: start + 60_000,
+    });
+    const requesting = applyRealtimeConsultation(
+      inquiry(),
+      consultation({ isConnect: false }),
+      start + 1000,
+    );
+    expect(requesting.idleTurn).toBeNull();
   });
 });
 

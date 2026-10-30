@@ -61,7 +61,7 @@ export function PlanCard({
       className={cn(type === "subscribed" && "ring-1 ring-primary", className)}
       {...props}
     >
-      <div className="flex flex-col items-center gap-4 px-5 pt-5">
+      <div className="flex flex-col items-center gap-3 px-4 pt-4 tablet:gap-4 tablet:px-5 tablet:pt-5">
         <p
           className={cn(
             "text-lg leading-none font-semibold tracking-[-0.45px]",
@@ -70,7 +70,7 @@ export function PlanCard({
         >
           {title}
         </p>
-        <p className="text-2xl leading-none font-semibold tracking-[-0.6px]">
+        <p className="text-xl leading-none font-semibold tracking-[-0.6px] tablet:text-2xl">
           {price}
         </p>
         {badges && <div className="flex gap-2">{badges}</div>}
@@ -78,21 +78,21 @@ export function PlanCard({
       </div>
 
       {isDisabled ? (
-        <div className="flex flex-1 flex-col items-center justify-center gap-1.5 p-5 text-center text-sm leading-5 text-muted-foreground">
+        <div className="flex flex-1 flex-col items-center justify-center gap-1.5 p-4 text-center text-sm leading-4 text-muted-foreground tablet:p-5 tablet:leading-5">
           <EmptyIllustration type="construction" className="size-5" />
           {comingSoonText}
         </div>
       ) : (
         <ul
           className={cn(
-            "flex flex-col gap-2 px-5 pt-5",
-            isExpandedWithDetail ? "pb-5" : "flex-1",
+            "flex flex-col gap-2 px-4 pt-4 tablet:px-5 tablet:pt-5",
+            !isExpandedWithDetail && "flex-1",
           )}
         >
           {features.map((feature) => (
             <li
               key={feature.id}
-              className="flex items-start gap-1.5 text-sm leading-5 text-foreground"
+              className="flex items-start gap-1.5 text-sm leading-4 text-foreground tablet:leading-5"
             >
               <span className="flex size-3 shrink-0 translate-y-1 items-center justify-center">
                 <span className="size-1.5 rounded-full bg-foreground" />
@@ -104,10 +104,21 @@ export function PlanCard({
       )}
 
       {isExpandedWithDetail && (
-        <div className="flex flex-1 flex-col gap-5 px-5">{detail}</div>
+        // 위 여백(pt-5)을 이 영역 안에 둬야 목록의 카드 높이 맞춤이 펼침 영역 높이만 빼서 접힌 높이를 잴 수 있음.
+        <div
+          data-slot="plan-card-detail"
+          className="flex flex-1 flex-col gap-5 px-4 pt-4 tablet:px-5 tablet:pt-5"
+        >
+          {detail}
+        </div>
       )}
 
-      <div className={cn("flex flex-col p-5", isDisabled ? "gap-1" : "gap-2")}>
+      <div
+        className={cn(
+          "flex flex-col p-4 tablet:p-5",
+          isDisabled ? "gap-1" : "gap-2",
+        )}
+      >
         {!isDisabled && detailLabel && (
           <Button
             variant="outline"

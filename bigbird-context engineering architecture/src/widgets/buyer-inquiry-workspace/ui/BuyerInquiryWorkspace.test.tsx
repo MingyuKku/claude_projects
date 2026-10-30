@@ -132,8 +132,8 @@ describe("구매자 문의 목록", () => {
     expect(router.state.location.search).toBe("");
   });
 
-  it("알 수 없는 status(재문의 포함)는 전체 탭으로 본다", () => {
-    renderWorkspace({}, `${ROUTES.customerCenterBuyer}?status=reinquiry`);
+  it("알 수 없는 status는 전체 탭으로 본다", () => {
+    renderWorkspace({}, `${ROUTES.customerCenterBuyer}?status=unknown`);
     expect(screen.getByRole("tab", { name: "전체" })).toHaveAttribute(
       "aria-selected",
       "true",

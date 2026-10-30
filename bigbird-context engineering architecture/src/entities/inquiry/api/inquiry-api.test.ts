@@ -12,7 +12,7 @@ import {
   fetchQnaDetail,
   fetchBuyerInquiryPage,
   fetchBuyerProduct,
-  fetchInquiryUserImage,
+  fetchInquiryUser,
   sendInquiryMessage,
   uploadInquiryAttachment,
 } from "./inquiry-api";
@@ -229,6 +229,32 @@ describe("fetchBuyerInquiryPage", () => {
     });
   });
 
+  it("등록일 범위는 시작일·종료일이 모두 있을 때만 서버로 보낸다", async () => {
+    vi.mocked(serverApiV3.get).mockResolvedValue({
+      result: true,
+      list: [],
+      pagingInfo: { page: 1, size: 20, totalCount: 0, totalPage: 0 },
+    });
+    await fetchBuyerInquiryPage("all", 1, {
+      sourceType: "ALL",
+      startDate: "2026-11-01",
+      endDate: "2026-11-07",
+    });
+    expect(serverApiV3.get).toHaveBeenLastCalledWith("/help/inquiry", {
+      params: expect.objectContaining({
+        startDate: "2026-11-01",
+        endDate: "2026-11-07",
+      }),
+    });
+    await fetchBuyerInquiryPage("all", 1, {
+      sourceType: "ALL",
+      startDate: "2026-11-01",
+    });
+    expect(
+      vi.mocked(serverApiV3.get).mock.lastCall?.[1]?.params,
+    ).not.toHaveProperty("startDate");
+  });
+
   it("선택한 문의 유형·캠페인·인플루언서를 서버 필터로 전달한다", async () => {
     vi.mocked(serverApiV3.get).mockResolvedValue({
       result: true,
@@ -282,6 +308,9 @@ describe("구매자 문의 상세·대화·Q&A", () => {
       progressEndDate: null,
       influencerPlatform: null,
       influencerAccountLink: null,
+      mainImageUrl: null,
+      brandName: null,
+      productName: null,
     });
     const detail = await fetchBuyerInquiryDetail(501, "PRODUCT_QNA");
     expect(serverApiV3.get).toHaveBeenCalledWith("/help/inquiry/501", {
@@ -413,26 +442,22 @@ describe("구매자 문의 상세·대화·Q&A", () => {
   });
 });
 
-describe("fetchInquiryUserImage", () => {
-  it("문의자 번호로 프로필 이미지 주소를 받는다", async () => {
+describe("fetchInquiryUser", () => {
+  it("문의자 번호로 회사명(닉네임)과 프로필 이미지 주소를 받는다", async () => {
     vi.mocked(serverApiV3.get).mockResolvedValue({
       result: true,
       data: {
-        nickname: "김하루",
-        id: "haru",
+        nickname: "밍구스",
+        id: "mgkang",
         profileImage: "https://img/p.png",
       },
     });
-    await expect(fetchInquiryUserImage(77)).resolves.toBe("https://img/p.png");
-    expect(serverApiV3.get).toHaveBeenCalledWith("/help/user/77");
-  });
-
-  it("비회원이나 이미지가 없으면 null이라 기본 아바타를 쓴다", async () => {
-    vi.mocked(serverApiV3.get).mockResolvedValue({
-      result: true,
-      data: { nickname: "손님", id: null, profileImage: null },
+    await expect(fetchInquiryUser(77)).resolves.toEqual({
+      nickname: "밍구스",
+      id: "mgkang",
+      profileImage: "https://img/p.png",
     });
-    await expect(fetchInquiryUserImage(78)).resolves.toBeNull();
+    expect(serverApiV3.get).toHaveBeenCalledWith("/help/user/77");
   });
 });
 
@@ -454,7 +479,7 @@ describe("fetchBuyerProduct", () => {
       },
     });
     await expect(fetchBuyerProduct("20261001-0001")).resolves.toEqual({
-      name: "[빅버드]여섯별 스킨케어 세트",
+      name: "빅버드 여섯별 스킨케어 세트",
       imageUrl: null,
     });
     expect(serverApiV3.get).toHaveBeenCalledWith(

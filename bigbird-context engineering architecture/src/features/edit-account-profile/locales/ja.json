@@ -2,10 +2,17 @@
   "info": {
     "title": "基本情報",
     "id": "ID",
+    "password": "パスワード",
     "name": "担当者名",
     "phone": "携帯番号",
     "email": "メールアドレス",
     "joinedAt": "登録日"
+  },
+  "sub": {
+    "id": "ID",
+    "name": "担当者名",
+    "email": "メールアドレス",
+    "joinedAt": "作成日"
   },
   "form": {
     "title": "情報修正",
@@ -32,7 +39,13 @@
     },
     "phone": {
       "label": "携帯番号",
-      "verify": "認証"
+      "verify": "認証",
+      "verification": {
+        "success": "本人認証に成功しました。",
+        "failed": "本人認証に失敗しました。",
+        "duplicate": "すでに登録されているユーザーです。",
+        "popupBlocked": "ブラウザでポップアップのブロックを解除してから、もう一度お試しください。"
+      }
     },
     "email": {
       "label": "メールアドレス",

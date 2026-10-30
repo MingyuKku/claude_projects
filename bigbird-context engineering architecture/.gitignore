@@ -12,6 +12,8 @@ CLAUDE.local.md
 .claude/.last-verified
 .claude/.stop-attempts*
 .claude/.last-verify.log
+.claude/.unverified-edits
+.claude/.last-deleted
 .playwright-mcp/
 .DS_Store
 .pnpm-store/

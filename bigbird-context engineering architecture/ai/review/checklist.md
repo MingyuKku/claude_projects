@@ -15,8 +15,8 @@
 | 다른 슬라이스 내부 파일 직접 임포트 대신 `index.ts` 경유 | B |
 | 기능 전용 상태·로직·컴포넌트를 `shared/`에 둠 | B |
 | 기능 전용 변형을 `shared/ui/` 원본에 추가 (상위 컴포넌트에서 감싸야 함) | R |
-| Zod 스키마는 `entities/{domain}/model/types.ts`, 트랜스포머는 `entities/{domain}/lib/`, SWR 훅은 `entities/*/api/`·`features/*/api/` | R |
-| Zustand 스토어는 `features/*/model/store.ts`에 배치 | R |
+| 데이터를 소유하는 슬라이스(`entities/*`·`features/*`)에 Zod 스키마는 `model/schema.ts`(또는 `model/{대상}-schema.ts`), 트랜스포머는 `lib/`, fetcher·SWR 훅은 `api/` | R |
+| Zustand 스토어는 슬라이스의 `model/`(`features`·`widgets`)에 배치 | R |
 | 다른 슬라이스의 Zustand 스토어를 임포트 | B |
 | 슬라이스 전용 상수는 `model/constants.ts`, 공용은 `shared/config/`, 경로는 `ROUTES` | R |
 | 라우트 선언은 `app/router/routes.tsx`에만, 페이지는 `lazy`로 Public API 경유 | R |

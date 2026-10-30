@@ -13,16 +13,18 @@ import {
 import type { SubAccountViewModel } from "../model/types";
 
 interface DeleteSubAccountDialogProps {
-  /** 삭제를 확인받는 Sub ID. null이면 닫혀 있음. */
+  open: boolean;
+  /** 삭제를 확인받는 Sub ID. 닫히는 동안에도 문구가 바뀌지 않게 닫은 뒤에도 남겨 둠(`useDialogTarget`). */
   account: SubAccountViewModel | null;
   onCancel: () => void;
-  /** 삭제 버튼. 실제로 지울지는 호출하는 쪽이 정함(목록 API 전에는 준비 중 안내). */
+  /** 삭제 버튼. 요청과 결과 안내는 호출하는 쪽이 함. */
   onConfirm: (account: SubAccountViewModel) => void;
 }
 
 // Figma 삭제 알럿(10061:201625 PC·TAB, 10061:207084 MO): Destructive. 제목 "Sub ID 삭제", 모든 기기 같은 문구(사용자 확인).
 // PC·TAB은 왼쪽 정렬 + 취소·삭제 가로, MO는 가운데 정렬 + 삭제(위)·취소(아래) 세로(AlertDialog의 반응형 기본 구조).
 export function DeleteSubAccountDialog({
+  open,
   account,
   onCancel,
   onConfirm,
@@ -32,9 +34,9 @@ export function DeleteSubAccountDialog({
 
   return (
     <AlertDialog
-      open={account !== null}
-      onOpenChange={(open) => {
-        if (!open) onCancel();
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) onCancel();
       }}
     >
       <AlertDialogContent className="p-6">

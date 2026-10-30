@@ -27,7 +27,8 @@ interface MessageEditorProps {
   inputLabel: string;
   size?: "md" | "sm";
   attachments?: ReactNode;
-  attachLabel: string;
+  /** 없으면 첨부 버튼을 그리지 않습니다(본문만 고칠 수 있는 수정 등). */
+  attachLabel?: string;
   onClickAttach?: () => void;
   cancelLabel: string;
   onClickCancel?: () => void;
@@ -71,15 +72,19 @@ export function MessageEditor({
             />
           </div>
           <div className="flex items-center justify-between px-3 py-2.5">
-            <Button
-              variant="outline-muted"
-              size="sm"
-              onClick={onClickAttach}
-              className="pr-2 pl-3"
-            >
-              <Paperclip />
-              {attachLabel}
-            </Button>
+            {attachLabel ? (
+              <Button
+                variant="outline-muted"
+                size="sm"
+                onClick={onClickAttach}
+                className="pr-2 pl-3"
+              >
+                <Paperclip />
+                {attachLabel}
+              </Button>
+            ) : (
+              <span />
+            )}
             <div className="flex items-center gap-4">
               <p className="flex gap-1 text-xs leading-4 text-muted-foreground">
                 <span className="text-foreground">{value.length}</span>

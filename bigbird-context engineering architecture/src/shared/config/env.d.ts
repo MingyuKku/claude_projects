@@ -3,6 +3,8 @@ interface ImportMetaEnv {
   readonly VITE_API_MEMBER_URL: string;
   readonly VITE_API_SOCIAL_URL: string;
   readonly VITE_API_AUTH_URL: string;
+  readonly VITE_API_PAY_URL: string;
+  readonly VITE_INICIS_STDPAY_URL: string;
   readonly VITE_OAUTH_REDIRECT_URL: string;
   readonly VITE_NAVER_CLIENT_ID: string;
   readonly VITE_KAKAO_APP_KEY: string;

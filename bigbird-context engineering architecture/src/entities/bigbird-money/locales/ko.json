@@ -1,0 +1,11 @@
+{
+  "chargeStatus": {
+    "paid": "결제 완료",
+    "pending": "대기 중",
+    "canceled": "결제 취소"
+  },
+  "balance": {
+    "title": "보유 빅버드 머니",
+    "unit": "원"
+  }
+}

@@ -7,7 +7,13 @@
     "login": "登录",
     "goBack": "返回",
     "cancel": "取消",
-    "save": "保存"
+    "save": "保存",
+    "edit": "修改"
+  },
+  "loginRequired": {
+    "title": "需要登录",
+    "description": "该菜单登录后才能访问。",
+    "action": "前往登录"
   },
   "status": {
     "loading": "加载中…",
@@ -89,5 +95,41 @@
     "previous": "上一页",
     "next": "下一页",
     "page": "第 {{page}} 页"
+  },
+  "list": {
+    "search": {
+      "label": "搜索",
+      "placeholder": "请输入搜索条件。"
+    },
+    "filter": {
+      "action": "筛选",
+      "title": "筛选设置",
+      "description": "选择条件以缩小列表范围。",
+      "reset": "重置",
+      "apply": "应用",
+      "refresh": "刷新"
+    },
+    "empty": {
+      "search": {
+        "title": "没有“{{keyword}}”的相关结果。"
+      },
+      "searchFilter": {
+        "title": "没有符合“{{keyword}}”和所选条件的结果。"
+      },
+      "filter": {
+        "title": "没有符合所选条件的结果。",
+        "description": "请更改或重置筛选条件。"
+      }
+    },
+    "pageSize": {
+      "label": "显示{{size}}条",
+      "labelShort": "{{size}}条",
+      "aria": "每页显示数量"
+    }
+  },
+  "passwordConfirm": {
+    "title": "输入管理员密码",
+    "placeholder": "输入密码",
+    "mismatch": "密码不正确。"
   }
 }

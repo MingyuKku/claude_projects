@@ -16,5 +16,5 @@
   "select": "선택",
   "send": "전송",
   "messagePlaceholder": "문의 내용을 입력하세요. (최대 3,000자)",
-  "noCampaign": "신청하신 캠페인이 없습니다."
+  "noCampaign": "캠페인 내역이 존재하지 않습니다."
 }

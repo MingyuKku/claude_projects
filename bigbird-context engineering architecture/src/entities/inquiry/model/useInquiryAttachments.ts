@@ -1,5 +1,7 @@
 import { useEffect, useRef, useState } from "react";
 
+import { useDialogTarget } from "@/shared/lib";
+
 import {
   ATTACHMENT_TOTAL_MAX_COUNT,
   checkAttachments,
@@ -23,7 +25,8 @@ export interface InquiryAttachmentItem {
  */
 export function useInquiryAttachments() {
   const [items, setItems] = useState<InquiryAttachmentItem[]>([]);
-  const [error, setError] = useState<AttachmentError | null>(null);
+  // 닫힘 애니메이션 동안 안내 문구가 비지 않게 오류 이유는 닫은 뒤에도 남겨 둠.
+  const errorDialog = useDialogTarget<AttachmentError>();
   const latest = useRef(items);
   useEffect(() => {
     latest.current = items;
@@ -41,7 +44,7 @@ export function useInquiryAttachments() {
       incoming,
     );
     if (reason) {
-      setError(reason);
+      errorDialog.open(reason);
       return;
     }
     const added = incoming.map((file) => ({
@@ -87,20 +90,22 @@ export function useInquiryAttachments() {
    */
   function rejectIfFull() {
     if (items.length < ATTACHMENT_TOTAL_MAX_COUNT) return false;
-    setError("imageCount");
+    errorDialog.open("imageCount");
     return true;
   }
 
   return {
     items,
     files: items.map((item) => item.file),
-    error,
+    /** 마지막 오류 이유. 안내가 닫혀도 남으므로 열림은 `isErrorOpen`으로 봄. */
+    error: errorDialog.target,
+    isErrorOpen: errorDialog.isOpen,
     add,
     rejectIfFull,
     remove,
     removeSent,
     reset,
-    clearError: () => setError(null),
+    clearError: errorDialog.close,
   };
 }
 

@@ -15,6 +15,7 @@
     },
     "action": {
       "permission": "设置权限",
+      "edit": "编辑",
       "delete": "删除"
     },
     "empty": {
@@ -57,10 +58,6 @@
         "label": "确认密码",
         "placeholder": "请输入密码"
       },
-      "phone": {
-        "label": "手机号",
-        "placeholder": "请输入手机号"
-      },
       "email": {
         "label": "邮箱",
         "placeholder": "请输入邮箱"
@@ -94,18 +91,27 @@
       "created": "已创建子账号。"
     }
   },
+  "edit": {
+    "title": "编辑子账号",
+    "submit": "保存修改",
+    "toast": {
+      "updated": "Sub ID信息已更新。"
+    }
+  },
   "delete": {
     "title": "删除子账号",
-    "description": "确定删除“{{identifier}}”吗？删除后的数据无法恢复。"
+    "description": "确定删除“{{identifier}}”吗？删除后的数据无法恢复。",
+    "toast": {
+      "deleted": "已删除子账号。"
+    }
   },
   "access": {
-    "screen": "设置权限",
+    "tab": {
+      "service": "服务权限",
+      "campaign": "活动分配"
+    },
     "permission": {
       "title": "子账号权限",
-      "column": {
-        "name": "权限名称",
-        "granted": "是否授权"
-      },
       "name": {
         "campaign": "广告活动",
         "influencerMatching": "网红匹配",
@@ -114,7 +120,11 @@
         "buyerInquiry": "买家咨询",
         "bigbirdMoney": "Bigbird 余额"
       },
-      "switchLabel": "{{name}}权限"
+      "switchLabel": "{{name}}权限",
+      "toast": {
+        "granted": "已授予“{{name}}”权限。",
+        "revoked": "已取消“{{name}}”权限。"
+      }
     },
     "campaign": {
       "title": "子账号活动分配",
@@ -123,7 +133,6 @@
         "productType": "产品类型",
         "detailType": "产品详情",
         "status": "活动进度",
-        "statusShort": "进度",
         "assigned": "是否负责"
       },
       "productType": {
@@ -139,7 +148,8 @@
         "waiting": "待开始",
         "running": "进行中"
       },
-      "switchLabel": "{{name}}负责"
+      "switchLabel": "{{name}}负责",
+      "empty": "没有可分配的活动。"
     }
   }
 }

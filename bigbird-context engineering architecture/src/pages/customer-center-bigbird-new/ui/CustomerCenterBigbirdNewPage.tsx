@@ -54,9 +54,8 @@ export function CustomerCenterBigbirdNewPage() {
   const location = useLocation();
   const initialCampaignId = (location.state as NewInquiryLocationState | null)
     ?.campaignIdx;
-  const { inquiries, isLoading, isError, mutate } = useBigbirdInquiries(
-    session.threadUserIdx,
-  );
+  const { inquiries, isLoading, isError, mutate, refresh } =
+    useBigbirdInquiries(session.threadUserIdx);
   const {
     campaigns,
     isLoading: isCampaignsLoading,
@@ -76,6 +75,7 @@ export function CustomerCenterBigbirdNewPage() {
   // 일반 문의만 넣음. 실시간 요청은 서버 목록이 올 때까지 대화 화면이 로딩을 보여 줌.
   function goToThread(threadIdx: number, submitted?: SubmittedInquiry) {
     if (!submitted) {
+      // 바로 화면을 떠나므로 예약(refresh) 대신 즉시 다시 받음
       void mutate();
     } else {
       const created = buildSubmittedInquiryViewModel({
@@ -125,17 +125,24 @@ export function CustomerCenterBigbirdNewPage() {
 
   return (
     <BigbirdInquiryWorkspace
+      threadUserIdx={session.threadUserIdx}
       inquiries={inquiries}
       isLoading={isLoading}
       isError={isError}
-      onClickRefresh={() => void mutate()}
+      onClickRefresh={refresh}
       isPanelOpen
       panelLabel={t("title")}
     >
       <title>{t("title")}</title>
-      <header className="flex h-13.25 shrink-0 items-center justify-between border-b px-4 tablet:h-15 tablet:px-5">
+      {/* 닫기 버튼은 MO 40(아이콘 16)·TAB/PC 48(아이콘 24)이고 오른쪽 여백은 MO 4·TAB/PC 8(Figma Header / Sub) */}
+      <header className="flex h-13.25 shrink-0 items-center justify-between border-b pr-1 pl-4 tablet:h-15 tablet:pr-2 tablet:pl-5">
         <h2 className="text-base leading-none font-semibold">{t("title")}</h2>
-        <Button asChild variant="ghost-foreground" size="icon-sm">
+        <Button
+          asChild
+          variant="ghost-foreground"
+          size="icon"
+          className="tablet:size-12 tablet:[&_svg:not([class*='size-'])]:size-6"
+        >
           <Link
             to={ROUTES.customerCenterBigbird}
             aria-label={tCommon("action.close")}

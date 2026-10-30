@@ -23,6 +23,11 @@ payload=$(cat)
 target=$(printf '%s' "$payload" |
   jq -r '.tool_response.filePath // .tool_input.file_path // empty')
 
+DELETED=".claude/.last-deleted"
+had_stamp=0
+[ -f "$STAMP" ] && had_stamp=1
+new_deleted=""
+
 if [ -n "$target" ]; then
   files="$target"
 else
@@ -32,6 +37,12 @@ else
     sort -u | while IFS= read -r f; do
       if [ ! -f "$STAMP" ] || [ "$f" -nt "$STAMP" ]; then printf '%s\n' "$f"; fi
     done)
+  # 지운 파일은 수정 시각으로 비교할 수 없어, 직전 실행의 삭제 목록에 없던 것을 새로 지운 파일로 본다.
+  deleted=$(git -c core.quotePath=false diff --name-only --diff-filter=D HEAD 2>/dev/null)
+  if [ -f "$DELETED" ]; then
+    new_deleted=$(printf '%s\n' "$deleted" | grep -vxF -f "$DELETED" | sed '/^$/d')
+  fi
+  mkdir -p "$(dirname "$DELETED")" && printf '%s\n' "$deleted" > "$DELETED"
 fi
 
 mkdir -p "$(dirname "$STAMP")" && touch "$STAMP"
@@ -51,6 +62,29 @@ is_lintable() {
     *) return 1 ;;
   esac
 }
+
+# 검증 입력(scripts/verify.sh 의 WATCH)을 바꿨으면 Stop 훅이 검증하도록 표시를 남긴다.
+# Bash 경로에서 스탬프가 없던 첫 실행(새 클론, 스탬프 삭제 직후)은 누가 바꿨는지 알 수 없어 표시하지 않는다.
+# 스탬프 이후 사용자가 에디터에서 고친 파일도 Claude 변경으로 보이는 것은 알려진 한계다(검증이 더 도는 쪽이라 허용).
+if [ -n "$target" ]; then
+  attributed="$target"
+elif [ "$had_stamp" = 1 ]; then
+  attributed=$(printf '%s\n%s\n' "$files" "$new_deleted" | sed '/^$/d')
+else
+  attributed=""
+fi
+if [ -n "$attributed" ] && [ -f scripts/verify.sh ]; then
+  watch=$(sh scripts/verify.sh --watch-list)
+  touched=$(printf '%s\n' "$attributed" | while IFS= read -r f; do
+    in_repo "$f" || continue
+    rel=${f#"$PWD"/}
+    for w in $watch; do
+      # $( ) 안의 case 는 패턴 앞 ( 가 있어야 괄호 짝이 맞는다.
+      case "$rel" in ("$w" | "$w"/*) echo x; break ;; esac
+    done
+  done)
+  [ -n "$touched" ] && touch .claude/.unverified-edits
+fi
 
 checked=$(printf '%s\n' "$files" | while IFS= read -r f; do
   if in_repo "$f" && [ -f "$f" ]; then printf '%s\n' "$f"; fi

@@ -3,13 +3,14 @@ import userEvent from "@testing-library/user-event";
 import { MemoryRouter, useLocation } from "react-router";
 import { SWRConfig } from "swr";
 
-import { ApiError, serverApi } from "@/shared/api";
+import { ApiError, serverApiV3 } from "@/shared/api";
 
 import { HomePage } from "./HomePage";
 
 vi.mock("@/shared/api", async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   serverApi: { get: vi.fn(), post: vi.fn() },
+  serverApiV3: { get: vi.fn() },
 }));
 
 const session = {
@@ -39,7 +40,7 @@ function renderHome() {
 }
 
 beforeEach(() => {
-  vi.mocked(serverApi.get).mockReset().mockResolvedValue(session);
+  vi.mocked(serverApiV3.get).mockReset().mockResolvedValue(session);
 });
 
 describe("HomePage", () => {
@@ -61,7 +62,7 @@ describe("HomePage", () => {
   });
 
   it("비로그인에게도 같은 본문을 보여 준다", async () => {
-    vi.mocked(serverApi.get).mockRejectedValue(
+    vi.mocked(serverApiV3.get).mockRejectedValue(
       new ApiError(401, { result: false }),
     );
     renderHome();
@@ -90,20 +91,77 @@ describe("HomePage", () => {
     expect(screen.getByRole("heading", { level: 2 })).toBeInTheDocument();
   });
 
-  it("인플루언서 추천 카드는 활성이고 비로그인도 검색 화면으로 이동한다", async () => {
+  it("인플루언서 추천 카드는 로그인하면 검색 화면으로 이동한다", async () => {
     const user = userEvent.setup();
-    vi.mocked(serverApi.get).mockRejectedValue(
-      new ApiError(401, { result: false }),
-    );
     renderHome();
     await screen.findByRole("heading", { level: 2 });
     const card = screen.getByRole("button", { name: /인플루언서 추천/ });
     expect(card).not.toHaveAttribute("aria-disabled");
-    expect(card.closest("[title]")).toBeNull();
     await user.click(card);
     expect(screen.getByTestId("location")).toHaveTextContent(
       "/influencers/search",
     );
+  });
+
+  describe("비로그인", () => {
+    beforeEach(() => {
+      vi.mocked(serverApiV3.get).mockRejectedValue(
+        new ApiError(401, { result: false }),
+      );
+    });
+
+    it.each([/인플루언서 추천/, /캠페인 등록\/운영/])(
+      "%s 카드를 누르면 이동하지 않고 로그인 안내 알럿을 띄운다",
+      async (name) => {
+        const user = userEvent.setup();
+        renderHome();
+        await screen.findByRole("heading", { level: 2 });
+        await user.click(screen.getByRole("button", { name }));
+        const alert = await screen.findByRole("alertdialog");
+        expect(within(alert).getByText("로그인 필요")).toBeInTheDocument();
+        expect(screen.getByTestId("location")).toHaveTextContent(/^\/$/);
+        await user.click(
+          within(alert).getByRole("button", { name: "로그인하러 가기" }),
+        );
+        expect(screen.getByTestId("location")).toHaveTextContent("/login");
+      },
+    );
+
+    it("세션을 확인하는 동안에는 알럿을 띄우지 않는다", async () => {
+      // 확인이 끝나지 않는 세션(로그인한 사용자가 확인 중에 카드를 누르는 경우).
+      vi.mocked(serverApiV3.get).mockReturnValue(new Promise(() => {}));
+      const user = userEvent.setup();
+      renderHome();
+      await screen.findByRole("heading", { level: 2 });
+      await user.click(
+        screen.getByRole("button", { name: /캠페인 등록\/운영/ }),
+      );
+      expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+    });
+
+    it("알럿의 취소를 누르면 닫히고 그대로 남는다", async () => {
+      const user = userEvent.setup();
+      renderHome();
+      await screen.findByRole("heading", { level: 2 });
+      await user.click(screen.getByRole("button", { name: /인플루언서 추천/ }));
+      await user.click(
+        within(await screen.findByRole("alertdialog")).getByRole("button", {
+          name: "취소",
+        }),
+      );
+      expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+      expect(screen.getByTestId("location")).toHaveTextContent(/^\/$/);
+    });
+
+    it("요금 안내 카드는 알럿 없이 비활성이다", async () => {
+      const user = userEvent.setup();
+      renderHome();
+      await screen.findByRole("heading", { level: 2 });
+      const card = screen.getByRole("button", { name: /요금 안내/ });
+      expect(card).toHaveAttribute("aria-disabled", "true");
+      await user.click(card);
+      expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+    });
   });
 
   describe("인플루언서 추천 카드 터치", () => {
@@ -200,7 +258,10 @@ describe("HomePage", () => {
       Element.prototype.scrollIntoView = vi.fn();
     }
 
-    afterEach(() => vi.unstubAllGlobals());
+    afterEach(() => {
+      vi.unstubAllGlobals();
+      vi.restoreAllMocks();
+    });
 
     it("키보드가 떠 있는 동안 카드 묶음이 입력창 위로 올라간다", async () => {
       stubKeyboard(450);
@@ -240,6 +301,26 @@ describe("HomePage", () => {
       await user.click(textbox);
       expect(screen.getByRole("textbox")).toBe(textbox);
       expect(textbox).toHaveFocus();
+    });
+
+    it("키보드가 레이아웃을 줄이지 않는 iOS에서는 셸을 보이는 영역에 맞춰 줄이고 내린 만큼 따라 내린다", async () => {
+      stubKeyboard(450);
+      vi.spyOn(document.documentElement, "clientHeight", "get").mockReturnValue(
+        800,
+      );
+      Object.assign(window.visualViewport ?? {}, { offsetTop: 120, scale: 1 });
+      const user = userEvent.setup();
+      renderHome();
+      const textbox = await screen.findByRole("textbox");
+      const container = textbox.closest<HTMLElement>("[data-keyboard]");
+      expect(container?.style.height).toBe("");
+      await user.click(textbox);
+      expect(container?.style.height).toBe("450px");
+      expect(container?.style.top).toBe("120px");
+      // 셸 바로 아래(키보드 뒤)를 페이지 배경으로 칠함.
+      const gapPaint = container?.nextElementSibling;
+      expect(gapPaint).toHaveAttribute("aria-hidden");
+      expect(gapPaint).toHaveStyle({ top: "570px" });
     });
 
     it("키보드가 내려가 보이는 영역이 돌아오면 기본 순서로 돌아간다", async () => {

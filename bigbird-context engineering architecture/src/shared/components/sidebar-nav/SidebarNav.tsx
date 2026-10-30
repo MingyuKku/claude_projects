@@ -39,8 +39,10 @@ interface SidebarNavProps {
   className?: string;
 }
 
+// 오른쪽 선은 border가 아니라 안쪽 그림자로 그림: Figma는 선이 프레임 안쪽에 그려져 안쪽 여백(10px)에 영향을 주지 않으므로
+// 메인 메뉴 210px·서브 메뉴 177px이 되려면 선이 레이아웃 폭을 차지하면 안 됨(border-r는 1px을 빼 209·176px이 됨).
 const sidebarVariants = cva(
-  "flex h-full flex-col border-r bg-[color-mix(in_srgb,var(--color-muted)_40%,var(--color-background))]",
+  "flex h-full flex-col bg-[color-mix(in_srgb,var(--color-muted)_40%,var(--color-background))] shadow-[inset_-1px_0_0_var(--color-border)]",
   {
     variants: {
       isCollapsed: { true: "w-14", false: "w-57.5" },

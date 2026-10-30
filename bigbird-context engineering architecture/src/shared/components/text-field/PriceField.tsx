@@ -5,7 +5,7 @@ import { Label } from "@/shared/ui/label";
 
 import type { ComponentProps, ReactNode } from "react";
 
-// Figma Text Field / Price(6958:57035). 라벨(semibold) + 단위가 붙은 40px 필드 + 선택 버튼.
+// Figma Text Field / Count(6958:57034, 옛 이름 Price). 라벨(medium) + 단위가 붙은 40px 필드 + 선택 버튼.
 // 포커스 링은 입력이 아니라 필드 테두리에 그림.
 interface PriceFieldProps extends Omit<ComponentProps<"input">, "children"> {
   label?: string;
@@ -33,11 +33,7 @@ export function PriceField({
         className,
       )}
     >
-      {label && (
-        <Label htmlFor={inputId} className="font-semibold">
-          {label}
-        </Label>
-      )}
+      {label && <Label htmlFor={inputId}>{label}</Label>}
       <div className="flex items-center gap-2">
         <div className="flex h-10 min-w-0 flex-1 items-center rounded-md border border-input bg-background px-3 py-2 has-focus-visible:ring-2 has-focus-visible:ring-primary has-focus-visible:ring-offset-2">
           <input

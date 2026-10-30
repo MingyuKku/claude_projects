@@ -97,6 +97,8 @@ export function useRequestRealtimeConsultation(
               userIdx: session.userIdx,
               userId: session.identifier,
               campaign: requestCampaign,
+              sequence: current.sequence,
+              threadIdx: current.threadIdx,
             },
             campaign?.campaignIdx ?? null,
             formatWriteTime(Date.now()),

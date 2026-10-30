@@ -13,7 +13,9 @@ export type ConversationRow =
     };
 
 const isFile = (message: InquiryMessageViewModel) =>
-  (message.kind === "image" || message.kind === "video") &&
+  (message.kind === "image" ||
+    message.kind === "video" ||
+    message.kind === "file") &&
   message.attachment !== null &&
   !message.isDeleted;
 

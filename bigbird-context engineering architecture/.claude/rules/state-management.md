@@ -11,7 +11,7 @@ paths:
 | 상태                                    | 도구                      | 위치                                 |
 | :-------------------------------------- | :------------------------ | :----------------------------------- |
 | 로컬 UI (모달, 포커스)                  | `useState` / `useReducer` | 컴포넌트                             |
-| 글로벌 클라이언트 UI (세션, 필터, 테마) | Zustand                   | `features/*/model/store.ts`          |
+| 글로벌 클라이언트 UI (세션, 필터, 테마) | Zustand                   | 슬라이스의 `model/` (`features`·`widgets`) |
 | 서버 데이터 · 캐시                      | SWR                       | `entities/*/api/`, `features/*/api/` |
 | URL 상태 (페이지, 검색어, 탭)           | router searchParams       | 페이지                               |
 
@@ -32,7 +32,7 @@ paths:
 `useSWRMutation`의 `optimisticData` + `rollbackOnError`를 씁니다. 실패 시 자동 롤백되고, 응답으로 캐시를 확정합니다.
 
 ```typescript
-useSWRMutation(["post", postId], () => apiClient.postLike(postId), {
+useSWRMutation(["post", postId], () => likePost(postId), {
   optimisticData: (current?: Post) =>
     current && {
       ...current,

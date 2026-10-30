@@ -84,6 +84,25 @@ async function run(
   });
 }
 
+// 응대 락은 계정 문서만 보므로 상담 문서를 읽지 않음. 15초마다 갱신하는 동안 읽기를 절반으로 줄임(2026-10-29).
+async function runAccount(
+  target: ConsultationTarget,
+  decide: (account: AccountDoc | undefined) => Plan,
+): Promise<WriteResult> {
+  const { db, runTransaction, account } = await refs(target);
+  return runTransaction(db, async (tx): Promise<WriteResult> => {
+    const accountSnap = await tx.get(account);
+    const plan = decide(
+      accountSnap.exists() ? (accountSnap.data() as AccountDoc) : undefined,
+    );
+    if (plan.kind === "reject") return { ok: false, reason: plan.reason };
+    if (plan.kind === "skip" || !plan.account)
+      return { ok: true, skipped: plan.kind === "skip" };
+    tx.update(account, plan.account);
+    return { ok: true, skipped: false };
+  });
+}
+
 const TAB_ID_KEY = "bigbird.tabId";
 
 // 새로고침해도 같은 탭으로 보도록 sessionStorage에 둠(없으면 내 이전 락이 만료될 때까지 스스로 막힘).
@@ -128,7 +147,7 @@ export const acquireConsultationLock = (
   target: ConsultationTarget,
   lock: Lock,
 ) =>
-  run(target, (_consultation, account) =>
+  runAccount(target, (account) =>
     planAcquireLock(account, lock, target.sequence, Date.now()),
   );
 
@@ -136,9 +155,7 @@ export const releaseConsultationLock = (
   target: ConsultationTarget,
   lock: Lock,
 ) =>
-  run(target, (_consultation, account) =>
-    planReleaseLock(account, lock, Date.now()),
-  );
+  runAccount(target, (account) => planReleaseLock(account, lock, Date.now()));
 
 interface CloseArgs {
   /** REST 종료 호출. 이미 종료됐다는 응답도 성공으로 돌려줘야 함. */
@@ -184,7 +201,10 @@ export const retryRealtimeRequest = (
 export const abortConsultationClose = (target: ConsultationTarget) =>
   run(target, (consultation) => planAbortClose(consultation));
 
-/** 실시간 상담 요청 문서를 만듦. 같은 `sequence`가 이미 있으면 만들지 않고 skipped로 돌려줌. */
+/**
+ * 실시간 상담 요청 문서를 만듦. 같은 `sequence`가 이미 있으면 만들지 않고 skipped로 돌려줌. 단 열린 일반 문의 문서면
+ * 실시간 필드를 합쳐 씀(일반 문의 스레드에서 실시간으로 전환).
+ */
 export async function createRealtimeRequest(
   input: CreateRequestInput,
 ): Promise<{ skipped: boolean }> {
@@ -206,7 +226,8 @@ export async function createRealtimeRequest(
       input,
     );
     if (!plan) return { skipped: true };
-    tx.set(consultation, plan.consultation);
+    if (plan.isConversion) tx.update(consultation, plan.consultation);
+    else tx.set(consultation, plan.consultation);
     if (plan.createAccount) {
       // v2 `createChatCollection`과 같은 초기값 위에 요청 값을 얹음.
       tx.set(account, {

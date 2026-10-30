@@ -7,6 +7,7 @@ import { useTranslation } from "@/shared/i18n";
 import {
   AlertDialog,
   AlertDialogAction,
+  AlertDialogCancel,
   AlertDialogContent,
   AlertDialogDescription,
   AlertDialogFooter,
@@ -98,7 +99,13 @@ export function AttachmentTextField({
                 return (
                   <FileThumbnail
                     key={url}
-                    src={kind === "image" ? url : (poster ?? BLANK_POSTER)}
+                    src={
+                      kind === "image"
+                        ? url
+                        : kind === "video"
+                          ? (poster ?? BLANK_POSTER)
+                          : undefined
+                    }
                     alt={file.name}
                     type={kind}
                     removeLabel={t("attachment.remove")}
@@ -127,8 +134,8 @@ export function AttachmentTextField({
               type="button"
               variant="outline-muted"
               size="sm"
-              // Figma 입력창 128px에 맞춰 도구줄 버튼을 32px로 둠(sm 기본은 36px).
-              className="h-8"
+              // Figma 첨부 버튼(5198:98500): 높이 36, 왼쪽 12·오른쪽 8(안쪽 테두리 보정 -1px).
+              className="pr-1.75 pl-2.75"
               disabled={isBlocked}
               onClick={() => {
                 if (!attachments.rejectIfFull()) inputRef.current?.click();
@@ -141,7 +148,7 @@ export function AttachmentTextField({
         }
       />
       <AlertDialog
-        open={error !== null}
+        open={attachments.isErrorOpen}
         onOpenChange={(open) => !open && attachments.clearError()}
       >
         <AlertDialogContent>
@@ -154,7 +161,11 @@ export function AttachmentTextField({
               {error && t(`attachment.error.${error}.description`)}
             </AlertDialogDescription>
           </AlertDialogHeader>
+          {/* 시안(9997:422432, 2026-10-21)은 취소·확인 두 버튼이며 둘 다 닫기만 합니다. */}
           <AlertDialogFooter>
+            <AlertDialogCancel onClick={attachments.clearError}>
+              {t("action.cancel")}
+            </AlertDialogCancel>
             <AlertDialogAction onClick={attachments.clearError}>
               {t("action.confirm")}
             </AlertDialogAction>

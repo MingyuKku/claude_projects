@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
 
-import { ApiError, serverApi } from "@/shared/api";
+import { ApiError, serverApi, serverApiV3 } from "@/shared/api";
 import { ENV } from "@/shared/config";
 
 import { clearLoginCredential } from "../lib/login-handoff";
@@ -19,9 +19,14 @@ export function getLastAllowedSession() {
   return lastAllowedSession;
 }
 
+/** 직전 확인 결과를 비움. 로그인·로그아웃에서 쓰고, 테스트는 앞 테스트의 사용자가 다음 테스트의 셸에 남지 않게 비움. */
+export function clearLastAllowedSession() {
+  lastAllowedSession = undefined;
+}
+
 async function fetchSession(pathname: string) {
   try {
-    const response = await serverApi.get("/sec", {
+    const response = await serverApiV3.get("/sec", {
       headers: { "X-Path": pathname },
     });
     const session = transformSessionToViewModel(sessionSchema.parse(response));
@@ -34,7 +39,7 @@ async function fetchSession(pathname: string) {
 }
 
 /**
- * `GET /sec`는 마운트할 때마다 요청하고 캐시로 응답하지 않음. 권한은 서버에서
+ * `GET /v3/sec`는 마운트할 때마다 요청하고 캐시로 응답하지 않음. 권한은 서버에서
  * 바뀔 수 있어, 오래된 응답은 접근 권한을 잃은 사용자를 화면에 남겨 둠.
  * 서버가 `X-Path`별로 권한을 판단하므로 경로가 키에 들어감.
  *
@@ -70,7 +75,7 @@ export async function formLogin(
   username: string,
   password: string,
 ): Promise<FormLoginResult> {
-  lastAllowedSession = undefined;
+  clearLastAllowedSession();
   const body = new FormData();
   body.append("username", username);
   body.append("password", password);
@@ -104,7 +109,7 @@ export async function logout(): Promise<void> {
     throw new ApiError(response.status, undefined);
   }
   clearLoginCredential();
-  lastAllowedSession = undefined;
+  clearLastAllowedSession();
 }
 
 export function useLogout() {

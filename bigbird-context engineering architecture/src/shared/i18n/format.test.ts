@@ -1,7 +1,12 @@
 import i18next from "i18next";
 
 import { DEFAULT_LANGUAGE, type Language } from "./config";
-import { formatDate, formatNumber } from "./format";
+import {
+  formatDate,
+  formatNumber,
+  formatNumericDate,
+  formatNumericDateTime,
+} from "./format";
 
 const DATE = new Date(Date.UTC(2026, 9, 15));
 
@@ -32,6 +37,34 @@ describe("formatDate·formatNumber", () => {
     await i18next.changeLanguage("en");
     expect(formatNumber(1000, { style: "currency", currency: "KRW" })).toBe(
       "₩1,000",
+    );
+  });
+});
+
+describe("formatNumericDate·formatNumericDateTime", () => {
+  const DATE_TIME = new Date(2025, 4, 31, 14, 23, 18);
+
+  afterEach(async () => {
+    await i18next.changeLanguage(DEFAULT_LANGUAGE);
+  });
+
+  it.each<[Language, string, string]>([
+    ["ko", "2025.05.31", "2025-05-31 14:23:18"],
+    ["en", "05/31/2025", "05/31/2025 14:23:18"],
+    ["ja", "2025/05/31", "2025/05/31 14:23:18"],
+    ["zh-CN", "2025/05/31", "2025/05/31 14:23:18"],
+  ])(
+    "%s 는 언어의 순서·구분자로 공백 없이 포맷한다",
+    async (language, expectedDate, expectedDateTime) => {
+      await i18next.changeLanguage(language);
+      expect(formatNumericDate(DATE_TIME)).toBe(expectedDate);
+      expect(formatNumericDateTime(DATE_TIME)).toBe(expectedDateTime);
+    },
+  );
+
+  it("자정은 24시가 아니라 00시로 쓴다", () => {
+    expect(formatNumericDateTime(new Date(2025, 4, 31, 0, 5, 9))).toBe(
+      "2025-05-31 00:05:09",
     );
   });
 });

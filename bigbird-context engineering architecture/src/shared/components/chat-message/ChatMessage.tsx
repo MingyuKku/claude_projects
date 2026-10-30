@@ -1,11 +1,21 @@
+import { useMediaQuery } from "@/shared/lib/useMediaQuery";
 import { cn } from "@/shared/lib/utils";
 import { Avatar, AvatarImage, AvatarPlaceholder } from "@/shared/ui/avatar";
-import { Tooltip, TooltipContent, TooltipTrigger } from "@/shared/ui/tooltip";
+import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/shared/ui/tooltip";
 
 import { MessageBubble } from "./MessageBubble";
 
 import type { MessageSide, MessageSize } from "./MessageBubble";
 import type { ReactNode } from "react";
+
+// 마우스처럼 hover할 수 없는 기기(터치)인지.
+const TOUCH_QUERY = "(hover: none)";
 
 // Figma Chat Base / Message Row(5198:102410). lg·md는 40px 아바타 옆에 이름·말풍선·첨부를 쌓고,
 // sm은 32px 아바타 + 이름 줄 아래에 말풍선을 둠. Card는 행 위에 12px 간격으로 붙음.
@@ -22,8 +32,10 @@ interface ChatMessageProps {
   attachments?: ReactNode;
   /** 행 위에 붙는 카드(ChatCodeCard 등). */
   card?: ReactNode;
-  /** 말풍선 hover 시 위에 뜨는 아이콘 버튼 묶음(답장·수정·삭제). */
+  /** 말풍선 hover 시 위에 뜨는 아이콘 버튼 묶음(답장·수정·삭제). hover가 없는 기기(터치)에서는 말풍선을 누르면 열립니다. */
   toolbar?: ReactNode;
+  /** 아바타와 이름·말풍선 묶음 사이 간격(기본 8px). 화면마다 시안이 달라 바깥에서 덮어씁니다. */
+  rowClassName?: string;
   className?: string;
 }
 
@@ -38,9 +50,11 @@ export function ChatMessage({
   attachments,
   card,
   toolbar,
+  rowClassName,
   className,
 }: ChatMessageProps) {
   const isMe = side === "me";
+  const isTouch = useMediaQuery(TOUCH_QUERY);
   const isSmall = size === "sm";
   const align = isMe ? "items-end" : "items-start";
 
@@ -61,30 +75,59 @@ export function ChatMessage({
     />
   );
 
-  // 알려진 한계: Figma 시안이 hover 툴바라 Tooltip으로 그리며, 트리거가 div라 키보드·터치로는 열 수 없음.
-  // 실제 채팅 화면에 쓰기 전에 같은 동작(답장·수정·삭제)을 메뉴나 Popover로도 제공해야 함.
+  // 시안은 hover 툴바. Radix Tooltip은 터치로 열리지 않아, hover 없는 기기에서는 같은 툴바를
+  // 말풍선을 누르면 열리는 Popover로 보여 줌(사용자 결정 2026-10-21). 말풍선에 포커스해 Enter·Space로도 열림.
+  // 알려진 한계: hover 기기에서 키보드로는 아직 못 엶
   const bubbleWithToolbar =
-    toolbar && bubble ? (
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <div>{bubble}</div>
-        </TooltipTrigger>
-        <TooltipContent
+    toolbar && bubble && isTouch ? (
+      <Popover>
+        <PopoverTrigger asChild>
+          <div
+            role="button"
+            tabIndex={0}
+            onKeyDown={(event) => {
+              if (event.key === "Enter" || event.key === " ") {
+                event.preventDefault();
+                event.currentTarget.click();
+              }
+            }}
+          >
+            {bubble}
+          </div>
+        </PopoverTrigger>
+        <PopoverContent
           side="top"
           align={isMe ? "end" : "start"}
-          variant="toolbar"
+          className="flex w-fit items-center rounded-lg p-1"
         >
           {toolbar}
-        </TooltipContent>
-      </Tooltip>
+        </PopoverContent>
+      </Popover>
+    ) : toolbar && bubble ? (
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <div>{bubble}</div>
+          </TooltipTrigger>
+          <TooltipContent
+            side="top"
+            align={isMe ? "end" : "start"}
+            variant="toolbar"
+          >
+            {toolbar}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
     ) : (
       bubble
     );
 
+  // Figma는 이름 줄 높이 14(leading-none)인데, 말줄임(overflow hidden)이 g·y 같은 영문 아래 획을 자릅니다.
+  // 위아래 2px 여유를 주고 같은 만큼 바깥 여백을 빼서 배치는 시안과 같게 둡니다.
   const nameText = (
     <p
       className={cn(
-        "truncate text-sm leading-none font-medium text-foreground",
+        "-my-0.5 truncate py-0.5 text-sm leading-none font-medium text-foreground",
         isMe && "text-right",
       )}
     >
@@ -127,6 +170,7 @@ export function ChatMessage({
           "flex items-start gap-2",
           isMe && "flex-row-reverse",
           attachments && "w-full",
+          rowClassName,
         )}
       >
         {avatar}

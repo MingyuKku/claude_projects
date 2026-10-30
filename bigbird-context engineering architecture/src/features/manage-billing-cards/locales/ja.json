@@ -1,0 +1,34 @@
+{
+  "title": "定期決済カード",
+  "card": {
+    "default": "基本カード",
+    "add": "カードを追加",
+    "registerResult": {
+      "success": "カードを登録しました。",
+      "failure": "カードを登録できませんでした。もう一度お試しください。"
+    }
+  },
+  "menu": {
+    "label": "{{issuer}} {{number}} カードメニュー",
+    "delete": "カードを削除",
+    "setDefault": "決済カードに登録"
+  },
+  "delete": {
+    "title": "カードの削除",
+    "description": "{{issuer}} {{number}} のカードを削除しますか？削除したカードは再登録しないと利用できません。",
+    "confirm": "削除",
+    "completed": "カードを削除しました。"
+  },
+  "change": {
+    "title": "決済カードの変更",
+    "description": "決済カードを変更しますか？次回の決済から、このカードでサブスクリプションが決済されます。",
+    "completed": {
+      "title": "決済カードの変更完了",
+      "description": "決済カードを変更しました。"
+    }
+  },
+  "error": {
+    "defaultCardInUse": "契約中のため基本カードは削除できません。別のカードを決済カードに登録してから削除してください。",
+    "notFound": "すでに削除されたか、存在しないカードです。"
+  }
+}

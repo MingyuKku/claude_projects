@@ -1,0 +1,121 @@
+{
+  "won": "{{amount}}韩元",
+  "usage": {
+    "title": "使用明细",
+    "list": {
+      "label": "使用明细"
+    },
+    "column": {
+      "campaignName": "活动名称",
+      "usedAt": "使用日期",
+      "usage": "使用内容",
+      "amount": "使用金额",
+      "campaignCode": "活动代码",
+      "detail": "详情"
+    },
+    "card": {
+      "usedAt": "使用日期",
+      "campaignName": "活动名称",
+      "campaignType": "活动类型",
+      "campaignCode": "活动代码",
+      "usage": "使用内容",
+      "amount": "使用金额",
+      "remaining": "使用后余额"
+    },
+    "action": {
+      "detail": "查看详情"
+    },
+    "detail": {
+      "title": "详情",
+      "usedAt": "使用日期",
+      "campaignName": "活动名称",
+      "campaignType": "活动类型",
+      "campaignCode": "活动代码",
+      "usage": "使用内容",
+      "amount": "使用金额",
+      "remaining": "使用后余额"
+    },
+    "filter": {
+      "date": {
+        "label": "使用日期",
+        "placeholder": "请选择日期。"
+      },
+      "campaign": {
+        "label": "活动名称",
+        "placeholder": "请选择活动名称。"
+      },
+      "usage": {
+        "label": "使用内容",
+        "placeholder": "请选择使用内容。"
+      }
+    },
+    "empty": {
+      "none": "暂无 Bigbird 余额使用记录。"
+    }
+  },
+  "charge": {
+    "title": "充值明细",
+    "list": {
+      "label": "充值明细"
+    },
+    "column": {
+      "requestedAt": "充值日期",
+      "amount": "申请金额",
+      "method": "支付方式",
+      "status": "到账状态",
+      "receipt": "交易明细",
+      "detail": "详情"
+    },
+    "card": {
+      "requestedAt": "充值日期",
+      "amount": "申请金额",
+      "method": "支付方式",
+      "status": "到账状态"
+    },
+    "action": {
+      "detail": "查看详情",
+      "receipt": "交易明细",
+      "receiptShort": "明细"
+    },
+    "method": {
+      "vbank": "银行转账"
+    },
+    "detail": {
+      "title": "交易详情",
+      "approvedAt": "确认日期",
+      "requestedAt": "申请日期",
+      "amount": "申请金额",
+      "method": "支付方式",
+      "bank": "银行名称",
+      "account": "虚拟账号",
+      "depositedAt": "到账日期",
+      "status": "到账状态",
+      "receipt": "获取交易明细"
+    },
+    "filter": {
+      "date": {
+        "label": "充值日期",
+        "placeholder": "请选择日期。"
+      },
+      "status": {
+        "label": "到账状态",
+        "placeholder": "请选择到账状态。",
+        "option": {
+          "paid": "支付完成",
+          "pending": "等待中",
+          "canceled": "支付取消"
+        }
+      }
+    },
+    "empty": {
+      "none": "暂无 Bigbird 余额充值记录。"
+    },
+    "notice": {
+      "title": "须知",
+      "method": "Bigbird 余额通过银行转账充值。",
+      "validity": "虚拟账户有效期至2天后的午夜。",
+      "instant": "确认到账后立即充值。",
+      "delay": "到账后，余额更新最长可能需要5分钟。"
+    }
+  }
+}

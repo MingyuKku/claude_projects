@@ -7,14 +7,19 @@ import {
   useInquiryUserImage,
   usePurchaserConversation,
 } from "@/entities/inquiry";
-import { ChatDivider, ChatMessage } from "@/shared/components/chat-message";
+import { EditableChatMessage } from "@/features/edit-inquiry-message";
+import { ChatDivider } from "@/shared/components/chat-message";
 import { EmptyState } from "@/shared/components/empty-state";
 import { useTranslation } from "@/shared/i18n";
+import { useMediaQuery } from "@/shared/lib/useMediaQuery";
 
 import { formatDividerDate, formatMessageTime } from "../lib/format";
+import { IS_BUYER_WRITE_ENABLED } from "../model/constants";
 import { QnaConversation } from "./QnaConversation";
 
 import type { BuyerInquiryViewModel } from "@/entities/inquiry";
+
+const TABLET_ONLY_QUERY = "(min-width: 768px) and (max-width: 1439.98px)";
 
 interface BuyerConversationProps {
   inquiry: BuyerInquiryViewModel;
@@ -32,7 +37,10 @@ export function BuyerConversation({ inquiry }: BuyerConversationProps) {
 function PurchaserConversation({ inquiry }: BuyerConversationProps) {
   const { t } = useTranslation("widgets/buyer-inquiry-workspace");
   const { t: tCommon } = useTranslation();
-  const { messages, isLoading, isError } = usePurchaserConversation(inquiry);
+  // Figma 구매자 대화 말풍선: TAB(6791:59549)은 작은 형태(아바타 32·최대 200), MO·PC는 최대 340입니다.
+  const isTablet = useMediaQuery(TABLET_ONLY_QUERY);
+  const { messages, isLoading, isError, mutate } =
+    usePurchaserConversation(inquiry);
   const writerName = inquiry.writerName ?? t("unknownWriter");
   const avatarSrc = useInquiryUserImage(inquiry.threadUserIdx);
 
@@ -54,8 +62,11 @@ function PurchaserConversation({ inquiry }: BuyerConversationProps) {
       />
     );
   }
+  // 구매자 앱이 문의를 시작할 때 보내는 캠페인 JSON auto 메시지는 상세 패널과 내용이 겹쳐 숨깁니다.
   const rows = groupAttachments(
-    (messages ?? []).filter((message) => message.kind !== "system"),
+    (messages ?? []).filter(
+      (message) => message.kind !== "system" && !message.campaign,
+    ),
   );
   if (rows.length === 0) {
     return (
@@ -81,7 +92,12 @@ function PurchaserConversation({ inquiry }: BuyerConversationProps) {
         const isNewDay =
           !previousCreatedAt || formatDividerDate(previousCreatedAt) !== day;
         const isMine = row.type === "files" ? row.isMine : row.message.isMine;
-        const name = isMine ? t("advertiser") : writerName;
+        const senderId =
+          row.type === "files"
+            ? (row.text ?? row.messages[0])?.senderId
+            : row.message.senderId;
+        // 내 말풍선에는 보낸 광고주 계정 id를 보입니다(v2와 같음, Figma "광고주명"). 모를 때만 "광고주"입니다.
+        const name = isMine ? (senderId ?? t("advertiser")) : writerName;
         return (
           <li key={row.id} className="flex flex-col gap-3 tablet:gap-4">
             {isNewDay && (
@@ -101,12 +117,16 @@ function PurchaserConversation({ inquiry }: BuyerConversationProps) {
               </ChatDivider>
             ) : (
               <Fragment>
-                <ChatMessage
+                <EditableChatMessage
+                  message={row.message}
                   name={name}
-                  side={isMine ? "me" : "other"}
                   avatarSrc={isMine ? undefined : avatarSrc}
-                  message={row.message.body}
                   time={formatMessageTime(row.message.createdAt)}
+                  size={isTablet ? "sm" : "md"}
+                  // Figma 구매자 PC 내 메시지(6756:28994)는 아바타와 12px, 나머지는 8px입니다.
+                  rowClassName={isMine ? "desktop:gap-3" : undefined}
+                  canModify={IS_BUYER_WRITE_ENABLED}
+                  onChanged={() => void mutate()}
                 />
               </Fragment>
             )}

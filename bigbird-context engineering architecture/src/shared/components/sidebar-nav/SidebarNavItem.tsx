@@ -9,6 +9,8 @@ import type { ComponentProps, ComponentType, HTMLAttributes } from "react";
 // Figma의 Focus 상태는 현재 페이지(aria-current="page").
 export interface SidebarLinkProps extends ComponentProps<"a"> {
   href: string;
+  // 메뉴 항목의 id. 링크 컴포넌트가 항목별 동작(예: 로그인 안내)을 정할 때 씀.
+  navId?: string;
 }
 
 export type SidebarLinkComponent = ComponentType<SidebarLinkProps>;
@@ -19,7 +21,8 @@ const FALLBACK_HREF = "#";
 export interface SidebarNavSubItemData {
   id: string;
   label: string;
-  href: string;
+  // 화면이 아직 없는 하위 메뉴는 목적지 없이 두고, 링크 컴포넌트가 비활성으로 그림.
+  href?: string;
   isActive?: boolean;
 }
 
@@ -49,8 +52,22 @@ const mainRowClass = cn(
   FOCUS_RING,
 );
 
-function DefaultLink({ children, ...props }: SidebarLinkProps) {
-  return <a {...props}>{children}</a>;
+// 드롭다운 아이콘은 16px 아이콘 + 2px 여백 = 20×20 영역(Figma Icon Button 5052:72817). 행의 오른쪽 여백 12px(px-3)과 함께
+// 하위 메뉴가 있는 모든 행에서 같은 자리에 정렬됨.
+function NavChevron({ className }: { className?: string }) {
+  return (
+    <span className="shrink-0 rounded-md p-0.5">
+      <ChevronDown className={cn("size-4", className)} />
+    </span>
+  );
+}
+
+function DefaultLink({ children, navId, ...props }: SidebarLinkProps) {
+  return (
+    <a data-nav-id={navId} {...props}>
+      {children}
+    </a>
+  );
 }
 
 export function SidebarNavItem({
@@ -65,13 +82,14 @@ export function SidebarNavItem({
     return (
       <Link
         href={item.href ?? FALLBACK_HREF}
+        navId={item.id}
         aria-current={item.isActive ? "page" : undefined}
         className={cn(mainRowClass, className)}
         {...props}
       >
         <Icon className="size-4 shrink-0" />
         <span className="flex-1 truncate">{item.label}</span>
-        {item.hasSubItems && <ChevronDown className="size-4" />}
+        {item.hasSubItems && <NavChevron />}
       </Link>
     );
   }
@@ -88,19 +106,18 @@ export function SidebarNavItem({
       >
         <Icon className="size-4 shrink-0" />
         <span className="flex-1 truncate">{item.label}</span>
-        <span className="rounded-md p-0.5">
-          <ChevronDown className="size-4 transition-transform group-open/nav-item:rotate-180" />
-        </span>
+        <NavChevron className="transition-transform group-open/nav-item:rotate-180" />
       </summary>
       <div className="py-1.5 pl-5">
         <ul className="flex flex-col border-l pl-3">
           {item.subItems.map((subItem) => (
             <li key={subItem.id}>
               <Link
-                href={subItem.href}
+                href={subItem.href ?? FALLBACK_HREF}
+                navId={subItem.id}
                 aria-current={subItem.isActive ? "page" : undefined}
                 className={cn(
-                  "block min-w-32 truncate rounded-sm p-1.5 text-sm leading-5 text-sidebar-foreground aria-[current=page]:bg-muted aria-[current=page]:text-primary",
+                  "block min-w-32 truncate rounded-sm p-1.5 text-sm leading-5 text-sidebar-foreground transition-colors hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:text-primary",
                   FOCUS_RING,
                 )}
               >
@@ -127,6 +144,7 @@ export function SidebarRailItem({
   return (
     <Link
       href={item.href ?? item.subItems?.[0]?.href ?? FALLBACK_HREF}
+      navId={item.id}
       aria-label={item.label}
       aria-current={isActive ? "page" : undefined}
       className={cn(

@@ -1,56 +1,77 @@
+import { useEffect } from "react";
 import { useSearchParams } from "react-router";
 
 import { EmptyState } from "@/shared/components/empty-state";
 import { PageNavigator } from "@/shared/components/page-navigator";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery } from "@/shared/lib";
+import { Button } from "@/shared/ui/button";
 
 import { useSubAccounts } from "../api/use-sub-accounts";
+import { useListParams } from "../lib/use-list-params";
+import { KEYWORD_PARAM, PAGE_PARAM } from "../model/constants";
 import { CreateSubAccountButton } from "./CreateSubAccountButton";
 import { SubAccountCardList } from "./SubAccountCardList";
+import { SubAccountListSkeleton } from "./SubAccountListSkeleton";
 import { SubAccountSearch } from "./SubAccountSearch";
 import { SubAccountTable } from "./SubAccountTable";
 
 import type { SubAccountViewModel } from "../model/types";
 
-const KEYWORD_PARAM = "keyword";
-const PAGE_PARAM = "page";
-const TABLET_QUERY = "(min-width: 768px)";
+// 표는 PC(1440~)만 쓰고 TAB·MO는 카드(2026-10-27 시안).
+const DESKTOP_QUERY = "(min-width: 1440px)";
 
 interface SubAccountListProps {
-  /** 권한 부여를 열어 둔 Sub ID. 그 행을 활성(accent) 처리함. */
+  /** 권한 부여·수정을 열어 둔 Sub ID. 그 행을 활성(accent) 처리함. */
   activeAccountIdx: number | null;
   onClickCreate: () => void;
   onClickPermission: (account: SubAccountViewModel) => void;
+  onClickEdit: (account: SubAccountViewModel) => void;
   onClickDelete: (account: SubAccountViewModel) => void;
 }
 
-// 검색어·쪽은 URL 쿼리가 소유함(새로고침·뒤로 가기에도 유지). PC·TAB은 표, MO는 카드.
+// 검색어·쪽은 URL 쿼리가 소유함(새로고침·뒤로 가기에도 유지). 검색·쪽 나눔은 서버가 함. PC는 표, TAB·MO는 카드.
 // MO의 화면 하단 고정 생성 버튼은 레이아웃 여백을 알아야 해서 페이지가 그림.
 export function SubAccountList({
   activeAccountIdx,
   onClickCreate,
   onClickPermission,
+  onClickEdit,
   onClickDelete,
 }: SubAccountListProps) {
   const { t } = useTranslation("features/manage-sub-accounts");
   const { t: tCommon } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const isTabletUp = useMediaQuery(TABLET_QUERY);
+  const isDesktop = useMediaQuery(DESKTOP_QUERY);
 
-  const keyword = searchParams.get(KEYWORD_PARAM) ?? "";
-  const requestedPage = Number(searchParams.get(PAGE_PARAM)) || 1;
-  const { accounts, totalCount, page, totalPages } = useSubAccounts({
+  const { keyword, page: requestedPage } = useListParams();
+  const { list, isLoading, isError, mutate } = useSubAccounts({
     keyword,
     page: requestedPage,
   });
+  const totalPages = list?.totalPages ?? 0;
+  // 마지막 쪽의 마지막 항목을 지웠거나 주소를 직접 고쳐 범위를 벗어난 쪽은 마지막 쪽으로 당김.
+  const isPageOutOfRange =
+    list !== undefined && totalPages > 0 && requestedPage > totalPages;
 
-  /** 목록이 바뀌면 열어 둔 권한 부여 섹션은 닫음(스펙 §3). 생성 패널은 그대로 둠. */
+  useEffect(() => {
+    if (!isPageOutOfRange) return;
+    setSearchParams(
+      (prev) => {
+        const params = new URLSearchParams(prev);
+        params.set(PAGE_PARAM, String(totalPages));
+        return params;
+      },
+      { replace: true },
+    );
+  }, [isPageOutOfRange, totalPages, setSearchParams]);
+
+  /** 목록이 바뀌면 열어 둔 권한 부여·수정 패널은 닫음(스펙 §3). 생성 패널은 그대로 둠. */
   function updateParams(update: (params: URLSearchParams) => void) {
     setSearchParams((prev) => {
       const params = new URLSearchParams(prev);
       update(params);
-      if (params.get("panel") === "permission") {
+      if (["permission", "edit"].includes(params.get("panel") ?? "")) {
         params.delete("panel");
         params.delete("subId");
       }
@@ -72,7 +93,8 @@ export function SubAccountList({
     return `?${params.toString()}`;
   }
 
-  const isEmpty = totalCount === 0;
+  const accounts = list?.accounts ?? [];
+  const isEmpty = list?.totalCount === 0;
   const emptyContent = isEmpty ? (
     <EmptyState
       type={keyword ? "no-search" : "no-list"}
@@ -104,45 +126,62 @@ export function SubAccountList({
       </div>
 
       {/* 표(또는 카드)와 쪽 이동은 12px 간격으로 한 묶음(시안). */}
-      <div className="flex flex-col gap-3">
-        {isTabletUp ? (
-          <SubAccountTable
-            accounts={accounts}
-            activeAccountIdx={activeAccountIdx}
-            onClickPermission={onClickPermission}
-            onClickDelete={onClickDelete}
-            emptyContent={emptyContent}
-          />
-        ) : (
-          <>
-            {emptyContent ?? (
-              <SubAccountCardList
-                accounts={accounts}
-                activeAccountIdx={activeAccountIdx}
-                onClickPermission={onClickPermission}
-                onClickDelete={onClickDelete}
-              />
-            )}
-          </>
-        )}
+      {isLoading ? (
+        <SubAccountListSkeleton isTable={isDesktop} />
+      ) : isError || !list ? (
+        <EmptyState
+          type="alarm"
+          title={tCommon("error.unexpected")}
+          className="py-20"
+          action={
+            <Button variant="outline" onClick={() => void mutate()}>
+              {tCommon("action.retry")}
+            </Button>
+          }
+        />
+      ) : (
+        <div className="flex flex-col gap-3">
+          {isDesktop ? (
+            <SubAccountTable
+              accounts={accounts}
+              activeAccountIdx={activeAccountIdx}
+              onClickPermission={onClickPermission}
+              onClickEdit={onClickEdit}
+              onClickDelete={onClickDelete}
+              emptyContent={emptyContent}
+            />
+          ) : (
+            <>
+              {emptyContent ?? (
+                <SubAccountCardList
+                  accounts={accounts}
+                  activeAccountIdx={activeAccountIdx}
+                  onClickPermission={onClickPermission}
+                  onClickEdit={onClickEdit}
+                  onClickDelete={onClickDelete}
+                />
+              )}
+            </>
+          )}
 
-        {!isEmpty && (
-          <PageNavigator
-            page={page}
-            totalPages={totalPages}
-            buildHref={buildPageHref}
-            onChangePage={(target) =>
-              updateParams((params) => params.set(PAGE_PARAM, String(target)))
-            }
-            labels={{
-              navigation: tCommon("pagination.navigation"),
-              previous: tCommon("pagination.previous"),
-              next: tCommon("pagination.next"),
-              page: (target) => tCommon("pagination.page", { page: target }),
-            }}
-          />
-        )}
-      </div>
+          {!isEmpty && (
+            <PageNavigator
+              page={list.page}
+              totalPages={totalPages}
+              buildHref={buildPageHref}
+              onChangePage={(target) =>
+                updateParams((params) => params.set(PAGE_PARAM, String(target)))
+              }
+              labels={{
+                navigation: tCommon("pagination.navigation"),
+                previous: tCommon("pagination.previous"),
+                next: tCommon("pagination.next"),
+                page: (target) => tCommon("pagination.page", { page: target }),
+              }}
+            />
+          )}
+        </div>
+      )}
     </div>
   );
 }

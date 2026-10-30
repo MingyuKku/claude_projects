@@ -31,6 +31,8 @@ vi.mock("@/entities/inquiry", () => ({
   LOCK_REFRESH_MS: 15_000,
   markRealtimeRequestExpired: mocks.expire,
   newMessageId: () => `id-${++mocks.ids}`,
+  REALTIME_IDLE_LIMIT_MS: 10 * 60_000,
+  REALTIME_IDLE_WARNING_MS: 5 * 60_000,
   releaseConsultationLock: mocks.release,
   retryRealtimeRequest: mocks.retry,
   TAB_ID: "tab-1",
@@ -67,17 +69,15 @@ function setup(
   enabled = true,
 ) {
   const onChanged = vi.fn();
-  const onLeaveForMessage = vi.fn();
   const hook = renderHook(() =>
     useRealtimeConversation({
       inquiry: value ?? undefined,
       session,
       enabled,
       onChanged,
-      onLeaveForMessage,
     }),
   );
-  return { ...hook, onChanged, onLeaveForMessage };
+  return { ...hook, onChanged };
 }
 
 describe("useRealtimeConversation", () => {
@@ -193,6 +193,83 @@ describe("useRealtimeConversation", () => {
     }
   });
 
+  it("광고주 차례가 5분이면 안내하고, 10분이면 상담을 끝내고 종료를 알린다", async () => {
+    vi.useFakeTimers();
+    try {
+      const since = Date.now();
+      const { result } = setup(
+        inquiry({ idleTurn: { waitingFor: "advertiser", since } }),
+      );
+      // 락을 얻은 뒤에 타이머가 걸림.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(5 * 60_000);
+      });
+      expect(result.current.idleAlert).toBe("advertiserWarning");
+      expect(mocks.close).not.toHaveBeenCalled();
+      act(() => result.current.dismissIdleAlert());
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(5 * 60_000);
+      });
+      expect(result.current.idleAlert).toBe("advertiserClosed");
+      expect(mocks.close).toHaveBeenCalledOnce();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("운영 차례가 5분이면 안내만, 10분이면 실시간을 끝내 일반 문의로 돌린다", async () => {
+    vi.useFakeTimers();
+    try {
+      const since = Date.now();
+      const { result } = setup(
+        inquiry({ idleTurn: { waitingFor: "operator", since } }),
+      );
+      // 락을 얻은 뒤에 타이머가 걸림.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(5 * 60_000);
+      });
+      expect(result.current.idleAlert).toBe("operatorDelay");
+      expect(mocks.close).not.toHaveBeenCalled();
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(5 * 60_000);
+      });
+      expect(result.current.idleAlert).toBe("operatorUnavailable");
+      expect(mocks.close).toHaveBeenCalledOnce();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  it("5분 안내에서 취소하면 상담을 끝낸다", async () => {
+    vi.useFakeTimers();
+    try {
+      const { result } = setup(
+        inquiry({ idleTurn: { waitingFor: "operator", since: Date.now() } }),
+      );
+      // 락을 얻은 뒤에 타이머가 걸림.
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      await act(async () => {
+        await vi.advanceTimersByTimeAsync(5 * 60_000);
+      });
+      await act(async () => {
+        result.current.endFromIdleAlert();
+        await vi.advanceTimersByTimeAsync(0);
+      });
+      expect(result.current.idleAlert).toBeNull();
+      expect(mocks.close).toHaveBeenCalledOnce();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
   it("락 확인이 오류로 실패하면 입력이 막힌 이유를 한 번 알린다", async () => {
     mocks.acquire.mockRejectedValue(new Error("network"));
     const { result } = setup();
@@ -278,45 +355,6 @@ describe("useRealtimeConversation", () => {
     expect(onChanged).not.toHaveBeenCalled();
   });
 
-  it("문의 메시지로 남기기: 취소 → 요청 정리 → 같은 캠페인으로 이동", async () => {
-    const { result, onLeaveForMessage } = setup(
-      inquiry({ realtimePhase: "failed" }),
-    );
-    await act(async () => {
-      await result.current.leaveForMessage();
-    });
-    expect(mocks.cancel).toHaveBeenCalledWith({
-      threadUserIdx: 5971,
-      sequence: 7,
-    });
-    expect(mocks.close).toHaveBeenCalledOnce();
-    expect(onLeaveForMessage).toHaveBeenCalledWith(55);
-  });
-
-  it("그 사이 상담원이 연결됐으면 이동하지 않고 상담에 남는다", async () => {
-    mocks.cancel.mockResolvedValue({ ok: false, reason: "connected" });
-    const { result, onLeaveForMessage } = setup(
-      inquiry({ realtimePhase: "failed" }),
-    );
-    await act(async () => {
-      await result.current.leaveForMessage();
-    });
-    expect(mocks.close).not.toHaveBeenCalled();
-    expect(onLeaveForMessage).not.toHaveBeenCalled();
-    expect(mocks.toastError).toHaveBeenCalledOnce();
-  });
-
-  it("요청 정리가 실패해도 취소는 확정됐으니 이동한다", async () => {
-    mocks.close.mockRejectedValue(new Error("rest"));
-    const { result, onLeaveForMessage } = setup(
-      inquiry({ realtimePhase: "failed" }),
-    );
-    await act(async () => {
-      await result.current.leaveForMessage();
-    });
-    expect(onLeaveForMessage).toHaveBeenCalledWith(55);
-  });
-
   it("요청 실패 상태에서 락을 가진 탭이 만료를 한 번만 기록한다", async () => {
     const { result, rerender } = setup(
       inquiry({ realtimePhase: "failed", connectDeadlineAt: 1000 }),
@@ -325,17 +363,6 @@ describe("useRealtimeConversation", () => {
     await waitFor(() => expect(mocks.expire).toHaveBeenCalledOnce());
     rerender();
     expect(mocks.expire).toHaveBeenCalledOnce();
-  });
-
-  it("재시도는 같은 문의를 다시 요청한다", async () => {
-    const { result } = setup(inquiry({ realtimePhase: "failed" }));
-    await act(async () => {
-      await result.current.retry();
-    });
-    expect(mocks.retry).toHaveBeenCalledWith(
-      { threadUserIdx: 5971, sequence: 7 },
-      expect.anything(),
-    );
   });
 
   it("파일을 모두 올린 뒤 한 번의 저장으로 보내고, 실패해 다시 보내면 업로드와 messageId를 재사용한다", async () => {

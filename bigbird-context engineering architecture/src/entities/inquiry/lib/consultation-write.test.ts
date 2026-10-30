@@ -204,19 +204,19 @@ describe("요청 취소·만료", () => {
     });
   });
 
-  it("마감 필드가 없으면 요청 시각 + 5분으로 만료를 판단한다", () => {
+  it("마감 필드가 없으면 요청 시각 + 3분으로 만료를 판단한다", () => {
     const waiting = doc({
       isConnect: false,
       created: stamp(0),
       origin: "v3",
     });
-    expect(getWaitDeadline(waiting)).toBe(NOW + 5 * 60_000);
-    expect(planMarkExpired(waiting, NOW + 5 * 60_000 - 1000)).toEqual({
+    expect(getWaitDeadline(waiting)).toBe(NOW + 3 * 60_000);
+    expect(planMarkExpired(waiting, NOW + 3 * 60_000 - 1000)).toEqual({
       kind: "skip",
     });
-    expect(planMarkExpired(waiting, NOW + 5 * 60_000)).toMatchObject({
+    expect(planMarkExpired(waiting, NOW + 3 * 60_000)).toMatchObject({
       kind: "write",
-      consultation: { expiredAt: stamp(5 * 60_000) },
+      consultation: { expiredAt: stamp(3 * 60_000) },
     });
     expect(
       planMarkExpired(
@@ -224,6 +224,18 @@ describe("요청 취소·만료", () => {
         NOW + 10 * 60_000,
       ),
     ).toEqual({
+      kind: "skip",
+    });
+  });
+
+  it("일반 문의로 다시 열린 문서는 옛 마감이 남아 있어도 만료로 기록하지 않는다", () => {
+    const reopened = doc({
+      boardType: true,
+      isConnect: false,
+      origin: "v3",
+      waitDeadline: stamp(0),
+    });
+    expect(planMarkExpired(reopened, NOW + 60 * 60_000)).toEqual({
       kind: "skip",
     });
   });
@@ -364,6 +376,27 @@ describe("락", () => {
     });
   });
 
+  it("락 쓰기는 계정 문서 updated를 바꾸지 않는다", () => {
+    // 운영 v3가 updated를 목록 재조회 신호로 쓰므로 15초 갱신마다 재조회가 일어나지 않게 함
+    const held = {
+      clientResponseUserIdx: "1_1",
+      clientResponseTabs: { "tab-a": NOW + 5000, "tab-a2": NOW + 5000 },
+    };
+    const plans = [
+      planAcquireLock(undefined, lockA, 7, NOW),
+      planReleaseLock(held, lockA, NOW),
+      planReleaseLock(
+        { ...held, clientResponseTabs: { "tab-a": NOW + 5000 } },
+        lockA,
+        NOW,
+      ),
+    ];
+    for (const plan of plans) {
+      if (plan.kind !== "write") throw new Error();
+      expect(plan.account).not.toHaveProperty("updated");
+    }
+  });
+
   it("늦은 해제가 새 소유자의 락을 지우지 않는다", () => {
     const held = {
       clientResponseUserIdx: "2_9",
@@ -385,15 +418,29 @@ describe("planCreateRequest", () => {
     now: NOW,
   };
 
-  it("v3 요청으로 만들고 마감을 5분 뒤로 둔다", () => {
+  it("v3 요청으로 만들고 마감을 3분 뒤로 둔다", () => {
     const plan = planCreateRequest(undefined, {}, base);
     expect(plan?.consultation).toMatchObject({
       origin: "v3",
       isConnect: false,
       finishTime: null,
-      waitDeadline: stamp(5 * 60_000),
+      waitDeadline: stamp(3 * 60_000),
     });
     expect(plan?.createAccount).toBe(false);
+  });
+
+  it("운영 앱이 v3 알림을 구분하도록 알림에 origin·threadIdx·sequence를 담는다", () => {
+    const plan = planCreateRequest(undefined, {}, base);
+    expect(plan?.account.alarmData).toMatchObject({
+      id: "bigbird",
+      callType: "client",
+      threadUserIdx: 5971,
+      userIdx: 42,
+      campaignIdx: null,
+      origin: "v3",
+      threadIdx: 101,
+      sequence: 7,
+    });
   });
 
   it("기타 문의는 빈 대화로, 캠페인 문의는 카드 메시지 하나로 시작한다", () => {
@@ -417,6 +464,88 @@ describe("planCreateRequest", () => {
     expect(planCreateRequest(doc(), {}, base)).toBeNull();
   });
 
+  it("열린 일반 문의 문서면 메시지는 두고 실시간 필드를 합친다", () => {
+    const plan = planCreateRequest(
+      doc({ boardType: true, finishTime: null }),
+      {},
+      base,
+    );
+
+    expect(plan?.isConversion).toBe(true);
+    expect(plan?.consultation).toMatchObject({
+      boardType: false,
+      isConnect: false,
+      finishTime: null,
+      origin: "v3",
+      sequence: 7,
+      threadIdx: 101,
+      waitDeadline: stamp(3 * 60_000),
+    });
+    expect(plan?.consultation).not.toHaveProperty("messages");
+    // 전에 끝낸 실시간 상담의 종료 표시가 남아 있으면 새 요청이 종료 중으로 보이므로 지움
+    expect(plan?.consultation).toMatchObject({
+      closingAt: null,
+      canceledAt: null,
+      expiredAt: null,
+    });
+  });
+
+  it("일반 문의 문서로 전환할 때 같은 캠페인 카드가 없을 때만 카드를 붙인다", () => {
+    const card = JSON.stringify({ campaignIdx: 6329 });
+    const withCampaign = {
+      ...base,
+      campaign: {
+        campaignIdx: 6329,
+        campaignCode: "C1",
+        productName: "상품",
+        mainImageUrl: null,
+      },
+      firstMessage: { id: "first", body: card },
+    };
+    const question = {
+      auto: false,
+      attachmentIdx: null,
+      identifier: "bigbird",
+      isUserMessage: true,
+      body: "문의",
+      fileName: null,
+      created: "2026-10-29 10:00:00",
+    };
+
+    const added = planCreateRequest(
+      doc({ boardType: true, messages: [question] }),
+      {},
+      withCampaign,
+    );
+    expect(added?.consultation.messages).toMatchObject([
+      question,
+      { auto: true, body: card, messageId: "first" },
+    ]);
+
+    const existingCard = {
+      ...question,
+      auto: true,
+      isUserMessage: false,
+      body: card,
+    };
+    const kept = planCreateRequest(
+      doc({ boardType: true, messages: [existingCard, question] }),
+      {},
+      withCampaign,
+    );
+    expect(kept?.consultation).not.toHaveProperty("messages");
+  });
+
+  it("끝난 일반 문의 문서는 다시 요청으로 바꾸지 않는다", () => {
+    expect(
+      planCreateRequest(
+        doc({ boardType: true, finishTime: "2026-10-28 11:52:26" }),
+        {},
+        base,
+      ),
+    ).toBeNull();
+  });
+
   it("계정 문서가 없으면 새로 만들도록 알린다", () => {
     expect(planCreateRequest(undefined, undefined, base)?.createAccount).toBe(
       true,
@@ -433,7 +562,7 @@ describe("planRetryRequest", () => {
       kind: "write",
       consultation: {
         expiredAt: null,
-        waitDeadline: stamp(5 * 60_000),
+        waitDeadline: stamp(3 * 60_000),
         seqResponseDate: stamp(0),
       },
       account: { alarmData: alarm, newSenderUserIdx: 1 },

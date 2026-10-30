@@ -7,7 +7,13 @@
     "login": "Log in",
     "goBack": "Back",
     "cancel": "Cancel",
-    "save": "Save"
+    "save": "Save",
+    "edit": "Edit"
+  },
+  "loginRequired": {
+    "title": "Login required",
+    "description": "This menu is available after you log in.",
+    "action": "Go to log in"
   },
   "status": {
     "loading": "Loading…",
@@ -89,5 +95,41 @@
     "previous": "Previous",
     "next": "Next",
     "page": "Page {{page}}"
+  },
+  "list": {
+    "search": {
+      "label": "Search",
+      "placeholder": "Enter search terms."
+    },
+    "filter": {
+      "action": "Filter",
+      "title": "Filter settings",
+      "description": "Choose conditions to narrow the list.",
+      "reset": "Reset",
+      "apply": "Apply",
+      "refresh": "Refresh"
+    },
+    "empty": {
+      "search": {
+        "title": "No results for ‘{{keyword}}’."
+      },
+      "searchFilter": {
+        "title": "No results for ‘{{keyword}}’ with the selected filters."
+      },
+      "filter": {
+        "title": "No results match the selected filters.",
+        "description": "Change or reset the filters."
+      }
+    },
+    "pageSize": {
+      "label": "Show {{size}}",
+      "labelShort": "{{size}}/page",
+      "aria": "Items per page"
+    }
+  },
+  "passwordConfirm": {
+    "title": "Enter admin password",
+    "placeholder": "Enter password",
+    "mismatch": "Incorrect password."
   }
 }

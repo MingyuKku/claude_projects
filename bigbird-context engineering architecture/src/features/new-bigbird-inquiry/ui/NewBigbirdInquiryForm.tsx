@@ -2,6 +2,7 @@ import { CircleHelp, Handshake, Headset, Pencil } from "lucide-react";
 import { useId, useState, type CSSProperties, type ReactNode } from "react";
 
 import { AttachmentTextField, useInquiryAttachments } from "@/entities/inquiry";
+import { EmptyState } from "@/shared/components/empty-state";
 import { useTranslation } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
 import { Checkbox } from "@/shared/ui/checkbox";
@@ -135,7 +136,7 @@ export function NewBigbirdInquiryForm({
 
         {type === "campaign" && (
           <fieldset className="min-w-0">
-            <legend className="mb-4 text-sm leading-none font-semibold">
+            <legend className="mb-3 text-sm leading-none font-semibold desktop:mb-4">
               {t("campaignListLabel")}
             </legend>
             {/* 머리글은 고정하고 본문만 스크롤함. 스크롤바도 머리글 아래부터 시작함. */}
@@ -190,7 +191,11 @@ export function NewBigbirdInquiryForm({
                           {campaign.name}
                         </label>
                       </TableCell>
-                      <TableCell className="whitespace-normal">
+                      {/* 기간도 캠페인명처럼 한 줄 말줄임(Figma Table Base / Cell, MO에서 잘림) */}
+                      <TableCell
+                        className="truncate"
+                        title={campaign.periodLabel ?? undefined}
+                      >
                         {campaign.periodLabel ?? "—"}
                       </TableCell>
                     </TableRow>
@@ -217,7 +222,11 @@ export function NewBigbirdInquiryForm({
                     </CampaignStatusRow>
                   )}
                   {campaignsState === "ready" && campaigns.length === 0 && (
-                    <CampaignStatusRow>{t("noCampaign")}</CampaignStatusRow>
+                    <TableRow className="hover:bg-transparent">
+                      <TableCell colSpan={3} className="py-8">
+                        <EmptyState type="no-list" title={t("noCampaign")} />
+                      </TableCell>
+                    </TableRow>
                   )}
                 </TableBody>
               </Table>
@@ -251,7 +260,7 @@ export function NewBigbirdInquiryForm({
         />
 
         {method === "board" && (
-          <div className="space-y-4">
+          <div className="space-y-3 tablet:space-y-4">
             <label
               htmlFor={`${id}-body`}
               className="block text-sm leading-none font-semibold"

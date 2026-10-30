@@ -4,5 +4,6 @@
   "notFound": "문의를 찾을 수 없습니다.",
   "loadError": "문의를 불러오지 못했습니다.",
   "backToList": "문의 목록으로",
-  "conversation": "문의 대화"
+  "conversation": "문의 대화",
+  "requestFailed": "상담을 요청하지 못했습니다. 다시 시도해 주세요."
 }

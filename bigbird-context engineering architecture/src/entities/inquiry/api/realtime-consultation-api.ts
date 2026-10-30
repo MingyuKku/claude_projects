@@ -52,9 +52,10 @@ async function watchConsultation(
         onError(parsed.error);
         return;
       }
+      // 일반 문의 문서에는 이 필드가 없어 있을 때만 맞는지 봄.
       if (
-        parsed.data.sequence !== sequence ||
-        parsed.data.threadIdx !== threadIdx
+        (parsed.data.sequence != null && parsed.data.sequence !== sequence) ||
+        (parsed.data.threadIdx != null && parsed.data.threadIdx !== threadIdx)
       ) {
         onError(new Error("실시간 상담 식별자가 일치하지 않습니다."));
         return;
@@ -99,7 +100,10 @@ export function useRealtimeConsultationMessages(
       { sequence: selectedSequence, threadIdx: selectedThreadIdx },
       (consultation) =>
         next(null, transformRealtimeConsultationMessages(consultation)),
-      (cause) => next(cause),
+      (cause) => {
+        console.error("실시간 상담 문서 구독 오류", selectedSequence, cause);
+        next(cause);
+      },
     )
       .then((stop) => {
         if (isDisposed) stop();

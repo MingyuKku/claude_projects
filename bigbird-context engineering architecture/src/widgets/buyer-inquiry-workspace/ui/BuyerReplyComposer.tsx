@@ -70,7 +70,8 @@ export function BuyerReplyComposer({
   }
 
   return (
-    <div className="shrink-0 border-t border-border bg-muted">
+    // Figma Conversation Area(6756:28991): 입력창은 대화 배경 위에 16px 띄워 놓이고 구분선이 없습니다.
+    <div className="shrink-0 bg-muted">
       {threadIdx !== null && <InquiryUploadStatus threadIdx={threadIdx} />}
       <form
         className="p-4"

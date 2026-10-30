@@ -103,7 +103,7 @@ describe("useLiveInquiries", () => {
     );
   });
 
-  it("연결 대기 5분이 지나면 요청 실패로 바꾼다", async () => {
+  it("연결 대기가 지나면 요청 실패 단계가 되고 표시는 답변 대기다", async () => {
     vi.useFakeTimers({ toFake: ["setTimeout", "clearTimeout", "Date"] });
     vi.setSystemTime(requestedAt.getTime() + 1000);
     mocks.onSnapshot.mockImplementation((_ref, onNext) => {
@@ -121,7 +121,7 @@ describe("useLiveInquiries", () => {
       await vi.advanceTimersByTimeAsync(REALTIME_CONNECT_TIMEOUT_MS);
     });
     expect(result.current?.[0]).toMatchObject({
-      status: "failed",
+      status: "waiting",
       realtimePhase: "failed",
     });
   });

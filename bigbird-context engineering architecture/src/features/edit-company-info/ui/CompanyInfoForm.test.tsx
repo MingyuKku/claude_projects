@@ -133,7 +133,7 @@ describe("CompanyInfoForm", () => {
 
     await waitFor(() =>
       expect(serverApiV3.put).toHaveBeenCalledWith(
-        "/mypage/account/extra",
+        "/mypage/account/company",
         expect.objectContaining({
           companyName: "주식회사 빅버드",
           category: 3,
@@ -142,7 +142,7 @@ describe("CompanyInfoForm", () => {
     );
     await waitFor(() =>
       expect(serverApiV3.post).toHaveBeenCalledWith(
-        "/mypage/account/extra/registration/upload",
+        "/mypage/account/company/registration/upload",
         expect.any(FormData),
       ),
     );

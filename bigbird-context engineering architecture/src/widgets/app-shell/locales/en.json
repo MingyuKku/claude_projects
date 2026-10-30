@@ -2,12 +2,16 @@
   "nav": {
     "home": "Home",
     "campaign": "Campaigns",
-    "influencerMatching": "Influencer matching",
+    "influencerMatching": "Matching",
     "influencerMarket": "Influencer market",
-    "commerce": "Commerce sales",
+    "commerce": "Commerce",
     "mypage": "My page",
     "support": "Support",
-    "search": "Search",
+    "search": "Influencer search",
+    "influencerManage": "Influencer management",
+    "chat": "Chat",
+    "commerceSales": "Sales management",
+    "commerceSettlement": "Campaign settlement",
     "bigbird": "Ask Bigbird",
     "buyer": "Buyer Q&A",
     "subscribe": "Subscription",
@@ -33,7 +37,7 @@
     "open": "Open menu"
   },
   "header": {
-    "points": "Points (coming soon)",
+    "points": "Bigbird Money",
     "alerts": "Notifications",
     "alertsUnread": "Notifications, unread available",
     "profile": "My profile",

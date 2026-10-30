@@ -6,11 +6,11 @@ import { cn } from "@/shared/lib/utils";
 import type { ComponentProps } from "react";
 
 // Figma 디자인 시스템 Search(2752:9357). Line은 아래 테두리만, Filled는 사방 테두리 + 반경 6.
-// Figma에 포커스 링이 없어 커서만 보임.
+// Figma에 포커스 링이 없어 커서만 보임. Figma 테두리는 안쪽이라 높이 40에 테두리가 포함됨.
 // iOS(WebKit)는 입력 글자가 16px 미만이면 포커스할 때 화면을 자동 확대하므로 iOS에서만 16px로 키움(Figma는 14px).
 // 근거·한계는 shared/components/text-field/styles.ts 주석과 같음(공식 문서 근거 없음, 실기기 동작과 개발 자료에 의존).
 const searchInputVariants = cva(
-  "flex w-full items-center gap-2 border-border bg-popover px-3 py-2.5 text-foreground",
+  "flex h-10 w-full items-center gap-2 border-border bg-popover px-3 text-foreground",
   {
     variants: {
       variant: {

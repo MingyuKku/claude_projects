@@ -32,6 +32,8 @@ const itemVariants = cva(
 export interface ChatListBadge {
   label: string;
   variant: NonNullable<ComponentProps<typeof Badge>["variant"]>;
+  /** 배지 폭 제한 등(예: `max-w-26`). 넘는 글자는 말줄임 처리됨. */
+  className?: string;
 }
 
 interface ChatListItemUser {
@@ -44,6 +46,8 @@ interface ChatListItemBaseProps extends Omit<ComponentProps<"li">, "title"> {
   date: string;
   time?: string;
   preview?: string;
+  /** 제목 앞 회색 접두(Figma 3.0.6 광고주 문의 카드의 "기타 문의"). user 형태에서는 쓰지 않음. */
+  titlePrefix?: string;
   /** 검색어. 제목·이름·미리보기에서 일치 구간을 강조함. */
   highlight?: string;
   hasAlert?: boolean;
@@ -103,6 +107,7 @@ export function ChatListItem({
   title,
   user,
   preview,
+  titlePrefix,
   highlight,
   hasAlert = false,
   alertLabel,
@@ -114,7 +119,8 @@ export function ChatListItem({
   ...props
 }: ChatListItemProps) {
   const hasUser = Boolean(user);
-  const accessibleName = user?.name ?? title;
+  const accessibleName =
+    user?.name ?? [titlePrefix, title].filter(Boolean).join(" ");
 
   return (
     <li
@@ -133,8 +139,12 @@ export function ChatListItem({
         <div className="flex min-w-0 flex-1 items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             {badges.map((badge) => (
-              <Badge key={badge.label} variant={badge.variant}>
-                {badge.label}
+              <Badge
+                key={badge.label}
+                variant={badge.variant}
+                className={badge.className}
+              >
+                <span className="truncate">{badge.label}</span>
               </Badge>
             ))}
           </div>
@@ -164,7 +174,7 @@ export function ChatListItem({
           </Avatar>
           <div className="flex min-w-0 flex-1 flex-col gap-1">
             <div className="flex items-start gap-2">
-              <p className="min-w-0 flex-1 truncate text-base leading-none font-semibold text-card-foreground">
+              <p className="-my-0.5 min-w-0 flex-1 truncate py-0.5 text-base leading-none font-semibold text-card-foreground">
                 <HighlightedText text={user.name} keyword={highlight} />
               </p>
               {hasAlert && <AlertDot label={alertLabel} />}
@@ -178,6 +188,11 @@ export function ChatListItem({
         </div>
       ) : (
         <div className="pointer-events-none flex w-full items-center gap-2.5 pl-2">
+          {titlePrefix && (
+            <p className="shrink-0 text-base leading-7 font-semibold text-muted-foreground">
+              {titlePrefix}
+            </p>
+          )}
           <p className="min-w-0 flex-1 truncate text-base leading-7 font-semibold text-card-foreground">
             {title && <HighlightedText text={title} keyword={highlight} />}
           </p>

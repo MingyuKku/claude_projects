@@ -64,6 +64,37 @@ describe("업로드 작업", () => {
     ).toEqual(["https://cdn/a.png", "https://cdn/b.png", "https://cdn/c.png"]);
   });
 
+  it("끝난 문의라 서버가 새 스레드로 받았으면 다시 시도할 때도 그 스레드로 이어 보낸다", async () => {
+    vi.mocked(sendInquiryMessage).mockResolvedValue(202);
+    vi.mocked(uploadInquiryAttachment)
+      .mockImplementationOnce(async (f) => ({
+        url: `https://cdn/${f.name}`,
+        attachmentIdx: 1,
+        fileName: f.name,
+        fileSize: 1,
+      }))
+      .mockRejectedValueOnce(new Error("500"));
+    startInquiryUploads(101, [file("a.png"), file("b.png")]);
+    await vi.waitFor(() =>
+      expect(jobs()[101]).toMatchObject({ status: "failed" }),
+    );
+
+    retryInquiryUploads(101);
+    await vi.waitFor(() => expect(jobs()).toEqual({}));
+    expect(
+      vi.mocked(sendInquiryMessage).mock.calls.map(([arg]) => arg.threadIdx),
+    ).toEqual([101, 202]);
+  });
+
+  it("첨부를 보낸 뒤 캠페인 타임라인도 다시 받는다", async () => {
+    startInquiryUploads(101, [file("a.png")]);
+    await vi.waitFor(() => expect(jobs()).toEqual({}));
+    const [matcher] = vi.mocked(mutate).mock.calls[0] as unknown as [
+      (key: unknown) => boolean,
+    ];
+    expect(matcher(["campaign-timeline", 6329])).toBe(true);
+  });
+
   it("같은 문의에서는 업로드가 겹쳐 돌지 않는다", async () => {
     let release!: () => void;
     vi.mocked(uploadInquiryAttachment).mockImplementationOnce(

@@ -1,3 +1,5 @@
+import { CirclePlus } from "lucide-react";
+
 import pointIcon from "@/shared/assets/img/header/point.svg";
 import { cn } from "@/shared/lib/utils";
 
@@ -25,13 +27,24 @@ export function HeaderPointButton({
       type="button"
       aria-label={`${label} ${amount}`}
       className={cn(
+        "group",
         headerIconButtonClassName,
         "tablet:h-12 tablet:w-auto tablet:min-w-20 tablet:gap-2 tablet:rounded-md tablet:px-2.5 tablet:py-2",
         className,
       )}
       {...props}
     >
-      <img src={pointIcon} alt="" aria-hidden="true" className="size-6" />
+      {/* 마우스를 올리면 P 아이콘을 충전(plus) 아이콘으로 바꿈(시안 5180:90873의 숨은 plus 아이콘). */}
+      <img
+        src={pointIcon}
+        alt=""
+        aria-hidden="true"
+        className="size-6 group-hover:hidden group-focus-visible:hidden"
+      />
+      <CirclePlus
+        aria-hidden="true"
+        className="hidden size-6 text-primary group-hover:block group-focus-visible:block"
+      />
       <span className="hidden text-sm leading-6 font-medium tablet:inline">
         {amount}
       </span>

@@ -1,0 +1,47 @@
+{
+  "segment": {
+    "label": "商品選択"
+  },
+  "count": {
+    "unit": "件",
+    "value": "{{value}}件",
+    "tooltip": "{{value}}件"
+  },
+  "quota": {
+    "search": "インフルエンサー検索回数",
+    "proposal": "インフルエンサー提案回数",
+    "used": "使用",
+    "remaining": "残り"
+  },
+  "status": {
+    "title": "利用状況"
+  },
+  "filter": {
+    "metric": "指標",
+    "year": "年",
+    "month": "月",
+    "granularity": "集計単位",
+    "monthly": "月別",
+    "daily": "日別"
+  },
+  "metric": {
+    "campaignCount": "キャンペーン作成数",
+    "searchCount": "インフルエンサー検索数",
+    "proposalCount": "提案送信数",
+    "matchCount": "マッチング成立数"
+  },
+  "chart": {
+    "monthly": "月別利用量",
+    "daily": "日別利用量",
+    "prev": "前へ",
+    "next": "次へ"
+  },
+  "empty": {
+    "title": "利用状況がありません。",
+    "description": "商品を購読してください。"
+  },
+  "breakdown": {
+    "brand": "{{product}} ブランド型",
+    "groupBuy": "{{product}} 共同購入型"
+  }
+}

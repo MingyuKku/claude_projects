@@ -4,5 +4,6 @@
   "notFound": "找不到该咨询。",
   "loadError": "无法加载咨询。",
   "backToList": "返回列表",
-  "conversation": "咨询对话"
+  "conversation": "咨询对话",
+  "requestFailed": "咨询请求失败,请重试。"
 }

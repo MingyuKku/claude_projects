@@ -49,6 +49,12 @@ export const routes: RouteObject[] = [
         ROUTES.logout,
         async () => (await import("@/pages/login")).LoginPage,
       ),
+
+      // 이니시스 결제창의 closeUrl. 결제창(레이어) 안에서 열려 결제창을 닫기만 하므로 로그인 확인과 셸이 없음.
+      page(
+        ROUTES.inicisClose,
+        async () => (await import("@/pages/inicis-close")).InicisClosePage,
+      ),
       {
         path: ROUTES.legacyMain,
         loader: ({ request }) =>

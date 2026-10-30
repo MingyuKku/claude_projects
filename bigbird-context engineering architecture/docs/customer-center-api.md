@@ -18,7 +18,7 @@
 
 ## V3 고객센터 API (2026-10-16)
 
-백엔드가 고객센터를 `/v3/help/**`로 다시 노출했습니다. 근거는 [Stage Swagger `V3-고객센터` 그룹](https://api.stage.client.bigbird.co.kr:38443/v3/api-docs/V3-%EA%B3%A0%EA%B0%9D%EC%84%BC%ED%84%B0)과 [Stage REST Docs 15장](https://api.stage.client.bigbird.co.kr:38443/docs/index.html#_v3_마이그레이션_진행_중)(최종 갱신 2026-10-16 01:22 UTC, v2.2.4.12)입니다. REST Docs에 따르면 "재사용" 섹션은 v2 `ServiceCenterService`를 그대로 호출하고 V3 DTO로만 감쌉니다. **v3 화면은 V3 경로를 기준으로 연동합니다.** 같은 날 오후 Swagger 재확인에서 첨부 업로드·다운로드, 문의자 정보, 응대 상태 API 4개가 V3에 추가됐습니다. 2026-10-19에는 위에 기록한 세 조회 API를 인증된 계정으로 재검증했습니다.
+백엔드가 고객센터를 `/v3/help/**`로 다시 노출했습니다. 근거는 [Stage Swagger `V3-고객센터` 그룹](https://api.stage.client.bigbird.co.kr:38443/v3/api-docs/V3-%EA%B3%A0%EA%B0%9D%EC%84%BC%ED%84%B0)과 [Stage REST Docs 15장](https://api.stage.client.bigbird.co.kr:38443/docs/index.html#_v3_마이그레이션_진행_중)(최종 갱신 2026-10-16 01:22 UTC, v2.2.4.12)입니다. REST Docs에 따르면 "재사용" 섹션은 v2 `ServiceCenterService`를 그대로 호출하고 V3 DTO로만 감쌉니다. **v3 화면은 V3 경로를 기준으로 연동합니다.** 같은 날 오후 Swagger 재확인에서 첨부 업로드·다운로드, 문의자 정보, 응대 상태 API 4개가 V3에 추가됐습니다. 2026-10-19에는 위에 기록한 세 조회 API를 인증된 계정으로 재검증했습니다. 2026-10-23에 Swagger(`V3-고객센터`, 20개 작업)와 대조해 문의 상세, 메시지 수정·삭제, 캠페인 필드, Q&A 답변 요청을 갱신했습니다.
 
 | 화면 동작 | V3 API | v2 대응 | 백엔드 분류·상태 |
 | --- | --- | --- | --- |
@@ -30,18 +30,19 @@
 | 구매자 문의 + 상품 Q&A 통합 목록 | `GET /v3/help/inquiry?status&sourceType&campaignIdx&influencerThreadUserIdx&searchType&keyword&page&entrySize` | 없음(`c-purchaser-question`·`board` 개별) | Stage 실호출 HTTP 200, 두 출처와 상세 진입 식별자 확인 |
 | 인플루언서 필터 옵션 | `GET /v3/help/influencer-filter?campaignIdx` | 없음 | 신규 |
 | 구매자 상세 — 주문·상품 | `GET /v3/help/c-purchaser-questionInfo/{orderNumber}` | 같음 | 재사용 |
-| 구매자 상세 — 캠페인 | `GET /v3/help/c-campaign-question?page&filterType&searchType&keyword` | 같음 | 재사용 |
+| 구매자·Q&A 상세 패널 | `GET /v3/help/inquiry/{inquiryIdx}?sourceType` | 없음(`c-purchaser-questionInfo`·`c-campaign-question` 조합) | 신규. 문의자·주문(결제 금액 포함)·캠페인 정보를 한 번에 제공 |
+| 캠페인별 미확인 문의 집계 | `GET /v3/help/c-campaign-question?filterType&searchType&keyword&page&entrySize` | 같음 | 재사용. 구매자 상세용이 아니라 캠페인별 `purchaserCnt`·`qnaCnt` 집계입니다. 백엔드 확인(2026-10-23): 쓰일 일이 없어 v3에서 연결하지 않음 |
 | 상품 Q&A 상세 | `POST /v3/help/qna {userIdx, campaignIdx}` 또는 `{name, phoneNumber}` | 같음 | 재사용 |
 | Q&A 답변 등록·수정·삭제 | `POST`·`PUT /v3/help/reply`, `DELETE /v3/help/reply/{replyIdx}` | 같음 | 재사용. 등록 응답 형식 수정됨 |
 | 첨부 업로드 | `POST /v3/help/message/{type}/{service}` (multipart) → `{url, attachmentIdx, fileName, result, fileSize}` | `POST /help/message/{image\|video}/{service}` | 오후 추가. `type`·`service`는 명세상 자유 문자열 |
 | 첨부 다운로드 | `GET /v3/help/file/download/{type}/{attachmentIdx}` (`type`: `image \| video`) | `GET /help/file/download/...` | 오후 추가. 바이너리 응답 |
 | 문의자 정보 | `GET /v3/help/user/{threadUserIdx}` → `data: {nickname, id, profileImage}` | `GET /help/user/{threadUserIdx}` | 오후 추가. 비회원·운영 스레드면 `id`·`profileImage`는 null, 운영이면 `nickname`은 `bigbird` |
-| 응대 중 상태 | `PUT /v3/help/{threadIdx}/viewing/{isResponding}` | `PUT /help/{threadIdx}/viewing/{isResponding}` | 오후 추가. 게시판형 채팅의 응대 중 여부 갱신 |
+| 응대 중 상태 | `PUT /v3/help/{threadIdx}/viewing/{isResponding}` | `PUT /help/{threadIdx}/viewing/{isResponding}` | 오후 추가. 게시판형 채팅의 응대 중 여부 갱신. 백엔드 확인(2026-10-23): 쓰일 일이 없어 v3에서 연결하지 않음 |
 
 ### V3에서 해결된 것
 
 - **대화 응답 구조가 정의됐습니다.** `data[]`는 스레드 단위로 `threadIdx, sequence, viewing, toUserIdx, fmUserIdx, campaignIdx, finishTime(null이면 진행 중), created, boardType, status, messages[]`를 줍니다. `status`는 `WAITING | IN_PROGRESS | ANSWERED`이고, `status=ALL` 또는 각 상태로 서버 필터링합니다. 메시지는 `messageIdx, threadIdx, body, userIdx, attachmentIdx, writeTime, readTime, modifyTime, deleteTime, identifier, isUserMessage(광고주 쪽 메시지 여부), auto, fileName, fileSize, fileType`입니다.
-- **통합 목록·상태·필터 계약이 생겼습니다.** 상태 `WAITING | ANSWERED`, 출처 `PURCHASER_QUESTION | PRODUCT_QNA`, 캠페인·인플루언서·검색어(`name | orderNumber`) 필터, `pagingInfo`를 제공합니다. 항목은 `inquiryIdx, sourceType, status, campaignIdx, orderNumber, writerName, body, writeTime, threadUserIdx, userIdx`입니다. 두 식별자 중 출처에 맞는 값이 있고 반대편 값은 null입니다.
+- **통합 목록·상태·필터 계약이 생겼습니다.** 상태 `WAITING | ANSWERED`, 출처 `PURCHASER_QUESTION | PRODUCT_QNA`, 캠페인·인플루언서·검색어(`name | orderNumber | body`)·등록일(`startDate`·`endDate`) 필터, `pagingInfo`를 제공합니다. 항목은 `inquiryIdx, sourceType, status, campaignIdx, orderNumber, writerName, body, writeTime, threadUserIdx, userIdx`입니다. 두 식별자 중 출처에 맞는 값이 있고 반대편 값은 null입니다.
 - **캠페인별 인플루언서 검색**은 `influencer-filter`가 드롭다운 옵션 `{threadUserIdx, displayName}`을 줍니다. 선택값을 `influencerThreadUserIdx`로 넘깁니다.
 - **답변 등록 응답이 정상화됐습니다.** v2는 실패해도 HTTP 200이고 결과가 `data.body.status`에 있었습니다. V3는 `{result, status}`와 올바른 HTTP 상태 코드를 줍니다.
 - **Q&A 상세**는 답변이 없으면 `replyInfo`가 빈 객체 `{}`로 온다고 명시됐습니다.
@@ -51,8 +52,8 @@
 - **통합 목록의 이전 TODO는 해결됐습니다.** Stage 실호출에서 구매자 문의와 상품 Q&A, 계산된 상태를 확인했습니다.
 - **빅버드 문의 목록에 캠페인명은 없습니다.** `campaignIdx`와 상태값을 줍니다.
 - **새 문의 생성·전송·종료는 상태값 설계 확정 전이라 v2 로직 그대로입니다.** 상태값이 정해지면 응답이 바뀔 수 있습니다.
-- **주문·상품 정보에 결제 금액이 없습니다.**
-- **캠페인 정보에 이미지·진행 기간·진행 상태·인플루언서 명단이 없습니다.** `campaignPeople`은 인원수입니다.
+- **주문·상품 정보(`c-purchaser-questionInfo`)에는 결제 금액이 없습니다.** 결제 금액·주문일은 문의 상세 `GET /v3/help/inquiry/{inquiryIdx}`의 `paymentAmount`·`orderDate`로 받습니다.
+- **캠페인 집계(`c-campaign-question`)에는 이미지·진행 기간·진행 상태·인플루언서 명단이 없고** `campaignPeople`은 인원수입니다. 이 값들은 문의 상세가 `campaignType, progressStatus(모집중|오픈 준비중|구매중|정산대기|정산완료|종료), progressStartDate·progressEndDate, influencerPlatform·influencerAccountLink`로 줍니다.
 - **채팅 전용 API는 없습니다.** 대화창은 `GET /v3/help/thread`를 재사용하고, 실시간 기록은 프론트(Firestore)가 관리합니다.
 
 ### V3 기준으로 남은 확인 (프론트 판단)
@@ -60,14 +61,14 @@
 | 항목 | 내용 |
 | --- | --- |
 | 통합 목록 → 상세 진입 키 | 구매자 항목의 `threadUserIdx`를 `GET /v3/help/thread?type=client`에, Q&A 항목의 `userIdx`와 `campaignIdx`를 `POST /v3/help/qna`에 사용합니다. 식별자가 null인 예외 항목은 상세 진입 전에 별도 처리해야 합니다 |
-| 통합 목록 표시 데이터 | 새 메시지 여부·마지막 메시지 미리보기가 없습니다. 등록일 기간 필터도 없습니다 |
-| 새 문의 캠페인 목록 범위 | v2 `/service/client-question`은 결제 완료된 빅버드 캠페인, V3 `c-client-campaign`은 "광고주(마스터/서브)에게 접근 가능한 캠페인"으로 설명됩니다. 같은 범위인지, 캠페인 기간을 줄 수 있는지 확인합니다 |
+| 통합 목록 표시 데이터 | 새 메시지 여부·마지막 메시지 미리보기가 없습니다. 등록일 기간 필터는 2026-10-21에 `startDate`·`endDate`로 추가됐습니다 |
+| 새 문의 캠페인 목록 범위 | v2 `/service/client-question`은 결제 완료된 빅버드 캠페인, V3 `c-client-campaign`은 "광고주(마스터/서브)에게 접근 가능한 캠페인"으로 설명됩니다. 같은 범위인지 확인합니다. 캠페인 기간(`progressStartDate`·`progressEndDate`)과 유형(`campaignServiceIdx`·`campaignServiceName`)은 응답에 추가됐습니다 |
 | `GET /v3/help/thread`의 `type` | 광고주가 구매자 대화·상담 기록을 볼 때는 `type=client`입니다. `type=admin`은 구매자↔운영 대화입니다 |
 | 필수·null·오류 | 2026-10-16 백엔드가 응답 DTO에 `required`·`nullable`을 채우고, 4xx·5xx 응답을 공통 `V3ErrorResponse`(`{result: false, reason}`)로 정리했습니다. 1차 Zod는 이 표시를 그대로 따릅니다(스레드 `messages`는 null 가능, 메시지 `identifier`는 null 아님·알 수 없으면 빈 문자열). 오류는 상태 코드로 나누고 `reason` 원문은 화면에 노출하지 않습니다. 이제 생성 도구(`@hey-api/openapi-ts` 등) 도입을 검토할 수 있습니다 |
 | 날짜 형식 | 스레드 `2026-10-01T10:00:00`(시간대 없음), 통합 목록·Q&A `2026-10-01 10:00`, 캠페인 패널 `2026.10.01 10:00`입니다. 시간대는 KST로 가정하기 전에 확인합니다 |
 | 첨부 | V3 업로드·다운로드 경로는 생겼습니다. `{service}`에 넣을 값(v2는 `help`), 다중 첨부·용량·형식 기준(2장)은 여전히 확인 대상입니다 |
-| 응대 중 상태 | `viewing` API가 Firestore 응대중 락도 갱신하는지, 읽음 처리를 겸하는지 확인 전에는 v2처럼 Firestore 락을 유지합니다 |
-| 메시지 수정·삭제 | 광고주용 API는 V3에도 없습니다 |
+| 응대 중 상태 | `viewing` API는 백엔드 확인(2026-10-23)으로 쓰지 않습니다. 응대중 락은 v2처럼 Firestore로 유지합니다 |
+| 메시지 수정·삭제 | `PUT /v3/help/thread/message {messageIdx, body}`와 `DELETE /v3/help/thread/message/{messageIdx}`(하드 삭제)가 추가됐습니다. 본인 메시지만 가능하고, 남의 메시지는 403, 없으면 404, 상대가 읽은 뒤에는 409입니다. 답장 API는 없습니다 |
 
 ## Stage Swagger 재확인 결과 (2026-10-14)
 
@@ -86,9 +87,9 @@
 | 문의 종료·응대 상태·Q&A 수정·삭제 | `{result: boolean}` | 읽음·락·Firestore 반영 범위, Q&A 요청 필수 필드 |
 | 구매자 문의 목록 | `list[]`에 구매자 정보·`threadIdx`·`threadUserIdx`·`orderNumber`·`campaignIdx`, `pagingInfo` | 통합 목록·답변 상태·새 필터는 별도 필요 |
 | 상품 Q&A 목록 | `list[]`, `pagingInfo`, `searchInfo`, 결과 `code` | `campaignIdx` 필수. 비회원 `userIdx`는 null |
-| 주문번호 기반 상세 | `list`는 단일 객체. 주문 상태·이미지·상품명·캠페인/공구샵 코드·서비스 유형 제공 | 구매자 이메일·전화, 주문일·결제 금액, 캠페인 기간·진행 상태·인스타 등은 이 스키마에 없음 |
+| 주문번호 기반 상세 | `list`는 단일 객체. 주문 상태·이미지·상품명·캠페인/공구샵 코드·서비스 유형 제공 | 구매자 이메일·전화, 주문일·결제 금액, 캠페인 기간·진행 상태·인스타 등은 이 스키마에 없음(이후 `GET /v3/help/inquiry/{inquiryIdx}`가 제공) |
 | 문의자 프로필 | `data: {nickname, id, profileImage}` | 전체 구매자 상세를 제공하는 API는 아님 |
-| 필터 캠페인 목록 | `/help/c-client-campaign`: 접근 가능한 캠페인의 ID·코드·브랜드·상품명·이미지 | 인플루언서 검색 지원은 별도 확인 |
+| 필터 캠페인 목록 | `/help/c-client-campaign`: 접근 가능한 캠페인의 ID·코드·브랜드·상품명·이미지(이후 `progressStartDate`·`progressEndDate`, `campaignServiceIdx`·`campaignServiceName` 추가) | 인플루언서 검색은 `influencer-filter`로 해결 |
 | 빅버드 문의 사용자 정보 | `/help/c-bigbird-question`: `list` 단일 객체의 `threadUserIdx`, `writeTime` | 대화 목록·메시지 본문을 제공하는 API는 아님 |
 
 ### 아직 스키마가 부족한 부분
@@ -187,7 +188,7 @@
 | --- | --- | --- |
 | 목록 새 메시지 표시 | 읽음 처리 동작 미확정 | 대화 조회 시 해제되는지, 별도 갱신이 필요한지 |
 | REST 메시지 읽음 | `readTime` 사용 예정 | 필드 제공 여부와 읽음 주체·시점 |
-| REST 메시지 수정·삭제·답장 | 광고주용 계약 없음. 운영 앱용 `POST /help/message/hide`만 확인 | 광고주용 기능과 `replyTo` 계약 |
+| REST 메시지 수정·삭제·답장 | 광고주용 수정·삭제는 V3에 추가됨(`PUT`·`DELETE /v3/help/thread/message`). 답장 API는 없음. 운영 앱용 `POST /help/message/hide`는 별개 | 서버가 `readTime`을 실제로 채우는지, 답장(`replyTo`) 계약 |
 | Q&A 답변 수정·삭제 | 기존 `PUT /help/reply`, `DELETE /help/reply/{replyIdx}` | 읽음 이후 제한 등 서버 정책 |
 | 실시간 메시지 기능 | Firestore 필드 추가 제안 | 운영 앱 지원과 선행·동시 배포 |
 
@@ -207,7 +208,7 @@
 
 **질문:**
 
-- 주문 상세·문의자 프로필의 기존 필드는 위 Stage 재확인 표에 정리했습니다. 빠진 연락처·주문일·결제 금액·캠페인 기간 등의 출처를 확인해 주세요.
+- 주문 상세·문의자 프로필의 기존 필드는 위 Stage 재확인 표에 정리했습니다. 연락처·주문일·결제 금액·캠페인 기간은 `GET /v3/help/inquiry/{inquiryIdx}`로 해소됐습니다.
 - 주문번호가 없는 상품 Q&A는 어떤 키로 상세를 조회하나요?
 - `threadIdx`, `sequence`, `inquiryIdx`, `replyIdx`, 구매자 식별자는 어떻게 연결되나요?
 - 회원 Q&A는 `campaignIdx + userIdx`, 비회원은 `name + phoneNumber`로 조회한다고 명세에 정의돼 있습니다. 비회원 직접 진입에 사용할 안정적인 키와 조회 범위를 확인해 주세요.
@@ -244,9 +245,9 @@
 | --- | --- |
 | 공통 응답 | 채택할 API의 스키마, 필수·null 여부, 오류 형식, 권한 조건. 용도 미확정 후보까지 모두 선행 요청하지 않음 |
 | 문의 생성 | 현재 Stage는 `{isBoardType, campaignIdx}`로 확인됨. `isBoardType` 필수 표기와 "인플루언서 → 운영" 설명 보완 |
-| Q&A 답변 요청 | Swagger 필수 `inquiryIdx, userIdx, isMasterUser, body, writeTime`와 v2 POST `{inquiryIdx, body}`·PUT `{replyIdx, body}`의 차이. 서버가 채우는 필드 |
+| Q&A 답변 요청 | 요청이 `POST {inquiryIdx, body}`·`PUT {replyIdx, body}`로 정리돼 v2와 같아졌습니다. 남은 확인은 서버가 채우는 값 |
 | Q&A 답변 길이 | v2 화면 500자 → 새 디자인 3,000자를 서버가 받는지 |
-| 새 문의 캠페인 목록 | `GET /service/client-question`의 시작일·종료일 제공 여부. 캠페인명 표기 기준(v2는 `[브랜드명]상품명`) |
+| 새 문의 캠페인 목록 | 시작일·종료일은 `c-client-campaign`의 `progressStartDate`·`progressEndDate`로 제공됨. 캠페인명 표기 기준(v2는 `[브랜드명]상품명`) |
 | 빅버드 문의 표시 데이터 | 목록 제목·표시 일시, 헤더 상담일, 캠페인 카드의 이미지·이름·유형·기간·코드 출처. v2는 첫 auto 메시지의 캠페인 JSON 사용 |
 
 ### 실시간 상담 · 연동·배포 전 확인 (#14~#17)
@@ -286,8 +287,8 @@ V3 REST Docs(2026-10-16) 기준으로 아래와 같이 기록했습니다. 답�
 | 통합 목록·상태·필터 (#1, #2, #6) | 신규 `GET /v3/help/inquiry` | REST Docs 15.4 | Stage, TODO 상태 | 상태 계산·Q&A 연결, 상세 진입 키, 등록일 필터 |
 | 캠페인별 인플루언서 검색 | 신규 `GET /v3/help/influencer-filter` | REST Docs 15.4 | Stage | — |
 | Q&A 답변 등록 응답 형식 | V3에서 수정 | REST Docs 15.9 | Stage | — |
-| 구매자 상세 결제 금액·캠페인 기간 등 (#9) | 미지원(백엔드가 공백으로 명시) | REST Docs 15.5, 15.6 | — | 추가 여부 |
-| 첨부 업로드·다운로드, 문의자 정보, 응대 상태 | V3 경로 추가 | Swagger `V3-고객센터` | Stage, 2026-10-16 오후 | `{service}` 값, 다중 첨부, viewing의 Firestore 반영 |
+| 구매자 상세 결제 금액·캠페인 기간 등 (#9) | 반영됨(`GET /v3/help/inquiry/{inquiryIdx}`) | Swagger `V3-고객센터` | Stage | — |
+| 첨부 업로드·다운로드, 문의자 정보, 응대 상태 | V3 경로 추가 | Swagger `V3-고객센터` | Stage, 2026-10-16 오후 | `{service}` 값, 다중 첨부. `viewing`은 쓰지 않음(2026-10-23) |
 | 응답 DTO `required`·`nullable`, 오류 스키마 | 반영됨(`V3ErrorResponse` 추가) | Swagger `V3-고객센터` | Stage, 2026-10-16 | 생성 도구 도입 여부 |
 
 ## 3. 기존 API 상세
@@ -298,7 +299,7 @@ V3 REST Docs(2026-10-16) 기준으로 아래와 같이 기록했습니다. 답�
 
 | API | 용도 | 요청 / v2가 읽는 응답 |
 | --- | --- | --- |
-| `GET /sec` | 세션: `threadUserIdx`, `userIdx`, `accountIdx`, 고객센터 권한 | 헤더 `X-Path` |
+| `GET /v3/sec` | 세션: `threadUserIdx`, `userIdx`, `accountIdx`, 메뉴 권한(`isPurchaserQuestionAccess` 등) | 헤더 `X-Path` |
 | `GET /help/c-bigbird-question` | 내 `threadUserIdx`, 최근 작성 시각 | `list`가 배열이 아니라 객체 |
 | `GET /help/thread` | 빅버드·구매자 대화 | query `threadUserIdx`(필수), `campaignIdx`, `type=client`(구매자). `data[]`: `sequence, created, finishTime, boardType, isConnect, threadIdx, messages[], seqResponseDate` |
 | `POST /help/thread` | 문의 생성 | v2 body `{isBoardType, campaignIdx}` → `data.threadIdx`, `data.sequence`. 현재 Stage `ThreadCreateRequest`도 같은 body. 과거 REST Docs 예시와 구분 |
@@ -307,7 +308,7 @@ V3 REST Docs(2026-10-16) 기준으로 아래와 같이 기록했습니다. 답�
 | `GET /help/file/download/{type}/{attachmentIdx}` | 첨부 다운로드 | v2는 `window.open` |
 | `PUT /help/thread/{threadIdx}` | 문의 종료 | body 없음 |
 | `GET /service/client-question` | 새 문의 캠페인 목록 | `list[]`: `mainImageUrl, campaignCode, brandName, productName, campaignIdx` |
-| `GET /help/c-campaign-question` | 캠페인별 문의 목록·건수 | `page, filterType, searchType(brandName\|productName\|campaignCode\|shopCode), keyword` → `list[]`: `purchaserCnt, qnaCnt, campaignIdx …`, `pagingInfo` |
+| `GET /help/c-campaign-question` | 캠페인별 문의 목록·건수 | `page, entrySize(V3), filterType, searchType(brandName\|productName\|campaignCode\|shopCode), keyword` → `list[]`: `purchaserCnt, qnaCnt, campaignIdx, campaignServiceName, shopCode, campaignPeople, listTime …`, `pagingInfo` |
 | `GET /help/c-purchaser-question` | 구매자 문의 목록 | `campaignIdx`(명세상 선택), `page, entrySize, filterType(UNIDENTIFIED\|CHECK), searchType(name\|id\|orderNumber), keyword` → `list[]`: `name, id, orderNumber, writeTime, modifyTime, threadUserIdx`, `pagingInfo` |
 | `GET /help/board` | 상품 Q&A 목록 | `campaignIdx` **필수** → `list[]`: `userIdx, phoneNumber, name, id, isBuyer, writeTime, modifyTime` |
 | `POST /help/qna` | 상품 Q&A 대화 | `{campaignIdx, userIdx, name, phoneNumber}` → `list[]`(단건 아님): `campaignInfo, inquiryInfo, replyInfo(readTime)` |
@@ -320,7 +321,7 @@ V3 REST Docs(2026-10-16) 기준으로 아래와 같이 기록했습니다. 답�
 | `GET /help/c-purchaser-questionInfo/{orderNumber}` | 구매자 상세 패널 | 응답 DTO 확인됨. 부족한 상세 필드와 주문번호 없는 경우의 조회 키 |
 | `GET /help/user/{threadUserIdx}` | 대화 상대 프로필 | `nickname, id, profileImage` 확인됨. 전체 연락처·주문 상세는 제공하지 않음 |
 | `GET /help/c-qna` | 전체 Q&A 조회 후보(채택 보류) | 명세의 빈 SELECT 쿼리 QA 기록 확인 필요. 항목 스키마 미정의 |
-| `PUT /help/{threadIdx}/viewing/{isResponding}` | 응대중·보는 중 상태 | 읽음 처리를 겸하는지, 락 소유자와 경합 처리, Firestore도 갱신하는지. 확인 전에는 v2처럼 Firestore 락 유지 |
+| `PUT /help/{threadIdx}/viewing/{isResponding}` | 응대중·보는 중 상태 | v3에서는 쓰지 않음(백엔드 확인 2026-10-23). 응대중 락은 Firestore 유지 |
 | `GET /service/client-campaign`, `GET /help/c-client-campaign` | 필터의 캠페인 목록 | `/help/c-client-campaign`은 접근 가능한 캠페인 DTO 확인됨. 다른 후보와의 차이·채택 여부 확인 |
 | `GET /service/client-purchaser/{campaignIdx}` | 캠페인별 구매자 | 용도, `searchType(purchaserName\|purchaserId\|orderNumber)` |
 | `GET /service/client-cardtab[/{userIdx}]` | (불명) | 용도. 상태별 건수라는 근거 없음 |

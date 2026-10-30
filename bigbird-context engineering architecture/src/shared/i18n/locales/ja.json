@@ -7,7 +7,13 @@
     "login": "ログイン",
     "goBack": "戻る",
     "cancel": "キャンセル",
-    "save": "保存"
+    "save": "保存",
+    "edit": "編集"
+  },
+  "loginRequired": {
+    "title": "ログインが必要です",
+    "description": "このメニューはログイン後にご利用いただけます。",
+    "action": "ログインする"
   },
   "status": {
     "loading": "読み込み中…",
@@ -89,5 +95,41 @@
     "previous": "前へ",
     "next": "次へ",
     "page": "{{page}}ページ"
+  },
+  "list": {
+    "search": {
+      "label": "検索",
+      "placeholder": "条件を入力してください。"
+    },
+    "filter": {
+      "action": "フィルター",
+      "title": "フィルター設定",
+      "description": "条件を選んで一覧を絞り込みます。",
+      "reset": "リセット",
+      "apply": "適用",
+      "refresh": "更新"
+    },
+    "empty": {
+      "search": {
+        "title": "「{{keyword}}」に一致する結果がありません。"
+      },
+      "searchFilter": {
+        "title": "「{{keyword}}」と選択した条件に一致する結果がありません。"
+      },
+      "filter": {
+        "title": "選択した条件に一致する結果がありません。",
+        "description": "フィルターを変更するかリセットしてください。"
+      }
+    },
+    "pageSize": {
+      "label": "{{size}}件表示",
+      "labelShort": "{{size}}件",
+      "aria": "表示件数"
+    }
+  },
+  "passwordConfirm": {
+    "title": "管理者パスワード入力",
+    "placeholder": "パスワードを入力",
+    "mismatch": "パスワードが一致しません。"
   }
 }

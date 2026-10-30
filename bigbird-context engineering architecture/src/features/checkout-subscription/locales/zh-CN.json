@@ -1,0 +1,51 @@
+{
+  "product": {
+    "title": "已选套餐",
+    "serviceType": "服务类型",
+    "fee": "使用费用",
+    "start": "开始时间",
+    "startValue": {
+      "monthly": "支付后立即开始使用1个月",
+      "yearly": "支付后立即开始使用1年"
+    }
+  },
+  "notice": {
+    "title": "确认事项",
+    "agree": "我已确认以下全部事项,同意定期支付和自动续订。",
+    "items": {
+      "1": "支付完成后立即开始订阅,取消及退款按各套餐政策办理。"
+    },
+    "renewal": {
+      "monthly": "订阅按每月自动续订,每月定期扣款。",
+      "yearly": "订阅按每年自动续订,每年定期扣款。"
+    }
+  },
+  "summary": {
+    "title": "支付摘要",
+    "product": "支付套餐",
+    "card": "支付卡",
+    "amount": "支付金额",
+    "pay": "支付",
+    "cancel": "取消"
+  },
+  "price": {
+    "won": "{{amount}}韩元",
+    "fee": {
+      "monthly": "每月{{amount}}韩元",
+      "yearly": "每年{{amount}}韩元"
+    }
+  },
+  "completed": {
+    "title": "支付完成",
+    "description": "订阅支付已完成。"
+  },
+  "error": {
+    "noBillingCard": "没有已注册的卡片，请先添加卡片。",
+    "cardsLoadFailed": "无法加载卡片信息。",
+    "alreadySubscribed": "您已订阅该套餐。",
+    "productNotAvailable": "该套餐暂时无法订阅。",
+    "cardLimitExceeded": "最多可注册2张卡。",
+    "cardRegisterFailed": "卡注册失败，请重试。",
+    "paymentFailed": "支付失败，请重试。"
+  }
+}

@@ -26,7 +26,9 @@ interface ConversationFilesProps {
 export function ConversationFiles({ row, name, time }: ConversationFilesProps) {
   const { t: tCommon } = useTranslation();
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
-  const items = row.messages.flatMap((message) =>
+  // 문서는 뷰어 대상이 아니라 누르면 바로 내려받음. 뷰어는 이미지·동영상만 넘김.
+  const media = row.messages.filter((message) => message.kind !== "file");
+  const items = media.flatMap((message) =>
     message.attachment
       ? [
           {
@@ -59,25 +61,45 @@ export function ConversationFiles({ row, name, time }: ConversationFilesProps) {
               row.isMine ? "justify-end" : "justify-start",
             )}
           >
-            {row.messages.map((message, index) => (
-              <li key={message.id}>
-                <button
-                  type="button"
-                  aria-label={message.attachment?.fileName ?? ""}
-                  onClick={() => setViewerIndex(index)}
-                  className="block rounded-md outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                >
-                  <FileThumbnail
-                    type={message.kind === "video" ? "video" : "image"}
-                    src={message.kind === "video" ? undefined : message.body}
-                    videoSrc={
-                      message.kind === "video" ? message.body : undefined
-                    }
-                    alt={message.attachment?.fileName ?? ""}
-                  />
-                </button>
-              </li>
-            ))}
+            {row.messages.map((message) => {
+              const fileName = message.attachment?.fileName ?? "";
+              if (message.kind === "file" && message.attachment)
+                return (
+                  <li key={message.id}>
+                    <a
+                      href={getAttachmentDownloadUrl(
+                        "image",
+                        message.attachment.attachmentIdx,
+                      )}
+                      download={fileName || undefined}
+                      aria-label={fileName}
+                      className="block rounded-md outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                    >
+                      <FileThumbnail type="file" alt={fileName} />
+                    </a>
+                  </li>
+                );
+              const index = media.indexOf(message);
+              return (
+                <li key={message.id}>
+                  <button
+                    type="button"
+                    aria-label={fileName}
+                    onClick={() => setViewerIndex(index)}
+                    className="block rounded-md outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                  >
+                    <FileThumbnail
+                      type={message.kind === "video" ? "video" : "image"}
+                      src={message.kind === "video" ? undefined : message.body}
+                      videoSrc={
+                        message.kind === "video" ? message.body : undefined
+                      }
+                      alt={fileName}
+                    />
+                  </button>
+                </li>
+              );
+            })}
           </ul>
         }
       />

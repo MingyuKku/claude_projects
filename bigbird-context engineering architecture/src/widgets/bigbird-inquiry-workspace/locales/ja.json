@@ -5,6 +5,7 @@
   "all": "すべて",
   "waiting": "返信待ち",
   "consulting": "相談中",
+  "consultingBadge": "リアルタイム相談中",
   "done": "回答済み",
   "empty": {
     "title": "お問い合わせはありません。",
@@ -16,7 +17,6 @@
     "campaignUnknown": "キャンペーン問合せ",
     "other": "その他問合せ"
   },
-  "consultDate": "相談日",
   "bigbirdManager": "Bigbird担当者",
   "completed": {
     "title": "完了した相談",
@@ -29,7 +29,6 @@
   "copyCode": "キャンペーンコードをコピー",
   "copied": "クリップボードにコピーしました。",
   "backToList": "一覧へ",
-  "filterEmpty": "該当する問合せはありません。",
   "copyFailed": "コピーできませんでした。",
   "deletedMessage": "メッセージが削除されました。",
   "failed": "リクエスト失敗",
@@ -37,19 +36,28 @@
     "requesting": {
       "title": "相談リクエスト中",
       "description": "担当者が接続するとリアルタイム相談が始まります。",
-      "caption": "接続には最大5分かかる場合があります。"
+      "caption": "接続には最大3分かかる場合があります。"
     },
     "failed": {
-      "title": "相談リクエスト失敗",
-      "description": "お問い合わせを残していただければ、確認後に順次ご回答します。",
-      "caption": "メッセージへの回答は、お問い合わせ状況により遅れる場合があります。"
+      "title": "リアルタイム相談不可",
+      "description": "現在、担当者が対応できません。お問い合わせを残していただければご返信します。"
     },
-    "retry": "再試行",
-    "leaveMessage": "メッセージを残す",
     "end": "相談終了",
     "composer": "リアルタイム相談メッセージ",
     "composerPlaceholder": "お問い合わせ内容を入力してください。（最大3,000文字）",
     "attach": "添付",
-    "send": "送信"
-  }
+    "send": "送信",
+    "request": "リアルタイム相談"
+  },
+  "composer": {
+    "placeholder": "お問い合わせ内容を入力してください。（最大3,000文字）",
+    "send": "送信",
+    "failed": "処理できませんでした。もう一度お試しください。"
+  },
+  "detail": "詳細情報",
+  "closeDetail": "詳細を閉じる",
+  "campaignInfo": "キャンペーン情報",
+  "campaignType": "キャンペーン種別",
+  "productName": "商品名",
+  "period": "進行期間"
 }

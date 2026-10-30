@@ -129,7 +129,7 @@ it("요청 중에도 캠페인 카드를 보여 주고 빈 상담 안내는 띄�
   state.onlyCard = false;
 });
 
-it("요청 실패 카드에 시안의 안내 문구와 작은 글씨를 보여 준다", async () => {
+it("연결 실패 카드에 요구명세서 문구를 보여 준다", async () => {
   render(
     <SWRConfig value={{ provider: () => new Map() }}>
       <MemoryRouter>
@@ -145,11 +145,8 @@ it("요청 실패 카드에 시안의 안내 문구와 작은 글씨를 보여 �
     expect(screen.queryByLabelText("불러오는 중…")).not.toBeInTheDocument(),
   );
   expect(
-    screen.getByText("문의를 남겨주시면 확인 후 순차적으로 답변드립니다."),
-  ).toBeInTheDocument();
-  expect(
     screen.getByText(
-      "문의 메시지 답변은 고객 문의 상황에 따라 지연될 수 있습니다.",
+      "현재, 상담원 응대가 어려운 상황입니다. 문의를 남겨주시면 답변드리도록 하겠습니다.",
     ),
   ).toBeInTheDocument();
 });

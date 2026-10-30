@@ -1,0 +1,32 @@
+{
+  "title": "サブスクリプション決済商品",
+  "won": "{{amount}}ウォン",
+  "column": {
+    "name": "サービス名",
+    "startedAt": "メンバーシップ開始",
+    "endsAt": "メンバーシップ終了",
+    "amount": "決済額",
+    "method": "決済方法",
+    "action": "サブスクリプション管理"
+  },
+  "action": {
+    "cancel": "解約",
+    "cancelScheduled": "解約予定"
+  },
+  "empty": {
+    "title": "サブスクリプションを決済した商品がありません。"
+  },
+  "cancelDialog": {
+    "title": "サブスクリプション解約",
+    "description": "サブスクリプションを解約しますか？決済期間が終了する{{endsAt}}までは利用できます。",
+    "confirm": "解約",
+    "completed": {
+      "title": "解約完了",
+      "description": "サブスクリプションを解約しました。またのご利用をお待ちしております！"
+    }
+  },
+  "error": {
+    "alreadyCanceled": "すでに解約済みのサブスクリプションです。",
+    "notFound": "サブスクリプション情報が見つかりません。"
+  }
+}

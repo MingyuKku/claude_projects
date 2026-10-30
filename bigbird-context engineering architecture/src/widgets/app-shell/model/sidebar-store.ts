@@ -11,7 +11,8 @@ export const useSidebarStore = create<SidebarState>()(
   devtools(
     persist(
       (set) => ({
-        isCollapsed: false,
+        // 디자인팀 QA(2026-10-28): 모든 LNB는 접힌(closed) 상태가 기본. 사용자가 펼치면 저장된 값을 따름.
+        isCollapsed: true,
         toggleCollapsed: () =>
           set((state) => ({ isCollapsed: !state.isCollapsed })),
       }),

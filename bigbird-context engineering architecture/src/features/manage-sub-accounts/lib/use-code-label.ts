@@ -1,15 +1,19 @@
 import { useTranslation } from "@/shared/i18n";
 
-// 서버가 코드(enum)로 주는 값 → 번역 키 표(스펙 §6, i18n 규칙 "서버 데이터"). 코드는 임시이고 백엔드 확정 뒤(§7 B-6) 맞춤.
-// 표에 없는 코드는 화면을 깨지 않고 서버가 준 값을 그대로 보임.
-const PERMISSION_KEYS = {
+import type { PermissionKey } from "../model/constants";
+
+// 권한 이름. 권한은 서버가 필드로 주고 프론트가 키를 정하므로(model/constants의 PERMISSION_FIELDS) 모든 키에 번역이 있음.
+const PERMISSION_LABEL_KEYS = {
   campaign: "access.permission.name.campaign",
   influencerMatching: "access.permission.name.influencerMatching",
   influencerMarket: "access.permission.name.influencerMarket",
   commerce: "access.permission.name.commerce",
   buyerInquiry: "access.permission.name.buyerInquiry",
   bigbirdMoney: "access.permission.name.bigbirdMoney",
-} as const;
+} as const satisfies Record<PermissionKey, string>;
+
+// 서버가 코드(enum)로 주는 값 → 번역 키 표(스펙 §6, i18n 규칙 "서버 데이터"). 코드는 임시이고 백엔드 확정 뒤(§7 B-6) 맞춤.
+// 표에 없는 코드는 화면을 깨지 않고 서버가 준 값을 그대로 보임.
 
 const PRODUCT_TYPE_KEYS = {
   recruit: "access.campaign.productType.recruit",
@@ -38,8 +42,7 @@ export function useCodeLabel() {
   const { t } = useTranslation("features/manage-sub-accounts");
 
   return {
-    permission: (code: string, fallback: string) =>
-      isKnown(PERMISSION_KEYS, code) ? t(PERMISSION_KEYS[code]) : fallback,
+    permission: (key: PermissionKey) => t(PERMISSION_LABEL_KEYS[key]),
     productType: (code: string) =>
       isKnown(PRODUCT_TYPE_KEYS, code) ? t(PRODUCT_TYPE_KEYS[code]) : code,
     detailType: (code: string) =>

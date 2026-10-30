@@ -8,6 +8,10 @@ export const ENV = {
   apiMemberUrl: import.meta.env.VITE_API_MEMBER_URL,
   apiSocialUrl: import.meta.env.VITE_API_SOCIAL_URL,
   apiAuthUrl: import.meta.env.VITE_API_AUTH_URL,
+  // 결제 서버(bigbird-pay-be). 빅버드 머니 충전에서 결제 요청을 직접 보냄.
+  apiPayUrl: import.meta.env.VITE_API_PAY_URL,
+  // KG이니시스 표준결제 스크립트 주소. 운영과 테스트가 달라 환경마다 지정함.
+  inicisStdPayUrl: import.meta.env.VITE_INICIS_STDPAY_URL,
   oauthRedirectUrl: import.meta.env.VITE_OAUTH_REDIRECT_URL,
   naverClientId: import.meta.env.VITE_NAVER_CLIENT_ID,
   kakaoAppKey: import.meta.env.VITE_KAKAO_APP_KEY,

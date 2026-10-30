@@ -5,11 +5,15 @@ import type {
   RealtimePhase,
 } from "../model/schema";
 
-/** 상담 요청 뒤 운영자가 연결되기를 기다리는 시간(요구명세서 5분). */
-export const REALTIME_CONNECT_TIMEOUT_MS = 5 * 60 * 1000;
+/** 상담 요청 뒤 운영자가 연결되기를 기다리는 시간(요구명세서 REQ-23-0020 3분). */
+export const REALTIME_CONNECT_TIMEOUT_MS = 3 * 60 * 1000;
 
-/** 연결 후 광고주가 말하지 않으면 상담이 자동 종료되는 시간(기존 스펙 3분). */
-export const REALTIME_IDLE_TIMEOUT_MS = 3 * 60 * 1000;
+/**
+ * 연결 뒤 상대 응답을 기다리는 시간(REQ-23-0021). 마지막 메시지 뒤 이만큼 지나면 안내하고, 두 번째 값이 지나면
+ * 광고주 차례일 때는 자동 종료, 운영 차례일 때는 지연 안내만 함. 새 메시지가 오면 다시 셈.
+ */
+export const REALTIME_IDLE_WARNING_MS = 5 * 60 * 1000;
+export const REALTIME_IDLE_LIMIT_MS = 10 * 60 * 1000;
 
 /** Firestore에 쓰는 `YYYY-MM-DD HH:mm:ss`(로컬 시각)를 ms로. 비었거나 잘못된 값은 null. */
 export function parseWriteTime(value: string | null | undefined) {
@@ -21,7 +25,8 @@ export function parseWriteTime(value: string | null | undefined) {
 const PHASE_STATUS: Record<RealtimePhase, BigbirdInquiryStatus> = {
   requesting: "waiting",
   connected: "consulting",
-  failed: "failed",
+  // 연결 실패 뒤에는 일반 문의로 이어가므로 답변 대기로 보임(사용자 결정 2026-10-29).
+  failed: "waiting",
   finished: "done",
 };
 
@@ -37,7 +42,7 @@ interface PhaseInput {
  * 종료 여부(`finishTime`)가 먼저. `isConnect`는 종료 때 v2 광고주는 true, 운영 앱은 false를 쓰므로
  * 종료된 상담의 상태를 판정하는 데 쓰지 않음.
  *
- * ponytail: 요청 실패는 서버·Firestore에 저장되지 않아 "요청 시각 + 5분이 지나도 연결되지 않음"으로 계산함.
+ * ponytail: 요청 실패는 서버·Firestore에 저장되지 않아 "요청 시각 + 3분이 지나도 연결되지 않음"으로 계산함.
  * 재시도할 때 새 요청 시각을 담을 필드가 정해지면 `requestedAt`을 그 값으로 바꿈.
  */
 export function getRealtimePhase({
@@ -66,13 +71,35 @@ export function getConnectDeadline(
     : null;
 }
 
-/** 연결된 상담의 무응답 종료 시각. 광고주가 말했거나 연결 전이면 null. */
-export function getIdleDeadline(
-  inquiry: Pick<BigbirdInquiryViewModel, "realtimePhase" | "idleDeadlineAt">,
-): number | null {
-  return inquiry.realtimePhase === "connected"
-    ? (inquiry.idleDeadlineAt ?? null)
-    : null;
+// 캠페인 카드는 요청 때 쓰는 auto 메시지라 대화 차례 계산에서 뺌.
+function isCampaignCardMessage(
+  message: RealtimeConsultation["messages"][number],
+) {
+  return message.auto && message.body.trimStart().startsWith("{");
+}
+
+/**
+ * 연결된 상담에서 지금 누구의 답을 기다리는지와 그 시작 시각. 마지막 메시지가 광고주 것이면 운영 차례,
+ * 운영 것(연결 안내 포함)이면 광고주 차례. 메시지가 없으면 연결 시각(`seqResponseDate`)부터 광고주 차례.
+ */
+export function getIdleTurn(
+  consultation: RealtimeConsultation,
+): BigbirdInquiryViewModel["idleTurn"] {
+  const last = consultation.messages
+    .filter((message) => !isCampaignCardMessage(message))
+    .at(-1);
+  if (last) {
+    const since = parseWriteTime(last.created);
+    if (since === null) return null;
+    return {
+      waitingFor: last.isUserMessage ? "operator" : "advertiser",
+      since,
+    };
+  }
+  const connectedAt = parseWriteTime(consultation.seqResponseDate);
+  return connectedAt === null
+    ? null
+    : { waitingFor: "advertiser", since: connectedAt };
 }
 
 /**
@@ -102,18 +129,14 @@ export function applyRealtimeConsultation(
   const phase = isDead
     ? "failed"
     : getRealtimePhase({ isFinished, isConnect, requestedAt, now });
-  const idleStart =
-    phase === "connected"
-      ? parseWriteTime(consultation?.seqResponseDate)
-      : null;
   return {
     ...inquiry,
     realtimePhase: phase,
     isFinished: phase === "finished",
     status: PHASE_STATUS[phase],
     connectDeadlineAt: requestedAt.getTime() + REALTIME_CONNECT_TIMEOUT_MS,
-    idleDeadlineAt:
-      idleStart === null ? null : idleStart + REALTIME_IDLE_TIMEOUT_MS,
+    idleTurn:
+      phase === "connected" && consultation ? getIdleTurn(consultation) : null,
     isRetryable: phase === "failed" && !consultation?.canceledAt,
   };
 }

@@ -21,7 +21,8 @@ const textFieldVariants = cva(
         count: "",
       },
       isWide: {
-        true: "flex-col items-start gap-1.5 rounded-md px-3 py-2.5",
+        // Figma Text Field(6756:28999) 높이 130: 안쪽 테두리라 패딩을 1px씩 줄입니다(드롭 상태 h-32.5와 같음).
+        true: "flex-col items-start gap-1.5 rounded-md px-2.75 py-2.25",
         false: "items-center gap-4 rounded-lg p-2.5",
       },
     },

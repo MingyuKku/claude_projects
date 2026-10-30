@@ -13,7 +13,8 @@ import {
 import type { SocialProvider } from "@/entities/account";
 
 interface UnlinkSocialDialogProps {
-  /** 해제를 확인받는 SNS. null이면 닫혀 있음. */
+  open: boolean;
+  /** 해제를 확인받는 SNS. 닫히는 동안에도 문구가 바뀌지 않게 닫은 뒤에도 남겨 둠(`useDialogTarget`). */
   provider: SocialProvider | null;
   onCancel: () => void;
   onConfirm: (provider: SocialProvider) => void;
@@ -21,6 +22,7 @@ interface UnlinkSocialDialogProps {
 
 // 해제 확인 알럿. 시안에 없는 화면이라 삭제 알럿과 같은 구조·문구는 스펙 §6(사용자 결정).
 export function UnlinkSocialDialog({
+  open,
   provider,
   onCancel,
   onConfirm,
@@ -31,9 +33,9 @@ export function UnlinkSocialDialog({
 
   return (
     <AlertDialog
-      open={provider !== null}
-      onOpenChange={(open) => {
-        if (!open) onCancel();
+      open={open}
+      onOpenChange={(next) => {
+        if (!next) onCancel();
       }}
     >
       <AlertDialogContent className="p-6">

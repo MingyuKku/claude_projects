@@ -1,20 +1,55 @@
-import {
-  MOCK_CAMPAIGN_ASSIGNMENTS,
-  MOCK_PERMISSIONS,
-} from "../model/mock-permission";
+import useSWR from "swr";
+import useSWRMutation from "swr/mutation";
 
-/**
- * Sub ID의 메뉴 권한. 조회·저장 API가 공개되기 전이라 목 데이터를 돌려줌(스펙 §7 B-3).
- * API가 나오면 `accountIdx`를 받는 SWR 훅으로 바꾸고 이 목 분기와 model/mock-permission.ts를 지움.
- */
-export function useSubAccountPermissions() {
-  return { permissions: MOCK_PERMISSIONS, isLoading: false };
+import { applyPermissionChange } from "../lib/transform-sub-accounts";
+import { MOCK_CAMPAIGN_ASSIGNMENTS } from "../model/mock-permission";
+import {
+  fetchSubAccountPermissions,
+  updateSubAccountPermission,
+} from "./permission-api";
+
+import type {
+  SubAccountPermission,
+  SubAccountPermissionChange,
+} from "../model/types";
+
+function permissionKey(accountIdx: number) {
+  return ["mypage", "sub-permission", accountIdx] as const;
+}
+
+/** Sub ID의 메뉴 권한. */
+export function useSubAccountPermissions(accountIdx: number) {
+  const { data, error, isLoading, mutate } = useSWR(
+    permissionKey(accountIdx),
+    () => fetchSubAccountPermissions(accountIdx),
+  );
+  return { permissions: data, isLoading, isError: Boolean(error), mutate };
+}
+
+/** 스위치를 바꾸는 즉시 화면에 반영하고, 실패하면 이전 값으로 되돌림. 실패는 반환한 함수가 던짐. */
+export function useUpdateSubAccountPermission(accountIdx: number) {
+  const { trigger } = useSWRMutation(
+    permissionKey(accountIdx),
+    (_key, { arg }: { arg: SubAccountPermissionChange }) =>
+      updateSubAccountPermission(accountIdx, arg),
+  );
+
+  /** `current`는 화면에 그린 현재 권한(스위치는 조회가 끝난 뒤에만 그려짐). */
+  return (
+    current: SubAccountPermission[],
+    change: SubAccountPermissionChange,
+  ) =>
+    trigger(change, {
+      optimisticData: applyPermissionChange(current, change),
+      rollbackOnError: true,
+      populateCache: true,
+      revalidate: false,
+    });
 }
 
 /**
- * Master의 캠페인과 이 Sub ID의 담당 여부(페이지 없이 전부). `GET /campaign` 응답 스키마가 반영됐으나(2026-10-22)
- * 화면 열(상품 유형·세부 상품·진행 상태)에 맞는 필드가 불명확하고 Sub ID 목록 API가 없어 `accountIdx`를 얻지 못하므로
- * 목 데이터를 돌려줌(docs/mypage-api.md §4-5). 실제 훅은 `accountIdx`를 받음.
+ * Master의 캠페인과 이 Sub ID의 담당 여부(페이지 없이 전부). `GET /campaign`이 있으나 화면의 "진행 상태"가 어느 상태 코드인지
+ * 정해지지 않아(docs/mypage-api.md §4-5) 개발 서버에서만 목 데이터를 돌려줌. 빌드에서는 빈 목록. 실제 훅은 `accountIdx`를 받음.
  */
 export function useCampaignAssignments() {
   return { campaigns: MOCK_CAMPAIGN_ASSIGNMENTS, isLoading: false };

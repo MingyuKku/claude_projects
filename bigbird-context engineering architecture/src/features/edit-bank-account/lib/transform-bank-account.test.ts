@@ -9,12 +9,14 @@ describe("transformBankAccountToViewModel", () => {
       accountNumber: "110-123-456789",
       accountHolder: "홍길동",
       isExistsBankBookFile: true,
+      bankBookFileName: "통장사본.pdf",
     });
     expect(transformBankAccountToViewModel(response)).toEqual({
       bankName: "신한은행",
       accountNumber: "110-123-456789",
       accountHolder: "홍길동",
       hasBankBookFile: true,
+      bankBookFileName: "통장사본.pdf",
     });
   });
 

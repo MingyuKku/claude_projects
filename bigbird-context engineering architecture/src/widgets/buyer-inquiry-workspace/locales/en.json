@@ -1,6 +1,5 @@
 {
   "listTitle": "Inquiry list",
-  "refresh": "Refresh",
   "all": "All",
   "waiting": "Waiting",
   "done": "Answered",
@@ -17,9 +16,7 @@
   "unknownWriter": "No name",
   "conversation": "Conversation",
   "detail": "Details",
-  "history": "Chat History",
   "backToList": "Back to inquiries",
-  "closeHistory": "Close history",
   "closeDetail": "Close details",
   "advertiser": "Advertiser",
   "messagePlaceholder": "Enter your message (up to 3,000 characters)",
@@ -35,6 +32,7 @@
     "campaignPlaceholder": "Select a campaign",
     "influencer": "Influencer",
     "influencerPlaceholder": "Select an influencer",
+    "influencerSearchPlaceholder": "Search influencers",
     "campaignFallback": "Campaign {{idx}}",
     "influencerFallback": "Influencer {{idx}}",
     "removeChip": "Remove {{name}}",
@@ -60,7 +58,7 @@
   "shopCode": "Shop code",
   "influencer": "Influencer",
   "detailError": "Couldn't load details.",
-  "copied": "Copied.",
+  "copied": "Copied to clipboard.",
   "copyFailed": "Couldn't copy.",
   "won": "{{amount}} KRW",
   "conversationError": "Couldn't load the conversation.",
@@ -79,7 +77,5 @@
     "deleteTitle": "Delete this reply?",
     "deleteDescription": "A deleted reply can't be restored."
   },
-  "historyEmpty": "No consultation history.",
-  "copyCampaignCode": "Copy campaign code",
   "messageDeleted": "This message was deleted."
 }

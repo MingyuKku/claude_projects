@@ -12,9 +12,16 @@ describe("getAttachmentKind", () => {
 
   it("허용하지 않는 형식과 확장자 없는 파일은 null이다", () => {
     expect(getAttachmentKind(file("a.gif"))).toBeNull();
-    expect(getAttachmentKind(file("a.mov"))).toBeNull();
+    expect(getAttachmentKind(file("a.hwp"))).toBeNull();
     expect(getAttachmentKind(file("noext"))).toBeNull();
   });
+});
+
+it("동영상 4종과 문서 파일을 받는다(REQ-23-0018)", () => {
+  for (const name of ["a.avi", "a.mp4", "a.mov", "a.mpeg"])
+    expect(getAttachmentKind(file(name))).toBe("video");
+  for (const name of ["a.pdf", "a.txt", "a.docx", "a.xlsx", "a.pptx"])
+    expect(getAttachmentKind(file(name))).toBe("file");
 });
 
 describe("checkAttachments", () => {

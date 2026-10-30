@@ -20,6 +20,7 @@ type SessionAppShellProps = Pick<
   | "icon"
   | "activeNavId"
   | "isKeyboardAware"
+  | "keyboardGapClassName"
 >;
 
 const SESSION_ERROR_TOAST_ID = "session-check-failed";

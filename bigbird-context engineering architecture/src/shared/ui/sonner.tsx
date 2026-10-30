@@ -35,6 +35,8 @@ const Toaster = ({ ...props }: ToasterProps) => {
   return (
     <Sonner
       theme="light"
+      // Figma 토스트 시안(6706:13698 등)은 화면 상단 가운데에 뜹니다.
+      position="top-center"
       className="toaster group"
       offset={TOAST_OFFSET}
       mobileOffset={TOAST_OFFSET}

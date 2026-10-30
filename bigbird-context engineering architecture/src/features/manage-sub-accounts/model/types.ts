@@ -1,3 +1,5 @@
+import type { PERMISSION_FIELDS } from "./constants";
+
 export interface SubAccountViewModel {
   /** 서버가 주는 Sub ID 인덱스. 권한 부여·삭제의 대상 키. */
   accountIdx: number;
@@ -6,15 +8,29 @@ export interface SubAccountViewModel {
   /** 담당자명. */
   name: string;
   email: string;
-  createdAt: Date;
+  /** 서버가 생성일을 주지 않으면 null. */
+  createdAt: Date | null;
 }
 
-/** Sub ID에 부여하는 메뉴 권한 한 항목. 항목 목록·순서는 서버가 정함(스펙 §3). */
+/** Sub ID 목록 한 쪽. */
+export interface SubAccountPageViewModel {
+  accounts: SubAccountViewModel[];
+  totalCount: number;
+  page: number;
+  totalPages: number;
+}
+
+/** 서버에 저장할 수 있는 권한(API가 나온 것만). */
+export type ApiPermissionKey = keyof typeof PERMISSION_FIELDS;
+
+/** Sub ID에 부여하는 메뉴 권한 한 항목. 서버가 주는 권한만 그림(스펙 §3). */
 export interface SubAccountPermission {
-  /** 서버가 주는 권한 코드. 번역 키로 쓰고, 모르는 코드는 서버 이름을 그대로 보임. */
-  key: string;
-  /** 서버가 준 표시 이름. 번역 키가 없을 때 대신 보임. */
-  name: string;
+  key: ApiPermissionKey;
+  isGranted: boolean;
+}
+
+export interface SubAccountPermissionChange {
+  key: ApiPermissionKey;
   isGranted: boolean;
 }
 

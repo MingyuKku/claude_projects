@@ -27,7 +27,7 @@ description: 모바일 가상 키보드, visualViewport, 입력 포커스에 따
 ## 금지
 
 - 출처 없는 고정값: 키보드·입력 보조 막대·주소 표시줄 높이 같은 값을 눈대중 상수로 넣지 않습니다. 웹 API로 알 수 없는 값이면 그 사실을 보고합니다.
-- `visualViewport`의 `resize`·`scroll`마다 JS로 레이아웃 높이·위치나 스크롤을 다시 맞추는 방식(셸을 `position: fixed`로 보이는 창에 따라 옮기기, 매번 `scrollIntoView`). 사용자 스크롤과 충돌해 화면이 떨리고, iOS 26의 `offsetTop` 어긋남(WebKit 297779)에 그대로 노출됩니다.
+- `visualViewport`의 `resize`·`scroll`마다 **스크롤을** 다시 맞추거나(매번 `scrollIntoView`) 셸을 `position: fixed`로 보이는 창에 따라 옮기는 방식. 사용자 스크롤과 충돌해 화면이 떨리고, iOS 26의 `offsetTop` 어긋남(WebKit 297779)에 그대로 노출됩니다. 예외는 아래 "iOS 셸 맞춤"의 안전장치를 갖춘 높이·위치 맞춤뿐입니다.
 - 접근성을 해치는 강제: `user-scalable=no`, `maximum-scale=1` 같은 확대 차단.
 - User-Agent 문자열로 iOS 버전을 가려 분기하기. 기능 감지(`CSS.supports`, `@supports`)를 씁니다.
 
@@ -46,9 +46,15 @@ description: 모바일 가상 키보드, visualViewport, 입력 포커스에 따
 ## 이 프로젝트의 현재 결정
 
 - Android: `index.html` viewport 메타에 `interactive-widget=resizes-content`.
-- iOS: OS 기본 동작을 따릅니다. 입력하는 동안 헤더가 밀려나는 것은 Safari 기본 동작으로 받아들였습니다(`specs/home.md` "키보드 활성 배치", 방안 A).
-- 키보드 열림 감지와 열림 배치: `AppShell`의 `isKeyboardAware`(`data-keyboard`) + 본문 CSS(`in-data-[keyboard=open]:`). iOS에서 `innerHeight` 변화로 배치를 나누는 방식은 스크롤 중 판정이 바뀌어 화면이 덜컹거려 되돌렸습니다. 높이가 줄지 않는 iOS에서 아래 붙이기로 헤더와 제목 사이가 벌어지는 문제는 미해결입니다.
+- iOS 셸 맞춤(2026-10-28, 챗지피티 웹 방식): Safari는 `interactive-widget`을 지원하지 않아 키보드가 레이아웃을 줄이지 않고 덮고, 입력을 보이려고 보이는 영역을 내립니다(`offsetTop`). 그래서 키보드가 열린 동안 셸을 `visualViewport.height`로 줄이고 내린 만큼(`offsetTop`) `relative` + `top`으로 따라 내립니다(`shared/lib/useKeyboardViewport`, `widgets/app-shell/model/useKeyboardAwareShell`). 셸이 보이는 영역을 그대로 채우므로 Android처럼 본문이 줄고, 키보드 위·아래로 빈 여백이 보이지 않으며, 입력창이 키보드에 가리지 않습니다.
+  - 안전장치(챗지피티 웹 chatgpt.com 배포 번들에서 확인): 키보드 열림(입력 포커스) 중에만, `visualViewport.scale === 1`(핀치 확대 아님)일 때만 켜고, `offsetTop`을 `0~gap`(레이아웃 높이 − 보이는 높이)으로 제한해 WebKit 297779의 어긋난 값이 화면을 밀지 않게 합니다. 판단은 UA가 아니라 gap(> 1px)으로 하므로 Android(resizes-content로 gap 0)에는 적용되지 않습니다.
+  - `transform`은 `fixed` 자식의 기준을 바꾸므로 쓰지 않습니다. 스크롤 위치는 건드리지 않고, 셸이 줄어든 직후 한 번만 `[data-keyboard-anchor]`를 다시 보이게 합니다.
+  - 바깥 끌기 막기: 맞춘 동안 사용자가 셸 바깥(키보드 뒤 영역)을 터치로 끌면 보이는 영역이 움직여 빈 영역이 드러납니다. 비패시브 `touchmove`에서 그 방향으로 스크롤할 수 있는 조상이 없으면 `preventDefault`합니다(`shared/lib/usePreventViewportPan`). 안쪽 스크롤 영역이 끝에 닿아 문서로 넘어가는 경우(WebKit 191204)도 같이 막습니다. Radix Dialog·Sheet가 쓰는 react-remove-scroll과 같은 방식이고, 두 손가락(확대)과 가로 이동은 막지 않습니다.
+  - 키보드 뒤 칠하기: 셸을 따라 맞추기 전 한두 프레임이나 막지 못한 끌기로 셸 아래가 드러나도 흰 문서 배경이 보이지 않게, 셸 바로 아래에 `max(6rem, gap − pan)` 높이의 배경 블록을 둡니다(챗지피티 웹 `keyboardGapPaint`). 색은 화면이 `keyboardGapClassName`으로 넘기며(기본 `bg-background`), 셸 배경에도 같이 깔아 이음매가 없게 합니다. 블록과 이어져야 하므로 세로로 변하지 않는 배경(단색·가로 그라데이션)만 씁니다.
+  - 본문 아래 끝 흐리기: iOS 26은 보이는 영역 아래에 반투명한 주소·입력 보조 막대를 띄우고, 그 뒤로 셸 아래 블록이 비칩니다. 본문을 스크롤하면 내용이 보이는 영역 아래 끝에서 잘린 듯 끊겨 보이므로, 맞춘 동안 `<main>` 아래를 `mask-image`로 흐리게 합니다. 흐리는 길이와 앵커의 scroll-margin-bottom은 셸이 정하는 `--keyboard-anchor-gap`(1rem) 하나를 같이 써서, 스크롤하지 않은 상태의 입력 영역은 흐려지지 않습니다. 막대 높이는 웹 API로 알 수 없어 셸을 막대 뒤까지 늘리지 않습니다.
+  - 근거 수준: 플랫폼 사실(위 "플랫폼 사실")은 공식 근거이고, 맞춤 방식은 대기업 서비스의 공개 배포 코드(2순위 근거)입니다. iOS 실기기 확인 결과를 `specs/home.md`에 남깁니다.
+- 키보드 열림 감지와 열림 배치: `AppShell`의 `isKeyboardAware`(`data-keyboard`) + 본문 CSS(`in-data-[keyboard=open]:`). iOS에서 `innerHeight` 변화로 배치를 나누는 방식은 스크롤 중 판정이 바뀌어 화면이 덜컹거려 되돌렸습니다. 높이가 줄지 않는 iOS에서 아래 붙이기로 헤더와 제목 사이가 벌어지던 문제는 위 "iOS 셸 맞춤"으로 다룹니다.
 - 키보드 위 입력 보조 막대·주소 표시는 iOS에서 `visualViewport` 바깥이지만 레이아웃 뷰포트 안을 덮습니다. iOS의 `innerHeight`는 주소창 상태에 따라 같은 화면에서도 매번 달라지므로(실측 487·543·641) 이 높이를 재서 레이아웃을 보정하는 방식은 쓰지 않습니다(홈에서 시도 후 효과가 없어 되돌림). 홈에서 이 막대가 버튼 줄을 가리는 문제는 미해결로 남겨 두었습니다(`specs/home.md`).
-- 키보드가 열리는 순간 한 번만 `[data-keyboard-anchor]`를 `scrollIntoView({ block: "end" })`로 보이게 하고 여백은 `scroll-margin-bottom`으로 줍니다(iOS는 포커스한 입력의 커서까지만 스크롤해 아래 버튼 줄이 가려짐). `scroll-margin`이 `scrollIntoView`에 적용되는 것은 CSSOM View·CSS Scroll Snap 표준입니다. [MDN scroll-margin-bottom](https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-margin-bottom)
+- 키보드가 열리는 순간 한 번만 `[data-keyboard-anchor]`를 `scrollIntoView({ block: "end" })`로 보이게 하고 여백은 `scroll-mb-(--keyboard-anchor-gap)`(셸이 정하는 변수)으로 줍니다(iOS는 포커스한 입력의 커서까지만 스크롤해 아래 버튼 줄이 가려짐). `scroll-margin`이 `scrollIntoView`에 적용되는 것은 CSSOM View·CSS Scroll Snap 표준입니다. [MDN scroll-margin-bottom](https://developer.mozilla.org/en-US/docs/Web/CSS/scroll-margin-bottom)
 - iOS 입력 자동 확대 방지: 입력 글자를 iOS에서만 16px로(`shared/components/text-field/styles.ts`). **공식 근거 없음**: Apple·WebKit 공식 문서에서 16px 기준을 찾지 못했고(2026-10 조사), 실기기 동작(14px에서 확대 발생, 16px 적용 후 사라짐)과 [CSS-Tricks](https://css-tricks.com/16px-or-larger-text-prevents-ios-form-zoom/)(2021, 출처 없는 관찰) 같은 개발 자료에 의존합니다. 확대 차단(`maximum-scale`·`user-scalable=no`)은 접근성 때문에 쓰지 않습니다. WebKit이 기준을 바꾸면 깨질 수 있으니 iOS 업데이트 후 확대가 다시 생기는지 확인합니다.
 - `interactive-widget=resizes-content`(`index.html`): 값의 의미는 [MDN](https://developer.mozilla.org/en-US/docs/Web/HTML/Reference/Elements/meta/name/viewport)과 [Chrome for Developers](https://developer.chrome.com/blog/viewport-resize-behavior)에서 확인했습니다. Chrome for Android 108+, Firefox for Android 132+가 지원하고 Safari는 지원하지 않습니다([WebKit 230225](https://bugs.webkit.org/show_bug.cgi?id=230225)).

@@ -31,4 +31,14 @@ describe("TermsDocument", () => {
     expect(firstBlock).toHaveTextContent("Article 1 (Purpose)");
     expect(screen.queryByText("제 1 장 총칙")).not.toBeInTheDocument();
   });
+
+  it("충전 약관은 번역본이 없어 영어에서도 한국어 원문을 바로 보여 준다", async () => {
+    await useLanguage("en");
+    render(<TermsDocument kind="charge" />);
+
+    expect(
+      screen.getByText("광고주 결제 정보 수집 및 약관"),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  });
 });

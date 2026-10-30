@@ -1,15 +1,30 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { ApiError, serverApi } from "@/shared/api";
+import { ApiError, serverApi, serverApiV3 } from "@/shared/api";
 import { ROUTES } from "@/shared/config";
 import { hardNavigate } from "@/shared/lib";
 
-import { renderRoute } from "./test-utils";
+import {
+  mockSession,
+  mockSessionError,
+  renderRoute,
+  resetSession,
+} from "./test-utils";
+
+// 이 파일은 펼친 PC LNB에서 셸 동작을 검증함. LNB 기본은 접힘이고(sidebar-store), 저장된 상태는 스토어를 불러올 때
+// localStorage에서 복원되므로 모듈을 불러오기 전에 "펼쳐 둔 사용자" 상태를 저장해 둠.
+vi.hoisted(() => {
+  localStorage.setItem(
+    "bigbird:sidebar",
+    JSON.stringify({ state: { isCollapsed: false }, version: 0 }),
+  );
+});
 
 vi.mock("@/shared/api", async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   serverApi: { get: vi.fn(), post: vi.fn() },
+  serverApiV3: { get: vi.fn() },
 }));
 
 vi.mock("@/shared/lib", async (importOriginal) => ({
@@ -36,11 +51,8 @@ const accounts = {
 
 beforeEach(() => {
   vi.mocked(hardNavigate).mockClear();
-  vi.mocked(serverApi.get)
-    .mockReset()
-    .mockImplementation(async (path) =>
-      path === "/super" ? accounts : adminSession,
-    );
+  resetSession(adminSession);
+  vi.mocked(serverApi.get).mockReset().mockResolvedValue(accounts);
   vi.mocked(serverApi.post).mockReset().mockResolvedValue({ result: true });
 });
 afterEach(() => {
@@ -60,7 +72,7 @@ describe("관리자 계정 전환", () => {
     expect(within(list).getAllByRole("listitem")[0]).toHaveTextContent(
       "bigbird",
     );
-    expect(serverApi.get).toHaveBeenCalledWith("/sec", {
+    expect(serverApiV3.get).toHaveBeenCalledWith("/sec", {
       headers: { "X-Path": ROUTES.switchAccount },
     });
     expect(
@@ -71,7 +83,7 @@ describe("관리자 계정 전환", () => {
   it.each(["MASTER", "SUB"])(
     "%s는 계정 전환 목록을 요청하지 않고 홈으로 돌아간다",
     async (authority) => {
-      vi.mocked(serverApi.get).mockResolvedValue({
+      mockSession({
         ...adminSession,
         authority,
       });
@@ -86,7 +98,7 @@ describe("관리자 계정 전환", () => {
   );
 
   it("미인증 접근은 로컬 로그인으로 이동한다", async () => {
-    vi.mocked(serverApi.get).mockRejectedValue(new ApiError(401, undefined));
+    mockSessionError(new ApiError(401, undefined));
     const router = await renderRoute(ROUTES.switchAccount);
     await screen.findByLabelText("아이디");
     expect(router.state.location.pathname).toBe(ROUTES.login);
@@ -144,8 +156,7 @@ describe("관리자 계정 전환", () => {
   it("목록 조회 실패 후 다시 시도할 수 있다", async () => {
     vi.spyOn(console, "error").mockImplementation(() => {});
     let hasFailed = false;
-    vi.mocked(serverApi.get).mockImplementation(async (path) => {
-      if (path !== "/super") return adminSession;
+    vi.mocked(serverApi.get).mockImplementation(async () => {
       if (!hasFailed) {
         hasFailed = true;
         throw new ApiError(500, undefined);

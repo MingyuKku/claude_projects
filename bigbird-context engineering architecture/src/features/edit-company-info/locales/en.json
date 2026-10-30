@@ -1,5 +1,5 @@
 {
-  "title": "Edit info",
+  "title": "Company info",
   "form": {
     "companyName": "Company name",
     "contact": "Contact number",
@@ -16,8 +16,10 @@
     "registered": "Registered",
     "error": {
       "extension": "Only JPG, PNG and PDF files are allowed.",
-      "size": "Max file size is 10MB."
-    }
+      "size": "Max file size is 10MB.",
+      "download": "Couldn't download the file. Please try again."
+    },
+    "download": "Download {{name}}"
   },
   "inform": {
     "required": "Fill in all required fields to save.",

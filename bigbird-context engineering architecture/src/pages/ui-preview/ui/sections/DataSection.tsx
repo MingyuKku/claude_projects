@@ -433,7 +433,7 @@ function HeaderPreview({
     <div className={BARE_TABLE}>
       <Table headerTone={tone} className="w-auto">
         <TableHeader>
-          <TableRow className="hover:bg-transparent">
+          <TableRow>
             <TableHead
               className={cn(
                 type === "Checkbox" ? "w-12" : "w-36",

@@ -36,3 +36,8 @@ export function uploadBankBook(file: File) {
   body.append("file", file);
   return serverApiV3.post("/mypage/account/bank/upload", body);
 }
+
+/** 통장 사본 파일. 등록된 파일이 없으면 404. */
+export function downloadBankBook() {
+  return serverApiV3.download("/mypage/account/bank/download");
+}

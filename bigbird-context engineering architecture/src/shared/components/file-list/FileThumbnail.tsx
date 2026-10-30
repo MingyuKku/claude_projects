@@ -1,10 +1,11 @@
 import { cva } from "class-variance-authority";
-import { X } from "lucide-react";
+import { FileText, X } from "lucide-react";
 
 import playIcon from "@/shared/assets/img/chat/play.svg";
 import { cn } from "@/shared/lib/utils";
 
-// Figma File List Base / Thumbnail(5219:126850) Image·Movie.
+// Figma File List Base / Thumbnail(5219:126850) Image·Movie. 문서(file)는 시안이 없어 요구명세서 REQ-23-0009
+// "픽토그램 + 파일명 앞 5자"로 임시 표시함.
 // md는 80px 고정, sm은 File List / Thumbnail_sm(6977:45434)처럼 줄 너비를 나눠 갖는 정사각형.
 const thumbnailVariants = cva(
   "group/thumbnail relative overflow-hidden rounded-md border border-border bg-muted",
@@ -19,13 +20,16 @@ const thumbnailVariants = cva(
   },
 );
 
+/** 문서 썸네일에 보이는 파일 이름 길이(REQ-23-0009). */
+const FILE_NAME_LENGTH = 5;
+
 interface FileThumbnailProps {
   /** 이미지 주소. 동영상이면 첫 장면 이미지(없으면 `videoSrc`나 빈 칸). */
   src?: string;
   /** 동영상 파일 주소. 첫 장면을 브라우저가 직접 그림(다른 출처의 영상은 캔버스로 캡처할 수 없음). */
   videoSrc?: string;
   alt: string;
-  type?: "image" | "video";
+  type?: "image" | "video" | "file";
   size?: "md" | "sm";
   /** 있으면 hover 시 어둡게 + 오른쪽 위 삭제 버튼을 보여 줌. */
   onClickRemove?: () => void;
@@ -47,7 +51,18 @@ export function FileThumbnail({
 }: FileThumbnailProps) {
   return (
     <div className={cn(thumbnailVariants({ size }), className)} {...props}>
-      {type === "video" && videoSrc && !src ? (
+      {type === "file" ? (
+        <div
+          role="img"
+          aria-label={alt}
+          className="flex size-full flex-col items-center justify-center gap-1 p-1 text-muted-foreground"
+        >
+          <FileText aria-hidden className="size-6" />
+          <span className="max-w-full truncate text-xs leading-4">
+            {[...alt].slice(0, FILE_NAME_LENGTH).join("")}
+          </span>
+        </div>
+      ) : type === "video" && videoSrc && !src ? (
         <video
           // #t=0.1: 메타데이터만 받아 그 지점의 장면을 보여 줌(검은 첫 프레임 회피).
           src={`${videoSrc}#t=0.1`}

@@ -5,6 +5,7 @@
   "all": "全部",
   "waiting": "待回复",
   "consulting": "咨询中",
+  "consultingBadge": "实时咨询中",
   "done": "已回复",
   "empty": {
     "title": "暂无咨询。",
@@ -16,7 +17,6 @@
     "campaignUnknown": "活动咨询",
     "other": "其他咨询"
   },
-  "consultDate": "咨询日",
   "bigbirdManager": "Bigbird客服",
   "completed": {
     "title": "已结束",
@@ -29,7 +29,6 @@
   "copyCode": "复制活动代码",
   "copied": "已复制到剪贴板。",
   "backToList": "返回列表",
-  "filterEmpty": "没有符合条件的咨询。",
   "copyFailed": "复制失败。",
   "deletedMessage": "消息已删除。",
   "failed": "请求失败",
@@ -37,19 +36,28 @@
     "requesting": {
       "title": "咨询请求中",
       "description": "工作人员接入后将开始实时咨询。",
-      "caption": "连接最多可能需要5分钟。"
+      "caption": "连接最多可能需要3分钟。"
     },
     "failed": {
-      "title": "咨询请求失败",
-      "description": "请留言,我们确认后将依次回复。",
-      "caption": "留言回复可能因咨询情况而延迟。"
+      "title": "无法实时咨询",
+      "description": "目前客服暂时无法应答。请留下咨询，我们会为您回复。"
     },
-    "retry": "重试",
-    "leaveMessage": "留言咨询",
     "end": "结束咨询",
     "composer": "实时咨询消息",
     "composerPlaceholder": "请输入咨询内容。（最多3,000字）",
     "attach": "附件",
-    "send": "发送"
-  }
+    "send": "发送",
+    "request": "实时咨询"
+  },
+  "composer": {
+    "placeholder": "请输入咨询内容。（最多3,000字）",
+    "send": "发送",
+    "failed": "处理失败，请重试。"
+  },
+  "detail": "详细信息",
+  "closeDetail": "关闭详情",
+  "campaignInfo": "活动信息",
+  "campaignType": "活动类型",
+  "productName": "商品名称",
+  "period": "进行期间"
 }

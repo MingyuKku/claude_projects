@@ -3,7 +3,7 @@ import userEvent from "@testing-library/user-event";
 import { Link, MemoryRouter, Outlet, Route, Routes } from "react-router";
 import { SWRConfig } from "swr";
 
-import { ApiError, serverApi } from "@/shared/api";
+import { ApiError, serverApi, serverApiV3 } from "@/shared/api";
 
 import { AuthGuard } from "../ui/AuthGuard";
 import {
@@ -21,6 +21,7 @@ vi.mock("@/shared/api", async (importOriginal) => {
   return {
     ...actual,
     serverApi: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn() },
+    serverApiV3: { get: vi.fn() },
   };
 });
 
@@ -73,22 +74,22 @@ function renderGuard(cache = new Map()) {
 
 describe("useSession", () => {
   beforeEach(() => {
-    vi.mocked(serverApi.get).mockReset();
+    vi.mocked(serverApiV3.get).mockReset();
   });
 
   it("asks /sec with the X-Path header and returns the view model", async () => {
-    vi.mocked(serverApi.get).mockResolvedValue(sessionBody);
+    vi.mocked(serverApiV3.get).mockResolvedValue(sessionBody);
     const Wrapper = wrapper(new Map());
     render(<SessionName pathname="/" />, { wrapper: Wrapper });
 
     expect(await screen.findByText("hong1234")).toBeInTheDocument();
-    expect(serverApi.get).toHaveBeenCalledWith("/sec", {
+    expect(serverApiV3.get).toHaveBeenCalledWith("/sec", {
       headers: { "X-Path": "/" },
     });
   });
 
   it("reports an error when the server rejects the request", async () => {
-    vi.mocked(serverApi.get).mockImplementation(async () => {
+    vi.mocked(serverApiV3.get).mockImplementation(async () => {
       throw new ApiError(401, undefined);
     });
     render(<SessionName pathname="/" />, { wrapper: wrapper(new Map()) });
@@ -97,7 +98,7 @@ describe("useSession", () => {
   });
 
   it("revalidates on every mount even with a warm cache", async () => {
-    vi.mocked(serverApi.get).mockResolvedValue(sessionBody);
+    vi.mocked(serverApiV3.get).mockResolvedValue(sessionBody);
     const cache = new Map();
 
     const first = render(<SessionName pathname="/" />, {
@@ -107,24 +108,24 @@ describe("useSession", () => {
     first.unmount();
 
     render(<SessionName pathname="/" />, { wrapper: wrapper(cache) });
-    await waitFor(() => expect(serverApi.get).toHaveBeenCalledTimes(2));
+    await waitFor(() => expect(serverApiV3.get).toHaveBeenCalledTimes(2));
   });
 });
 
 describe("AuthGuard", () => {
   beforeEach(() => {
-    vi.mocked(serverApi.get).mockReset();
+    vi.mocked(serverApiV3.get).mockReset();
   });
 
   it("hands the session to children once the server allows the path", async () => {
-    vi.mocked(serverApi.get).mockResolvedValue(sessionBody);
+    vi.mocked(serverApiV3.get).mockResolvedValue(sessionBody);
     renderGuard();
 
     expect(await screen.findByText("hello hong1234")).toBeInTheDocument();
   });
 
   it("redirects to the local login page when unauthenticated", async () => {
-    vi.mocked(serverApi.get).mockImplementation(async () => {
+    vi.mocked(serverApiV3.get).mockImplementation(async () => {
       throw new ApiError(401, undefined);
     });
     renderGuard();
@@ -133,7 +134,7 @@ describe("AuthGuard", () => {
   });
 
   it("ignores the external redirectTo and keeps the login flow in this app", async () => {
-    vi.mocked(serverApi.get).mockRejectedValue(
+    vi.mocked(serverApiV3.get).mockRejectedValue(
       new ApiError(401, {
         result: false,
         redirectTo: "https://stage.member.bigbird.co.kr/client",
@@ -146,7 +147,7 @@ describe("AuthGuard", () => {
   // 셸은 유지하되, 다른 페이지의 본문은 그 경로의 권한 확인이 끝난 뒤에만 그림.
   function renderTwoPages(pageKey?: string) {
     let answerNextPath: (value: unknown) => void = () => {};
-    vi.mocked(serverApi.get)
+    vi.mocked(serverApiV3.get)
       .mockResolvedValueOnce(sessionBody)
       .mockReturnValueOnce(
         new Promise((resolve) => {
@@ -212,7 +213,7 @@ describe("AuthGuard", () => {
   });
 
   it("redirects when the server denies the path", async () => {
-    vi.mocked(serverApi.get).mockResolvedValue({
+    vi.mocked(serverApiV3.get).mockResolvedValue({
       ...sessionBody,
       result: false,
     });
@@ -265,7 +266,7 @@ describe("logout", () => {
 
 describe("getLastAllowedSession", () => {
   it("로그아웃하면 직전 사용자의 세션을 지운다", async () => {
-    vi.mocked(serverApi.get).mockResolvedValue(sessionBody);
+    vi.mocked(serverApiV3.get).mockResolvedValue(sessionBody);
     render(<SessionName pathname="/" />, { wrapper: wrapper(new Map()) });
     await screen.findByText("hong1234");
     expect(getLastAllowedSession()?.identifier).toBe("hong1234");
@@ -280,11 +281,11 @@ describe("getLastAllowedSession", () => {
   });
 
   it("세션 확인이 실패하면 지운다", async () => {
-    vi.mocked(serverApi.get).mockResolvedValueOnce(sessionBody);
+    vi.mocked(serverApiV3.get).mockResolvedValueOnce(sessionBody);
     render(<SessionName pathname="/" />, { wrapper: wrapper(new Map()) });
     await screen.findByText("hong1234");
 
-    vi.mocked(serverApi.get).mockRejectedValueOnce(
+    vi.mocked(serverApiV3.get).mockRejectedValueOnce(
       new ApiError(401, undefined),
     );
     render(<SessionName pathname="/other" />, { wrapper: wrapper(new Map()) });

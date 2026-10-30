@@ -13,6 +13,7 @@ const account = {
   accountNumber: "110-123-456789",
   accountHolder: "홍길동",
   hasBankBookFile: true,
+  bankBookFileName: null,
 };
 
 describe("toBankFormValues", () => {

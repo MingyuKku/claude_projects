@@ -1,0 +1,27 @@
+{
+  "title": "Charge Bigbird Money",
+  "field": {
+    "label": "Charge amount",
+    "unit": "KRW",
+    "placeholder": "Enter an amount."
+  },
+  "quick": {
+    "10000": "10K",
+    "30000": "30K",
+    "50000": "50K",
+    "100000": "100K"
+  },
+  "error": {
+    "min": "The minimum charge is {{amount}} KRW.",
+    "max": "You can charge up to {{amount}} KRW at a time."
+  },
+  "notice": {
+    "min": "Minimum charge is {{amount}} KRW.",
+    "max": "Maximum per charge is {{amount}} KRW."
+  },
+  "submit": "Charge {{amount}} KRW",
+  "terms": {
+    "title": "Advertiser Payment Information Collection and Terms",
+    "agree": "Agree and charge"
+  }
+}

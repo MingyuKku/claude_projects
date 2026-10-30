@@ -15,6 +15,7 @@
     },
     "action": {
       "permission": "権限付与",
+      "edit": "編集",
       "delete": "削除"
     },
     "empty": {
@@ -57,10 +58,6 @@
         "label": "パスワード確認",
         "placeholder": "パスワードを入力"
       },
-      "phone": {
-        "label": "携帯番号",
-        "placeholder": "携帯番号を入力"
-      },
       "email": {
         "label": "メールアドレス",
         "placeholder": "メールアドレスを入力"
@@ -94,18 +91,27 @@
       "created": "サブIDを作成しました。"
     }
   },
+  "edit": {
+    "title": "サブID編集",
+    "submit": "修正する",
+    "toast": {
+      "updated": "Sub IDの情報を更新しました。"
+    }
+  },
   "delete": {
     "title": "サブID削除",
-    "description": "「{{identifier}}」を削除しますか？削除したデータは復元できません。"
+    "description": "「{{identifier}}」を削除しますか？削除したデータは復元できません。",
+    "toast": {
+      "deleted": "サブIDを削除しました。"
+    }
   },
   "access": {
-    "screen": "権限付与",
+    "tab": {
+      "service": "サービス権限",
+      "campaign": "キャンペーン割当"
+    },
     "permission": {
       "title": "サブID権限",
-      "column": {
-        "name": "権限名",
-        "granted": "権限"
-      },
       "name": {
         "campaign": "キャンペーン",
         "influencerMatching": "マッチング",
@@ -114,7 +120,11 @@
         "buyerInquiry": "購入者問合せ",
         "bigbirdMoney": "ビッグバードマネー"
       },
-      "switchLabel": "{{name}}の権限"
+      "switchLabel": "{{name}}の権限",
+      "toast": {
+        "granted": "「{{name}}」の権限を付与しました。",
+        "revoked": "「{{name}}」の権限を解除しました。"
+      }
     },
     "campaign": {
       "title": "サブIDキャンペーン割当",
@@ -123,7 +133,6 @@
         "productType": "商品タイプ",
         "detailType": "詳細商品",
         "status": "キャンペーン進行状況",
-        "statusShort": "進行状況",
         "assigned": "担当"
       },
       "productType": {
@@ -139,7 +148,8 @@
         "waiting": "待機中",
         "running": "進行中"
       },
-      "switchLabel": "{{name}}の担当"
+      "switchLabel": "{{name}}の担当",
+      "empty": "割り当て可能なキャンペーンがありません。"
     }
   }
 }

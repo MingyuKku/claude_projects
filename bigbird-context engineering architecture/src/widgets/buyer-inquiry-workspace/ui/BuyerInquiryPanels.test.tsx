@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router";
@@ -62,7 +62,7 @@ const message = (
   readTime: null,
   modifyTime: null,
   deleteTime: null,
-  identifier: "id",
+  identifier: "mgkang",
   isUserMessage,
   fileName: null,
   fileSize: null,
@@ -86,6 +86,9 @@ const detail = {
   progressEndDate: "2026.10.31",
   influencerPlatform: "instagram",
   influencerAccountLink: "https://instagram.com/bigbird",
+  mainImageUrl: null,
+  brandName: "빅버드",
+  productName: "여섯별 스킨케어 세트",
 };
 
 beforeEach(() => {
@@ -144,6 +147,8 @@ describe("구매자 문의 오른쪽 패널", () => {
     renderPanels();
     expect(await screen.findByText("배송이 언제 되나요?")).toBeInTheDocument();
     expect(screen.getByText("오늘 발송합니다.")).toBeInTheDocument();
+    // 내 말풍선 위에는 보낸 광고주 계정 id가 보입니다.
+    expect(screen.getByText("mgkang")).toBeInTheDocument();
     expect(serverApiV3.get).toHaveBeenCalledWith("/help/thread", {
       params: { threadUserIdx: 77, type: "client", campaignIdx: 10 },
     });
@@ -151,6 +156,45 @@ describe("구매자 문의 오른쪽 패널", () => {
       .getAllByText(/배송이 언제 되나요\?|오늘 발송합니다\./)
       .map((element) => element.textContent);
     expect(texts).toEqual(["배송이 언제 되나요?", "오늘 발송합니다."]);
+  });
+
+  it("구매자 앱이 보낸 캠페인 JSON auto 메시지는 대화에 그리지 않는다", async () => {
+    const campaignJson = JSON.stringify({
+      brandName: "엘지",
+      campaignCode: "L-1",
+      mainImageUrl: null,
+      productName: "냉장고",
+    });
+    vi.mocked(serverApiV3.get).mockImplementation(async (path: string) => {
+      if (path !== "/help/thread") return detail;
+      return {
+        result: true,
+        data: [
+          {
+            threadIdx: 1,
+            sequence: 1,
+            viewing: null,
+            toUserIdx: 1,
+            fmUserIdx: 77,
+            campaignIdx: 10,
+            finishTime: null,
+            created: "2026-10-01T10:00:00",
+            boardType: true,
+            status: "WAITING",
+            messages: [
+              {
+                ...message(1, campaignJson, false, "2026-10-01T10:00:00"),
+                auto: true,
+              },
+              message(2, "배송이 언제 되나요?", false, "2026-10-01T10:01:00"),
+            ],
+          },
+        ],
+      };
+    });
+    renderPanels();
+    expect(await screen.findByText("배송이 언제 되나요?")).toBeInTheDocument();
+    expect(screen.queryByText(/campaignCode/)).not.toBeInTheDocument();
   });
 
   it("상세 정보를 문의 상세 API로 보여 준다", async () => {
@@ -165,103 +209,10 @@ describe("구매자 문의 오른쪽 패널", () => {
     expect(
       screen.getByRole("button", { name: /20261001-0001/ }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "instagram" })).toHaveAttribute(
+    expect(screen.getByRole("link", { name: "bigbird" })).toHaveAttribute(
       "href",
       "https://instagram.com/bigbird",
     );
-  });
-
-  it("상담 기록을 열고 닫는다", async () => {
-    const user = userEvent.setup();
-    const router = renderPanels();
-    await user.click(screen.getByRole("button", { name: "상담 기록" }));
-    expect(router.state.location.search).toBe("?status=done&panel=history");
-    const history = screen.getByRole("region", { name: "상담 기록" });
-    expect(
-      await within(history).findByText("배송이 언제 되나요?"),
-    ).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "상담 기록 닫기" }));
-    expect(router.state.location.search).toBe("?status=done");
-  });
-
-  it("상담 기록은 과거 상담(스레드)별로 날짜·캠페인 카드·대화를 보여 주고 삭제된 메시지는 안내로 바꾼다", async () => {
-    const user = userEvent.setup();
-    const aThread = (
-      threadIdx: number,
-      created: string,
-      campaignIdx: number,
-      body: string,
-      deleteTime: string | null = null,
-    ) => ({
-      threadIdx,
-      sequence: threadIdx,
-      viewing: null,
-      toUserIdx: 1,
-      fmUserIdx: 77,
-      campaignIdx,
-      finishTime: "2026-10-05T10:00:00",
-      created,
-      boardType: true,
-      status: "ANSWERED",
-      messages: [{ ...message(threadIdx, body, false, created), deleteTime }],
-    });
-    vi.mocked(serverApiV3.get).mockImplementation(async (path: string) => {
-      if (path === "/help/thread")
-        return {
-          result: true,
-          data: [
-            aThread(2, "2026-10-08T10:00:00", 11, "두 번째 상담 질문"),
-            aThread(1, "2026-10-01T10:00:00", 10, "첫 번째 상담 질문"),
-            aThread(
-              3,
-              "2026-10-09T10:00:00",
-              11,
-              "지운 글",
-              "2026-10-09T11:00:00",
-            ),
-          ],
-        };
-      if (path === "/help/c-client-campaign")
-        return {
-          result: true,
-          list: [
-            {
-              campaignIdx: 10,
-              campaignCode: "C-10",
-              brandName: "빅버드",
-              productName: "첫 캠페인",
-              mainImageUrl: null,
-              progressStartDate: "2026.01.01",
-              progressEndDate: "2026.12.31",
-            },
-            {
-              campaignIdx: 11,
-              campaignCode: "C-11",
-              brandName: "빅버드",
-              productName: "둘째 캠페인",
-              mainImageUrl: null,
-              progressStartDate: "2026.01.01",
-              progressEndDate: "2026.12.31",
-            },
-          ],
-        };
-      return detail;
-    });
-    renderPanels(77);
-    await user.click(screen.getByRole("button", { name: "상담 기록" }));
-    const history = screen.getByRole("region", { name: "상담 기록" });
-    const first = await within(history).findByText("첫 번째 상담 질문");
-    const second = within(history).getByText("두 번째 상담 질문");
-    // 오래된 상담이 위에 옴.
-    expect(
-      first.compareDocumentPosition(second) & Node.DOCUMENT_POSITION_FOLLOWING,
-    ).toBeTruthy();
-    expect(await within(history).findByText("첫 캠페인")).toBeInTheDocument();
-    expect(within(history).getAllByText("둘째 캠페인")).toHaveLength(2);
-    expect(
-      within(history).getByText("메시지가 삭제되었습니다."),
-    ).toBeInTheDocument();
-    expect(within(history).queryByText("지운 글")).not.toBeInTheDocument();
   });
 
   it("모바일 상세를 URL로 열고 목록으로 돌아갈 때 상태를 유지한다", async () => {
@@ -368,14 +319,14 @@ describe("구매자 문의 오른쪽 패널", () => {
       return detail;
     });
     renderPanels(77);
-    const product = await screen.findByAltText("[빅버드]여섯별 스킨케어 세트");
+    const product = await screen.findByAltText("빅버드 여섯별 스킨케어 세트");
     expect(product).toHaveAttribute("src", "https://img/product.jpg");
-    expect(screen.getByAltText("[빅버드]스킨케어 캠페인")).toHaveAttribute(
+    expect(screen.getByAltText("빅버드 스킨케어 캠페인")).toHaveAttribute(
       "src",
       "https://img/banner.jpg",
     );
     expect(
-      screen.getAllByText("[빅버드]스킨케어 캠페인").length,
+      screen.getAllByText("빅버드 스킨케어 캠페인").length,
     ).toBeGreaterThan(0);
     expect(serverApiV3.get).toHaveBeenCalledWith(
       "/help/c-purchaser-questionInfo/20261001-0001",
@@ -392,5 +343,28 @@ describe("구매자 문의 오른쪽 패널", () => {
     expect(await screen.findByText("haru@email.com")).toBeInTheDocument();
     expect(screen.getByText("39,800원")).toBeInTheDocument();
     expect(screen.queryByRole("img")).not.toBeInTheDocument();
+  });
+
+  it("상품·캠페인 목록에서 못 찾으면 상세 응답의 대표 이미지와 이름으로 채운다", async () => {
+    vi.mocked(serverApiV3.get).mockImplementation(async (path: string) => {
+      if (path === "/help/thread") return { result: true, data: [] };
+      if (path === "/help/inquiry/501") {
+        return {
+          ...detail,
+          mainImageUrl: "https://cdn/shop.png",
+          brandName: "빅버드",
+          productName: "스킨케어 세트",
+        };
+      }
+      throw new Error("500");
+    });
+    renderPanels(77);
+    // 주문 섹션과 캠페인 섹션 모두 같은 이미지·이름으로 채워진다.
+    expect(await screen.findAllByText("빅버드 스킨케어 세트")).toHaveLength(2);
+    const images = screen.getAllByRole("img", {
+      name: "빅버드 스킨케어 세트",
+    });
+    expect(images).toHaveLength(2);
+    expect(images[0]).toHaveAttribute("src", "https://cdn/shop.png");
   });
 });

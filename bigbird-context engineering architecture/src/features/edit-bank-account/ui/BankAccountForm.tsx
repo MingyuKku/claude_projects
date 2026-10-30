@@ -29,6 +29,8 @@ interface BankAccountFormProps {
   banks: { idx: number; name: string }[];
   /** 계좌 정보가 서버에 반영된 뒤 호출. 화면이 정보를 다시 읽음. */
   onSaved: () => void;
+  /** 수정 모드를 끝낼 때 호출: 취소를 누르거나, 모두 저장에 성공했을 때. */
+  onFinishEdit?: () => void;
 }
 
 // Figma 계좌정보(6925:68046): 라벨 왼쪽·입력 오른쪽 표(MO는 위·아래), 하단 취소·저장. 은행은 시안의 입력칸 대신 Select(사용자 확인).
@@ -36,6 +38,7 @@ export function BankAccountForm({
   account,
   banks,
   onSaved,
+  onFinishEdit,
 }: BankAccountFormProps) {
   const { t } = useTranslation("features/edit-bank-account");
   const { t: tCommon } = useTranslation();
@@ -65,6 +68,7 @@ export function BankAccountForm({
     setValues(toBankFormValues(account, banks));
     setBankBook(null);
     setFileError(null);
+    onFinishEdit?.();
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -80,6 +84,7 @@ export function BankAccountForm({
       setBankBook(null);
       setFileError(null);
       toast(tCommon("feedback.saved"));
+      onFinishEdit?.();
       return;
     }
 
@@ -93,17 +98,18 @@ export function BankAccountForm({
     }
   }
 
+  // 서버가 파일명을 주지 않는 기존 등록분은 "등록됨"으로 보임.
   const bankFileName =
     bankBook?.name ??
-    (uploadedName || (account?.hasBankBookFile ? t("file.registered") : ""));
+    (uploadedName ||
+      account?.bankBookFileName ||
+      (account?.hasBankBookFile ? t("file.registered") : ""));
 
   return (
     <form onSubmit={handleSubmit} noValidate>
       <section className="flex flex-col gap-4">
-        {/* PC·TAB 시안에는 제목이 없고 MO에만 있어 태블릿 이상에서는 화면 낭독용으로만 둠. */}
-        <h2 className="text-base leading-none font-semibold text-foreground tablet:sr-only">
-          {t("title")}
-        </h2>
+        {/* 보기·수정 시안 모두 제목이 없어 화면 낭독용으로만 둠. */}
+        <h2 className="sr-only">{t("title")}</h2>
         <Card>
           <div className="flex flex-col p-3 pb-3.5 tablet:p-5 tablet:pb-3">
             <div className="flex flex-col gap-2 p-3.5 tablet:gap-0 tablet:p-0">

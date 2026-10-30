@@ -1,5 +1,5 @@
 {
-  "title": "Edit info",
+  "title": "Bank account",
   "form": {
     "bank": "Bank",
     "accountNumber": "Account number",
@@ -12,10 +12,16 @@
     "registered": "Registered",
     "error": {
       "extension": "Only JPG, PNG and PDF files are allowed.",
-      "size": "Max file size is 10MB."
-    }
+      "size": "Max file size is 10MB.",
+      "download": "Couldn't download the file. Please try again."
+    },
+    "none": "No file",
+    "download": "Download {{name}}"
   },
   "toast": {
     "denied": "Account info can't be changed during settlement (5th–10th of each month)."
+  },
+  "view": {
+    "register": "Register"
   }
 }

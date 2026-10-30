@@ -14,6 +14,12 @@ export const serverApiV3 = createHttpClient(`${ENV.apiServerUrl}/v3`);
 /** Member backend: sign-up, id/password lookup, identity verification. */
 export const memberApi = createHttpClient(ENV.apiMemberUrl);
 
+/**
+ * 결제 서버(bigbird-pay-be). 세션 쿠키 없이 요청함(v2와 같음, `withCredentials: false`): 이 서버는 광고주 세션이 아니라
+ * `/v3/mypage/biz-money/init`이 준 암호화된 사용자 값으로 사용자를 알아보고, 쿠키를 보내면 CORS가 막힐 수 있음.
+ */
+export const payApi = createHttpClient(ENV.apiPayUrl, { credentials: "omit" });
+
 /** Social-login relay shared by Kakao, Naver, Google and Apple. */
 export const socialApi = createHttpClient(ENV.apiSocialUrl);
 

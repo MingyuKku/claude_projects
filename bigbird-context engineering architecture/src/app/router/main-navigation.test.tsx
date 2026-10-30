@@ -2,15 +2,32 @@ import { act, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { toast } from "sonner";
 
-import { ApiError, serverApi } from "@/shared/api";
+import { ApiError, serverApi, serverApiV3 } from "@/shared/api";
 import { ROUTES } from "@/shared/config";
 import { hardNavigate } from "@/shared/lib";
 
-import { renderRoute } from "./test-utils";
+import {
+  mockSession,
+  mockSessionError,
+  mockSessionErrorOnce,
+  mockSessionPending,
+  renderRoute,
+  resetSession,
+} from "./test-utils";
+
+// 이 파일은 펼친 PC LNB에서 셸 동작을 검증함. LNB 기본은 접힘이고(sidebar-store), 저장된 상태는 스토어를 불러올 때
+// localStorage에서 복원되므로 모듈을 불러오기 전에 "펼쳐 둔 사용자" 상태를 저장해 둠.
+vi.hoisted(() => {
+  localStorage.setItem(
+    "bigbird:sidebar",
+    JSON.stringify({ state: { isCollapsed: false }, version: 0 }),
+  );
+});
 
 vi.mock("@/shared/api", async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   serverApi: { get: vi.fn(), post: vi.fn() },
+  serverApiV3: { get: vi.fn() },
 }));
 
 vi.mock("@/shared/lib", async (importOriginal) => ({
@@ -35,7 +52,7 @@ const session = {
 
 beforeEach(() => {
   vi.mocked(hardNavigate).mockClear();
-  vi.mocked(serverApi.get).mockReset().mockResolvedValue(session);
+  resetSession(session);
   vi.mocked(serverApi.post)
     .mockReset()
     .mockResolvedValue({ result: true, authority: "ADMIN", userIdx: 1 });
@@ -52,7 +69,7 @@ describe("루트 메인과 공통 메뉴", () => {
       await screen.findByRole("heading", { name: "홈" }),
     ).toBeInTheDocument();
     expect(router.state.location.pathname).toBe("/");
-    expect(serverApi.get).toHaveBeenCalledWith("/sec", {
+    expect(serverApiV3.get).toHaveBeenCalledWith("/sec", {
       headers: { "X-Path": "/" },
     });
     const nav = screen.getByRole("navigation", { name: "주 메뉴" });
@@ -72,7 +89,7 @@ describe("루트 메인과 공통 메뉴", () => {
   });
 
   it("미인증 홈은 외부 redirectTo를 무시하고 비로그인 헤더를 보여준다", async () => {
-    vi.mocked(serverApi.get).mockRejectedValue(
+    mockSessionError(
       new ApiError(401, {
         result: false,
         redirectTo: "https://stage.member.bigbird.co.kr/client",
@@ -114,9 +131,7 @@ describe("루트 메인과 공통 메뉴", () => {
   });
 
   it("세션 조회 장애에도 홈 본문과 비로그인 헤더를 보여 주고 토스트로 재시도할 수 있다", async () => {
-    vi.mocked(serverApi.get)
-      .mockRejectedValueOnce(new ApiError(500, undefined))
-      .mockResolvedValue(session);
+    mockSessionErrorOnce(new ApiError(500, undefined));
     const router = await renderRoute(ROUTES.main);
     expect(
       await screen.findByRole("heading", { level: 2 }),
@@ -144,12 +159,7 @@ describe("루트 메인과 공통 메뉴", () => {
   });
 
   it("세션 확인 중에는 비로그인 UI 위에 전체 오버레이와 스피너를 덮는다", async () => {
-    let resolveSession: (value: typeof session) => void = () => {};
-    vi.mocked(serverApi.get).mockReturnValue(
-      new Promise((resolve) => {
-        resolveSession = resolve;
-      }),
-    );
+    const resolveSession = mockSessionPending();
     await renderRoute(ROUTES.main);
     expect(
       await screen.findByRole("status", { name: "로그인 상태 확인 중" }),
@@ -161,6 +171,46 @@ describe("루트 메인과 공통 메뉴", () => {
       await screen.findByRole("button", { name: "내 프로필" }),
     ).toBeInTheDocument();
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
+  });
+
+  it("LNB 하위 메뉴 그룹은 접힌 상태가 기본이고, 현재 화면의 그룹만 펼친다", async () => {
+    await renderRoute(ROUTES.main);
+    const [support] = await screen.findAllByText("고객센터", {
+      selector: "summary span",
+    });
+    expect(support?.closest("details")).not.toHaveAttribute("open");
+  });
+
+  it("인플루언서 관리·채팅은 비로그인이 누르면 로그인 안내 알럿을 띄우고, 로그인하면 준비 중으로 비활성이다", async () => {
+    mockSessionError(new ApiError(401, { result: false }));
+    const user = userEvent.setup();
+    const router = await renderRoute(ROUTES.main);
+    const nav = await screen.findByRole("navigation", { name: "주 메뉴" });
+    await user.click(
+      within(nav).getByRole("link", { name: "인플루언서 관리" }),
+    );
+    const alert = await screen.findByRole("alertdialog");
+    expect(within(alert).getByText("로그인 필요")).toBeInTheDocument();
+    await user.click(within(alert).getByRole("button", { name: "취소" }));
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+    await user.click(within(nav).getByRole("link", { name: "채팅" }));
+    await user.click(
+      within(await screen.findByRole("alertdialog")).getByRole("button", {
+        name: "로그인하러 가기",
+      }),
+    );
+    await waitFor(() => expect(router.state.location.pathname).toBe("/login"));
+  });
+
+  it("로그인한 사용자에게 인플루언서 관리·채팅은 준비 중으로 비활성이다", async () => {
+    await renderRoute(ROUTES.main);
+    const nav = await screen.findByRole("navigation", { name: "주 메뉴" });
+    for (const name of ["인플루언서 관리", "채팅"]) {
+      expect(within(nav).getByRole("link", { name })).toHaveAttribute(
+        "aria-disabled",
+        "true",
+      );
+    }
   });
 
   it("PC LNB를 접었다 다시 펼칠 수 있다", async () => {
@@ -186,7 +236,7 @@ describe("루트 메인과 공통 메뉴", () => {
   });
 
   it("ADMIN이 아닌 로그인 사용자의 로고는 홈으로 이동한다", async () => {
-    vi.mocked(serverApi.get).mockResolvedValue({
+    mockSession({
       ...session,
       authority: "MASTER",
     });
@@ -197,9 +247,7 @@ describe("루트 메인과 공통 메뉴", () => {
   });
 
   it("비로그인의 로고는 홈으로 이동한다", async () => {
-    vi.mocked(serverApi.get).mockRejectedValue(
-      new ApiError(401, { result: false }),
-    );
+    mockSessionError(new ApiError(401, { result: false }));
     await renderRoute(ROUTES.main);
     expect(
       await screen.findByRole("link", { name: "빅버드 · 홈" }),
@@ -207,9 +255,7 @@ describe("루트 메인과 공통 메뉴", () => {
   });
 
   it("비로그인의 이용 가이드는 헤더에만 있고 LNB에는 없다", async () => {
-    vi.mocked(serverApi.get).mockRejectedValue(
-      new ApiError(401, { result: false }),
-    );
+    mockSessionError(new ApiError(401, { result: false }));
     await renderRoute(ROUTES.main);
     const header = await screen.findByRole("banner");
     expect(
@@ -266,7 +312,7 @@ describe("루트 메인과 공통 메뉴", () => {
   });
 
   it("전체 메뉴의 로고를 누르면 메뉴가 닫힌다", async () => {
-    vi.mocked(serverApi.get).mockResolvedValue({
+    mockSession({
       ...session,
       authority: "MASTER",
     });
@@ -337,9 +383,7 @@ describe("루트 메인과 공통 메뉴", () => {
 
 describe("홈 본문과 검색 경로", () => {
   it("/ 에서 홈 본문이 로그인 여부와 관계없이 보인다", async () => {
-    vi.mocked(serverApi.get).mockRejectedValue(
-      new ApiError(401, { result: false }),
-    );
+    mockSessionError(new ApiError(401, { result: false }));
     await renderRoute(ROUTES.main);
     expect(await screen.findByRole("heading", { level: 2 })).toHaveTextContent(
       "AI가 딱 맞는 인플루언서를 찾아드려요",
@@ -369,11 +413,11 @@ describe("홈 본문과 검색 경로", () => {
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
       "인플루언서 매칭",
     );
-    // 인플루언서 매칭 그룹이 펼쳐지고 "검색"이 현재 위치로 표시된다.
+    // 인플루언서 매칭 그룹이 펼쳐지고 "인플루언서 검색"이 현재 위치로 표시된다.
     expect(
       within(screen.getByRole("navigation", { name: "주 메뉴" })).getByRole(
         "link",
-        { name: "검색" },
+        { name: "인플루언서 검색" },
       ),
     ).toHaveAttribute("aria-current", "page");
     expect(
@@ -385,9 +429,7 @@ describe("홈 본문과 검색 경로", () => {
   });
 
   it("비로그인도 검색 경로로 이동한다", async () => {
-    vi.mocked(serverApi.get).mockRejectedValue(
-      new ApiError(401, { result: false }),
-    );
+    mockSessionError(new ApiError(401, { result: false }));
     const user = userEvent.setup();
     const router = await renderRoute(ROUTES.main);
     await user.type(await screen.findByRole("textbox"), "스킨케어");

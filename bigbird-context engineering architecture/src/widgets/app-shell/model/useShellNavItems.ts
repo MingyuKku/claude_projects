@@ -20,10 +20,8 @@ export function useShellNavItems(activeNavId?: ShellNavId) {
   const items = SHELL_NAV_ITEMS.map((item) => ({
     ...item,
     label: t(`nav.${item.id}`),
-    // 현재 화면이 하위 메뉴이면 그 그룹을 펼쳐 둠.
-    isDefaultOpen:
-      item.isDefaultOpen ||
-      item.subItems?.some((subItem) => isCurrent(subItem.href)),
+    // 그룹은 접힌 상태가 기본이고(디자인팀 QA 2026-10-28), 현재 화면이 그 하위 메뉴일 때만 펼쳐 위치를 보여 줌.
+    isDefaultOpen: item.subItems?.some((subItem) => isCurrent(subItem.href)),
     // activeNavId가 있으면 그 메뉴만 활성(시안이 없는 화면을 임시로 특정 메뉴 아래에 둘 때).
     isActive: activeNavId ? item.id === activeNavId : isCurrent(item.href),
     subItems: item.subItems?.map((subItem) => ({

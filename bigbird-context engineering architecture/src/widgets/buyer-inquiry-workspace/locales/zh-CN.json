@@ -1,6 +1,5 @@
 {
   "listTitle": "咨询列表",
-  "refresh": "刷新",
   "all": "全部",
   "waiting": "待回复",
   "done": "已回复",
@@ -17,9 +16,7 @@
   "unknownWriter": "无名称",
   "conversation": "对话",
   "detail": "详细信息",
-  "history": "咨询记录",
   "backToList": "返回列表",
-  "closeHistory": "关闭记录",
   "closeDetail": "关闭详情",
   "advertiser": "广告主",
   "messagePlaceholder": "输入咨询内容（最多3,000字）",
@@ -35,6 +32,7 @@
     "campaignPlaceholder": "选择活动",
     "influencer": "达人",
     "influencerPlaceholder": "选择达人",
+    "influencerSearchPlaceholder": "搜索达人",
     "campaignFallback": "活动 {{idx}}",
     "influencerFallback": "达人 {{idx}}",
     "removeChip": "取消{{name}}",
@@ -60,7 +58,7 @@
   "shopCode": "店铺代码",
   "influencer": "网红",
   "detailError": "无法加载详情。",
-  "copied": "已复制。",
+  "copied": "已复制到剪贴板。",
   "copyFailed": "复制失败。",
   "won": "{{amount}}韩元",
   "conversationError": "无法加载对话。",
@@ -79,7 +77,5 @@
     "deleteTitle": "删除该回复？",
     "deleteDescription": "删除后无法恢复。"
   },
-  "historyEmpty": "暂无咨询记录。",
-  "copyCampaignCode": "复制活动代码",
   "messageDeleted": "消息已删除。"
 }

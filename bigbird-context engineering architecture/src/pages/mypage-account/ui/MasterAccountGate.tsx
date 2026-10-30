@@ -1,7 +1,6 @@
 import { useMasterAccount } from "@/entities/account";
-import { EmptyState } from "@/shared/components/empty-state";
-import { useTranslation } from "@/shared/i18n";
-import { Button } from "@/shared/ui/button";
+
+import { LoadFailedState } from "./LoadFailedState";
 
 import type { MasterAccountViewModel } from "@/entities/account";
 import type { ReactNode } from "react";
@@ -16,24 +15,12 @@ export function MasterAccountGate({
   skeleton,
   children,
 }: MasterAccountGateProps) {
-  const { t: tCommon } = useTranslation();
   const { master, isLoading, isError, mutate } = useMasterAccount(true);
 
   if (isLoading) return skeleton;
 
   if (isError || !master) {
-    return (
-      <EmptyState
-        type="alarm"
-        title={tCommon("error.unexpected")}
-        className="py-20"
-        action={
-          <Button variant="outline" onClick={() => void mutate()}>
-            {tCommon("action.retry")}
-          </Button>
-        }
-      />
-    );
+    return <LoadFailedState onRetry={() => void mutate()} />;
   }
 
   return children(master, () => void mutate());

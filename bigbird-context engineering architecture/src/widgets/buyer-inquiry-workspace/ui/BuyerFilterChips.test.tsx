@@ -95,7 +95,7 @@ describe("구매자 목록 적용된 필터 칩", () => {
     renderWorkspace("?campaignIdx=10&influencerThreadUserIdx=5");
     expect(
       await screen.findByRole("button", {
-        name: "[빅버드]스킨케어 캠페인 조건 해제",
+        name: "빅버드 스킨케어 캠페인 조건 해제",
       }),
     ).toBeInTheDocument();
     expect(
@@ -131,7 +131,7 @@ describe("구매자 목록 적용된 필터 칩", () => {
     const router = renderWorkspace("?campaignIdx=10&influencerThreadUserIdx=5");
     await user.click(
       await screen.findByRole("button", {
-        name: "[빅버드]스킨케어 캠페인 조건 해제",
+        name: "빅버드 스킨케어 캠페인 조건 해제",
       }),
     );
     await waitFor(() => expect(router.state.location.search).toBe(""));

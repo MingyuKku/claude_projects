@@ -23,7 +23,9 @@ describe("새 문의 UI", () => {
       screen.getByRole("columnheader", { name: "기간" }),
     ).toBeInTheDocument();
     // 캠페인이 없으면 안내 문구를 보여 주고 유형 카드 외 입력을 막음.
-    expect(screen.getByText("신청하신 캠페인이 없습니다.")).toBeInTheDocument();
+    expect(
+      screen.getByText("캠페인 내역이 존재하지 않습니다."),
+    ).toBeInTheDocument();
     expect(
       screen.getByRole("radio", { name: /^실시간 상담하기/ }),
     ).toBeDisabled();
@@ -98,7 +100,7 @@ describe("새 문의 UI", () => {
 
     expect(screen.getByText("문제가 발생했습니다")).toBeInTheDocument();
     expect(
-      screen.queryByText("신청하신 캠페인이 없습니다."),
+      screen.queryByText("캠페인 내역이 존재하지 않습니다."),
     ).not.toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "다시 시도" }));
     expect(onClickRetryCampaigns).toHaveBeenCalledOnce();
@@ -140,7 +142,7 @@ describe("첨부", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("허용하지 않는 형식은 담지 않고 확인 하나만 있는 안내를 띄운다", async () => {
+  it("허용하지 않는 형식은 담지 않고 취소·확인이 있는 안내를 띄운다", async () => {
     const user = userEvent.setup({ applyAccept: false });
     render(<NewBigbirdInquiryForm campaigns={campaigns} />);
     await user.upload(fileInput(), new File(["x"], "a.gif"));
@@ -149,10 +151,12 @@ describe("첨부", () => {
     expect(
       screen.queryByRole("img", { name: "a.gif" }),
     ).not.toBeInTheDocument();
-    expect(
-      screen.queryByRole("button", { name: "취소" }),
-    ).not.toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "확인" }));
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+
+    await user.upload(fileInput(), new File(["x"], "a.gif"));
+    await screen.findByRole("alertdialog");
+    await user.click(screen.getByRole("button", { name: "취소" }));
     expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
   });
 

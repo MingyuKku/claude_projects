@@ -10,7 +10,8 @@ import type { ReactNode } from "react";
 // 각 영역은 슬롯이라 Default(새 문의 버튼 + 탭)와 Search(검색 + 필터 + 탭) 구성을 모두 만듦.
 interface ChatListPanelProps {
   title: string;
-  refreshLabel: string;
+  /** 새로고침 버튼. 둘 다 주어질 때만 보임(구매자 문의 목록은 시안에 없음). */
+  refreshLabel?: string;
   onClickRefresh?: () => void;
   /** 헤더 오른쪽 동작(예: 새 문의 버튼). */
   action?: ReactNode;
@@ -47,31 +48,36 @@ export function ChatListPanel({
         className,
       )}
     >
-      <header className="flex h-15 shrink-0 items-center justify-between px-5 py-3">
+      {/* MO는 Header / Sub / Mobile(54, 위 8·아래 12·좌우 16), 이후 검색·칩·탭 줄도 좌우 16·탭 위 8 */}
+      <header className="flex h-13.5 shrink-0 items-center justify-between px-4 pt-2 pb-3 tablet:h-15 tablet:px-5 tablet:py-3">
         <div className="flex items-center gap-1">
           <h2 className="text-base leading-none font-semibold text-foreground">
             {title}
           </h2>
-          <Button
-            variant="ghost-foreground"
-            size="icon-xs"
-            aria-label={refreshLabel}
-            onClick={onClickRefresh}
-          >
-            <RotateCcw />
-          </Button>
+          {refreshLabel && onClickRefresh && (
+            <Button
+              variant="ghost-foreground"
+              size="icon-xs"
+              aria-label={refreshLabel}
+              onClick={onClickRefresh}
+            >
+              <RotateCcw />
+            </Button>
+          )}
         </div>
         {action}
       </header>
       {search && (
-        <div className="flex shrink-0 items-center gap-2 px-5 pb-2">
+        <div className="flex shrink-0 items-center gap-2 px-4 pb-2 tablet:px-5">
           {search}
         </div>
       )}
       {filters && (
-        <div className="flex shrink-0 flex-wrap gap-2 px-5 py-2">{filters}</div>
+        <div className="flex shrink-0 flex-wrap gap-2 px-4 py-2 tablet:px-5">
+          {filters}
+        </div>
       )}
-      {tabs && <div className="shrink-0 px-4 pt-3 pb-2">{tabs}</div>}
+      {tabs && <div className="shrink-0 px-4 py-2 tablet:pt-3">{tabs}</div>}
       {isEmpty ? (
         <div className="flex min-h-0 flex-1 items-center justify-center">
           {empty}

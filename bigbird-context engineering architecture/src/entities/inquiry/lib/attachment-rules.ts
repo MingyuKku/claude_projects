@@ -1,16 +1,27 @@
 const MB = 1024 * 1024;
 
-// Figma·사용자 확인(2026-10-14, 스펙 "입력 제한")과 서버 지원 한도(이미지 30MB·10개, 동영상 50MB·5개).
+// 요구명세서 REQ-23-0009·0018과 사용자 결정(2026-10-29): 이미지 30MB·10개, 동영상 50MB·5개, 문서도 받음.
+// ponytail: 문서 한도는 명세에 없고 서버도 크기를 막지 않아(31MB 업로드 성공) 크기 제한 없이 개수 합계에만 넣음.
+// 한도가 정해지면 maxBytes를 넣고 오류 문구를 추가함.
 export const ATTACHMENT_LIMITS = {
   image: {
     extensions: ["jpg", "jpeg", "png", "webp"],
     maxBytes: 30 * MB,
     maxCount: 10,
   },
-  video: { extensions: ["mp4"], maxBytes: 50 * MB, maxCount: 5 },
+  video: {
+    extensions: ["avi", "mp4", "mov", "mpeg"],
+    maxBytes: 50 * MB,
+    maxCount: 5,
+  },
+  file: {
+    extensions: ["pdf", "txt", "doc", "docx", "xls", "xlsx", "ppt", "pptx"],
+    maxBytes: Number.POSITIVE_INFINITY,
+    maxCount: 10,
+  },
 } as const;
 
-/** 한 번에 담을 수 있는 파일 수(이미지·동영상 합계). 동영상은 그중 `video.maxCount`개까지(사용자 지시 2026-10-20). */
+/** 한 번에 담을 수 있는 파일 수(이미지·동영상·문서 합계). 동영상은 그중 `video.maxCount`개까지(사용자 지시 2026-10-20). */
 export const ATTACHMENT_TOTAL_MAX_COUNT = 10;
 
 export type AttachmentKind = keyof typeof ATTACHMENT_LIMITS;
@@ -42,7 +53,7 @@ export function checkAttachments(
   current: readonly Pick<File, "name" | "size">[],
   incoming: readonly Pick<File, "name" | "size">[],
 ): AttachmentError | null {
-  const counts = { image: 0, video: 0 };
+  const counts = { image: 0, video: 0, file: 0 };
   for (const file of current) {
     const kind = getAttachmentKind(file);
     if (kind) counts[kind] += 1;
@@ -55,7 +66,7 @@ export function checkAttachments(
     counts[kind] += 1;
   }
   if (counts.video > ATTACHMENT_LIMITS.video.maxCount) return "videoCount";
-  if (counts.image + counts.video > ATTACHMENT_TOTAL_MAX_COUNT)
+  if (counts.image + counts.video + counts.file > ATTACHMENT_TOTAL_MAX_COUNT)
     return "imageCount";
   return null;
 }

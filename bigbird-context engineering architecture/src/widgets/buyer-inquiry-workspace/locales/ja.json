@@ -1,6 +1,5 @@
 {
   "listTitle": "お問い合わせ一覧",
-  "refresh": "更新",
   "all": "すべて",
   "waiting": "返信待ち",
   "done": "回答済み",
@@ -17,9 +16,7 @@
   "unknownWriter": "名前なし",
   "conversation": "会話",
   "detail": "詳細情報",
-  "history": "相談履歴",
   "backToList": "一覧に戻る",
-  "closeHistory": "履歴を閉じる",
   "closeDetail": "詳細を閉じる",
   "advertiser": "広告主",
   "messagePlaceholder": "お問い合わせ内容を入力（最大3,000字）",
@@ -35,6 +32,7 @@
     "campaignPlaceholder": "キャンペーンを選択",
     "influencer": "インフルエンサー",
     "influencerPlaceholder": "インフルエンサーを選択",
+    "influencerSearchPlaceholder": "インフルエンサーを検索",
     "campaignFallback": "キャンペーン {{idx}}",
     "influencerFallback": "インフルエンサー {{idx}}",
     "removeChip": "{{name}}を解除",
@@ -60,7 +58,7 @@
   "shopCode": "ショップコード",
   "influencer": "インフルエンサー",
   "detailError": "詳細を読み込めませんでした。",
-  "copied": "コピーしました。",
+  "copied": "クリップボードにコピーしました。",
   "copyFailed": "コピーできませんでした。",
   "won": "{{amount}}ウォン",
   "conversationError": "会話を読み込めませんでした。",
@@ -79,7 +77,5 @@
     "deleteTitle": "返信を削除しますか?",
     "deleteDescription": "削除した返信は元に戻せません。"
   },
-  "historyEmpty": "相談履歴がありません。",
-  "copyCampaignCode": "キャンペーンコードをコピー",
   "messageDeleted": "メッセージが削除されました。"
 }

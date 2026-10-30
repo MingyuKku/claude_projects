@@ -1,9 +1,10 @@
-import { useState } from "react";
 import { toast } from "sonner";
 
 import { SOCIAL_PROVIDERS } from "@/entities/account";
 import { SectionCard } from "@/shared/components/section-card";
 import { useTranslation } from "@/shared/i18n";
+import { useDialogTarget } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import { Switch } from "@/shared/ui/switch";
 
 import { SocialIcon } from "./SocialIcon";
@@ -22,7 +23,7 @@ interface SocialLinkCardProps {
 export function SocialLinkCard({ links, className }: SocialLinkCardProps) {
   const { t } = useTranslation("features/link-social-account");
   const { t: tCommon } = useTranslation();
-  const [unlinkTarget, setUnlinkTarget] = useState<SocialProvider | null>(null);
+  const unlinkDialog = useDialogTarget<SocialProvider>();
 
   function notifyComingSoon() {
     toast(tCommon("status.comingSoon"));
@@ -30,11 +31,14 @@ export function SocialLinkCard({ links, className }: SocialLinkCardProps) {
 
   function handleChangeLink(provider: SocialProvider, next: boolean) {
     if (next) notifyComingSoon();
-    else setUnlinkTarget(provider);
+    else unlinkDialog.open(provider);
   }
 
   return (
-    <SectionCard title={t("title")} className={className}>
+    <SectionCard
+      title={t("title")}
+      className={cn("gap-3 tablet:gap-4", className)}
+    >
       <ul className="flex flex-col p-3 tablet:p-5">
         {SOCIAL_PROVIDERS.map((provider) => {
           const name = t(`provider.${provider}`);
@@ -58,10 +62,11 @@ export function SocialLinkCard({ links, className }: SocialLinkCardProps) {
         })}
       </ul>
       <UnlinkSocialDialog
-        provider={unlinkTarget}
-        onCancel={() => setUnlinkTarget(null)}
+        open={unlinkDialog.isOpen}
+        provider={unlinkDialog.target}
+        onCancel={unlinkDialog.close}
         onConfirm={() => {
-          setUnlinkTarget(null);
+          unlinkDialog.close();
           notifyComingSoon();
         }}
       />

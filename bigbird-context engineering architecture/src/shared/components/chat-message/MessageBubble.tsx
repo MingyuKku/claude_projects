@@ -12,7 +12,7 @@ const bubbleVariants = cva("rounded-lg text-foreground", {
     size: {
       lg: "max-w-125 px-4 py-2.5 text-base leading-6",
       md: "max-w-85 px-4 py-2.5 text-base leading-6",
-      sm: "max-w-50 px-3.5 py-2 text-sm leading-5",
+      sm: "max-w-50 px-3.5 py-2 text-sm leading-4 tablet:leading-5",
     },
   },
   defaultVariants: { side: "other", size: "lg" },
@@ -53,7 +53,10 @@ export function MessageBubble({
       <p
         className={cn(
           bubbleVariants({ side, size }),
-          "break-words whitespace-pre-wrap",
+          // Figma PC·MO 상대 말풍선(6756:34141 등)은 양쪽 정렬, TAB 작은 말풍선은 왼쪽 정렬입니다.
+          side === "other" && size !== "sm" && "text-justify",
+          // break-words는 최소 폭을 줄이지 않아 띄어쓰기 없는 긴 URL·JSON이 말풍선 밖으로 나갑니다.
+          "min-w-0 wrap-anywhere whitespace-pre-wrap",
         )}
       >
         {message}

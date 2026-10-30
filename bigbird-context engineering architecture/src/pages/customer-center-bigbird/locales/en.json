@@ -4,5 +4,6 @@
   "notFound": "Inquiry not found.",
   "loadError": "Couldn't load the inquiry.",
   "backToList": "Back to list",
-  "conversation": "Conversation"
+  "conversation": "Conversation",
+  "requestFailed": "Couldn't request a chat. Please try again."
 }

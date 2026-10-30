@@ -15,6 +15,8 @@ export interface UploadJob {
   /** 올리고 메시지까지 보낸 파일 수. 실패하면 이 다음 파일부터 이어서 보냄. */
   sentCount: number;
   status: UploadJobStatus;
+  /** 서버가 마지막으로 받은 스레드. 끝난 문의면 새 스레드라서 다시 시도할 때도 여기로 보냄. */
+  targetThreadIdx?: number;
 }
 
 interface UploadJobsState {
@@ -27,8 +29,13 @@ interface UploadJobsState {
 // 같은 문의에서 업로드가 겹쳐 돌지 않게 함.
 const running = new Set<number>();
 
-// 대화 캐시를 다시 받음(키: ["bigbird-inquiries", threadUserIdx, status], ["purchaser-messages", …]).
-const CONVERSATION_KEYS = ["bigbird-inquiries", "purchaser-messages"];
+// 대화 캐시를 다시 받음(키: ["bigbird-inquiries", threadUserIdx, status], ["purchaser-messages", …],
+// ["campaign-timeline", campaignIdx]). 캠페인 문의 대화는 타임라인을 먼저 보여 주므로 함께 갱신함.
+const CONVERSATION_KEYS = [
+  "bigbird-inquiries",
+  "purchaser-messages",
+  "campaign-timeline",
+];
 const revalidateInquiries = () =>
   void mutate(
     (key) => Array.isArray(key) && CONVERSATION_KEYS.includes(String(key[0])),
@@ -53,14 +60,17 @@ export const useInquiryUploadStore = create<UploadJobsState>()(
         running.add(threadIdx);
         try {
           patch(threadIdx, { status: "uploading" });
+          // 끝난 문의로 보내면 서버가 새 스레드를 만들어 그 번호를 돌려줌. 이어지는 파일은 그 스레드로 보내
+          // 파일마다 새 스레드가 생기지 않게 함.
+          let target = get().jobs[threadIdx]?.targetThreadIdx ?? threadIdx;
           for (;;) {
             const job = get().jobs[threadIdx];
             const file = job?.files[job.sentCount];
             if (!job || !file) break;
             const [error] = await tryit(async () => {
               const uploaded = await uploadInquiryAttachment(file);
-              await sendInquiryMessage({
-                threadIdx,
+              target = await sendInquiryMessage({
+                threadIdx: target,
                 body: uploaded.url,
                 attachmentIdx: uploaded.attachmentIdx,
               });
@@ -71,7 +81,10 @@ export const useInquiryUploadStore = create<UploadJobsState>()(
               revalidateInquiries();
               return;
             }
-            patch(threadIdx, { sentCount: job.sentCount + 1 });
+            patch(threadIdx, {
+              sentCount: job.sentCount + 1,
+              targetThreadIdx: target,
+            });
           }
           set((state) => {
             const jobs = { ...state.jobs };

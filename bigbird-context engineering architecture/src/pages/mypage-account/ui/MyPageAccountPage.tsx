@@ -1,27 +1,32 @@
 import { useOutletContext, useSearchParams } from "react-router";
 
+import { useSubAccount } from "@/features/manage-sub-accounts";
 import { NotificationConsentCards } from "@/features/notification-consent";
 import { WithdrawFlow } from "@/features/withdraw-account";
 import { EmptyState } from "@/shared/components/empty-state";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery, usePanelParam, useTabParam } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 
 import { getAccountTabs } from "../model/tabs";
 import { BankAccountTab } from "./BankAccountTab";
 import { CompanyInfoTab } from "./CompanyInfoTab";
-import { CreateSubAccountScreen } from "./CreateSubAccountScreen";
 import { MasterAccountTab } from "./MasterAccountTab";
+import { SubAccountFormScreen } from "./SubAccountFormScreen";
 import { SubAccountTab } from "./SubAccountTab";
 import { SubSelfTab } from "./SubSelfTab";
 
 import type { SubAccountLayout } from "./SubAccountTab";
 import type { SessionViewModel } from "@/entities/session";
 
-const SUB_PANELS = ["create", "permission", "withdraw"] as const;
+const SUB_PANELS = ["create", "permission", "edit", "withdraw"] as const;
 // 레이아웃 breakpoint는 홈과 같음(TAB 768~1439, PC 1440~).
 const TABLET_QUERY = "(min-width: 768px)";
 const DESKTOP_QUERY = "(min-width: 1440px)";
+// 모든 탭 본문이 공유하는 콘텐츠 폭. 시안(10061:200877)의 PC 1440 화면에서 본문 폭 1170을 최대 너비로 두고, 더 넓은 화면에서는
+// 가로 가운데 정렬함. 그보다 좁으면 가용 폭을 다 씀.
+const TAB_CONTENT_WIDTH_CLASS_NAME = "mx-auto w-full max-w-292.5";
 
 // 탭 본문을 구현한 탭. 나머지는 각 feature가 구현되기 전까지 "준비 중" 안내.
 const IMPLEMENTED_TABS: readonly string[] = [
@@ -39,24 +44,28 @@ export function MyPageAccountPage() {
   const { t: tCommon } = useTranslation();
   const session = useOutletContext<SessionViewModel>();
   const tabs = getAccountTabs(session.authority);
-  // 탭이 바뀌면 하위 화면(Sub ID 생성·권한 부여)과 목록 검색어·쪽 쿼리는 지움.
+  // 탭이 바뀌면 하위 화면(Sub ID 생성·권한 부여·수정)과 목록 검색어·쪽 쿼리는 지움.
   const { tab, setTab } = useTabParam({
     tabs,
     defaultTab: tabs[0],
     resetParams: ["panel", "subId", "keyword", "page"],
   });
 
-  // Sub ID 생성·권한 부여 하위 화면은 URL 쿼리(panel, subId)가 소유함(뒤로 가기로 닫히고 새로고침해도 유지).
+  // Sub ID 생성·권한 부여·수정 하위 화면은 URL 쿼리(panel, subId)가 소유함(뒤로 가기로 닫히고 새로고침해도 유지).
   const { panel, openPanel, closePanel } = usePanelParam({
     panels: SUB_PANELS,
     linkedParams: ["subId"],
   });
   const [searchParams] = useSearchParams();
   const subIdParam = Number(searchParams.get("subId"));
-  const permissionAccountIdx =
-    tab === "sub" && panel === "permission" && Number.isInteger(subIdParam)
+  const panelAccountIdx =
+    tab === "sub" &&
+    (panel === "permission" || panel === "edit") &&
+    Number.isInteger(subIdParam)
       ? subIdParam
       : null;
+  // 수정 대상은 지금 보이는 목록에 있는 Sub ID만 엶(지워졌거나 주소를 고친 subId는 열지 않음).
+  const editAccount = useSubAccount(panel === "edit" ? panelAccountIdx : null);
   const isDesktop = useMediaQuery(DESKTOP_QUERY);
   const isTabletUp = useMediaQuery(TABLET_QUERY);
   const subLayout: SubAccountLayout = isDesktop
@@ -64,10 +73,12 @@ export function MyPageAccountPage() {
     : isTabletUp
       ? "tablet"
       : "mobile";
-  const isCreateOpen = tab === "sub" && panel === "create";
+  const subPanel =
+    tab === "sub" &&
+    (panel === "create" || panel === "permission" || panel === "edit")
+      ? panel
+      : null;
   const isWithdrawOpen = tab === "master" && panel === "withdraw";
-  // 조회 API가 없어 목으로 그리는 화면(스펙 §1)은 개발 서버에서만 목을 쓰고, 빌드(stage·prod)에서는 "준비 중"을 보임.
-  const isMockDataEnabled = import.meta.env.DEV;
   const comingSoon = (
     <EmptyState
       type="construction"
@@ -86,15 +97,19 @@ export function MyPageAccountPage() {
     );
   }
 
-  // TAB의 Sub ID 생성은 탭 줄까지 덮는 본문 전체 화면(시안).
-  if (isCreateOpen && subLayout === "tablet") {
+  // TAB의 Sub ID 생성·수정은 탭 줄까지 덮는 본문 전체 화면(시안).
+  if (
+    subLayout === "tablet" &&
+    (subPanel === "create" || (subPanel === "edit" && editAccount))
+  ) {
     return (
       <>
         <title>{t("title")}</title>
-        <CreateSubAccountScreen
+        <SubAccountFormScreen
           variant="tablet"
+          account={editAccount ?? undefined}
           onClose={closePanel}
-          onCreated={closePanel}
+          onSaved={closePanel}
         />
       </>
     );
@@ -103,10 +118,12 @@ export function MyPageAccountPage() {
   return (
     <>
       <title>{t("title")}</title>
+      {/* --account-tabs-offset: 고정된 탭 줄 높이(위 여백 + 탭 36) + 탭 줄과 본문 사이 간격(gap). 본문 안의 요소로 스크롤할 때
+          탭 줄에 가리지 않게 쓰는 값이라, 탭 줄·gap을 바꾸면 함께 맞춤(TAB 8+36+20, PC 20+36+24). */}
       <Tabs
         value={tab}
         onValueChange={setTab}
-        className="gap-4 tablet:gap-5 desktop:gap-6"
+        className="min-h-full gap-4 [--account-tabs-offset:calc(var(--spacing)*16)] tablet:gap-5 desktop:gap-6 desktop:[--account-tabs-offset:calc(var(--spacing)*20)]"
       >
         {/* 탭 줄은 스크롤해도 화면 위에 고정함. 위 여백(MO·TAB 8px, PC 20px)은 고정 영역이 직접 가져 스크롤 내용이
             그 위로 비치지 않게 함. 모바일은 탭이 넘치면 가로로 스크롤하는데, 잘리는 위치가 콘텐츠 여백이 아니라
@@ -132,9 +149,12 @@ export function MyPageAccountPage() {
             key={accountTab}
             value={accountTab}
             // 셸이 아래 여백을 두지 않으므로 직접 둠. Sub ID 관리는 MO의 하단 고정 버튼이 바닥에 붙어야 해서 MO만 제외.
-            className={
-              accountTab === "sub" ? "tablet:pb-5" : "pb-4 tablet:pb-5"
-            }
+            className={cn(
+              TAB_CONTENT_WIDTH_CLASS_NAME,
+              accountTab === "sub"
+                ? "data-[state=active]:flex data-[state=active]:flex-col tablet:pb-5"
+                : "pb-4 tablet:pb-5",
+            )}
           >
             {accountTab === "master" && (
               <MasterAccountTab onClickWithdraw={() => openPanel("withdraw")} />
@@ -149,20 +169,20 @@ export function MyPageAccountPage() {
             {accountTab === "sub" && (
               <SubAccountTab
                 layout={subLayout}
-                isCreateOpen={isCreateOpen}
+                panel={subPanel}
+                panelAccountIdx={panelAccountIdx}
                 onOpenCreate={() => openPanel("create")}
-                onCloseCreate={closePanel}
-                permissionAccountIdx={permissionAccountIdx}
                 onOpenPermission={(account) =>
                   openPanel("permission", { subId: String(account.accountIdx) })
                 }
-                onClosePermission={closePanel}
+                onOpenEdit={(account) =>
+                  openPanel("edit", { subId: String(account.accountIdx) })
+                }
+                onClosePanel={closePanel}
               />
             )}
-            {accountTab === "self" &&
-              (isMockDataEnabled ? <SubSelfTab /> : comingSoon)}
-            {accountTab === "notification" &&
-              (isMockDataEnabled ? <NotificationConsentCards /> : comingSoon)}
+            {accountTab === "self" && <SubSelfTab />}
+            {accountTab === "notification" && <NotificationConsentCards />}
             {!IMPLEMENTED_TABS.includes(accountTab) && comingSoon}
           </TabsContent>
         ))}

@@ -1,0 +1,11 @@
+{
+  "chargeStatus": {
+    "paid": "Paid",
+    "pending": "Pending",
+    "canceled": "Canceled"
+  },
+  "balance": {
+    "title": "Bigbird Money balance",
+    "unit": "KRW"
+  }
+}

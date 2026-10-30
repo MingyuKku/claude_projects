@@ -34,7 +34,17 @@ export type ShellNavItem = Omit<
 };
 
 export type ShellNavSubItem = Omit<SidebarNavSubItemData, "id" | "label"> & {
-  id: "search" | "bigbird" | "buyer" | "subscribe" | "money" | "account";
+  id:
+    | "search"
+    | "influencerManage"
+    | "chat"
+    | "commerceSales"
+    | "commerceSettlement"
+    | "bigbird"
+    | "buyer"
+    | "subscribe"
+    | "money"
+    | "account";
 };
 
 export const HOME_NAV_ITEM: ShellNavItem = {
@@ -51,10 +61,20 @@ export const SHELL_NAV_ITEMS: ShellNavItem[] = [
   {
     id: "influencerMatching",
     icon: Users,
-    subItems: [{ id: "search", href: ROUTES.influencerSearch }],
+    // 관리·채팅은 화면이 생기기 전까지 목적지 없이 두고, 비로그인이 누르면 로그인 안내 알럿(ShellLink)을 띄움.
+    subItems: [
+      { id: "search", href: ROUTES.influencerSearch },
+      { id: "influencerManage" },
+      { id: "chat" },
+    ],
   },
   { id: "influencerMarket", icon: Store, hasSubItems: true },
-  { id: "commerce", icon: ShoppingCart },
+  {
+    id: "commerce",
+    icon: ShoppingCart,
+    // 화면이 생기기 전까지 하위 메뉴는 목적지 없이 비활성으로 표시함.
+    subItems: [{ id: "commerceSales" }, { id: "commerceSettlement" }],
+  },
   {
     id: "mypage",
     icon: UserCog,
@@ -69,7 +89,6 @@ export const SHELL_NAV_ITEMS: ShellNavItem[] = [
   {
     id: "support",
     icon: Headset,
-    isDefaultOpen: true,
     subItems: [
       { id: "bigbird", href: ROUTES.customerCenterBigbird },
       { id: "buyer", href: ROUTES.customerCenterBuyer },

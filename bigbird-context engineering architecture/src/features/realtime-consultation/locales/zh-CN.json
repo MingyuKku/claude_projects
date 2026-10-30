@@ -4,7 +4,7 @@
   "send": "发送",
   "lock": {
     "title": "咨询正在进行中。",
-    "description": "目前其他客服正在处理该咨询,请在咨询结束后再使用。",
+    "description": "您正在其他页面与Bigbird运营团队咨询。请在当前咨询结束后再使用。",
     "cancel": "取消",
     "confirm": "确认"
   },
@@ -19,5 +19,29 @@
   "lockLost": "其他账号正在处理该咨询。",
   "alreadyConnected": "客服已连接。",
   "failed": "无法确认咨询信息。",
-  "lockCheckFailed": "无法确认咨询状态,稍后将自动重试。"
+  "lockCheckFailed": "无法确认咨询状态,稍后将自动重试。",
+  "idle": {
+    "advertiserWarning": {
+      "title": "实时咨询自动结束",
+      "description": "10分钟内没有新咨询时，实时咨询将自动结束"
+    },
+    "advertiserClosed": {
+      "title": "实时咨询自动结束",
+      "description": "由于没有新的咨询，实时咨询已自动结束"
+    },
+    "operatorDelay": {
+      "title": "正在连接实时咨询",
+      "description": "客服正在处理其他咨询，回复有所延迟。请稍候"
+    },
+    "operatorUnavailable": {
+      "title": "实时咨询延迟",
+      "description": "目前客服暂时无法实时应答。请留下咨询，我们会尽快回复。"
+    },
+    "cancel": "取消",
+    "confirm": "确认"
+  },
+  "hours": {
+    "title": "实时咨询",
+    "description": "实时咨询的服务时间为工作日上午10点至下午6点。非服务时间请使用普通咨询"
+  }
 }

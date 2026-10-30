@@ -8,7 +8,12 @@ export {
   SUPPORTED_LANGUAGES,
   type Language,
 } from "./config";
-export { formatDate, formatNumber } from "./format";
+export {
+  formatDate,
+  formatNumber,
+  formatNumericDate,
+  formatNumericDateTime,
+} from "./format";
 export { initI18n } from "./initI18n";
 export { useLanguage } from "./language";
 export { resolveLanguage } from "./resolveLanguage";

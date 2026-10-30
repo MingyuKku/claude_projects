@@ -14,7 +14,11 @@ export function HomeContent() {
   const { t } = useTranslation("pages/home");
 
   return (
-    <div className="relative flex min-h-full flex-col items-center justify-center gap-8 px-4 py-4 tablet:gap-10 tablet:px-10 desktop:gap-12">
+    <div
+      // 펼친 검색창이 이 영역의 안쪽 위까지 덮음(features/search-influencer).
+      data-search-expand-boundary
+      className="relative flex min-h-full flex-col items-center justify-center gap-8 px-4 py-4 tablet:gap-10 tablet:px-10 desktop:gap-12"
+    >
       <div
         aria-hidden
         className="pointer-events-none absolute inset-0 bg-[linear-gradient(116.9deg,var(--color-white)_3.5%,var(--color-blue-100)_33.9%,var(--color-blue-50)_75.1%,var(--color-blue-200)_100%)] tablet:bg-linear-to-l tablet:from-background tablet:to-blue-100"
@@ -37,7 +41,7 @@ export function HomeContent() {
       <section
         // 키보드가 열릴 때 셸이 이 영역(입력창과 버튼 줄)의 아래 끝을 키보드 위 16px에 보이게 스크롤함.
         data-keyboard-anchor
-        className="relative flex w-full max-w-158 scroll-mb-4 flex-col gap-4 tablet:gap-5 desktop:max-w-174.5"
+        className="relative flex w-full max-w-158 scroll-mb-(--keyboard-anchor-gap) flex-col gap-4 tablet:gap-5 desktop:max-w-174.5"
       >
         <InfluencerSearchForm />
         <FeatureCards className="in-data-[keyboard=open]:order-first" />

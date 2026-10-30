@@ -1,0 +1,40 @@
+{
+  "title": "订阅支付记录",
+  "won": "{{amount}}韩元",
+  "list": {
+    "label": "订阅支付记录"
+  },
+  "column": {
+    "paidAt": "支付日期",
+    "name": "支付内容",
+    "amount": "支付金额",
+    "method": "支付方式",
+    "status": "支付状态",
+    "receipt": "交易明细"
+  },
+  "action": {
+    "receipt": "交易明细"
+  },
+  "status": {
+    "paid": "已支付",
+    "refunding": "退款中",
+    "refunded": "已退款"
+  },
+  "filter": {
+    "date": {
+      "label": "支付日期",
+      "placeholder": "请选择日期。"
+    },
+    "method": {
+      "label": "支付方式",
+      "placeholder": "请选择支付方式。"
+    },
+    "status": {
+      "label": "支付状态",
+      "placeholder": "请选择支付状态。"
+    }
+  },
+  "empty": {
+    "none": "没有订阅支付记录。"
+  }
+}

@@ -1,0 +1,121 @@
+{
+  "won": "{{amount}}ウォン",
+  "usage": {
+    "title": "利用履歴",
+    "list": {
+      "label": "利用履歴"
+    },
+    "column": {
+      "campaignName": "キャンペーン名",
+      "usedAt": "利用日",
+      "usage": "利用内容",
+      "amount": "利用金額",
+      "campaignCode": "キャンペーンコード",
+      "detail": "詳細"
+    },
+    "card": {
+      "usedAt": "利用日",
+      "campaignName": "キャンペーン名",
+      "campaignType": "キャンペーン種類",
+      "campaignCode": "キャンペーンコード",
+      "usage": "利用内容",
+      "amount": "利用金額",
+      "remaining": "利用後残高"
+    },
+    "action": {
+      "detail": "詳細を見る"
+    },
+    "detail": {
+      "title": "詳細",
+      "usedAt": "利用日",
+      "campaignName": "キャンペーン名",
+      "campaignType": "キャンペーン種類",
+      "campaignCode": "キャンペーンコード",
+      "usage": "利用内容",
+      "amount": "利用金額",
+      "remaining": "利用後残高"
+    },
+    "filter": {
+      "date": {
+        "label": "利用日",
+        "placeholder": "日付を選択してください。"
+      },
+      "campaign": {
+        "label": "キャンペーン名",
+        "placeholder": "キャンペーン名を選択してください。"
+      },
+      "usage": {
+        "label": "利用内容",
+        "placeholder": "利用内容を選択してください。"
+      }
+    },
+    "empty": {
+      "none": "ビッグバードマネーの利用履歴がありません。"
+    }
+  },
+  "charge": {
+    "title": "チャージ履歴",
+    "list": {
+      "label": "チャージ履歴"
+    },
+    "column": {
+      "requestedAt": "チャージ日",
+      "amount": "リクエスト金額",
+      "method": "決済方法",
+      "status": "入金状態",
+      "receipt": "明細書",
+      "detail": "詳細"
+    },
+    "card": {
+      "requestedAt": "チャージ日",
+      "amount": "リクエスト金額",
+      "method": "決済方法",
+      "status": "入金状態"
+    },
+    "action": {
+      "detail": "詳細を見る",
+      "receipt": "取引明細書",
+      "receiptShort": "明細書"
+    },
+    "method": {
+      "vbank": "銀行振込"
+    },
+    "detail": {
+      "title": "取引詳細",
+      "approvedAt": "承認日",
+      "requestedAt": "入金リクエスト日",
+      "amount": "リクエスト金額",
+      "method": "決済方法",
+      "bank": "銀行名",
+      "account": "仮想口座番号",
+      "depositedAt": "入金完了日",
+      "status": "入金状態",
+      "receipt": "明細書を受け取る"
+    },
+    "filter": {
+      "date": {
+        "label": "チャージ日",
+        "placeholder": "日付を選択してください。"
+      },
+      "status": {
+        "label": "入金状態",
+        "placeholder": "入金状態を選択してください。",
+        "option": {
+          "paid": "決済完了",
+          "pending": "待機中",
+          "canceled": "決済キャンセル"
+        }
+      }
+    },
+    "empty": {
+      "none": "ビッグバードマネーのチャージ履歴がありません。"
+    },
+    "notice": {
+      "title": "ご案内",
+      "method": "ビッグバードマネーのチャージは銀行振込で行います。",
+      "validity": "仮想口座の有効期限は2日後の午前0時までです。",
+      "instant": "入金が確認され次第、すぐにチャージされます。",
+      "delay": "入金後、残高に反映されるまで最大5分かかる場合があります。"
+    }
+  }
+}

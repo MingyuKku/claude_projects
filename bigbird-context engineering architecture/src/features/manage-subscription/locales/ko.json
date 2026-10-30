@@ -1,0 +1,32 @@
+{
+  "title": "구독 결제 상품",
+  "won": "{{amount}}원",
+  "column": {
+    "name": "서비스명",
+    "startedAt": "멤버십 시작",
+    "endsAt": "멤버십 종료",
+    "amount": "결제액",
+    "method": "결제 방법",
+    "action": "구독 관리"
+  },
+  "action": {
+    "cancel": "구독해지",
+    "cancelScheduled": "해지 예정"
+  },
+  "empty": {
+    "title": "구독 결제한 상품이 없습니다."
+  },
+  "cancelDialog": {
+    "title": "구독 해지",
+    "description": "정말로 구독 서비스를 해지하시겠습니까? 구독 해지시 결제 기간이 끝나는 {{endsAt}}까지는 구독이 유지됩니다.",
+    "confirm": "해지",
+    "completed": {
+      "title": "구독 해지 완료",
+      "description": "구독 해지가 완료되었습니다. 다음에 다시 만나요!"
+    }
+  },
+  "error": {
+    "alreadyCanceled": "이미 해지된 구독입니다.",
+    "notFound": "구독 정보를 찾을 수 없습니다."
+  }
+}

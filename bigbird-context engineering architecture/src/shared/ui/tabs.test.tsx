@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { Tabs, TabsList, TabsTrigger } from "./tabs";
@@ -43,5 +43,71 @@ describe("TabsTrigger 포커스 링", () => {
     expect(screen.getByRole("tab", { name: "첫째" })).not.toHaveAttribute(
       "data-pointer-focus",
     );
+  });
+});
+
+describe("TabsList 선택 표시", () => {
+  function indicator(container: HTMLElement) {
+    return container.querySelector<HTMLElement>('[data-slot="tabs-indicator"]')!;
+  }
+
+  // jsdom은 레이아웃이 없어 탭마다 위치를 정해 줌(offsetLeft·offsetWidth).
+  function mockLayout() {
+    const offsets: Record<string, number> = { 첫째: 0, 둘째: 120 };
+    vi.spyOn(HTMLElement.prototype, "offsetLeft", "get").mockImplementation(
+      function (this: HTMLElement) {
+        return offsets[this.textContent ?? ""] ?? 0;
+      },
+    );
+    vi.spyOn(HTMLElement.prototype, "offsetWidth", "get").mockReturnValue(100);
+  }
+
+  afterEach(() => vi.restoreAllMocks())
+
+  it("선택된 탭의 위치·크기로 표시 요소를 놓고 스크린리더에는 숨긴다", () => {
+    mockLayout();
+    const { container } = render(
+      <Tabs defaultValue="a">
+        <TabsList variant="line">
+          <TabsTrigger value="a">첫째</TabsTrigger>
+          <TabsTrigger value="b">둘째</TabsTrigger>
+        </TabsList>
+      </Tabs>,
+    );
+    const element = indicator(container);
+    expect(element).toHaveAttribute("aria-hidden", "true");
+    expect(element).toHaveAttribute("data-measured");
+    expect(element.style.getPropertyValue("--tab-x")).toBe("0px");
+    expect(element.style.getPropertyValue("--tab-w")).toBe("100px");
+  });
+
+  it("탭을 바꾸면 새 탭의 위치로 옮겨 간다", async () => {
+    mockLayout();
+    const user = userEvent.setup();
+    const { container } = render(
+      <Tabs defaultValue="a">
+        <TabsList>
+          <TabsTrigger value="a">첫째</TabsTrigger>
+          <TabsTrigger value="b">둘째</TabsTrigger>
+        </TabsList>
+      </Tabs>,
+    );
+    await user.click(screen.getByRole("tab", { name: "둘째" }));
+    await waitFor(() =>
+      expect(indicator(container).style.getPropertyValue("--tab-x")).toBe(
+        "120px",
+      ),
+    );
+  });
+
+  it("선택된 탭이 없으면 표시 요소를 숨긴다", () => {
+    const { container } = render(
+      <Tabs value="none">
+        <TabsList>
+          <TabsTrigger value="a">첫째</TabsTrigger>
+        </TabsList>
+      </Tabs>,
+    );
+    expect(indicator(container)).not.toHaveAttribute("data-measured");
   });
 });

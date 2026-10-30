@@ -1,6 +1,5 @@
 {
   "listTitle": "문의 목록",
-  "refresh": "새로고침",
   "all": "전체",
   "waiting": "답변 대기",
   "done": "답변 완료",
@@ -17,9 +16,7 @@
   "unknownWriter": "이름 없음",
   "conversation": "대화",
   "detail": "상세 정보",
-  "history": "상담 기록",
   "backToList": "문의 목록으로 돌아가기",
-  "closeHistory": "상담 기록 닫기",
   "closeDetail": "상세 정보 닫기",
   "advertiser": "광고주",
   "messagePlaceholder": "문의 내용을 입력하세요. (최대 3,000자)",
@@ -35,6 +32,7 @@
     "campaignPlaceholder": "캠페인을 선택하세요.",
     "influencer": "인플루언서",
     "influencerPlaceholder": "인플루언서를 선택하세요.",
+    "influencerSearchPlaceholder": "인플루언서를 검색하세요.",
     "campaignFallback": "캠페인 {{idx}}",
     "influencerFallback": "인플루언서 {{idx}}",
     "removeChip": "{{name}} 조건 해제",
@@ -60,7 +58,7 @@
   "shopCode": "공구샵 코드",
   "influencer": "공구 진행 인플루언서",
   "detailError": "상세 정보를 불러오지 못했습니다.",
-  "copied": "복사되었습니다.",
+  "copied": "클립보드에 복사가 완료되었습니다.",
   "copyFailed": "복사하지 못했습니다.",
   "won": "{{amount}}원",
   "conversationError": "대화를 불러오지 못했습니다.",
@@ -79,7 +77,5 @@
     "deleteTitle": "답변을 삭제할까요?",
     "deleteDescription": "삭제한 답변은 복구할 수 없습니다."
   },
-  "historyEmpty": "상담 기록이 없습니다.",
-  "copyCampaignCode": "캠페인 코드 복사",
   "messageDeleted": "메시지가 삭제되었습니다."
 }

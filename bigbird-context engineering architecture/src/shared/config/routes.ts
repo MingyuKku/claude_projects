@@ -20,6 +20,8 @@ export const ROUTES = {
   mypageSubscribe: "/mypage/subscribe",
   mypageMoney: "/mypage/money",
   mypageAccount: "/mypage/account",
+  // 이니시스 결제창의 `closeUrl`. 결제 서버에 경로로 보내 결제창 안에서 열리고, 결제창을 닫기만 함.
+  inicisClose: "/inicis/close",
   legacyMain: "/main",
   influencerSearch: "/influencers/search",
   find: "/find",

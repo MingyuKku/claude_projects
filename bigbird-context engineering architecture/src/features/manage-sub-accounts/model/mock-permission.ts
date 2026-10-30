@@ -1,18 +1,7 @@
-// 임시 목 데이터(스펙 §1·§7 B-3·B-6). 권한·캠페인 할당 API가 공개되고 코드(enum)가 확정되면 지움.
-// 코드값(key·productType·detailType·status)은 임시이고, 권한은 스펙의 6개(빅버드 머니 포함)를 따름.
-// 개발 서버에서만 채우고 빌드(stage·prod)에서는 빈 목록이라 번들에 목 값이 들어가지 않음.
-import type { CampaignAssignment, SubAccountPermission } from "./types";
+// 임시 목 데이터(스펙 §1·§7 B-3·B-6). 캠페인 할당의 진행 상태 기준이 확정되면(docs/mypage-api.md §4-5) 지움.
+// 코드값(productType·detailType·status)은 임시. 개발 서버에서만 채우고 빌드(stage·prod)에서는 빈 목록이라 번들에 목 값이 들어가지 않음.
+import type { CampaignAssignment } from "./types";
 
-export const MOCK_PERMISSIONS: SubAccountPermission[] = import.meta.env.DEV
-  ? [
-      { key: "campaign", name: "캠페인", isGranted: false },
-      { key: "influencerMatching", name: "인플루언서 매칭", isGranted: true },
-      { key: "influencerMarket", name: "인플루언서 마켓", isGranted: true },
-      { key: "commerce", name: "커머스 관리", isGranted: false },
-      { key: "buyerInquiry", name: "구매자 문의", isGranted: false },
-      { key: "bigbirdMoney", name: "빅버드 머니", isGranted: false },
-    ]
-  : [];
 export const MOCK_CAMPAIGN_ASSIGNMENTS: CampaignAssignment[] = import.meta.env
   .DEV
   ? [

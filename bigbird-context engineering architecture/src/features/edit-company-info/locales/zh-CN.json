@@ -1,5 +1,5 @@
 {
-  "title": "修改信息",
+  "title": "公司信息",
   "form": {
     "companyName": "公司名称",
     "contact": "联系方式",
@@ -16,8 +16,10 @@
     "registered": "已登记",
     "error": {
       "extension": "仅支持 JPG、PNG、PDF 文件。",
-      "size": "最大 10MB。"
-    }
+      "size": "最大 10MB。",
+      "download": "无法下载文件，请重试。"
+    },
+    "download": "下载{{name}}"
   },
   "inform": {
     "required": "需填写所有必填项才能保存。",

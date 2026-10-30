@@ -1,10 +1,11 @@
 import { ApiError } from "@/shared/api";
 
 import {
-  changeMasterEmail,
+  modifyMasterAccount,
   changeMasterPassword,
   changeSubEmail,
   changeSubPassword,
+  changeSubPhone,
   uploadProfileImage,
   uploadSubProfileImage,
 } from "../api/profile-api";
@@ -17,6 +18,7 @@ const base = {
   password: "Wq!9a2k7xZ",
   email: "new@bigbird.com",
   certIdx: 87,
+  verifiedPhone: null,
   imageFile: image,
   hasExistingImage: false,
 };
@@ -24,16 +26,19 @@ const everything = {
   hasPasswordChange: true,
   hasEmailChange: true,
   hasImageChange: true,
+  hasPhoneChange: false,
 };
+const verifiedPhone = { certIdx: 120, phone: "01098765432" };
 
 beforeEach(() => {
   vi.resetAllMocks();
   vi.mocked(uploadProfileImage).mockResolvedValue({ result: true });
-  vi.mocked(changeMasterEmail).mockResolvedValue({ result: true });
+  vi.mocked(modifyMasterAccount).mockResolvedValue({ result: true });
   vi.mocked(changeMasterPassword).mockResolvedValue({ result: true });
   vi.mocked(uploadSubProfileImage).mockResolvedValue({ result: true });
   vi.mocked(changeSubEmail).mockResolvedValue({ result: true });
   vi.mocked(changeSubPassword).mockResolvedValue({ result: true });
+  vi.mocked(changeSubPhone).mockResolvedValue({ result: true });
 });
 
 describe("saveAccountProfile", () => {
@@ -43,7 +48,7 @@ describe("saveAccountProfile", () => {
       completed: ["image", "email", "password"],
       failure: null,
     });
-    expect(changeMasterEmail).toHaveBeenCalledWith({
+    expect(modifyMasterAccount).toHaveBeenCalledWith({
       certIdx: 87,
       email: "new@bigbird.com",
     });
@@ -57,11 +62,11 @@ describe("saveAccountProfile", () => {
     });
     expect(changeMasterPassword).not.toHaveBeenCalled();
     expect(uploadProfileImage).not.toHaveBeenCalled();
-    expect(changeMasterEmail).toHaveBeenCalledTimes(1);
+    expect(modifyMasterAccount).toHaveBeenCalledTimes(1);
   });
 
   it("첫 실패에서 멈추고 앞 단계만 완료로 알린다", async () => {
-    vi.mocked(changeMasterEmail).mockRejectedValue(new ApiError(400, {}));
+    vi.mocked(modifyMasterAccount).mockRejectedValue(new ApiError(400, {}));
     const result = await saveAccountProfile({ ...base, plan: everything });
     expect(result).toEqual({ completed: ["image"], failure: "generic" });
     expect(changeMasterPassword).not.toHaveBeenCalled();
@@ -96,10 +101,61 @@ describe("saveAccountProfile", () => {
       plan: { ...everything, hasImageChange: false, hasPasswordChange: false },
     });
     expect(result.failure).toBe("generic");
-    expect(changeMasterEmail).not.toHaveBeenCalled();
+    expect(modifyMasterAccount).not.toHaveBeenCalled();
+  });
+
+  it("휴대폰을 인증했으면 새 certIdx와 현재 이메일을 한 요청으로 보낸다", async () => {
+    const result = await saveAccountProfile({
+      ...base,
+      email: "old@bigbird.com",
+      verifiedPhone,
+      plan: {
+        hasPasswordChange: false,
+        hasEmailChange: false,
+        hasImageChange: false,
+        hasPhoneChange: true,
+      },
+    });
+    expect(result).toEqual({ completed: ["phone"], failure: null });
+    expect(modifyMasterAccount).toHaveBeenCalledWith({
+      certIdx: 120,
+      email: "old@bigbird.com",
+    });
+  });
+
+  it("휴대폰과 이메일을 함께 바꾸면 요청은 한 번이다", async () => {
+    const result = await saveAccountProfile({
+      ...base,
+      verifiedPhone,
+      plan: { ...everything, hasPhoneChange: true },
+    });
+    expect(result.completed).toEqual(["image", "phone", "email", "password"]);
+    expect(modifyMasterAccount).toHaveBeenCalledTimes(1);
+    expect(modifyMasterAccount).toHaveBeenCalledWith({
+      certIdx: 120,
+      email: "new@bigbird.com",
+    });
   });
 
   describe("Sub ID", () => {
+    it("인증한 휴대폰 번호를 Sub 경로로 보낸다", async () => {
+      const result = await saveAccountProfile({
+        ...base,
+        role: "sub",
+        certIdx: null,
+        verifiedPhone,
+        plan: {
+          hasPasswordChange: false,
+          hasEmailChange: false,
+          hasImageChange: false,
+          hasPhoneChange: true,
+        },
+      });
+      expect(result).toEqual({ completed: ["phone"], failure: null });
+      expect(changeSubPhone).toHaveBeenCalledWith("01098765432");
+      expect(modifyMasterAccount).not.toHaveBeenCalled();
+    });
+
     it("Sub 경로로 저장하고 이메일은 본인인증 없이 값만 보낸다", async () => {
       const result = await saveAccountProfile({
         ...base,
@@ -115,7 +171,7 @@ describe("saveAccountProfile", () => {
       expect(changeSubEmail).toHaveBeenCalledWith("new@bigbird.com");
       expect(changeSubPassword).toHaveBeenCalledWith("Wq!9a2k7xZ");
       expect(uploadProfileImage).not.toHaveBeenCalled();
-      expect(changeMasterEmail).not.toHaveBeenCalled();
+      expect(modifyMasterAccount).not.toHaveBeenCalled();
       expect(changeMasterPassword).not.toHaveBeenCalled();
     });
   });

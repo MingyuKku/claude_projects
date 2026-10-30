@@ -5,16 +5,15 @@ import { toast } from "sonner";
 import {
   acquireConsultationLock,
   appendConsultationMessage,
-  buildRequestAlarm,
-  cancelRealtimeRequest,
   closeBigbirdInquiry,
   closeConsultation,
   getAttachmentKind,
   LOCK_REFRESH_MS,
   markRealtimeRequestExpired,
   newMessageId,
+  REALTIME_IDLE_LIMIT_MS,
+  REALTIME_IDLE_WARNING_MS,
   releaseConsultationLock,
-  retryRealtimeRequest,
   TAB_ID,
   uploadInquiryAttachment,
 } from "@/entities/inquiry";
@@ -25,6 +24,18 @@ import type { SessionViewModel } from "@/entities/session";
 
 export type LockState = "inactive" | "acquiring" | "held" | "blocked" | "error";
 
+/** 연결 뒤 무응답 안내 4종(REQ-23-0021 문구, Figma Alert 10819:40827·40834·40832·40833 모양). */
+export type IdleAlert =
+  | "advertiserWarning"
+  | "advertiserClosed"
+  | "operatorDelay"
+  | "operatorUnavailable";
+
+const IDLE_STAGES = {
+  advertiser: ["advertiserWarning", "advertiserClosed"],
+  operator: ["operatorDelay", "operatorUnavailable"],
+} as const satisfies Record<string, readonly [IdleAlert, IdleAlert]>;
+
 interface Options {
   inquiry: BigbirdInquiryViewModel | undefined;
   session: Pick<
@@ -34,8 +45,6 @@ interface Options {
   enabled: boolean;
   /** 쓰기 뒤 목록(REST)을 다시 읽음. */
   onChanged: () => void;
-  /** 일반 문의 전환: 요청을 취소한 뒤 새 문의 화면으로 보냄. */
-  onLeaveForMessage: (campaignIdx: number | null) => void;
 }
 
 const REASON_KEY = {
@@ -51,15 +60,14 @@ const REASON_KEY = {
 } as const;
 
 /**
- * 실시간 상담 화면의 쓰기 동작: 응대 락(획득·갱신·해제), 전송, 종료, 재시도, 일반 문의 전환, 만료 기록,
- * 연결 후 무응답 자동 종료. 실제 쓰기 규칙은 entities/inquiry의 트랜잭션 함수가 지킴.
+ * 실시간 상담 화면의 쓰기 동작: 응대 락(획득·갱신·해제), 전송, 종료, 만료 기록,
+ * 연결 후 무응답 안내·자동 종료. 실제 쓰기 규칙은 entities/inquiry의 트랜잭션 함수가 지킴.
  */
 export function useRealtimeConversation({
   inquiry,
   session,
   enabled,
   onChanged,
-  onLeaveForMessage,
 }: Options) {
   const { t } = useTranslation("features/realtime-consultation");
   // 락 결과는 비동기 콜백에서만 기록함. 상담이 바뀌면 키가 달라져 자동으로 "확인 중"이 됨.
@@ -197,21 +205,52 @@ export function useRealtimeConversation({
     }
   }
 
-  // 연결 후 3분 동안 광고주가 말하지 않으면 자동 종료함(기존 스펙). 락을 가진 탭만 실행함.
-  const idleDeadline = inquiry?.idleDeadlineAt ?? null;
+  // 연결 뒤 마지막 메시지부터 5분이면 안내, 10분이면 광고주 차례는 자동 종료·운영 차례는 지연 안내(REQ-23-0021).
+  // 새 메시지가 오면 시작 시각이 바뀌어 다시 셈. 락을 가진 탭만 셈.
+  const idleTurn = inquiry?.idleTurn ?? null;
+  const idleSince = idleTurn?.since ?? null;
+  const idleWaitingFor = idleTurn?.waitingFor ?? null;
+  const [idleAlert, setIdleAlert] = useState<{
+    sequence: number;
+    kind: IdleAlert;
+  } | null>(null);
+  const shownIdleAlerts = useRef(new Set<string>());
   const endRef = useRef(end);
   useEffect(() => {
     endRef.current = end;
   });
   useEffect(() => {
     if (!isLive || lock !== "held" || phase !== "connected") return;
-    if (idleDeadline === null) return;
-    const timer = setTimeout(
-      () => void endRef.current(),
-      Math.max(0, idleDeadline - Date.now()),
-    );
-    return () => clearTimeout(timer);
-  }, [isLive, lock, phase, idleDeadline]);
+    if (sequence === undefined || idleSince === null || !idleWaitingFor) return;
+    const [warning, limit] = IDLE_STAGES[idleWaitingFor];
+    const limitAt = idleSince + REALTIME_IDLE_LIMIT_MS;
+    // 들어왔을 때 이미 10분이 지났으면 5분 안내는 건너뜀.
+    const stages = [
+      ...(Date.now() < limitAt
+        ? [{ kind: warning, at: idleSince + REALTIME_IDLE_WARNING_MS }]
+        : []),
+      { kind: limit, at: limitAt },
+    ];
+    const timers = stages.map(({ kind, at }) => {
+      const key = `${sequence}:${idleSince}:${kind}`;
+      if (shownIdleAlerts.current.has(key)) return undefined;
+      return setTimeout(
+        () => {
+          shownIdleAlerts.current.add(key);
+          // 광고주 10분은 자동 종료, 운영 10분은 실시간을 끝내고 일반 문의로 전환(REQ-23-0021, 2026-10-29 결정).
+          // 끝난 상담의 입력창은 일반 문의로 보내므로 종료가 곧 전환임. 10분 강제 종료는 백엔드도 하므로
+          // 여기서 종료가 실패해도 다시 시도하지 않음.
+          if (kind === "advertiserClosed" || kind === "operatorUnavailable")
+            void endRef.current();
+          setIdleAlert({ sequence, kind });
+        },
+        Math.max(0, at - Date.now()),
+      );
+    });
+    return () => {
+      for (const timer of timers) if (timer) clearTimeout(timer);
+    };
+  }, [isLive, lock, phase, sequence, idleSince, idleWaitingFor]);
 
   async function send(text: string): Promise<boolean> {
     const body = text.trim();
@@ -309,76 +348,30 @@ export function useRealtimeConversation({
     return true;
   }
 
-  async function retry(): Promise<void> {
-    if (!target || isBusy) return;
-    setIsBusy(true);
-    try {
-      const alarm = buildRequestAlarm(
-        {
-          threadUserIdx: session.threadUserIdx,
-          userIdx: session.userIdx,
-          userId: session.identifier,
-          campaign: null,
-        },
-        inquiry?.campaignIdx ?? null,
-        new Date().toISOString(),
-      );
-      const [error, result] = await tryit(retryRealtimeRequest)(target, alarm);
-      if (error) {
-        console.error("실시간 상담 재요청 실패", error);
-        toast.error(t("retryFailed"));
-        return;
-      }
-      if (!result.ok) {
-        toast.error(t(REASON_KEY[result.reason]));
-        return;
-      }
-      // 새 마감은 Firestore 구독으로 들어오고, 화면이 다시 "요청 중"이 됨.
-      expiredKey.current = null;
-    } finally {
-      setIsBusy(false);
-    }
+  const currentIdleAlert =
+    idleAlert && idleAlert.sequence === sequence ? idleAlert.kind : null;
+
+  function dismissIdleAlert() {
+    setIdleAlert(null);
   }
 
-  async function leaveForMessage(): Promise<void> {
-    if (!target || threadIdx === undefined || isBusy) return;
-    setIsBusy(true);
-    try {
-      // ①요청 취소(운영의 늦은 연결 차단). 이미 연결됐으면 상담으로 돌아감.
-      const [cancelError, canceled] = await tryit(cancelRealtimeRequest)(
-        target,
-      );
-      if (cancelError) {
-        console.error("실시간 상담 요청 취소 실패", cancelError);
-        toast.error(t("cancelFailed"));
-        return;
-      }
-      if (!canceled.ok) {
-        toast.error(t(REASON_KEY[canceled.reason]));
-        return;
-      }
-      // ②REST에 열려 있는 요청 정리. 실패해도 취소는 확정됐으므로 일반 문의 작성으로 넘어감.
-      const [closeError] = await tryit(closeConsultation)(target, {
-        closeRest: () => closeBigbirdInquiry(threadIdx),
-      });
-      if (closeError) console.error("취소한 요청 정리 실패", closeError);
-      onChanged();
-      onLeaveForMessage(inquiry?.campaignIdx ?? null);
-    } finally {
-      setIsBusy(false);
-    }
+  /** 5분 안내의 취소: 실시간 상담을 끝냄(Figma 캡션 "실시간 문의 유지"의 반대 선택). */
+  function endFromIdleAlert() {
+    setIdleAlert(null);
+    void end();
   }
 
   return {
     lock,
     isBusy,
+    idleAlert: currentIdleAlert,
+    dismissIdleAlert,
+    endFromIdleAlert,
     // 요청 중에도 미리 보낼 수 있음. 요청 실패·종료 뒤에는 막음.
     canSend:
       lock === "held" && (phase === "requesting" || phase === "connected"),
     send,
     sendFiles,
     end,
-    retry,
-    leaveForMessage,
   };
 }

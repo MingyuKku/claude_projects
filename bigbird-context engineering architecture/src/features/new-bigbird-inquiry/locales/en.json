@@ -16,5 +16,5 @@
   "select": "Select",
   "send": "Send",
   "messagePlaceholder": "Enter your inquiry. (Up to 3,000 characters)",
-  "noCampaign": "You haven't applied for any campaigns."
+  "noCampaign": "No campaigns found."
 }

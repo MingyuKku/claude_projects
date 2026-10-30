@@ -15,6 +15,7 @@ const badgeVariants = cva(
         gray: "bg-slate-200 text-muted-foreground",
         red: "bg-red-200 text-red-600",
         yellow: "bg-yellow-200 text-yellow-600",
+        outline: "border border-border bg-white text-muted-foreground",
       },
       size: {
         md: "px-2.5 py-2 text-sm leading-none font-semibold",

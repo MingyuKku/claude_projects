@@ -9,7 +9,10 @@ const empty = { password: "", passwordCheck: "", email: "old@bigbird.com" };
 
 function evaluate(values: typeof empty, hasNewImage = false) {
   const errors = validateProfileForm(values, context);
-  const plan = getProfileSavePlan(values, context.initialEmail, hasNewImage);
+  const plan = getProfileSavePlan(values, context.initialEmail, {
+    hasNewImage,
+    hasVerifiedPhone: false,
+  });
   return { errors, plan, canSave: canSaveProfile(values, errors, plan) };
 }
 

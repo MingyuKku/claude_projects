@@ -14,10 +14,14 @@ import type { TermsBlock } from "../model/types";
 /**
  * 현재 언어의 약관 본문. 한국어는 바로 돌려주고, 다른 언어는 파일을 불러오는 동안
  * `undefined`. 불러오지 못하면 한국어 원문으로 대신함(번역이 없다고 약관을 숨기지 않음).
+ * 충전 약관(`charge`)은 번역본이 없어 모든 언어에서 한국어 원문임.
  */
 export function useTermsContent(kind: TermsKind): TermsBlock[] | undefined {
   const language = useLanguage();
-  const loader = language === "ko" ? undefined : TERMS_LOADERS[language];
+  const loader =
+    language === "ko" || kind === "charge"
+      ? undefined
+      : TERMS_LOADERS[language];
 
   const { data, error } = useSWRImmutable(
     loader ? ["terms-content", language] : null,

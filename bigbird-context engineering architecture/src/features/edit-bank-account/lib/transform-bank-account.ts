@@ -14,5 +14,6 @@ export function transformBankAccountToViewModel(
     accountNumber: response.accountNumber ?? "",
     accountHolder: response.accountHolder ?? "",
     hasBankBookFile: Boolean(response.isExistsBankBookFile),
+    bankBookFileName: response.bankBookFileName || null,
   };
 }

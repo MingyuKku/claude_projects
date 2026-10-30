@@ -1,16 +1,21 @@
 import { z } from "zod";
 
+import { normalizeFirestoreTime } from "./firestore-time";
+
 // V3 고객센터(`/v3/help/**`) 응답. Swagger의 required·nullable 표시를 그대로 따름
 // (백엔드 재판정 반영, 2026-10-16).
 
-/** `GET /v3/help/thread`의 메시지. */
+/**
+ * `GET /v3/help/thread`·`GET /v3/help/thread/campaign-timeline`의 메시지. 타임라인의 실시간 상담 구간 메시지는
+ * MySQL 행이 없어 `messageIdx`·`userIdx`가 null이고, `writeTime`은 Firestore 문자열 파싱에 실패하면 null(2026-10-28).
+ */
 export const inquiryMessageSchema = z.object({
-  messageIdx: z.number(),
+  messageIdx: z.number().nullable(),
   threadIdx: z.number(),
   body: z.string(),
-  userIdx: z.number(),
+  userIdx: z.number().nullable(),
   attachmentIdx: z.number().nullable(),
-  writeTime: z.string(),
+  writeTime: z.string().nullable(),
   readTime: z.string().nullable(),
   modifyTime: z.string().nullable(),
   deleteTime: z.string().nullable(),
@@ -45,6 +50,12 @@ export const inquiryThreadSchema = z.object({
 });
 export type InquiryThread = z.infer<typeof inquiryThreadSchema>;
 
+/** `GET /v3/help/thread/campaign-timeline`. 캠페인에 걸린 모든 스레드의 메시지를 시간순으로 합친 목록. */
+export const campaignTimelineSchema = z.object({
+  result: z.boolean(),
+  data: z.array(inquiryMessageSchema),
+});
+
 export const inquiryThreadListSchema = z.object({
   result: z.boolean(),
   data: z.array(inquiryThreadSchema),
@@ -60,6 +71,8 @@ export const inquiryCampaignSchema = z.object({
   /** 진행기간(`yyyy-MM-dd`). 값이 없을 수 있음(Swagger required + nullable). */
   progressStartDate: z.string().nullable(),
   progressEndDate: z.string().nullable(),
+  /** 캠페인 유형 표시명(예: "베이직형"). 서버 DB 값이라 번역하지 않고 그대로 보여 줍니다. 아직 없는 서버를 위해 없음도 받습니다. */
+  campaignServiceName: z.string().nullish(),
 });
 export type InquiryCampaign = z.infer<typeof inquiryCampaignSchema>;
 
@@ -107,12 +120,16 @@ export const campaignCardSchema = z.object({
 });
 export type CampaignCard = z.infer<typeof campaignCardSchema>;
 
-/** 기존 헬프데스크 Firestore `sequence/{sequence}`의 실시간 상담 메시지. */
+/**
+ * 기존 헬프데스크 Firestore `sequence/{sequence}`의 상담 문서. 일반 문의로 만든 문서(백엔드가 씀)와 실시간 문서가
+ * 같은 경로를 쓰고, 일반 문서에는 `sequence`·`threadIdx`·`isConnect`가 없고 `finishTime`이 Timestamp이며 메시지의
+ * `isUserMessage`가 null일 수 있음(2026-10-29 dev 확인). 그래서 이 필드들은 없어도 읽을 수 있어야 함.
+ */
 export const realtimeConsultationSchema = z.object({
-  sequence: z.number(),
-  threadIdx: z.number(),
-  isConnect: z.boolean(),
-  finishTime: z.string().nullable(),
+  sequence: z.number().nullish(),
+  threadIdx: z.number().nullish(),
+  isConnect: z.boolean().nullish(),
+  finishTime: z.preprocess(normalizeFirestoreTime, z.string().nullish()),
   // 다른 앱이 읽는 기존 필드. 요청 시각 판단에는 REST의 created를 쓰고 여기서는 읽기만 함.
   seqResponseDate: z.string().nullish(),
   // 실시간 상담 상태 계약(specs/customer-center/customer-center.md)의 추가 필드. 없는 과거 문서도 읽을 수 있어야 함.
@@ -126,7 +143,8 @@ export const realtimeConsultationSchema = z.object({
       auto: z.boolean(),
       attachmentIdx: z.number().nullable(),
       identifier: z.string().nullable(),
-      isUserMessage: z.boolean(),
+      /** 일반 문의로 쓴 메시지 일부는 null(발신 구분 없음). 내 메시지가 아닌 것으로 봄. */
+      isUserMessage: z.boolean().nullish(),
       body: z.string(),
       fileName: z.string().nullish(),
       /** v2의 텍스트·auto 메시지는 이 필드를 쓰지 않음. */
@@ -167,6 +185,12 @@ export interface InquiryMessageViewModel {
   body: string;
   createdAt: Date;
   isDeleted: boolean;
+  /** 상대가 읽었는지. 읽은 메시지는 수정·삭제할 수 없습니다(서버 409). */
+  isRead: boolean;
+  /** 보낸 뒤 수정된 메시지인지("편집됨" 표시). */
+  isEdited: boolean;
+  /** 보낸 계정 id(v2가 내 말풍선 위에 보여 주던 값). 모르면 null입니다. */
+  senderId: string | null;
   campaign: CampaignCard | null;
   attachment: InquiryAttachment | null;
 }
@@ -182,8 +206,8 @@ export interface BigbirdInquiryViewModel {
   realtimePhase: RealtimePhase | null;
   /** 연결 대기가 끝나는 시각(ms). Firestore 상태를 받은 실시간 상담만 있음. */
   connectDeadlineAt?: number;
-  /** 연결된 상담이 무응답으로 종료되는 시각(ms). 광고주가 말했거나 연결 전이면 null. */
-  idleDeadlineAt?: number | null;
+  /** 연결된 상담에서 답을 기다리는 쪽과 그 시작 시각(ms). 연결 전·종료 뒤면 null. */
+  idleTurn?: { waitingFor: "advertiser" | "operator"; since: number } | null;
   /** 요청 실패한 상담을 같은 문의로 다시 요청할 수 있는지(취소된 요청은 불가). */
   isRetryable?: boolean;
   createdAt: Date;
@@ -192,10 +216,12 @@ export interface BigbirdInquiryViewModel {
 
 export interface InquiryCampaignViewModel {
   campaignIdx: number;
+  /** 캠페인 유형 표시명. 없으면 null. */
+  typeName: string | null;
   campaignCode: string;
   brandName: string;
   productName: string;
-  /** v2 표기 `[브랜드명]상품명` */
+  /** "브랜드 상품명"(Figma 표기). */
   name: string;
   imageUrl: string | null;
   /** 진행기간 표시 `yyyy.MM.dd ~ yyyy.MM.dd`(Figma). 기간이 없으면 null. */
@@ -302,6 +328,10 @@ export const buyerInquiryDetailSchema = z.object({
   progressEndDate: z.string().nullable(),
   influencerPlatform: z.string().nullable(),
   influencerAccountLink: z.string().nullable(),
+  /** 공구샵 대표 이미지. 주문상품·캠페인 정보 공용이며 연관 캠페인이 없으면 null(Swagger). */
+  mainImageUrl: z.string().nullable(),
+  brandName: z.string().nullable(),
+  productName: z.string().nullable(),
 });
 export type BuyerInquiryDetail = z.infer<typeof buyerInquiryDetailSchema>;
 
@@ -387,6 +417,12 @@ export interface BuyerInquiryDetailViewModel {
   progressEndDate: string | null;
   influencerPlatform: string | null;
   influencerAccountLink: string | null;
+  /** 링크 마지막 경로에서 뽑은 계정명. 링크가 없으면 null. */
+  influencerAccountName: string | null;
+  /** 상세 응답의 대표 이미지. 상품·캠페인 목록에서 못 찾을 때 대신 씀. */
+  imageUrl: string | null;
+  /** 상품·캠페인 목록과 같은 "브랜드 상품명" 표기. 둘 다 없으면 null. */
+  name: string | null;
 }
 
 /** 상품 Q&A 한 건: 질문과 광고주 답변(없으면 null). */

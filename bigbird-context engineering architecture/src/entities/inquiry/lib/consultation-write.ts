@@ -9,6 +9,9 @@ export const LOCK_REFRESH_MS = 15_000;
 
 export type Fields = Record<string, unknown>;
 
+/** 실시간 상담이 끝날 때 대화에 남는 안내. 운영 앱·v2도 같은 문구를 보내므로 화면이 알아보는 데도 씀. */
+export const REALTIME_CLOSED_MESSAGE = "실시간 상담이 종료되었습니다.";
+
 export interface StoredMessage {
   auto: boolean;
   attachmentIdx: number | null;
@@ -23,6 +26,8 @@ export interface StoredMessage {
 
 /** 상담 문서(`sequence/{sequence}`)에서 쓰기 판단에 필요한 필드. */
 export interface ConsultationDoc {
+  /** true면 일반 문의(문의 남기기) 문서. 백엔드가 일반 문의로 만든 문서도 같은 경로를 씀. */
+  boardType?: boolean;
   sequence: number;
   threadIdx: number;
   isConnect: boolean;
@@ -76,7 +81,7 @@ export function formatWriteTime(time: number): string {
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 }
 
-/** 연결 대기 마감(ms). 마감 필드가 없는 과거 문서는 요청 시각 + 5분으로 계산함. */
+/** 연결 대기 마감(ms). 마감 필드가 없는 과거 문서는 요청 시각 + 3분으로 계산함. */
 export function getWaitDeadline(doc: ConsultationDoc): number | null {
   const explicit = parseWriteTime(doc.waitDeadline);
   if (explicit !== null) return explicit;
@@ -221,6 +226,8 @@ export function planMarkExpired(
   if (doc.expiredAt) return { kind: "skip" };
   // v2 요청은 v2가 만료 시 종료함. v3가 만료를 기록하면 그 흐름과 겹침.
   if (doc.origin !== "v3") return { kind: "skip" };
+  // 끝난 실시간 스레드를 백엔드가 일반 문의로 다시 열면 옛 waitDeadline·origin이 남음. 일반 문의는 만료 대상이 아님.
+  if (doc.boardType === true) return { kind: "skip" };
   const closed = getClosedReason(doc);
   if (closed || doc.isConnect) return { kind: "skip" };
   const deadline = getWaitDeadline(doc);
@@ -277,7 +284,7 @@ export function planFinishClose(
                 attachmentIdx: null,
                 identifier: null,
                 isUserMessage: false,
-                body: "실시간 상담이 종료되었습니다.",
+                body: REALTIME_CLOSED_MESSAGE,
                 fileName: null,
                 created: stamp,
                 messageId: input.closeMessageId,
@@ -326,7 +333,6 @@ export function planAcquireLock(
       clientResponseSequence: sequence,
       clientResponseAt: formatWriteTime(now),
       clientResponseTabs: { ...mine, [lock.tabId]: now + LOCK_TTL_MS },
-      updated: formatWriteTime(now),
     },
   };
 }
@@ -346,12 +352,11 @@ export function planReleaseLock(
     kind: "write",
     account:
       Object.keys(rest).length > 0
-        ? { clientResponseTabs: rest, clientResponseAt: stamp, updated: stamp }
+        ? { clientResponseTabs: rest, clientResponseAt: stamp }
         : {
             clientResponseUserIdx: null,
             clientResponseSequence: null,
             clientResponseTabs: {},
-            updated: stamp,
           },
   };
 }
@@ -379,12 +384,15 @@ export interface CreateRequestInput {
   now: number;
 }
 
-/** 운영 앱 알림(`alarmData`). 재시도에서는 캠페인 정보 없이 `campaignIdx`만 담음. */
+/**
+ * 운영 앱 알림(`alarmData`). 재시도에서는 캠페인 정보 없이 `campaignIdx`만 담음.
+ * `origin`·`threadIdx`·`sequence`는 운영 앱이 v3 알림을 골라 해당 대화를 바로 열 때 씀(v2 알림에는 없음).
+ */
 export function buildRequestAlarm(
   input: Pick<
     CreateRequestInput,
-    "threadUserIdx" | "userIdx" | "userId" | "campaign"
-  >,
+    "threadUserIdx" | "userIdx" | "userId" | "campaign" | "sequence"
+  > & { threadIdx: number | null },
   campaignIdx: number | null,
   stamp: string,
 ): Fields {
@@ -399,7 +407,25 @@ export function buildRequestAlarm(
       : null,
     icon: input.campaign?.mainImageUrl ?? null,
     campaignIdx,
+    origin: "v3",
+    threadIdx: input.threadIdx,
+    sequence: input.sequence,
   };
+}
+
+/** 캠페인 카드 메시지(JSON)의 `campaignIdx`. 카드가 아니면 null. */
+function cardCampaignIdx(body: string): number | null {
+  try {
+    const parsed: unknown = JSON.parse(body);
+    return typeof parsed === "object" &&
+      parsed !== null &&
+      "campaignIdx" in parsed &&
+      typeof parsed.campaignIdx === "number"
+      ? parsed.campaignIdx
+      : null;
+  } catch {
+    return null;
+  }
 }
 
 /**
@@ -410,50 +436,83 @@ export function planCreateRequest(
   existing: ConsultationDoc | undefined,
   account: Fields | undefined,
   input: CreateRequestInput,
-): { consultation: Fields; account: Fields; createAccount: boolean } | null {
-  if (existing) return null;
+): {
+  consultation: Fields;
+  account: Fields;
+  createAccount: boolean;
+  /** true면 이미 있는 일반 문의 문서에 실시간 필드를 합쳐 씀(메시지는 그대로). */
+  isConversion: boolean;
+} | null {
+  const isGeneralDoc =
+    existing?.boardType === true && existing.finishTime == null;
+  if (existing && !isGeneralDoc) return null;
   const stamp = formatWriteTime(input.now);
   const campaignIdx = input.campaign?.campaignIdx ?? null;
   const alarm = buildRequestAlarm(input, campaignIdx, stamp);
+  const realtimeFields = {
+    boardType: false,
+    threadIdx: input.threadIdx,
+    senderUserServiceType: "광고주",
+    sequence: input.sequence,
+    senderThreadUserIdx: input.threadUserIdx,
+    senderUserIdx: input.userIdx,
+    isConnect: false,
+    seqResponseDate: stamp,
+    campaignIdx,
+    finishTime: null,
+    origin: "v3",
+    waitDeadline: formatWriteTime(input.now + REALTIME_CONNECT_TIMEOUT_MS),
+  };
+  const accountFields = {
+    currentCampaignIdx: campaignIdx,
+    threadBoardType: 0,
+    newSenderUserIdx: 1,
+    senderUserServiceType: "광고주",
+    alarmData: alarm,
+    msgResponseDate: stamp,
+    updated: stamp,
+  };
+  const firstMessage = input.firstMessage && {
+    auto: true,
+    attachmentIdx: null,
+    identifier: null,
+    isUserMessage: false,
+    body: input.firstMessage.body,
+    fileName: null,
+    created: stamp,
+    messageId: input.firstMessage.id,
+  };
+  // 일반 문의로 쓰던 스레드에서 실시간을 요청하면 백엔드가 만든 문서에 실시간 필드를 합침(백엔드 답 2026-10-29,
+  // "일반→실시간 전환은 프론트가 합침"). 기존 메시지는 그대로 두고, 같은 캠페인 카드가 없을 때만 카드를 붙임.
+  if (isGeneralDoc) {
+    const messages = existing.messages ?? [];
+    const hasCard =
+      campaignIdx !== null &&
+      messages.some((m) => m.auto && cardCampaignIdx(m.body) === campaignIdx);
+    return {
+      createAccount: account === undefined,
+      account: accountFields,
+      // 전에 끝낸 실시간 상담이 남긴 종료·취소·만료 표시를 지움(남으면 새 요청이 종료 중으로 보임).
+      consultation: {
+        ...realtimeFields,
+        closingAt: null,
+        canceledAt: null,
+        expiredAt: null,
+        ...(firstMessage && !hasCard
+          ? { messages: [...messages, firstMessage] }
+          : {}),
+      },
+      isConversion: true,
+    };
+  }
   return {
+    isConversion: false,
     createAccount: account === undefined,
-    account: {
-      currentCampaignIdx: campaignIdx,
-      threadBoardType: 0,
-      newSenderUserIdx: 1,
-      senderUserServiceType: "광고주",
-      alarmData: alarm,
-      msgResponseDate: stamp,
-      updated: stamp,
-    },
+    account: accountFields,
     consultation: {
-      boardType: false,
-      threadIdx: input.threadIdx,
-      senderUserServiceType: "광고주",
-      sequence: input.sequence,
-      senderThreadUserIdx: input.threadUserIdx,
-      senderUserIdx: input.userIdx,
-      isConnect: false,
-      seqResponseDate: stamp,
-      campaignIdx,
-      finishTime: null,
+      ...realtimeFields,
       created: stamp,
-      origin: "v3",
-      waitDeadline: formatWriteTime(input.now + REALTIME_CONNECT_TIMEOUT_MS),
-      messages: input.firstMessage
-        ? [
-            {
-              auto: true,
-              attachmentIdx: null,
-              identifier: null,
-              isUserMessage: false,
-              body: input.firstMessage.body,
-              fileName: null,
-              created: stamp,
-              messageId: input.firstMessage.id,
-            },
-          ]
-        : [],
+      messages: firstMessage ? [firstMessage] : [],
     },
   };
 }

@@ -1,0 +1,47 @@
+{
+  "segment": {
+    "label": "상품 선택"
+  },
+  "count": {
+    "unit": "건",
+    "value": "{{value}} 건",
+    "tooltip": "{{value}}건"
+  },
+  "quota": {
+    "search": "인플루언서 검색 횟수",
+    "proposal": "인플루언서 제안 횟수",
+    "used": "사용",
+    "remaining": "잔여"
+  },
+  "status": {
+    "title": "이용 현황"
+  },
+  "filter": {
+    "metric": "지표",
+    "year": "연도",
+    "month": "월",
+    "granularity": "집계 단위",
+    "monthly": "월별",
+    "daily": "일별"
+  },
+  "metric": {
+    "campaignCount": "캠페인 생성 수",
+    "searchCount": "인플루언서 검색 수",
+    "proposalCount": "제안 발송 수",
+    "matchCount": "매칭 성사 수"
+  },
+  "chart": {
+    "monthly": "월별 이용량",
+    "daily": "일별 이용량",
+    "prev": "이전",
+    "next": "다음"
+  },
+  "empty": {
+    "title": "이용 현황이 없습니다.",
+    "description": "상품을 구독해주세요."
+  },
+  "breakdown": {
+    "brand": "{{product}} 브랜드형",
+    "groupBuy": "{{product}} 공구형"
+  }
+}

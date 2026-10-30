@@ -1,22 +1,34 @@
 import { useSubSelfAccount } from "@/entities/account";
 import {
-  AccountInfoCard,
-  AccountProfileForm,
+  AccountInfoCardSkeleton,
+  AccountProfileCard,
 } from "@/features/edit-account-profile";
+import { SkeletonGroup } from "@/shared/components/skeleton-presets";
 
-// Sub ID 본인 화면("Sub ID 관리" 탭)은 Master ID 관리에서 간편 로그인 연동 카드와 회원 탈퇴만 뺀 구성(스펙 §3).
-// 저장은 Sub 전용 API(/sub/pw·/sub/email·/sub/profile)로 보내고, 조회만 API가 없어 목.
+import { LoadFailedState } from "./LoadFailedState";
+
+// Sub ID 본인 화면("Sub ID 관리" 탭, Figma 10724:185444·185610): Master와 같은 보기·수정 카드 한 장이고 간편 로그인 연동·회원 탈퇴는 없음(스펙 §3).
+// 저장은 Sub 전용 API(/sub/pw·/sub/email·/sub/profile)로 보냄.
 export function SubSelfTab() {
-  const { profile, refresh } = useSubSelfAccount();
+  const { profile, isLoading, isError, mutate } = useSubSelfAccount();
+
+  if (isLoading) {
+    return (
+      <SkeletonGroup>
+        <AccountInfoCardSkeleton />
+      </SkeletonGroup>
+    );
+  }
+
+  if (isError || !profile) {
+    return <LoadFailedState onRetry={() => void mutate()} />;
+  }
 
   return (
-    <div className="flex flex-col gap-5 desktop:grid desktop:grid-cols-[minmax(0,1fr)_calc(var(--spacing)*143.75)] desktop:gap-x-5">
-      <AccountInfoCard profile={profile} />
-      <AccountProfileForm
-        accountType="sub"
-        profile={profile}
-        onSaved={refresh}
-      />
-    </div>
+    <AccountProfileCard
+      accountType="sub"
+      profile={profile}
+      onSaved={() => void mutate()}
+    />
   );
 }

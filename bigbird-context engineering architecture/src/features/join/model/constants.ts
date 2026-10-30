@@ -10,11 +10,6 @@ export const JOIN_STEP_PROGRESS = {
   terms: 4 / JOIN_STEP_COUNT,
 } as const;
 
-export const KMC_CERT_URL = "https://www.kmcert.com/kmcis/web/kmcisReq.jsp";
-export const KMC_POPUP_NAME = "KMCISWindow";
-export const KMC_POPUP_FEATURES =
-  "width=396, height=643, resizable=0, scrollbars=no, status=0, titlebar=0, toolbar=0, left=435, top=250";
-
 /** 번역 키(`cert.notice.{key}`). */
 export const CERT_INTRO_NOTICES = ["privacy", "passApp"] as const;
 

@@ -12,18 +12,18 @@ export interface ExtraInformationBody {
 }
 
 export async function fetchCompanyCategories() {
-  const response = await serverApiV3.get("/mypage/account/extra/category");
+  const response = await serverApiV3.get("/mypage/account/company/category");
   return companyCategoryListSchema.parse(response).category;
 }
 
 /** 처음 등록. 필수값(회사명·연락처·사업자 등록 번호·통신판매업 신고번호)을 서버가 검증함. */
 export function registerCompanyInfo(body: ExtraInformationBody) {
-  return serverApiV3.post("/mypage/account/extra", body);
+  return serverApiV3.post("/mypage/account/company", body);
 }
 
 /** 수정. 보내지 않은 필드는 null로 덮어써지므로 항상 전체 필드를 보냄. */
 export function updateCompanyInfo(body: ExtraInformationBody) {
-  return serverApiV3.put("/mypage/account/extra", body);
+  return serverApiV3.put("/mypage/account/company", body);
 }
 
 function toFormData(file: File) {
@@ -35,14 +35,24 @@ function toFormData(file: File) {
 /** 업로드는 항상 HTTP 200이고 `result`·`reason`으로 성공을 가름. 회사정보가 먼저 등록돼 있어야 함. */
 export function uploadBusinessRegistration(file: File) {
   return serverApiV3.post(
-    "/mypage/account/extra/registration/upload",
+    "/mypage/account/company/registration/upload",
     toFormData(file),
   );
 }
 
 export function uploadMailorderReport(file: File) {
   return serverApiV3.post(
-    "/mypage/account/extra/mailorder/upload",
+    "/mypage/account/company/mailorder/upload",
     toFormData(file),
   );
+}
+
+/** 사업자 등록증 파일. 등록된 파일이 없으면 404. */
+export function downloadBusinessRegistration() {
+  return serverApiV3.download("/mypage/account/company/registration/download");
+}
+
+/** 통신판매업 신고증 파일. 등록된 파일이 없으면 404. */
+export function downloadMailorderReport() {
+  return serverApiV3.download("/mypage/account/company/mailorder/download");
 }

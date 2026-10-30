@@ -47,11 +47,13 @@ export function MessageAlert({
     <div
       role={status === "error" ? "alert" : "status"}
       className={cn(
-        "flex flex-wrap items-end justify-end gap-3 rounded-lg border border-border bg-background p-6",
+        // 시안 여백 24는 테두리 바깥에서 잰 값이라 테두리 1px을 뺌
+        "flex flex-wrap items-end justify-end gap-3 rounded-lg border border-border bg-background p-5.75",
         className,
       )}
     >
-      <div className="flex min-w-72 flex-1 flex-col gap-2">
+      {/* 최소 폭 262(Figma Body). 더 크면 MO(328)에서 내용이 왼쪽 여백을 침범함 */}
+      <div className="flex min-w-65.5 flex-1 flex-col gap-2">
         <p className={titleVariants({ status })}>
           {STATUS_ICON[status]}
           {title}

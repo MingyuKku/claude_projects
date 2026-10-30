@@ -1,5 +1,5 @@
 {
-  "title": "修改信息",
+  "title": "账户信息",
   "form": {
     "bank": "银行",
     "accountNumber": "账户号码",
@@ -12,10 +12,16 @@
     "registered": "已登记",
     "error": {
       "extension": "仅支持 JPG、PNG、PDF 文件。",
-      "size": "最大 10MB。"
-    }
+      "size": "最大 10MB。",
+      "download": "无法下载文件，请重试。"
+    },
+    "none": "无文件",
+    "download": "下载{{name}}"
   },
   "toast": {
     "denied": "每月 5 日至 10 日结算期间无法修改账户信息。"
+  },
+  "view": {
+    "register": "登记"
   }
 }

@@ -11,53 +11,20 @@ import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 
+import {
+  STATUS_FILTERS,
+  toBuyerInquiryFilters,
+  toBuyerStatusFilter,
+} from "../lib/filters";
 import { formatListDate, STATUS_BADGE_VARIANT } from "../lib/format";
 import { BuyerFilterChips } from "./BuyerFilterChips";
 import { BuyerInquiryFilterDialog } from "./BuyerInquiryFilterDialog";
 
 import type {
-  BuyerInquiryStatusFilter,
   BuyerInquiryFilters,
   BuyerInquiryViewModel,
 } from "@/entities/inquiry";
 import type { FormEvent, ReactNode } from "react";
-
-const STATUS_FILTERS = ["all", "waiting", "done"] as const;
-
-function toPositiveNumber(value: string | null) {
-  const number = Number(value);
-  return value !== null && Number.isSafeInteger(number) && number > 0
-    ? number
-    : undefined;
-}
-
-export function toBuyerInquiryFilters(
-  params: URLSearchParams,
-): BuyerInquiryFilters {
-  const source = params.get("source");
-  const campaignIdx = toPositiveNumber(params.get("campaignIdx"));
-  return {
-    sourceType:
-      source === "purchaser"
-        ? "PURCHASER_QUESTION"
-        : source === "qna"
-          ? "PRODUCT_QNA"
-          : "ALL",
-    campaignIdx,
-    influencerThreadUserIdx:
-      campaignIdx === undefined
-        ? undefined
-        : toPositiveNumber(params.get("influencerThreadUserIdx")),
-    keyword: params.get("q")?.trim() || undefined,
-  };
-}
-
-/** URL의 `?status=` 값을 목록 필터로 바꿈. 모르는 값(재문의 포함)은 전체. */
-export function toBuyerStatusFilter(
-  value: string | null,
-): BuyerInquiryStatusFilter {
-  return STATUS_FILTERS.find((filter) => filter === value) ?? "all";
-}
 
 interface BuyerInquiryWorkspaceProps {
   /** 서버가 준 순서(최신순) 그대로의 문의 목록. */
@@ -172,6 +139,13 @@ export function BuyerInquiryWorkspace({
           "influencerThreadUserIdx",
           String(value.influencerThreadUserIdx),
         );
+      if (value.startDate && value.endDate) {
+        params.set("startDate", value.startDate);
+        params.set("endDate", value.endDate);
+      } else {
+        params.delete("startDate");
+        params.delete("endDate");
+      }
       return params;
     });
   }
@@ -217,8 +191,6 @@ export function BuyerInquiryWorkspace({
     <div className="flex h-full min-h-0 min-w-0 gap-5">
       <ChatListPanel
         title={t("listTitle")}
-        refreshLabel={t("refresh")}
-        onClickRefresh={onClickRefresh}
         search={
           <>
             <form
@@ -267,7 +239,7 @@ export function BuyerInquiryWorkspace({
         isEmpty={isLoading || isError || !hasItems}
         empty={renderListBody()}
         className={cn(
-          "min-h-0 flex-1 rounded-none border-0 tablet:rounded-lg tablet:border desktop:w-94 desktop:flex-none",
+          "min-h-0 flex-1 rounded-none border-0 tablet:rounded-lg tablet:border desktop:w-94.25 desktop:flex-none",
           isPanelOpen && "hidden desktop:flex",
         )}
       >
@@ -321,7 +293,8 @@ export function BuyerInquiryWorkspace({
       <section
         aria-label={panelLabel}
         className={cn(
-          "min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-none border-0 bg-background tablet:rounded-lg tablet:border tablet:border-border",
+          // 테두리는 안쪽 패널(대화·상세, 빈 화면)이 각자 그립니다. Figma는 둘을 떨어진 박스로 그립니다.
+          "min-h-0 min-w-0 flex-1 flex-col bg-background",
           isPanelOpen ? "flex" : "hidden desktop:flex",
           // 목록이 비었으면 오른쪽 패널을 그리지 않음(Figma 구매자 문의 Empty 6790:100517).
           isEmptyList && "desktop:hidden",

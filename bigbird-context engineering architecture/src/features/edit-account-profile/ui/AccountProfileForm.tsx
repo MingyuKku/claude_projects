@@ -1,34 +1,30 @@
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 
-import {
-  checkUploadFile,
-  formatPhoneNumber,
-  IMAGE_EXTENSIONS,
-} from "@/entities/account";
-import { AvatarEdit } from "@/shared/components/avatar-edit";
-import { FormRow, PasswordInput } from "@/shared/components/form-field";
+import { FormRow } from "@/shared/components/form-field";
+import { InfoRow } from "@/shared/components/info-row";
 import { SectionCard } from "@/shared/components/section-card";
 import { useTranslation } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 
-import { useProfileImage } from "../api/use-profile-image";
+import { formatJoinedAt } from "../lib/format-joined-at";
 import {
   canSaveProfile,
   getProfileSavePlan,
   validateProfileForm,
 } from "../lib/profile-form";
 import { saveAccountProfile } from "../lib/save-account-profile";
-import { EMAIL_MAX_LENGTH, PASSWORD_MAX_LENGTH } from "../model/constants";
+import { usePhoneVerification } from "../lib/use-phone-verification";
+import { useProfileImagePicker } from "../lib/use-profile-image-picker";
+import { EMAIL_MAX_LENGTH } from "../model/constants";
+import { PhoneVerifyRow } from "./PhoneVerifyRow";
+import { ProfileImageField } from "./ProfileImageField";
+import { ProfilePasswordFields } from "./ProfilePasswordFields";
 
 import type { AccountRole } from "../lib/save-account-profile";
 import type { AccountProfileViewModel } from "@/entities/account";
 import type { ChangeEvent, FormEvent } from "react";
-
-const IMAGE_ACCEPT = IMAGE_EXTENSIONS.map((extension) => `.${extension}`).join(
-  ",",
-);
 
 interface AccountProfileFormProps {
   /** Master와 Sub ID는 저장 API 경로가 다름. 기본은 Master. */
@@ -38,12 +34,9 @@ interface AccountProfileFormProps {
   onClickWithdraw?: () => void;
   /** 서버에 하나라도 반영된 뒤 호출. 화면이 정보를 다시 읽음. */
   onSaved: () => void;
+  /** 수정 모드를 끝낼 때 호출: 취소를 누르거나, 모두 저장에 성공했을 때. */
+  onFinishEdit?: () => void;
   className?: string;
-}
-
-interface PickedImage {
-  file: File;
-  previewUrl: string;
 }
 
 // Figma 정보 수정(7046:124807): PC·TAB은 라벨 왼쪽·입력 오른쪽 표, MO는 라벨 위·입력 아래.
@@ -52,40 +45,38 @@ export function AccountProfileForm({
   profile,
   onClickWithdraw,
   onSaved,
+  onFinishEdit,
   className,
 }: AccountProfileFormProps) {
   const { t } = useTranslation("features/edit-account-profile");
   const { t: tCommon } = useTranslation();
-  const { profileUrl, mutate: mutateProfileImage } = useProfileImage();
+  const image = useProfileImagePicker(accountType);
 
   const [values, setValues] = useState({
     password: "",
     passwordCheck: "",
     email: profile.email,
   });
-  const [pickedImage, setPickedImage] = useState<PickedImage | null>(null);
-  // Sub ID는 `GET /profile`이 권한 오류로 거부되는 경우를 대비해 저장한 이미지를 이 화면에서만 계속 보임(미리보기 주소는 화면을 떠날 때 풀림).
-  const [savedImage, setSavedImage] = useState<PickedImage | null>(null);
   const [isSaving, setIsSaving] = useState(false);
-  const imageInputRef = useRef<HTMLInputElement>(null);
-
-  // 고른 이미지를 바꾸거나 화면을 떠날 때 미리보기 주소를 풀어 줌.
-  useEffect(() => {
-    return () => {
-      if (pickedImage) URL.revokeObjectURL(pickedImage.previewUrl);
-    };
-  }, [pickedImage]);
-  useEffect(() => {
-    return () => {
-      if (savedImage) URL.revokeObjectURL(savedImage.previewUrl);
-    };
-  }, [savedImage]);
+  // 모바일은 KMC로 페이지를 옮겼다 돌아오므로 입력 중이던 이메일을 되살림.
+  const {
+    state: phoneVerification,
+    startVerification,
+    resetVerification,
+  } = usePhoneVerification((draft) =>
+    setValues((prev) => ({ ...prev, email: draft.email })),
+  );
 
   const errors = validateProfileForm(values, {
     identifier: profile.identifier,
     initialEmail: profile.email,
   });
-  const plan = getProfileSavePlan(values, profile.email, pickedImage !== null);
+  const verifiedPhone =
+    phoneVerification.status === "verified" ? phoneVerification : null;
+  const plan = getProfileSavePlan(values, profile.email, {
+    hasNewImage: image.pickedFile !== null,
+    hasVerifiedPhone: verifiedPhone !== null,
+  });
   const canSave = canSaveProfile(values, errors, plan);
 
   function handleChangeField(field: keyof typeof values) {
@@ -93,22 +84,11 @@ export function AccountProfileForm({
       setValues((prev) => ({ ...prev, [field]: event.target.value }));
   }
 
-  function handleChangeImage(event: ChangeEvent<HTMLInputElement>) {
-    const file = event.target.files?.[0];
-    // 같은 파일을 다시 골라도 change가 일어나도록 비움.
-    event.target.value = "";
-    if (!file) return;
-    const rejection = checkUploadFile(file, IMAGE_EXTENSIONS);
-    if (rejection) {
-      toast.error(t(`form.profileImage.error.${rejection}`));
-      return;
-    }
-    setPickedImage({ file, previewUrl: URL.createObjectURL(file) });
-  }
-
   function handleClickCancel() {
     setValues({ password: "", passwordCheck: "", email: profile.email });
-    setPickedImage(null);
+    image.discardPicked();
+    resetVerification();
+    onFinishEdit?.();
   }
 
   async function handleSubmit(event: FormEvent) {
@@ -121,138 +101,104 @@ export function AccountProfileForm({
       password: values.password,
       email: values.email,
       certIdx: profile.certIdx,
-      imageFile: pickedImage?.file ?? null,
-      hasExistingImage: Boolean(profileUrl ?? savedImage),
+      verifiedPhone,
+      imageFile: image.pickedFile,
+      hasExistingImage: image.hasExistingImage,
     });
     setIsSaving(false);
 
+    // 저장한 번호는 다시 읽은 정보로 보임.
+    if (completed.includes("phone")) resetVerification();
     if (completed.includes("password")) {
       setValues((prev) => ({ ...prev, password: "", passwordCheck: "" }));
     }
-    if (completed.includes("image")) {
-      // 고른 이미지의 미리보기 주소는 아래에서 풀리므로 저장본은 새 주소로 따로 만듦.
-      if (accountType === "sub" && pickedImage) {
-        setSavedImage({
-          file: pickedImage.file,
-          previewUrl: URL.createObjectURL(pickedImage.file),
-        });
-      }
-      setPickedImage(null);
-    }
+    if (completed.includes("image")) image.markSaved();
     if (completed.length > 0) {
-      void mutateProfileImage();
+      void image.refresh();
       onSaved();
     }
 
     if (failure === "generic") toast.error(tCommon("feedback.saveFailed"));
     else if (failure) toast.error(t(`toast.save.${failure}`));
-    else toast(tCommon("feedback.saved"));
+    else {
+      toast(tCommon("feedback.saved"));
+      onFinishEdit?.();
+    }
   }
 
-  const passwordLabel = t("form.password.label");
-  const passwordCheckLabel = t("form.passwordCheck.label");
+  const isMaster = accountType === "master";
+  // Sub ID는 시안의 라벨이 다르고(담당자 명·아이디 명·이메일 주소·생성일) 휴대폰 번호 행이 없음.
+  const labels = isMaster
+    ? {
+        id: t("info.id"),
+        name: t("info.name"),
+        email: t("form.email.label"),
+        joinedAt: t("info.joinedAt"),
+      }
+    : {
+        id: t("sub.id"),
+        name: t("sub.name"),
+        email: t("sub.email"),
+        joinedAt: t("sub.joinedAt"),
+      };
+  const idValue = profile.identifier;
+  const joinedAtValue = formatJoinedAt(profile.joinedAt);
+  const rowClassName = "hidden tablet:flex";
 
   return (
-    <SectionCard title={t("form.title")} className={className}>
+    <SectionCard title={t("info.title")} className={className}>
       <form onSubmit={handleSubmit} noValidate className="flex flex-col">
-        <div className="flex flex-col p-3 tablet:p-5">
-          <div className="flex flex-col gap-2 p-3.5 tablet:gap-3 tablet:p-0">
-            <div className="grid grid-cols-1 tablet:min-h-12 tablet:grid-cols-2 tablet:items-start">
-              <p className="text-sm leading-5 font-medium text-foreground tablet:min-h-12 tablet:px-4 tablet:font-semibold">
-                {t("form.profileImage.label")}
-              </p>
-              <div className="flex justify-center tablet:justify-start tablet:px-4">
-                <AvatarEdit
-                  src={
-                    pickedImage?.previewUrl ??
-                    profileUrl ??
-                    savedImage?.previewUrl ??
-                    undefined
-                  }
-                  alt={t("form.profileImage.alt")}
-                  editLabel={t("form.profileImage.edit")}
-                  onClickEdit={() => imageInputRef.current?.click()}
-                />
-                <input
-                  ref={imageInputRef}
-                  type="file"
-                  accept={IMAGE_ACCEPT}
-                  className="hidden"
-                  onChange={handleChangeImage}
-                />
-              </div>
+        <div className="flex flex-col p-4 tablet:p-5">
+          <div className="flex flex-col gap-3">
+            <ProfileImageField
+              src={image.previewSrc}
+              inputRef={image.inputRef}
+              onClickEdit={image.openPicker}
+              onChange={image.handleChange}
+            />
+
+            {/* MO는 읽기 전용 값을 회색 박스로 묶음. */}
+            <div className="flex flex-col rounded-lg bg-muted/40 p-2.5 tablet:hidden">
+              {!isMaster && (
+                <InfoRow label={labels.name}>{profile.name}</InfoRow>
+              )}
+              <InfoRow label={labels.id}>{idValue}</InfoRow>
+              {isMaster && (
+                <InfoRow label={labels.name}>{profile.name}</InfoRow>
+              )}
+              <InfoRow label={labels.joinedAt}>{joinedAtValue}</InfoRow>
             </div>
 
-            <div className="flex flex-col gap-2 tablet:gap-0">
-              <FormRow
-                label={passwordLabel}
-                errorText={
-                  errors.password
-                    ? t(`form.password.error.${errors.password}`)
-                    : undefined
-                }
-              >
-                {(control) => (
-                  <PasswordInput
-                    {...control}
-                    autoComplete="new-password"
-                    maxLength={PASSWORD_MAX_LENGTH}
-                    value={values.password}
-                    onChange={handleChangeField("password")}
-                    showLabel={tCommon("password.show", {
-                      label: passwordLabel,
-                    })}
-                    hideLabel={tCommon("password.hide", {
-                      label: passwordLabel,
-                    })}
+            <div className="flex flex-col gap-3 tablet:gap-0">
+              {!isMaster && (
+                <InfoRow label={labels.name} className={rowClassName}>
+                  {profile.name}
+                </InfoRow>
+              )}
+              <InfoRow label={labels.id} className={rowClassName}>
+                {idValue}
+              </InfoRow>
+              <ProfilePasswordFields
+                values={values}
+                errors={errors}
+                onChangeField={handleChangeField}
+              />
+              {isMaster && (
+                <>
+                  <InfoRow label={labels.name} className={rowClassName}>
+                    {profile.name}
+                  </InfoRow>
+                  <PhoneVerifyRow
+                    phone={profile.phone}
+                    verification={phoneVerification}
+                    onClickVerify={() =>
+                      void startVerification({ email: values.email })
+                    }
                   />
-                )}
-              </FormRow>
+                </>
+              )}
               <FormRow
-                label={passwordCheckLabel}
-                errorText={
-                  errors.passwordCheck
-                    ? t("form.passwordCheck.mismatch")
-                    : undefined
-                }
-              >
-                {(control) => (
-                  <PasswordInput
-                    {...control}
-                    autoComplete="new-password"
-                    maxLength={PASSWORD_MAX_LENGTH}
-                    value={values.passwordCheck}
-                    onChange={handleChangeField("passwordCheck")}
-                    showLabel={tCommon("password.show", {
-                      label: passwordCheckLabel,
-                    })}
-                    hideLabel={tCommon("password.hide", {
-                      label: passwordCheckLabel,
-                    })}
-                  />
-                )}
-              </FormRow>
-              <FormRow label={t("form.phone.label")}>
-                {(control) => (
-                  <div className="flex items-center gap-2">
-                    <Input
-                      {...control}
-                      readOnly
-                      value={formatPhoneNumber(profile.phone)}
-                    />
-                    {/* 본인인증 경로 확인 전(스펙 §7 B-12)이라 준비 중 안내. */}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => toast(tCommon("status.comingSoon"))}
-                    >
-                      {t("form.phone.verify")}
-                    </Button>
-                  </div>
-                )}
-              </FormRow>
-              <FormRow
-                label={t("form.email.label")}
+                label={labels.email}
                 errorText={
                   errors.email ? t("form.email.error.format") : undefined
                 }
@@ -268,11 +214,14 @@ export function AccountProfileForm({
                   />
                 )}
               </FormRow>
+              <InfoRow label={labels.joinedAt} className={rowClassName}>
+                {joinedAtValue}
+              </InfoRow>
             </div>
           </div>
         </div>
 
-        <div className="flex items-end justify-between gap-2 p-3 tablet:p-5">
+        <div className="flex items-end justify-between gap-2 p-4 tablet:p-5">
           {onClickWithdraw ? (
             <Button
               type="button"

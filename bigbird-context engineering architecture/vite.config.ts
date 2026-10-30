@@ -4,7 +4,7 @@ import { defineConfig, loadEnv, type ProxyOptions } from "vite";
 
 // 백엔드 CORS 허용 목록에 이 앱 origin이 없어서, 개발 서버가 같은 origin에서 프록시합니다.
 // VITE_API_*_URL(경로 접두사)과 VITE_PROXY_*_URL(실제 주소)이 둘 다 있는 백엔드만 프록시합니다.
-const BACKENDS = ["SERVER", "MEMBER", "SOCIAL", "AUTH"] as const;
+const BACKENDS = ["SERVER", "MEMBER", "SOCIAL", "AUTH", "PAY"] as const;
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());

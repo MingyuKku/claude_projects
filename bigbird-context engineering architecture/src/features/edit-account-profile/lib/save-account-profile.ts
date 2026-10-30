@@ -7,17 +7,18 @@ import {
 } from "@/entities/account";
 
 import {
-  changeMasterEmail,
   changeMasterPassword,
   changeSubEmail,
   changeSubPassword,
+  changeSubPhone,
+  modifyMasterAccount,
   uploadProfileImage,
   uploadSubProfileImage,
 } from "../api/profile-api";
 
 import type { ProfileSavePlan } from "./profile-form";
 
-export type SaveStep = "image" | "email" | "password";
+export type SaveStep = "image" | "phone" | "email" | "password";
 /** 번역 키(`toast.save.{code}`). */
 export type SaveFailureCode = "tooManyRequests" | "personalInfo" | "generic";
 
@@ -35,8 +36,10 @@ interface SaveParams {
   plan: ProfileSavePlan;
   password: string;
   email: string;
-  /** 현재 연결된 본인인증 인덱스. 이메일을 바꿀 때 함께 보냄. */
+  /** 현재 연결된 본인인증 인덱스. 휴대폰을 바꾸지 않고 이메일만 바꿀 때 보냄. */
   certIdx: number | null;
+  /** 이번에 마친 휴대폰 본인인증. `plan.hasPhoneChange`일 때 씀. */
+  verifiedPhone: { certIdx: number; phone: string } | null;
   imageFile: File | null;
   hasExistingImage: boolean;
 }
@@ -50,7 +53,7 @@ function toFailureCode(error: unknown): SaveFailureCode {
 }
 
 /**
- * 이미지 → 이메일 → 비밀번호 순으로 저장하고 첫 실패에서 멈춤. 비밀번호를 마지막에 두는 이유는
+ * 이미지 → 휴대폰·이메일 → 비밀번호 순으로 저장하고 첫 실패에서 멈춤. 비밀번호를 마지막에 두는 이유는
  * 서버가 비밀번호를 바꾸면 세션을 무효화할 수 있어서(확인 전), 앞 단계가 먼저 끝나야 하기 때문.
  */
 export async function saveAccountProfile(params: SaveParams) {
@@ -60,17 +63,21 @@ export async function saveAccountProfile(params: SaveParams) {
     password,
     email,
     certIdx,
+    verifiedPhone,
     imageFile,
     hasExistingImage,
   } = params;
   const isSub = role === "sub";
   const completed: SaveStep[] = [];
 
-  async function run(step: SaveStep, request: () => Promise<unknown>) {
+  async function run(
+    steps: SaveStep | SaveStep[],
+    request: () => Promise<unknown>,
+  ) {
     const [error, response] = await tryit(request)();
     if (error) return toFailureCode(error);
     if (!isSimpleSuccess(response)) return "generic" as const;
-    completed.push(step);
+    completed.push(...[steps].flat());
     return null;
   }
 
@@ -83,14 +90,32 @@ export async function saveAccountProfile(params: SaveParams) {
     if (failure) return { completed, failure } satisfies SaveResult;
   }
 
-  if (plan.hasEmailChange) {
-    // Master는 본인인증이 없으면 서버가 이메일 변경을 받지 않음. Sub ID는 인증 없이 값만 보냄.
-    let request: (() => Promise<unknown>) | null = null;
-    if (isSub) request = () => changeSubEmail(email);
-    else if (certIdx !== null)
-      request = () => changeMasterEmail({ certIdx, email });
-    if (!request) return { completed, failure: "generic" } satisfies SaveResult;
-    const failure = await run("email", request);
+  const phoneChange = plan.hasPhoneChange ? verifiedPhone : null;
+
+  if (isSub) {
+    // Sub ID는 휴대폰·이메일이 따로 가는 API.
+    if (phoneChange) {
+      const failure = await run("phone", () =>
+        changeSubPhone(phoneChange.phone),
+      );
+      if (failure) return { completed, failure } satisfies SaveResult;
+    }
+    if (plan.hasEmailChange) {
+      const failure = await run("email", () => changeSubEmail(email));
+      if (failure) return { completed, failure } satisfies SaveResult;
+    }
+  } else if (phoneChange || plan.hasEmailChange) {
+    // Master는 휴대폰(새 `certIdx`)과 이메일을 한 요청으로 보냄. 본인인증이 없으면 서버가 받지 않음.
+    const nextCertIdx = phoneChange?.certIdx ?? certIdx;
+    if (nextCertIdx === null) {
+      return { completed, failure: "generic" } satisfies SaveResult;
+    }
+    const steps: SaveStep[] = [];
+    if (phoneChange) steps.push("phone");
+    if (plan.hasEmailChange) steps.push("email");
+    const failure = await run(steps, () =>
+      modifyMasterAccount({ certIdx: nextCertIdx, email }),
+    );
     if (failure) return { completed, failure } satisfies SaveResult;
   }
 

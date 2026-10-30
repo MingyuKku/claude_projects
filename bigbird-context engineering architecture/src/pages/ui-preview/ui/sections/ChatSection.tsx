@@ -146,6 +146,7 @@ function ChatListPanels() {
         className={panelClass}
         title="문의 목록"
         refreshLabel="새로고침"
+        onClickRefresh={() => {}}
         action={newButton}
         tabs={
           <ChatTabs labels={["전체", "답변 대기", "상담 중", "답변 완료"]} />
@@ -164,7 +165,6 @@ function ChatListPanels() {
       <ChatListPanel
         className={panelClass}
         title="문의 목록"
-        refreshLabel="새로고침"
         search={<SearchBar />}
         tabs={
           <ChatTabs labels={["전체", "답변 대기", "재문의", "답변 완료"]} />
@@ -187,6 +187,7 @@ function ChatListPanels() {
         className={panelClass}
         title="문의 목록"
         refreshLabel="새로고침"
+        onClickRefresh={() => {}}
         action={newButton}
         tabs={
           <ChatTabs labels={["전체", "답변 대기", "상담 중", "답변 완료"]} />
@@ -197,7 +198,6 @@ function ChatListPanels() {
       <ChatListPanel
         className={panelClass}
         title="문의 목록"
-        refreshLabel="새로고침"
         search={<SearchBar />}
         filters={
           <>

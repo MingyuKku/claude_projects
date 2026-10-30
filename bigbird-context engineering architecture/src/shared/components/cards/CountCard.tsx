@@ -9,6 +9,7 @@ import type { ComponentProps, ReactNode } from "react";
 
 // Figma Card / Count(6934:86666): 제목 + 큰 숫자·단위 + (선택) 증감 캡션.
 // 하단에 버튼(Button) 또는 사용량 Progress가 붙으면 Figma처럼 Hover·Focus 상태가 없음.
+// 큰 숫자·제목 줄 높이는 Figma 변수가 TAB·MO에서 22px, PC(desktop)에서 24px로 풀림.
 export interface CountCardUsageItem {
   id: string;
   label: ReactNode;
@@ -53,13 +54,15 @@ export function CountCard({
     <Card interactive={!hasFooter} className={className} {...props}>
       <CardHeader>
         {icon}
-        <CardTitle className="text-sm leading-6">{title}</CardTitle>
+        <CardTitle className="text-sm leading-5.5 desktop:leading-6">
+          {title}
+        </CardTitle>
       </CardHeader>
       <CardContent
         className={cn("flex flex-col gap-2 pt-1.5", hasFooter && "pb-0")}
       >
         <p className="flex items-center gap-1 font-semibold text-foreground">
-          <span className="text-2xl leading-none tracking-[-0.6px]">
+          <span className="text-[22px] leading-none tracking-[-0.6px] desktop:text-2xl">
             {value}
           </span>
           {unit && (

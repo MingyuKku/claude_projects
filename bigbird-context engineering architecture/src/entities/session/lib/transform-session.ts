@@ -1,25 +1,27 @@
 import type {
+  MenuPermissions,
   Session,
   SessionViewModel,
-  SubPermissions,
 } from "../model/schema";
 
-const ALL_PERMISSIONS: SubPermissions = {
-  requestCampaign: true,
-  openShop: true,
-  currentSituation: true,
-  settlement: true,
-  customerService: true,
+const ALL_PERMISSIONS: MenuPermissions = {
+  campaign: true,
+  influencerMatching: true,
+  influencerMarket: true,
+  commerce: true,
+  bigbirdMoney: true,
+  purchaserQuestion: true,
 };
 
-function toSubPermissions(session: Session): SubPermissions {
+function toMenuPermissions(session: Session): MenuPermissions {
   if (session.authority !== "SUB") return ALL_PERMISSIONS;
   return {
-    requestCampaign: session.isRequestCampaignAccess ?? false,
-    openShop: session.isOpenShopAccess ?? false,
-    currentSituation: session.isCurrentSituationAccess ?? false,
-    settlement: session.isSettlementAccess ?? false,
-    customerService: session.isCustomerServiceAccess ?? false,
+    campaign: session.isCampaignAccess ?? false,
+    influencerMatching: session.isInfluencerMatchingAccess ?? false,
+    influencerMarket: session.isInfluencerMarketAccess ?? false,
+    commerce: session.isCommerceAccess ?? false,
+    bigbirdMoney: session.isBigbirdMoneyAccess ?? false,
+    purchaserQuestion: session.isPurchaserQuestionAccess ?? false,
   };
 }
 
@@ -37,6 +39,6 @@ export function transformSessionToViewModel(
     identifier: session.identifier,
     email: session.email,
     phone: session.phone,
-    subPermissions: toSubPermissions(session),
+    permissions: toMenuPermissions(session),
   };
 }

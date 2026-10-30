@@ -17,10 +17,11 @@ vi.mock("@/shared/api", async (importOriginal) => {
 
 const campaign: InquiryCampaignViewModel = {
   campaignIdx: 10,
+  typeName: null,
   campaignCode: "P-1",
   brandName: "빅버드",
   productName: "샘플 상품",
-  name: "[빅버드]샘플 상품",
+  name: "빅버드 샘플 상품",
   imageUrl: null,
   period: null,
 };

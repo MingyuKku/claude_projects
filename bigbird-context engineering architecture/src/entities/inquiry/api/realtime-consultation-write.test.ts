@@ -1,6 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import {
+  acquireConsultationLock,
   appendConsultationMessage,
   cancelRealtimeRequest,
   closeConsultation,
@@ -12,7 +13,8 @@ const store = vi.hoisted(() => {
   const data = new Map<string, Record<string, unknown>>();
   const versions = new Map<string, number>();
   const hooks: { afterRead?: () => void } = {};
-  return { data, versions, hooks };
+  const reads: string[] = [];
+  return { data, versions, hooks, reads };
 });
 
 const path = (ref: { path: string }) => ref.path;
@@ -37,6 +39,7 @@ vi.mock("firebase/firestore", () => ({
       const writes: (() => void)[] = [];
       const tx = {
         get: async (ref: { path: string }) => {
+          store.reads.push(path(ref));
           seen.set(path(ref), store.versions.get(path(ref)) ?? 0);
           const value = store.data.get(path(ref));
           return {
@@ -114,6 +117,18 @@ describe("realtime-consultation-write", () => {
     store.data.clear();
     store.versions.clear();
     store.hooks.afterRead = undefined;
+    store.reads.length = 0;
+  });
+
+  it("응대 락은 계정 문서만 읽고 쓴다", async () => {
+    seed();
+    await expect(
+      acquireConsultationLock(target, { owner: "42_0", tabId: "tab" }),
+    ).resolves.toEqual({ ok: true, skipped: false });
+    expect(store.reads).toEqual([ACCOUNT]);
+    expect(store.data.get(ACCOUNT)).toMatchObject({
+      clientResponseUserIdx: "42_0",
+    });
   });
 
   it("동시에 보낸 두 메시지가 모두 남는다(재시도로 최신 배열에 붙인다)", async () => {

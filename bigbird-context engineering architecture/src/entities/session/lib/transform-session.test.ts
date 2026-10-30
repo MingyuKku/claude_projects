@@ -17,11 +17,12 @@ const base: Session = {
 };
 
 const ALL_TRUE = {
-  requestCampaign: true,
-  openShop: true,
-  currentSituation: true,
-  settlement: true,
-  customerService: true,
+  campaign: true,
+  influencerMatching: true,
+  influencerMarket: true,
+  commerce: true,
+  bigbirdMoney: true,
+  purchaserQuestion: true,
 };
 
 describe("transformSessionToViewModel", () => {
@@ -43,41 +44,42 @@ describe("transformSessionToViewModel", () => {
     expect(transformSessionToViewModel(session).displayName).toBe("admin-dev");
   });
 
-  it("grants every permission to MASTER and ADMIN", () => {
-    expect(transformSessionToViewModel(base).subPermissions).toEqual(ALL_TRUE);
+  it("grants every menu permission to MASTER and ADMIN", () => {
+    expect(transformSessionToViewModel(base).permissions).toEqual(ALL_TRUE);
     expect(
-      transformSessionToViewModel({ ...base, authority: "ADMIN" })
-        .subPermissions,
+      transformSessionToViewModel({ ...base, authority: "ADMIN" }).permissions,
     ).toEqual(ALL_TRUE);
   });
 
-  it("ignores SUB flags for MASTER", () => {
+  it("ignores the permission flags for MASTER", () => {
     const vm = transformSessionToViewModel({
       ...base,
-      isSettlementAccess: false,
+      isBigbirdMoneyAccess: false,
     });
-    expect(vm.subPermissions.settlement).toBe(true);
+    expect(vm.permissions.bigbirdMoney).toBe(true);
   });
 
   it("uses the server flags for SUB", () => {
     const vm = transformSessionToViewModel({
       ...base,
       authority: "SUB",
-      isOpenShopAccess: true,
-      isSettlementAccess: true,
+      isBigbirdMoneyAccess: true,
+      isInfluencerMatchingAccess: true,
     });
-    expect(vm.subPermissions).toEqual({
-      requestCampaign: false,
-      openShop: true,
-      currentSituation: false,
-      settlement: true,
-      customerService: false,
+    expect(vm.permissions).toEqual({
+      campaign: false,
+      influencerMatching: true,
+      influencerMarket: false,
+      commerce: false,
+      bigbirdMoney: true,
+      purchaserQuestion: false,
     });
   });
 
   it("denies a SUB permission the server did not send", () => {
     const vm = transformSessionToViewModel({ ...base, authority: "SUB" });
-    expect(Object.values(vm.subPermissions)).toEqual([
+    expect(Object.values(vm.permissions)).toEqual([
+      false,
       false,
       false,
       false,

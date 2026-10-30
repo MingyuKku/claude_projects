@@ -16,5 +16,5 @@
   "select": "选择",
   "send": "发送",
   "messagePlaceholder": "请输入咨询内容。（最多3,000字）",
-  "noCampaign": "您还没有申请的活动。"
+  "noCampaign": "暂无活动记录。"
 }

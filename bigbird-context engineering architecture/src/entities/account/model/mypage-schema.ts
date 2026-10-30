@@ -45,7 +45,7 @@ const masterUserSchema = z.object({
   emailApple: z.string().nullish(),
 });
 
-const masterExtraInformationSchema = z.object({
+const masterCompanyInformationSchema = z.object({
   companyName: z.string().nullish(),
   contact: z.string().nullish(),
   companyRegistrationNumber: z.string().nullish(),
@@ -67,9 +67,20 @@ export const accountMasterSchema = z.object({
   result: z.boolean(),
   user: masterUserSchema,
   // 회사정보를 등록하기 전에는 비어 있을 수 있어 nullish로 받음(Swagger는 필수로 표기).
-  extraInformation: masterExtraInformationSchema.nullish(),
+  companyInformation: masterCompanyInformationSchema.nullish(),
 });
 export type AccountMaster = z.infer<typeof accountMasterSchema>;
+
+/** `GET /v3/mypage/account/sub/self`. SUB 전용(MASTER·ADMIN은 403). 가입일은 응답에 없음(docs/mypage-api.md §4-8). */
+export const subSelfAccountSchema = z.object({
+  accountIdx: z.number(),
+  identifier: z.string(),
+  name: z.string(),
+  email: z.string(),
+  phone: z.string(),
+  profileImageUrl: z.string().nullish(),
+});
+export type SubSelfAccount = z.infer<typeof subSelfAccountSchema>;
 
 export const SOCIAL_PROVIDERS = [
   "kakao",

@@ -30,7 +30,7 @@ PRD 5.2의 페이스북 로그인은 **버튼만 넣고 동작은 비활성**으
 - 클라이언트 입력 검증은 빈 값뿐이며 서버 호출 전에 막는다.
 - 로컬은 변수 이름과 빈 값만 담긴 `.env.example`을 `.env.local`로 복사하고 `VITE_API_*_URL` 접두사와 `VITE_PROXY_*_URL` 대상을 함께 설정한다. 변경 후 개발 서버를 재시작한다. 서버 대상과 소셜 키는 팀에서 전달받은 환경별 값으로 설정한다. `.env.example`은 모든 값을 비워 Git으로 관리하고, 실제 값을 넣은 `.env.local`은 Git에서 제외한다.
 - 세션은 쿠키 기반이라 토큰을 저장하지 않는다. 백엔드 CORS 허용 목록에 이 앱 origin이 없어 dev proxy/운영 리버스 프록시를 경유한다.
-- `/sec` 세션 조회는 `X-Path` 헤더로 경로 인가를 묻고 **캐시된 답을 쓰지 않는다**(권한이 서버에서 바뀔 수 있음). 그래서 `AuthGuard`가 `children(session)`으로 세션을 내려 주고, 화면에서 `useSession`을 또 부르면 요청이 중복된다. 공개 홈의 `HomePage`는 `useSession`으로 로그인 상태만 확인하고 `AuthGuard`로 접근을 막지 않는다. `result`는 인증이 아니라 해당 경로의 인가 결과다.
+- `GET /v3/sec` 세션 조회는 `X-Path` 헤더로 경로 인가를 묻고 **캐시된 답을 쓰지 않는다**(권한이 서버에서 바뀔 수 있음). 그래서 `AuthGuard`가 `children(session)`으로 세션을 내려 주고, 화면에서 `useSession`을 또 부르면 요청이 중복된다. 공개 홈의 `HomePage`는 `useSession`으로 로그인 상태만 확인하고 `AuthGuard`로 접근을 막지 않는다. `result`는 인증이 아니라 해당 경로의 인가 결과다.
 - `AuthGuard`는 401·세션 오류·경로 거부 시 현재 앱의 `/login`으로 보낸다. 로컬 개발에서도 같은 로그인 흐름을 유지하며, 401 응답의 외부 `redirectTo`(Stage 회원 사이트)는 사용하지 않는다.
 - 로그인 착지점은 권한 분기 없이 홈이라 구 Vue 앱으로 넘어가는 전체 페이지 로드가 없다(`useNavigateToLanding`).
 - 비밀번호 만료 핸드오프: 자격 증명은 라우터 state가 아니라 모듈 변수에 둔다(state는 history 복원 파일로 디스크에 남음). 새로고침하면 사라지고, `ExpiredPasswordForm`이 액션 시점에 `/login`로 돌려보낸다. 비밀번호 변경/연장 성공 경로에서만 지우며 뒤로가기 등 그 외 이탈에서는 지우지 않는다.

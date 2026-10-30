@@ -15,6 +15,7 @@
     },
     "action": {
       "permission": "권한 부여",
+      "edit": "수정",
       "delete": "삭제"
     },
     "empty": {
@@ -57,10 +58,6 @@
         "label": "비밀번호 확인",
         "placeholder": "비밀번호를 입력하세요."
       },
-      "phone": {
-        "label": "휴대폰 번호",
-        "placeholder": "휴대폰 번호를 입력하세요."
-      },
       "email": {
         "label": "이메일",
         "placeholder": "이메일을 입력하세요."
@@ -94,18 +91,27 @@
       "created": "Sub ID가 생성되었습니다."
     }
   },
+  "edit": {
+    "title": "Sub ID 수정",
+    "submit": "수정하기",
+    "toast": {
+      "updated": "Sub ID 정보가 수정되었습니다."
+    }
+  },
   "delete": {
     "title": "Sub ID 삭제",
-    "description": "‘{{identifier}}’를 삭제하시겠습니까? 삭제된 데이터는 복구되지 않습니다."
+    "description": "‘{{identifier}}’를 삭제하시겠습니까? 삭제된 데이터는 복구되지 않습니다.",
+    "toast": {
+      "deleted": "Sub ID가 삭제되었습니다."
+    }
   },
   "access": {
-    "screen": "권한 부여",
+    "tab": {
+      "service": "서비스 권한",
+      "campaign": "캠페인 할당"
+    },
     "permission": {
       "title": "Sub ID 권한부여",
-      "column": {
-        "name": "권한명",
-        "granted": "권한 여부"
-      },
       "name": {
         "campaign": "캠페인",
         "influencerMatching": "인플루언서 매칭",
@@ -114,7 +120,11 @@
         "buyerInquiry": "구매자 문의",
         "bigbirdMoney": "빅버드 머니"
       },
-      "switchLabel": "{{name}} 권한"
+      "switchLabel": "{{name}} 권한",
+      "toast": {
+        "granted": "‘{{name}}’ 권한이 부여되었습니다.",
+        "revoked": "‘{{name}}’ 권한이 해제되었습니다."
+      }
     },
     "campaign": {
       "title": "Sub ID 캠페인 할당",
@@ -123,7 +133,6 @@
         "productType": "상품 유형",
         "detailType": "세부 상품",
         "status": "캠페인 진행 상태",
-        "statusShort": "진행 상태",
         "assigned": "담당 여부"
       },
       "productType": {
@@ -139,7 +148,8 @@
         "waiting": "대기중",
         "running": "진행중"
       },
-      "switchLabel": "{{name}} 담당 여부"
+      "switchLabel": "{{name}} 담당 여부",
+      "empty": "할당 가능한 캠페인이 없습니다."
     }
   }
 }

@@ -1,5 +1,5 @@
 {
-  "title": "情報修正",
+  "title": "会社情報",
   "form": {
     "companyName": "会社名",
     "contact": "連絡先",
@@ -16,8 +16,10 @@
     "registered": "登録済み",
     "error": {
       "extension": "JPG・PNG・PDFのみアップロードできます。",
-      "size": "最大10MBまでです。"
-    }
+      "size": "最大10MBまでです。",
+      "download": "ファイルをダウンロードできませんでした。もう一度お試しください。"
+    },
+    "download": "{{name}}をダウンロード"
   },
   "inform": {
     "required": "必須項目をすべて入力すると保存できます。",

@@ -228,8 +228,8 @@
 }
 
 /* Skeleton 빛 줄기. Figma Skeleton(4733:6553)에 모션 정의가 없어 코드에서 정함(디자인 확인 대기).
-   배경을 뷰포트에 고정(fixed)해 모든 막대가 그라데이션 하나를 나눠 씀. 막대마다 따로 움직이면 폭에 따라 속도가
-   달라 보이기 때문. 줄기는 그림(300vw) 가운데 30vw 폭이고, 화면 왼쪽 밖에서 오른쪽 밖까지 이동함. */
+   막대마다 자기 폭 안에서 빛이 지나가게 함. 뷰포트 기준으로 하면 이동 거리가 길어, 스켈레톤이 짧게 노출될 때
+   빛이 막대에 닿기 전에 사라짐. 줄기는 그림(200%) 가운데 10% 폭이고, 막대 왼쪽 밖에서 오른쪽 밖까지 이동함. */
 @utility skeleton-shimmer {
   background-image: linear-gradient(
     105deg,
@@ -237,10 +237,9 @@
     color-mix(in oklab, var(--background) 80%, transparent) 50%,
     transparent 55%
   );
-  background-size: 300vw 100vh;
+  background-size: 200% 100%;
   background-repeat: no-repeat;
-  background-attachment: fixed;
-  animation: skeleton-shimmer 1.8s ease-in-out infinite;
+  animation: skeleton-shimmer 1.8s linear infinite;
   @media (prefers-reduced-motion: reduce) {
     background-image: none;
     animation: none;
@@ -249,10 +248,10 @@
 
 @keyframes skeleton-shimmer {
   from {
-    background-position: -165vw 0;
+    background-position: 110% 0;
   }
   to {
-    background-position: -35vw 0;
+    background-position: -10% 0;
   }
 }
 

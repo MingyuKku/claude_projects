@@ -17,7 +17,15 @@
       "description": "Receive promotional push notifications at night (9 PM–8 AM)."
     }
   },
-  "marketing": { "label": "Marketing consent" },
-  "night": { "label": "Night-time consent" },
-  "notice": "Essential service and security notices are sent regardless of consent."
+  "marketing": {
+    "label": "Marketing consent"
+  },
+  "night": {
+    "label": "Night-time consent"
+  },
+  "notice": "Essential service and security notices are sent regardless of consent.",
+  "toast": {
+    "agreed": "Consent given on {{date}}.",
+    "withdrawn": "Consent withdrawn on {{date}}."
+  }
 }

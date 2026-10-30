@@ -21,6 +21,12 @@ if [ "${1:-}" = "--fingerprint" ]; then
   exit 0
 fi
 
+# `--watch-list`: 검증 입력 목록을 출력한다. 편집 직후 훅이 "검증 입력을 바꿨는지" 판단할 때 같은 목록을 쓴다.
+if [ "${1:-}" = "--watch-list" ]; then
+  echo "$WATCH"
+  exit 0
+fi
+
 failed=""
 for check in typecheck lint i18n:check test; do
   out=$(pnpm -s "$check" 2>&1)

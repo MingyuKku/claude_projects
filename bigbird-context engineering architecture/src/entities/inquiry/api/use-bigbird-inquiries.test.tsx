@@ -12,6 +12,9 @@ vi.mock("@/shared/api", async (importOriginal) => {
   return { ...actual, serverApiV3: { get: vi.fn() } };
 });
 // 실시간 상담(Firestore) 구독은 이 테스트의 관심사가 아니라 REST 목록을 그대로 돌려줌.
+vi.mock("./helpdesk-changes", () => ({
+  useInquirySummaryChanges: vi.fn(),
+}));
 vi.mock("./use-live-inquiries", () => ({
   useLiveInquiries: (_threadUserIdx: unknown, inquiries: unknown) => inquiries,
 }));

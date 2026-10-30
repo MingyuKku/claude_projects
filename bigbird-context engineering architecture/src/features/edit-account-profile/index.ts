@@ -1,6 +1,2 @@
-export { AccountInfoCard } from "./ui/AccountInfoCard";
-export { AccountProfileForm } from "./ui/AccountProfileForm";
-export {
-  AccountInfoCardSkeleton,
-  AccountProfileFormSkeleton,
-} from "./ui/AccountProfileSkeletons";
+export { AccountProfileCard } from "./ui/AccountProfileCard";
+export { AccountInfoCardSkeleton } from "./ui/AccountProfileSkeletons";

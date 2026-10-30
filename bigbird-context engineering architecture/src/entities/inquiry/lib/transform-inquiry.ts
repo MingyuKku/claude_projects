@@ -1,6 +1,7 @@
 import { tryit } from "radash";
 
 import { campaignCardSchema } from "../model/schema";
+import { REALTIME_CLOSED_MESSAGE } from "./consultation-write";
 
 import type {
   BigbirdInquiryStatus,
@@ -61,30 +62,55 @@ function parseCampaignCard(
   }
 }
 
+// Figma 상세 정보(6766:48186)는 "브랜드 상품명"으로 씁니다(v2의 "[브랜드]상품명" 아님). 브랜드가 비면 상품명만 씁니다.
+function toProductName(brandName: string, productName: string) {
+  return [brandName, productName].filter(Boolean).join(" ");
+}
+
+// 문서는 image 경로로 올라가 서버가 fileType을 image로 줄 수 있어 파일 이름으로 먼저 가림.
+const DOCUMENT_EXTENSION = /\.(pdf|txt|docx?|xlsx?|pptx?)$/i;
+
 function toKind(
-  message: Pick<InquiryMessage, "auto" | "attachmentIdx" | "fileType">,
+  message: Pick<
+    InquiryMessage,
+    "auto" | "body" | "attachmentIdx" | "fileType"
+  > & {
+    fileName?: string | null;
+  },
   campaign: CampaignCard | null,
 ): InquiryMessageKind {
   if (campaign) return "campaignCard";
-  if (message.auto) return "system";
+  // 상담 종료 안내는 자동 메시지지만 대화에 보여 줌(사용자 결정 2026-10-29). 나머지 자동 안내는 숨김.
+  if (message.auto && message.body !== REALTIME_CLOSED_MESSAGE) return "system";
   if (message.attachmentIdx === null) return "text";
+  if (DOCUMENT_EXTENSION.test(message.fileName ?? "")) return "file";
   if (message.fileType?.startsWith("image")) return "image";
   if (message.fileType?.startsWith("video")) return "video";
   return "file";
 }
 
+/**
+ * `fallback`은 서버 값이 null일 때 쓰는 값. 실시간 구간 메시지는 `messageIdx`가 없어 음수 id(수정·삭제 불가 표시)를,
+ * 시각 파싱에 실패한 메시지는 앞 메시지의 시각을 씀.
+ */
 export function transformInquiryMessageToViewModel(
   message: InquiryMessage,
+  fallback: { id: number; createdAt: Date } = { id: -1, createdAt: new Date() },
 ): InquiryMessageViewModel {
   const campaign = parseCampaignCard(message);
   return {
-    id: message.messageIdx,
+    id: message.messageIdx ?? fallback.id,
     // 캠페인 카드는 v2 호환으로 광고주가 보낸 auto 메시지(isUserMessage: false)로 저장됨. 내가 보낸 카드로 그림.
     isMine: message.isUserMessage || campaign !== null,
     kind: toKind(message, campaign),
     body: toPlainBody(message.body),
-    createdAt: toDate(message.writeTime),
+    createdAt: message.writeTime
+      ? toDate(message.writeTime)
+      : fallback.createdAt,
     isDeleted: message.deleteTime !== null,
+    isRead: message.readTime !== null,
+    isEdited: message.modifyTime !== null,
+    senderId: message.identifier || null,
     campaign,
     attachment:
       message.attachmentIdx === null
@@ -96,6 +122,22 @@ export function transformInquiryMessageToViewModel(
             fileType: message.fileType,
           },
   };
+}
+
+/** 메시지 목록을 뷰모델로 바꿈. 시각이 null인 메시지는 앞 메시지(없으면 뒤 메시지) 시각을 이어 씀. */
+export function transformInquiryMessagesToViewModels(
+  messages: InquiryMessage[],
+): InquiryMessageViewModel[] {
+  const firstTime = messages.find((message) => message.writeTime)?.writeTime;
+  let previousAt = firstTime ? toDate(firstTime) : new Date();
+  return messages.map((message, index) => {
+    const viewModel = transformInquiryMessageToViewModel(message, {
+      id: -(index + 1),
+      createdAt: previousAt,
+    });
+    previousAt = viewModel.createdAt;
+    return viewModel;
+  });
 }
 
 // 실시간 상담에서 같은 종료 안내가 여러 번 쌓인 이력이 있어, 연속된 동일 auto 메시지는 하나만 둠.
@@ -127,6 +169,9 @@ export function transformRealtimeConsultationMessages(
         body: toPlainBody(message.body),
         createdAt: toDate(message.created),
         isDeleted: false,
+        isRead: false,
+        isEdited: false,
+        senderId: message.identifier || null,
         campaign,
         attachment:
           message.attachmentIdx === null
@@ -161,8 +206,8 @@ export function transformInquiryThreadToViewModel(
     status: THREAD_STATUS[thread.status],
     realtimePhase: null,
     createdAt: toDate(thread.created),
-    messages: dropRepeatedAutoMessages(messages).map(
-      transformInquiryMessageToViewModel,
+    messages: transformInquiryMessagesToViewModels(
+      dropRepeatedAutoMessages(messages),
     ),
   };
 }
@@ -172,10 +217,11 @@ export function transformInquiryCampaignToViewModel(
 ): InquiryCampaignViewModel {
   return {
     campaignIdx: campaign.campaignIdx,
+    typeName: campaign.campaignServiceName ?? null,
     campaignCode: campaign.campaignCode,
     brandName: campaign.brandName,
     productName: campaign.productName,
-    name: `[${campaign.brandName}]${campaign.productName}`,
+    name: toProductName(campaign.brandName, campaign.productName),
     imageUrl: campaign.mainImageUrl,
     period: toCampaignPeriod(
       campaign.progressStartDate,
@@ -200,6 +246,9 @@ export function buildSubmittedInquiryViewModel(input: {
     isMine: true,
     createdAt: now,
     isDeleted: false,
+    isRead: false,
+    isEdited: false,
+    senderId: null,
     attachment: null,
   };
   const messages: InquiryMessageViewModel[] = [];
@@ -303,15 +352,30 @@ export function transformBuyerInquiryDetailToViewModel(
     progressEndDate: detail.progressEndDate,
     influencerPlatform: detail.influencerPlatform,
     influencerAccountLink: toHttpUrl(detail.influencerAccountLink),
+    influencerAccountName: toAccountName(detail.influencerAccountLink),
+    imageUrl: detail.mainImageUrl,
+    name:
+      toProductName(detail.brandName ?? "", detail.productName ?? "") || null,
   };
 }
 
-/** 주문/상품 정보를 상세 패널의 상품 표시(이름은 v2 표기)로 바꿈. */
+// 서버가 "플랫폼 URL 패턴 + 닉네임"으로 링크를 조합하므로(Swagger) 마지막 경로가 계정명
+function toAccountName(link: string | null): string | null {
+  const url = toHttpUrl(link);
+  if (!url) return null;
+  const name = new URL(url).pathname.split("/").filter(Boolean).at(-1);
+  if (!name) return null;
+  // 깨진 퍼센트 인코딩(%zz)은 decodeURIComponent가 예외를 던져 상세 전체가 실패하므로 원문을 씀
+  const [error, decoded] = tryit(() => decodeURIComponent(name))();
+  return (error ? name : decoded).replace(/^@/, "");
+}
+
+/** 주문/상품 정보를 상세 패널의 상품 표시(이름은 "브랜드 상품명")로 바꿈. */
 export function transformPurchaserQuestionInfoToViewModel(
   info: PurchaserQuestionInfo,
 ): BuyerProductViewModel {
   return {
-    name: `[${info.brandName}]${info.productName}`,
+    name: toProductName(info.brandName, info.productName),
     imageUrl: info.mainImageUrl,
   };
 }

@@ -1,4 +1,5 @@
 export {
+  clearLastAllowedSession,
   formLogin,
   useFormLogin,
   useLogout,
@@ -17,7 +18,7 @@ export type {
   FormLoginResult,
   Session,
   SessionViewModel,
-  SubPermissions,
+  MenuPermissions,
 } from "./model/schema";
 export { AuthGuard } from "./ui/AuthGuard";
 export { useSwitchAccount, useSwitchAccounts } from "./api/switch-account-api";

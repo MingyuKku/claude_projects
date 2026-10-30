@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { act, render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { SWRConfig } from "swr";
@@ -42,7 +42,10 @@ function inquiry(
   };
 }
 
-function renderConversation(value: BigbirdInquiryViewModel) {
+function renderConversation(
+  value: BigbirdInquiryViewModel,
+  onClickRealtime?: () => void,
+) {
   render(
     <SWRConfig value={{ provider: () => new Map() }}>
       <MemoryRouter>
@@ -50,6 +53,7 @@ function renderConversation(value: BigbirdInquiryViewModel) {
           inquiry={value}
           myName="김빅링크"
           threadUserIdx={5971}
+          onClickRealtime={onClickRealtime}
         />
       </MemoryRouter>
     </SWRConfig>,
@@ -62,7 +66,7 @@ describe("실시간 상담 대화", () => {
     expect(screen.getByText("상담 요청 중")).toBeInTheDocument();
     expect(
       screen.getByText(
-        "상담원 연결은 고객 문의 상황에 따라 최대 5분이 소요될 수 있습니다.",
+        "상담원 연결은 고객 문의 상황에 따라 최대 3분이 소요될 수 있습니다.",
       ),
     ).toBeInTheDocument();
     expect(screen.getByRole("textbox")).toBeDisabled();
@@ -70,17 +74,25 @@ describe("실시간 상담 대화", () => {
     expect(screen.getByRole("button", { name: "상담 종료" })).toBeDisabled();
   });
 
-  it("요청 실패 카드는 재시도·문의 메시지로 남기기를 보여 주되 연동 전에는 비활성이다", () => {
-    renderConversation(inquiry({ status: "failed", realtimePhase: "failed" }));
-    expect(screen.getByText("상담 요청 실패")).toBeInTheDocument();
-    expect(screen.getByText("요청 실패")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "재시도" })).toBeDisabled();
-    expect(
-      screen.getByRole("button", { name: "문의 메시지로 남기기" }),
-    ).toBeDisabled();
-    expect(screen.getByRole("textbox")).toBeDisabled();
+  it("연결 실패 카드는 버튼 없이 안내만 하고 10초 뒤 사라지며, 입력은 일반 문의로 보낸다", () => {
+    vi.useFakeTimers();
+    try {
+      renderConversation(
+        inquiry({ status: "failed", realtimePhase: "failed" }),
+      );
+      expect(screen.getByText("실시간 상담 불가")).toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "재시도" }),
+      ).not.toBeInTheDocument();
+      expect(screen.getByRole("textbox")).toBeEnabled();
+      act(() => {
+        vi.advanceTimersByTime(10_000);
+      });
+      expect(screen.queryByText("실시간 상담 불가")).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
   });
-
   it("상담 중에는 안내 카드가 없다", () => {
     renderConversation(
       inquiry({ status: "consulting", realtimePhase: "connected" }),
@@ -89,40 +101,57 @@ describe("실시간 상담 대화", () => {
     expect(screen.getByText("상담 중")).toBeInTheDocument();
   });
 
-  it("연동한 쓰기 핸들러가 있으면 버튼이 활성이다", () => {
-    const onClickRetry = vi.fn();
-    render(
-      <SWRConfig value={{ provider: () => new Map() }}>
-        <MemoryRouter>
-          <BigbirdInquiryConversation
-            inquiry={inquiry({ status: "failed", realtimePhase: "failed" })}
-            myName="김빅링크"
-            threadUserIdx={5971}
-            onClickRetry={onClickRetry}
-          />
-        </MemoryRouter>
-      </SWRConfig>,
-    );
-    expect(screen.getByRole("button", { name: "재시도" })).toBeEnabled();
-  });
-
-  it("종료된 상담은 완료 카드만 있고 입력창이 없으며 상담 종료는 비활성이다", () => {
+  it("종료된 상담은 완료 카드와 입력창이 있고 상담 종료는 비활성이다", () => {
     renderConversation(
       inquiry({ isFinished: true, status: "done", realtimePhase: "finished" }),
     );
     expect(screen.getByText("완료된 상담")).toBeInTheDocument();
-    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toBeEnabled();
     expect(screen.getByRole("button", { name: "상담 종료" })).toBeDisabled();
   });
 
-  it("일반 문의에는 상담 종료 버튼과 입력창이 없다", () => {
+  it("열린 일반 문의에는 입력창이 있고 상담 종료 버튼은 없다", () => {
     renderConversation(
       inquiry({ isRealtime: false, realtimePhase: null, status: "waiting" }),
     );
     expect(
       screen.queryByRole("button", { name: "상담 종료" }),
     ).not.toBeInTheDocument();
-    expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toBeEnabled();
+  });
+
+  it("열린 일반 문의의 실시간 상담하기 버튼을 누르면 실시간 상담을 요청한다", async () => {
+    const onClickRealtime = vi.fn();
+    renderConversation(
+      inquiry({ isRealtime: false, realtimePhase: null, status: "waiting" }),
+      onClickRealtime,
+    );
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "실시간 상담하기" }),
+    );
+
+    expect(onClickRealtime).toHaveBeenCalledOnce();
+  });
+
+  it("실시간 상담이나 종료된 문의에는 실시간 상담하기 버튼이 없다", () => {
+    renderConversation(inquiry(), vi.fn());
+    expect(
+      screen.queryByRole("button", { name: "실시간 상담하기" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("종료된 일반 문의도 입력창이 있다", () => {
+    renderConversation(
+      inquiry({
+        isRealtime: false,
+        realtimePhase: null,
+        isFinished: true,
+        status: "done",
+      }),
+    );
+    expect(screen.getByText("완료된 상담")).toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toBeEnabled();
   });
 });
 
@@ -134,6 +163,9 @@ describe("첨부 메시지", () => {
     body: `https://cdn/${name}`,
     createdAt: new Date("2026-10-19T10:00:00"),
     isDeleted: false,
+    isRead: false,
+    isEdited: false,
+    senderId: null,
     campaign: null,
     attachment: {
       attachmentIdx: id,

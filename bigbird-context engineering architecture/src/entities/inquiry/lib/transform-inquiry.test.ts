@@ -10,6 +10,7 @@ import {
   transformBuyerInquiryDetailToViewModel,
   transformBuyerInquiryToViewModel,
   transformInquiryCampaignToViewModel,
+  transformInquiryMessagesToViewModels,
   transformInquiryThreadToViewModel,
   transformRealtimeConsultationMessages,
 } from "./transform-inquiry";
@@ -178,6 +179,13 @@ describe("transformInquiryThreadToViewModel", () => {
             attachmentIdx: 9,
             fileType: "application/pdf",
           }),
+          // 문서는 image 경로로 올라가 fileType이 image여도 파일 이름으로 문서로 봄
+          message({
+            messageIdx: 8,
+            attachmentIdx: 9,
+            fileType: "image",
+            fileName: "보고서.xlsx",
+          }),
         ],
       }),
     );
@@ -188,6 +196,7 @@ describe("transformInquiryThreadToViewModel", () => {
       "text",
       "image",
       "video",
+      "file",
       "file",
     ]);
     expect(messages[0]?.campaign?.productName).toBe("샘플 상품");
@@ -248,7 +257,29 @@ describe("transformInquiryCampaignToViewModel", () => {
         progressStartDate: "2026-10-01",
         progressEndDate: "2026-10-31",
       }).name,
-    ).toBe("[빅버드]샘플 상품");
+    ).toBe("빅버드 샘플 상품");
+  });
+});
+
+describe("transformInquiryCampaignToViewModel: 캠페인 유형", () => {
+  const base = {
+    campaignIdx: 1,
+    campaignCode: "C1",
+    brandName: "브랜드",
+    productName: "상품",
+    mainImageUrl: null,
+    progressStartDate: null,
+    progressEndDate: null,
+  };
+
+  it("서버가 준 유형 표시명을 그대로 담고, 없으면 null이다", () => {
+    expect(
+      transformInquiryCampaignToViewModel({
+        ...base,
+        campaignServiceName: "베이직형",
+      }).typeName,
+    ).toBe("베이직형");
+    expect(transformInquiryCampaignToViewModel(base).typeName).toBeNull();
   });
 });
 
@@ -451,6 +482,29 @@ describe("transformBuyerInquiryDetailToViewModel: 인플루언서 링크", () =>
     progressEndDate: null,
     influencerPlatform: null,
     influencerAccountLink: link,
+    mainImageUrl: null,
+    brandName: null,
+    productName: null,
+  });
+
+  it('대표 이미지와 "브랜드 상품명"을 상세 응답에서 가져온다', () => {
+    const viewModel = transformBuyerInquiryDetailToViewModel({
+      ...detail(null),
+      mainImageUrl: "https://cdn/shop.png",
+      brandName: "빅버드",
+      productName: "스킨케어 세트",
+    });
+    expect(viewModel.imageUrl).toBe("https://cdn/shop.png");
+    expect(viewModel.name).toBe("빅버드 스킨케어 세트");
+    expect(
+      transformBuyerInquiryDetailToViewModel({
+        ...detail(null),
+        productName: "스킨케어 세트",
+      }).name,
+    ).toBe("스킨케어 세트");
+    expect(
+      transformBuyerInquiryDetailToViewModel(detail(null)).name,
+    ).toBeNull();
   });
 
   it("http(s) 링크만 그대로 둔다", () => {
@@ -464,12 +518,24 @@ describe("transformBuyerInquiryDetailToViewModel: 인플루언서 링크", () =>
   it.each(["javascript:alert(1)", "data:text/html,x", "bigbird", ""])(
     "다른 스킴이나 깨진 값(%s)은 null로 바꾼다",
     (link) => {
-      expect(
-        transformBuyerInquiryDetailToViewModel(detail(link))
-          .influencerAccountLink,
-      ).toBeNull();
+      const viewModel = transformBuyerInquiryDetailToViewModel(detail(link));
+      expect(viewModel.influencerAccountLink).toBeNull();
+      expect(viewModel.influencerAccountName).toBeNull();
     },
   );
+
+  it.each([
+    ["https://instagram.com/bigbirdinfluencer", "bigbirdinfluencer"],
+    ["https://www.youtube.com/@bigbird/", "bigbird"],
+    ["https://www.tiktok.com/@%EB%B9%85%EB%B2%84%EB%93%9C", "빅버드"],
+    ["https://instagram.com/", null],
+    ["https://instagram.com/abc%zz", "abc%zz"],
+  ])("링크(%s)의 마지막 경로를 계정명(%s)으로 뽑는다", (link, name) => {
+    expect(
+      transformBuyerInquiryDetailToViewModel(detail(link))
+        .influencerAccountName,
+    ).toBe(name);
+  });
 });
 
 describe("transformInquiryThreadToViewModel: v2가 저장한 링크·줄바꿈 HTML", () => {
@@ -543,5 +609,56 @@ describe("buildSubmittedInquiryViewModel", () => {
       body: "  ",
     });
     expect(inquiry.messages).toEqual([]);
+  });
+});
+
+describe("transformInquiryMessagesToViewModels", () => {
+  it("실시간 구간 메시지의 null 값은 음수 id와 앞 메시지 시각으로 채운다", () => {
+    const result = transformInquiryMessagesToViewModels([
+      message({ messageIdx: 5, writeTime: "2026-10-01T10:00:00" }),
+      message({ messageIdx: null, userIdx: null, writeTime: null }),
+      message({ messageIdx: 6, writeTime: "2026-10-01T11:00:00" }),
+    ]);
+
+    expect(result.map((item) => item.id)).toEqual([5, -2, 6]);
+    expect(result.map((item) => item.createdAt)).toEqual([
+      new Date("2026-10-01T10:00:00"),
+      new Date("2026-10-01T10:00:00"),
+      new Date("2026-10-01T11:00:00"),
+    ]);
+  });
+
+  it("첫 메시지의 시각이 null이면 뒤에서 처음 나오는 시각을 쓴다", () => {
+    const result = transformInquiryMessagesToViewModels([
+      message({ messageIdx: null, writeTime: null }),
+      message({ messageIdx: 6, writeTime: "2026-10-01T11:00:00" }),
+    ]);
+
+    expect(result.map((item) => item.createdAt)).toEqual([
+      new Date("2026-10-01T11:00:00"),
+      new Date("2026-10-01T11:00:00"),
+    ]);
+  });
+});
+
+describe("자동 메시지 분류", () => {
+  it("상담 종료 안내는 대화에 보이고 다른 자동 안내는 시스템 메시지로 숨긴다", () => {
+    const [closed, greeting] = transformInquiryMessagesToViewModels([
+      message({
+        messageIdx: 1,
+        auto: true,
+        isUserMessage: false,
+        body: "실시간 상담이 종료되었습니다.",
+      }),
+      message({
+        messageIdx: 2,
+        auto: true,
+        isUserMessage: false,
+        body: "상담원과 연결되었습니다.",
+      }),
+    ]);
+
+    expect(closed?.kind).toBe("text");
+    expect(greeting?.kind).toBe("system");
   });
 });

@@ -8,3 +8,4 @@ export {
 } from "./SkeletonForm";
 export { SkeletonGroup } from "./SkeletonGroup";
 export { SkeletonLine } from "./SkeletonLine";
+export { TableSkeleton } from "./TableSkeleton";

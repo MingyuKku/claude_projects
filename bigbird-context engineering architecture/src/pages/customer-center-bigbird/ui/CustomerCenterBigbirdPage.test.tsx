@@ -25,12 +25,17 @@ vi.mock("@/entities/inquiry", () => ({
     inquiries,
     isLoading: false,
     isError: false,
-    mutate: vi.fn(),
+    refresh: vi.fn(),
   }),
+  useInquiryCampaigns: () => ({ campaigns: [] }),
+  useInquiryUserName: () => undefined,
 }));
 vi.mock("@/features/realtime-consultation", () => ({
   IS_REALTIME_WRITE_ENABLED: true,
+  isRealtimeOpenHours: () => true,
   RealtimeComposer: () => null,
+  RealtimeHoursAlert: () => null,
+  RealtimeIdleAlert: () => null,
   RealtimeLockAlert: ({
     open,
     onLeave,
@@ -39,6 +44,10 @@ vi.mock("@/features/realtime-consultation", () => ({
     onLeave: () => void;
   }) => (open ? <button onClick={onLeave}>락 알림 닫기</button> : null),
   useRealtimeConversation: mocks.useRealtimeConversation,
+  useRequestRealtimeConsultation: () => ({
+    request: vi.fn(),
+    isRequesting: false,
+  }),
 }));
 vi.mock("@/shared/lib/useMediaQuery", () => ({
   useMediaQuery: () => mocks.isDesktop,
@@ -55,6 +64,7 @@ vi.mock("@/widgets/bigbird-inquiry-workspace", () => ({
       {children}
     </div>
   ),
+  BigbirdInquiryDetailPanel: () => null,
   BigbirdInquiryConversation: ({
     inquiry,
   }: {

@@ -5,6 +5,7 @@
   "all": "All",
   "waiting": "Waiting",
   "consulting": "Consulting",
+  "consultingBadge": "Live chat",
   "done": "Answered",
   "empty": {
     "title": "No inquiries yet.",
@@ -16,7 +17,6 @@
     "campaignUnknown": "Campaign inquiry",
     "other": "Other inquiry"
   },
-  "consultDate": "Opened",
   "bigbirdManager": "Bigbird team",
   "completed": {
     "title": "Closed",
@@ -29,7 +29,6 @@
   "copyCode": "Copy campaign code",
   "copied": "Copied to clipboard.",
   "backToList": "Back to list",
-  "filterEmpty": "No matching inquiries.",
   "copyFailed": "Couldn't copy.",
   "deletedMessage": "Message deleted.",
   "failed": "Failed",
@@ -37,19 +36,28 @@
     "requesting": {
       "title": "Requesting chat",
       "description": "The live chat starts when an operator joins.",
-      "caption": "Connecting can take up to 5 minutes."
+      "caption": "Connecting can take up to 3 minutes."
     },
     "failed": {
-      "title": "Chat request failed",
-      "description": "Leave a message and we'll reply in order after reviewing it.",
-      "caption": "Replies to messages may be delayed depending on inquiry volume."
+      "title": "Live chat unavailable",
+      "description": "Our agents can't respond right now. Leave a message and we'll get back to you."
     },
-    "retry": "Retry",
-    "leaveMessage": "Leave a message",
     "end": "End chat",
     "composer": "Live chat message",
     "composerPlaceholder": "Enter your inquiry. (Up to 3,000 characters)",
     "attach": "Attach",
-    "send": "Send"
-  }
+    "send": "Send",
+    "request": "Live chat"
+  },
+  "composer": {
+    "placeholder": "Enter your inquiry. (Up to 3,000 characters)",
+    "send": "Send",
+    "failed": "Something went wrong. Please try again."
+  },
+  "detail": "Details",
+  "closeDetail": "Close details",
+  "campaignInfo": "Campaign",
+  "campaignType": "Campaign type",
+  "productName": "Product",
+  "period": "Period"
 }

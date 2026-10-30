@@ -180,7 +180,7 @@ export function DataTable<TData>({
       <Table size={size} headerTone={headerTone}>
         <TableHeader>
           {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id} className="hover:bg-transparent">
+            <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => (
                 <DataTableHead key={header.id} column={header.column}>
                   {header.isPlaceholder
@@ -196,7 +196,8 @@ export function DataTable<TData>({
         </TableHeader>
         <TableBody>
           {rows.length === 0 && (
-            <TableRow className="hover:bg-transparent">
+            // 빈 상태 안내 행은 누를 대상이 아니라 호버 색을 없앰.
+            <TableRow className="[--table-row-hover:transparent]">
               <TableCell
                 colSpan={table.getVisibleLeafColumns().length}
                 className="text-center text-muted-foreground"

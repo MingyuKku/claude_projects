@@ -3,7 +3,7 @@ import * as koContent from "./content/ko";
 import type { TermsBlock } from "./types";
 import type { Language } from "@/shared/i18n";
 
-export type TermsKind = "service" | "privacy";
+export type TermsKind = "service" | "privacy" | "charge";
 
 export type TermsDocuments = Record<
   "PRIVACY_POLICY_CONTENT" | "TERMS_OF_SERVICE_CONTENT",
@@ -28,6 +28,7 @@ export function pickTerms(
   documents: TermsDocuments,
   kind: TermsKind,
 ): TermsBlock[] {
+  if (kind === "charge") return koContent.CHARGE_TERMS_CONTENT;
   return kind === "privacy"
     ? documents.PRIVACY_POLICY_CONTENT
     : documents.TERMS_OF_SERVICE_CONTENT;

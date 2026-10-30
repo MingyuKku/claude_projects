@@ -1,9 +1,10 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router";
 import { toast } from "sonner";
 import { SWRConfig } from "swr";
 
-import { ApiError, serverApiV3 } from "@/shared/api";
+import { ApiError, serverApi, serverApiV3 } from "@/shared/api";
 
 import { AccountProfileForm } from "./AccountProfileForm";
 
@@ -16,6 +17,7 @@ vi.mock("sonner", () => ({
 
 vi.mock("@/shared/api", async (importOriginal) => ({
   ...(await importOriginal<typeof SharedApi>()),
+  serverApi: { get: vi.fn() },
   serverApiV3: { get: vi.fn(), put: vi.fn(), post: vi.fn(), patch: vi.fn() },
 }));
 
@@ -35,17 +37,53 @@ function setup(
     onClickWithdraw?: () => void;
     accountType?: "master" | "sub";
   } = {},
+  initialEntry = "/mypage/account?tab=master",
 ) {
   const onSaved = vi.fn();
   render(
-    <SWRConfig value={{ provider: () => new Map() }}>
-      <AccountProfileForm profile={profile} onSaved={onSaved} {...props} />
-    </SWRConfig>,
+    <MemoryRouter initialEntries={[initialEntry]}>
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <AccountProfileForm profile={profile} onSaved={onSaved} {...props} />
+      </SWRConfig>
+    </MemoryRouter>,
   );
   return { onSaved, user: userEvent.setup() };
 }
 
+const CERT_TOKEN = {
+  trCert: "TR",
+  trUrl: "https://dev.bigbird.co.kr/cert/success",
+  trAdd: "Y",
+};
+
+/** 본인인증: init(v3)은 토큰, decrypte(v2)는 넘긴 결과. */
+function mockCert(decrypted: Record<string, unknown>) {
+  vi.mocked(serverApi.get).mockResolvedValue(decrypted);
+  vi.mocked(serverApiV3.get).mockImplementation((path: string) =>
+    Promise.resolve(
+      path === "/mypage/cert/init" ? CERT_TOKEN : { profileUrl: null },
+    ),
+  );
+}
+
+function stubMedia(...matching: string[]) {
+  vi.stubGlobal("matchMedia", (query: string) => ({
+    matches: matching.includes(query),
+    addEventListener: () => {},
+    removeEventListener: () => {},
+  }));
+}
+
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.restoreAllMocks();
+  sessionStorage.clear();
+});
+
 beforeEach(() => {
+  vi.mocked(serverApi.get).mockReset();
+  // jsdom은 form 제출(페이지 이동)을 구현하지 않음.
+  vi.spyOn(HTMLFormElement.prototype, "submit").mockImplementation(() => {});
   vi.mocked(toast).mockReset();
   vi.mocked(toast.error).mockReset();
   vi.mocked(serverApiV3.get)
@@ -60,13 +98,112 @@ describe("AccountProfileForm", () => {
     expect(screen.getByRole("button", { name: "저장" })).toBeDisabled();
   });
 
-  it("휴대폰은 읽기 전용이고 인증은 준비 중 안내만 한다", async () => {
-    const { user } = setup();
-    expect(screen.getByLabelText("휴대폰 번호")).toHaveAttribute("readonly");
-    await user.click(screen.getByRole("button", { name: "인증" }));
-    expect(toast).toHaveBeenCalledWith("준비 중인 기능입니다.");
-  });
+  describe("휴대폰 본인인증", () => {
+    const verified = {
+      result: "success",
+      certIdx: 120,
+      phoneNumber: "01098765432",
+      name: "홍길동",
+    };
 
+    async function verifyByPopup(user: ReturnType<typeof userEvent.setup>) {
+      await user.click(screen.getByRole("button", { name: "인증" }));
+      await waitFor(() => expect(window.open).toHaveBeenCalled());
+      act(() => window.cert_result?.({ rec_cert: "REC", certNum: "NUM" }));
+    }
+
+    it("PC는 팝업으로 인증하고, 결과 번호를 보인 뒤 저장에서 새 certIdx로 보낸다", async () => {
+      mockCert(verified);
+      vi.spyOn(window, "open").mockReturnValue({} as Window);
+      const { user, onSaved } = setup();
+      expect(screen.getByLabelText("휴대폰 번호")).toHaveAttribute("readonly");
+
+      await verifyByPopup(user);
+
+      expect(
+        await screen.findByText("본인 인증에 성공하였습니다."),
+      ).toBeInTheDocument();
+      expect(serverApiV3.get).toHaveBeenCalledWith("/mypage/cert/init", {
+        params: { trUrl: `${window.location.origin}/cert/success` },
+      });
+      expect(serverApi.get).toHaveBeenCalledWith("/cert/decrypte", {
+        params: { rec_cert: "REC", certNum: "NUM" },
+      });
+      expect(screen.getByLabelText("휴대폰 번호")).toHaveValue("010-9876-5432");
+
+      await user.click(screen.getByRole("button", { name: "저장" }));
+      await waitFor(() => expect(onSaved).toHaveBeenCalled());
+      expect(serverApiV3.put).toHaveBeenCalledWith("/mypage/account/modify", {
+        certIdx: 120,
+        email: "old@bigbird.com",
+      });
+    });
+
+    it("이미 등록된 번호면 안내하고 번호를 바꾸지 않는다", async () => {
+      mockCert({ result: "exist" });
+      vi.spyOn(window, "open").mockReturnValue({} as Window);
+      const { user } = setup();
+
+      await verifyByPopup(user);
+
+      expect(
+        await screen.findByText("이미 등록된 사용자입니다."),
+      ).toBeInTheDocument();
+      expect(screen.getByLabelText("휴대폰 번호")).toHaveValue("010-1234-5678");
+      expect(screen.getByRole("button", { name: "저장" })).toBeDisabled();
+    });
+
+    it("팝업이 막히면 차단 해제를 안내한다", async () => {
+      mockCert(verified);
+      vi.spyOn(window, "open").mockReturnValue(null);
+      const { user } = setup();
+      await user.click(screen.getByRole("button", { name: "인증" }));
+      expect(
+        await screen.findByText(
+          "브라우저에서 팝업 차단을 해제한 뒤 다시 시도해 주세요.",
+        ),
+      ).toBeInTheDocument();
+    });
+
+    it("터치 기기는 입력 중인 이메일을 보관하고 지금 화면으로 돌아오게 KMC로 이동한다", async () => {
+      stubMedia("(pointer: coarse)");
+      mockCert(verified);
+      const open = vi.spyOn(window, "open");
+      const { user } = setup();
+      const email = screen.getByLabelText("이메일");
+      await user.clear(email);
+      await user.type(email, "draft@bigbird.com");
+
+      await user.click(screen.getByRole("button", { name: "인증" }));
+
+      await waitFor(() =>
+        expect(HTMLFormElement.prototype.submit).toHaveBeenCalled(),
+      );
+      expect(open).not.toHaveBeenCalled();
+      expect(sessionStorage.getItem("kmc-return-path")).toBe(
+        "/mypage/account?tab=master",
+      );
+      expect(
+        JSON.parse(sessionStorage.getItem("account-profile-draft") ?? "{}"),
+      ).toEqual({ email: "draft@bigbird.com" });
+    });
+
+    it("KMC에서 돌아오면 보관한 이메일을 되살리고 결과를 한 번만 복호화한다", async () => {
+      mockCert(verified);
+      sessionStorage.setItem(
+        "account-profile-draft",
+        JSON.stringify({ email: "draft@bigbird.com" }),
+      );
+      setup({}, "/mypage/account?tab=master&rec_cert=REC&certNum=NUM");
+
+      expect(
+        await screen.findByText("본인 인증에 성공하였습니다."),
+      ).toBeInTheDocument();
+      expect(serverApi.get).toHaveBeenCalledTimes(1);
+      expect(screen.getByLabelText("이메일")).toHaveValue("draft@bigbird.com");
+      expect(sessionStorage.getItem("account-profile-draft")).toBeNull();
+    });
+  });
   it("확인 칸이 다르면 불일치 문구를 보이고 저장할 수 없다", async () => {
     const { user } = setup();
     await user.type(screen.getByLabelText("비밀번호 변경"), NEW_PASSWORD);
@@ -142,7 +279,7 @@ describe("AccountProfileForm", () => {
   describe("Sub ID", () => {
     it("Sub 경로로 이메일·비밀번호를 저장하고 현재 이미지는 GET /profile로 읽는다", async () => {
       const { user, onSaved } = setup({ accountType: "sub" });
-      const email = screen.getByLabelText("이메일");
+      const email = screen.getByLabelText("이메일 주소");
       await user.clear(email);
       await user.type(email, "new@bigbird.com");
       await user.type(screen.getByLabelText("비밀번호 변경"), NEW_PASSWORD);
