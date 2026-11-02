@@ -21,13 +21,13 @@ describe("parseAmount", () => {
 
 describe("addAmount", () => {
   it("입력값에 더한다", () => {
-    expect(addAmount(null, 100_000)).toBe(100_000);
-    expect(addAmount(200_000, 500_000)).toBe(700_000);
+    expect(addAmount(null, 10000)).toBe(10000);
+    expect(addAmount(20000, 30000)).toBe(50000);
   });
 
   it("한도를 넘어도 그대로 더하고 입력 상한만 넘지 않는다", () => {
-    expect(addAmount(95_000_000, 10_000_000)).toBe(105_000_000);
-    expect(addAmount(999_999_990, 100_000)).toBe(999_999_999);
+    expect(addAmount(950000, 100000)).toBe(1050000);
+    expect(addAmount(999999990, 100000)).toBe(999999999);
   });
 });
 
@@ -38,15 +38,15 @@ describe("getAmountError·isChargeable", () => {
   });
 
   it("최소 미만과 한도 초과는 오류이고 충전할 수 없다", () => {
-    expect(getAmountError(99_999)).toBe("min");
-    expect(getAmountError(100_000_001)).toBe("max");
-    expect(isChargeable(99_999)).toBe(false);
-    expect(isChargeable(100_000_001)).toBe(false);
+    expect(getAmountError(999)).toBe("min");
+    expect(getAmountError(1_000_001)).toBe("max");
+    expect(isChargeable(999)).toBe(false);
+    expect(isChargeable(1_000_001)).toBe(false);
   });
 
   it("경계값과 1원 단위는 충전할 수 있다", () => {
-    expect(isChargeable(100_000)).toBe(true);
-    expect(isChargeable(155_500)).toBe(true);
-    expect(isChargeable(100_000_000)).toBe(true);
+    expect(isChargeable(1000)).toBe(true);
+    expect(isChargeable(15500)).toBe(true);
+    expect(isChargeable(1_000_000)).toBe(true);
   });
 });

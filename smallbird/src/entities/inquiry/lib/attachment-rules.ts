@@ -1,8 +1,7 @@
 const MB = 1024 * 1024;
 
-// 요구명세서 REQ-23-0009·0018과 사용자 결정(2026-10-29): 이미지 30MB·10개, 동영상 50MB·5개, 문서도 받음.
-// ponytail: 문서 한도는 명세에 없고 서버도 크기를 막지 않아(31MB 업로드 성공) 크기 제한 없이 개수 합계에만 넣음.
-// 한도가 정해지면 maxBytes를 넣고 오류 문구를 추가함.
+// 요구명세서 REQ-23-0009·0018과 사용자 결정(2026-10-29·30): 이미지 30MB·10개, 동영상 50MB·5개,
+// 문서(기타 파일)는 30MB(REQ-23-0009 파랑).
 export const ATTACHMENT_LIMITS = {
   image: {
     extensions: ["jpg", "jpeg", "png", "webp"],
@@ -16,7 +15,7 @@ export const ATTACHMENT_LIMITS = {
   },
   file: {
     extensions: ["pdf", "txt", "doc", "docx", "xls", "xlsx", "ppt", "pptx"],
-    maxBytes: Number.POSITIVE_INFINITY,
+    maxBytes: 30 * MB,
     maxCount: 10,
   },
 } as const;
@@ -28,7 +27,18 @@ export type AttachmentKind = keyof typeof ATTACHMENT_LIMITS;
 
 /** 오류 Alert 6종 중 하나(공통 "파일당 30MB" 문구는 쓰지 않고 유형별로 안내함). */
 export type AttachmentError =
-  "format" | "imageSize" | "videoSize" | "imageCount" | "videoCount";
+  | "format"
+  | "imageSize"
+  | "videoSize"
+  | "fileSize"
+  | "imageCount"
+  | "videoCount";
+
+const SIZE_ERROR = {
+  image: "imageSize",
+  video: "videoSize",
+  file: "fileSize",
+} as const satisfies Record<AttachmentKind, AttachmentError>;
 
 export function getAttachmentKind(
   file: Pick<File, "name">,
@@ -61,12 +71,24 @@ export function checkAttachments(
   for (const file of incoming) {
     const kind = getAttachmentKind(file);
     if (!kind) return "format";
-    if (file.size > ATTACHMENT_LIMITS[kind].maxBytes)
-      return kind === "image" ? "imageSize" : "videoSize";
+    if (file.size > ATTACHMENT_LIMITS[kind].maxBytes) return SIZE_ERROR[kind];
     counts[kind] += 1;
   }
   if (counts.video > ATTACHMENT_LIMITS.video.maxCount) return "videoCount";
   if (counts.image + counts.video + counts.file > ATTACHMENT_TOTAL_MAX_COUNT)
     return "imageCount";
   return null;
+}
+
+/** 파일 카드의 용량 표기(Figma "2.5MB"). 1024 단위, 소수 첫째 자리까지. */
+export function formatFileSize(bytes: number) {
+  const units = ["B", "KB", "MB", "GB"];
+  let value = bytes;
+  let unit = 0;
+  while (value >= 1024 && unit < units.length - 1) {
+    value /= 1024;
+    unit += 1;
+  }
+  const rounded = unit === 0 ? value : Math.round(value * 10) / 10;
+  return `${rounded}${units[unit]}`;
 }

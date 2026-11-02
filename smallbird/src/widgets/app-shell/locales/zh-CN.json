@@ -56,5 +56,10 @@
   "session": {
     "checking": "正在确认登录状态",
     "checkFailed": "无法确认登录状态，请重试。"
+  },
+  "role": {
+    "label": "切换广告主·网红",
+    "advertiser": "广告主",
+    "influencer": "网红"
   }
 }

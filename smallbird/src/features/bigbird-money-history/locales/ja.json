@@ -6,50 +6,36 @@
       "label": "利用履歴"
     },
     "column": {
-      "type": "区分",
-      "date": "日付",
       "campaignName": "キャンペーン名",
-      "usage": "内容",
-      "amount": "金額",
-      "remaining": "残高",
+      "usedAt": "利用日",
+      "usage": "利用内容",
+      "amount": "利用金額",
+      "campaignCode": "キャンペーンコード",
       "detail": "詳細"
+    },
+    "card": {
+      "usedAt": "利用日",
+      "campaignName": "キャンペーン名",
+      "campaignType": "キャンペーン種類",
+      "campaignCode": "キャンペーンコード",
+      "usage": "利用内容",
+      "amount": "利用金額",
+      "remaining": "利用後残高"
     },
     "action": {
       "detail": "詳細を見る"
     },
     "detail": {
-      "title": "利用詳細",
-      "type": "区分",
-      "date": {
-        "use": "利用日",
-        "refund": "還付日",
-        "charge": "チャージ日",
-        "withdraw": "出金日"
-      },
+      "title": "詳細",
+      "usedAt": "利用日",
       "campaignName": "キャンペーン名",
       "campaignType": "キャンペーン種類",
       "campaignCode": "キャンペーンコード",
       "usage": "利用内容",
-      "contractTarget": "契約対象",
-      "amount": {
-        "use": "利用金額",
-        "refund": "利用金額",
-        "charge": "チャージ金額",
-        "withdraw": "出金金額"
-      },
+      "amount": "利用金額",
       "remaining": "利用後残高"
     },
     "filter": {
-      "type": {
-        "label": "区分",
-        "placeholder": "区分を選択してください。",
-        "option": {
-          "use": "利用",
-          "refund": "還付",
-          "charge": "チャージ",
-          "withdraw": "出金"
-        }
-      },
       "date": {
         "label": "利用日",
         "placeholder": "日付を選択してください。"
@@ -64,40 +50,27 @@
       }
     },
     "empty": {
-      "none": "利用履歴がありません。"
-    },
-    "type": {
-      "use": "利用",
-      "refund": "還付",
-      "charge": "チャージ",
-      "withdraw": "出金"
-    },
-    "campaignType": {
-      "recruit": "募集型",
-      "pick": "PICK型"
-    },
-    "usageDetail": {
-      "contractPick": "インフルエンサー契約費用(PICK型)",
-      "contractRecruit": "インフルエンサー契約費用(募集型)",
-      "aiManuscriptConfirm": "付加サービス(AI原稿チェック)",
-      "aiPostingGuide": "付加サービス(AI投稿ガイド)"
+      "none": "ビッグバードマネーの利用履歴がありません。"
     }
   },
   "charge": {
-    "title": "取引履歴",
+    "title": "チャージ履歴",
     "list": {
-      "label": "取引履歴"
+      "label": "チャージ履歴"
     },
     "column": {
-      "type": "区分",
-      "date": "日付",
-      "amount": "金額",
-      "bank": "銀行",
-      "account": "口座番号",
-      "holder": "入金者名",
+      "requestedAt": "チャージ日",
+      "amount": "リクエスト金額",
+      "method": "決済方法",
       "status": "入金状態",
       "receipt": "明細書",
       "detail": "詳細"
+    },
+    "card": {
+      "requestedAt": "チャージ日",
+      "amount": "リクエスト金額",
+      "method": "決済方法",
+      "status": "入金状態"
     },
     "action": {
       "detail": "詳細を見る",
@@ -109,35 +82,17 @@
     },
     "detail": {
       "title": "取引詳細",
-      "type": "チャージ区分",
+      "approvedAt": "承認日",
       "requestedAt": "入金リクエスト日",
-      "amount": "チャージ金額",
+      "amount": "リクエスト金額",
       "method": "決済方法",
       "bank": "銀行名",
-      "account": "口座番号",
-      "holder": "入金者名",
+      "account": "仮想口座番号",
       "depositedAt": "入金完了日",
       "status": "入金状態",
-      "receipt": "明細書を受け取る",
-      "withdraw": {
-        "requestedAt": "出金リクエスト日",
-        "amount": "出金金額",
-        "method": "処理方法",
-        "methodValue": "入力口座へ出金",
-        "holder": "口座名義",
-        "completedAt": "出金完了日",
-        "status": "出金状態"
-      }
+      "receipt": "明細書を受け取る"
     },
     "filter": {
-      "type": {
-        "label": "区分",
-        "placeholder": "区分を選択してください。",
-        "option": {
-          "charge": "チャージ",
-          "withdraw": "出金"
-        }
-      },
       "date": {
         "label": "チャージ日",
         "placeholder": "日付を選択してください。"
@@ -146,15 +101,14 @@
         "label": "入金状態",
         "placeholder": "入金状態を選択してください。",
         "option": {
-          "paid": "入金完了",
-          "withdrawn": "出金完了",
+          "paid": "決済完了",
           "pending": "待機中",
-          "canceled": "未入金キャンセル"
+          "canceled": "決済キャンセル"
         }
       }
     },
     "empty": {
-      "none": "チャージ・出金履歴がありません。"
+      "none": "ビッグバードマネーのチャージ履歴がありません。"
     },
     "notice": {
       "title": "ご案内",
@@ -162,10 +116,6 @@
       "validity": "仮想口座の有効期限は2日後の午前0時までです。",
       "instant": "入金が確認され次第、すぐにチャージされます。",
       "delay": "入金後、残高に反映されるまで最大5分かかる場合があります。"
-    },
-    "type": {
-      "charge": "チャージ",
-      "withdraw": "出金"
     }
   }
 }

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-/** `GET /v3/mypage/bigbird-money/init` 응답. 결제 요청에는 `encryptUserIdx`, 결제창의 구매자 정보에는 나머지를 씀. */
+/** `GET /v3/mypage/biz-money/init` 응답. 결제 요청에는 `encryptUserIdx`, 결제창의 구매자 정보에는 나머지를 씀. */
 export const chargeInitSchema = z.object({
   email: z.string().nullish(),
   name: z.string().nullish(),

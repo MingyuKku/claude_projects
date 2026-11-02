@@ -21,12 +21,14 @@ function toSocialLinks(user: AccountMaster["user"]) {
   const ids: Record<SocialProvider, string | null | undefined> = {
     kakao: user.idKakao,
     naver: user.idNaver,
+    facebook: user.idFacebook,
     google: user.idGoogle,
     apple: user.idApple,
   };
   const emails: Record<SocialProvider, string | null | undefined> = {
     kakao: user.emailKakao,
     naver: user.emailNaver,
+    facebook: user.emailFacebook,
     google: user.emailGoogle,
     apple: user.emailApple,
   };

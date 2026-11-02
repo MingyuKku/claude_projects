@@ -29,15 +29,6 @@ vi.mock("@/shared/api", async (importOriginal) => ({
   serverApiV3: { get: vi.fn(), put: vi.fn(), post: vi.fn(), patch: vi.fn() },
 }));
 
-// Radix ScrollArea(출금·충전 패널 본문 스크롤)가 쓰는 브라우저 API가 jsdom에 없어 이 파일에서만 채움.
-beforeAll(() => {
-  globalThis.ResizeObserver = class {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-  };
-});
-
 const session = {
   result: true,
   userIdx: 1,
@@ -574,53 +565,42 @@ describe("마이페이지 · 계정 설정 셸", () => {
 
 describe("마이페이지 · 빅버드 머니", () => {
   const chargeItem = {
-    id: "850",
-    type: "CHARGE",
-    status: "PENDING",
     requestDate: "2026-10-23 14:23:18",
-    completedDate: null,
-    amount: 50000,
-    payMethod: "VBANK",
+    requestAmount: 50000,
     bankName: "신한은행",
     accountNumber: "1234567890123456",
-    holderName: "밍구스",
+    depositDate: "N/A",
+    depositState: "대기중",
     receiptUrl: null,
+    payMethod: "VBank",
   };
   const usageItem = {
-    id: "BC-12345678901234",
-    type: "USE",
-    usageDetailCode: "INFLUENCER_CONTRACT_PICK",
-    usageDetailName: "인플루언서 계약비용(PICK형)",
+    usageType: "사용",
+    usageDetails: "인플루언서 계약비용(PICK형)",
     usageDate: "2026-10-23 14:23:18",
     campaignName: "여름 시즌 캠핑 용품 신제품 리뷰",
     campaignCode: "CP0001",
-    campaignType: "pick",
+    campaignService: "PICK형",
     usageAmount: -50000,
     remainingAmount: 1250000,
   };
 
   beforeEach(() => {
     sessionStorage.clear();
-    mockV3Get((path: string) => {
-      if (path === "/mypage/bigbird-money")
-        return Promise.resolve({
-          bigbirdMoney: 10000,
-          withdrawable: true,
-          withdrawUnavailableReason: null,
-        });
-      if (path === "/mypage/bigbird-money/usage/filter-options")
-        return Promise.resolve({ campaigns: [], usageDetails: [] });
-      return Promise.resolve({ profileUrl: null });
-    });
+    mockV3Get((path: string) =>
+      path === "/mypage/biz-money"
+        ? Promise.resolve({ bizMoney: 10000 })
+        : Promise.resolve({ profileUrl: null }),
+    );
     vi.mocked(serverApiV3.post).mockImplementation((path: string) => {
-      if (path === "/mypage/bigbird-money/charge")
+      if (path === "/mypage/biz-money/charge")
         return Promise.resolve({
           list: [chargeItem],
           count: 1,
           currentPage: 1,
           entrySize: 10,
         });
-      if (path === "/mypage/bigbird-money/usage")
+      if (path === "/mypage/biz-money/usage")
         return Promise.resolve({
           list: [usageItem],
           count: 1,
@@ -651,15 +631,6 @@ describe("마이페이지 · 빅버드 머니", () => {
     ).toBeInTheDocument();
   });
 
-  it("충전/출금 탭 이름은 PC가 충전/출금 내역이다", async () => {
-    mockViewport({ tablet: true, desktop: true });
-    await renderRoute(ROUTES.mypageMoney);
-
-    expect(
-      await screen.findByRole("tab", { name: "충전/출금 내역" }),
-    ).toHaveAttribute("aria-selected", "true");
-  });
-
   it("충전하기를 누르면 TAB은 본문을 충전 카드로 바꾸고 뒤로 버튼으로 돌아온다", async () => {
     mockViewport({ tablet: true, desktop: false });
     const user = userEvent.setup();
@@ -671,12 +642,10 @@ describe("마이페이지 · 빅버드 머니", () => {
     expect(
       await screen.findByRole("textbox", { name: "충전 금액 입력" }),
     ).toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: "상세 내역" })).toBeNull();
+    expect(screen.queryByText("충전 상세 내역")).toBeNull();
 
     await user.click(screen.getByRole("button", { name: "뒤로가기" }));
-    expect(
-      await screen.findByRole("heading", { name: "상세 내역" }),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("충전 상세 내역")).toBeInTheDocument();
     expect(router.state.location.search).not.toContain("panel");
   });
 
@@ -690,12 +659,10 @@ describe("마이페이지 · 빅버드 머니", () => {
     expect(router.state.location.search).toContain("panel=charge-detail");
     expect(await screen.findByText("거래 상세 보기")).toBeInTheDocument();
     expect(screen.getByText("1234567890123456")).toBeInTheDocument();
-    expect(
-      screen.getByRole("heading", { name: "상세 내역" }),
-    ).toBeInTheDocument();
+    expect(screen.getByText("충전 상세 내역")).toBeInTheDocument();
   });
 
-  it("사용 내역 탭은 3.0.9 열 순서로 보이고 상세 패널이 열리면 일부 열을 숨긴다(PC)", async () => {
+  it("사용 내역 탭은 새 열 순서로 보이고 상세 보기에서 사용 후 잔액을 본다(PC)", async () => {
     mockViewport({ tablet: true, desktop: true });
     const user = userEvent.setup();
     await renderRoute(`${ROUTES.mypageMoney}?tab=usage`);
@@ -706,44 +673,25 @@ describe("마이페이지 · 빅버드 머니", () => {
     expect(
       screen.getAllByRole("columnheader").map((header) => header.textContent),
     ).toEqual([
-      "구분",
-      "일자",
       "캠페인 명",
-      "내역",
-      "금액",
-      "잔액",
+      "사용 일자",
+      "사용 내역",
+      "사용 금액",
+      "캠페인 코드",
       "상세 보기",
     ]);
     expect(screen.getByText("-50,000원")).toBeInTheDocument();
-    expect(screen.getByText("1,250,000원")).toBeInTheDocument();
+    expect(screen.queryByText("1,250,000원")).toBeNull();
 
-    // 상세 보기 패널이 열리면 캠페인 명·내역·잔액 열은 숨기고 사용 후 잔액은 패널에서 본다.
     await user.click(screen.getByRole("button", { name: "상세 보기" }));
-    expect(await screen.findByText("사용 후 잔액")).toBeInTheDocument();
-    expect(
-      screen.getAllByRole("columnheader").map((header) => header.textContent),
-    ).toEqual(["구분", "일자", "내역", "금액", "상세 보기"]);
-    expect(screen.getAllByText("1,250,000원")).toHaveLength(1);
+    expect(await screen.findByText("1,250,000원")).toBeInTheDocument();
   });
 
-  it("다른 탭의 상세 쿼리는 무시한다", async () => {
-    mockViewport({ tablet: true, desktop: true });
-    await renderRoute(
-      `${ROUTES.mypageMoney}?tab=charge&panel=usage-detail&id=0`,
-    );
-    await screen.findByRole("heading", { name: "상세 내역" });
-    expect(screen.queryByText("사용 내역 상세 보기")).toBeNull();
-  });
-
-  it("보유 머니 카드는 사용 내역 탭에도 있고 충전 패널은 그 탭에서 그대로 열린다(PC)", async () => {
+  it("다른 탭의 하위 화면 쿼리는 무시한다", async () => {
     mockViewport({ tablet: true, desktop: true });
     await renderRoute(`${ROUTES.mypageMoney}?tab=usage&panel=charge`);
-
-    expect(await screen.findByText("빅버드 머니 충전")).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "사용 내역" })).toHaveAttribute(
-      "aria-selected",
-      "true",
-    );
+    await screen.findByText("사용 상세 내역");
+    expect(screen.queryByText("빅버드 머니 충전")).toBeNull();
   });
 
   it("MO는 세그먼트로 충전과 상세 내역을 나눈다", async () => {
@@ -751,100 +699,10 @@ describe("마이페이지 · 빅버드 머니", () => {
     await renderRoute(ROUTES.mypageMoney);
 
     expect(await screen.findByText("보유 빅버드 머니")).toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: "상세 내역" })).toBeNull();
+    expect(screen.queryByText("충전 상세 내역")).toBeNull();
 
     await user.click(screen.getByRole("tab", { name: "상세 내역" }));
-    expect(
-      await screen.findByRole("heading", { name: "상세 내역" }),
-    ).toBeInTheDocument();
-  });
-
-  it("출금하기를 누르면 ?panel=withdraw로 출금 패널을 열고 X로 닫는다(PC)", async () => {
-    mockViewport({ tablet: true, desktop: true });
-    const user = userEvent.setup();
-    const router = await renderRoute(ROUTES.mypageMoney);
-
-    await user.click(await screen.findByRole("button", { name: "출금하기" }));
-
-    expect(router.state.location.search).toContain("panel=withdraw");
-    expect(
-      await screen.findByRole("textbox", { name: /출금 계좌번호/ }),
-    ).toBeInTheDocument();
-    // 패널이 열려도 내역은 그대로 둠.
-    expect(
-      screen.getByRole("heading", { name: "상세 내역" }),
-    ).toBeInTheDocument();
-
-    await user.click(screen.getByRole("button", { name: "닫기" }));
-    await waitFor(() =>
-      expect(router.state.location.search).not.toContain("panel"),
-    );
-  });
-
-  it("출금 요청이 접수되면 완료 알럿을 띄우고, 확인하면 패널을 닫고 상세 내역으로 간다(MO)", async () => {
-    Element.prototype.hasPointerCapture = () => false;
-    Element.prototype.setPointerCapture = () => {};
-    Element.prototype.releasePointerCapture = () => {};
-    Element.prototype.scrollIntoView = () => {};
-    mockV3Get((path: string) =>
-      path === "/mypage/bigbird-money"
-        ? Promise.resolve({
-            bigbirdMoney: 10000,
-            withdrawable: true,
-            withdrawUnavailableReason: null,
-          })
-        : path === "/mypage/account/bank/list"
-          ? Promise.resolve({ bankList: [{ idx: 2, name: "국민은행" }] })
-          : Promise.resolve({ profileUrl: null }),
-    );
-    const post = vi.mocked(serverApiV3.post);
-    const baseImpl = post.getMockImplementation();
-    post.mockImplementation((path: string, ...rest: unknown[]) =>
-      path === "/mypage/bigbird-money/withdraw"
-        ? Promise.resolve({
-            id: "W1",
-            requestDate: "2025-06-02 10:30:00",
-            amount: 10000,
-            status: "PENDING",
-            balance: 10000,
-          })
-        : (baseImpl as (...args: unknown[]) => Promise<unknown>)(path, ...rest),
-    );
-    const user = userEvent.setup({ applyAccept: false });
-    const router = await renderRoute(ROUTES.mypageMoney);
-
-    await user.click(await screen.findByRole("button", { name: "출금하기" }));
-    await user.click(
-      await screen.findByRole("combobox", { name: /출금 은행/ }),
-    );
-    await user.click(await screen.findByRole("option", { name: "국민은행" }));
-    await user.type(
-      screen.getByRole("textbox", { name: /출금 계좌번호/ }),
-      "123",
-    );
-    await user.type(
-      screen.getByRole("textbox", { name: /출금 예금주 명/ }),
-      "홍길동",
-    );
-    await user.upload(
-      document.querySelector<HTMLInputElement>('input[type="file"]')!,
-      new File(["x"], "통장.pdf", { type: "application/pdf" }),
-    );
-    await user.click(screen.getByRole("button", { name: "다음" }));
-    await user.click(
-      screen.getByRole("button", { name: "전액 출금 요청하기" }),
-    );
-
-    const alert = await screen.findByRole("alertdialog");
-    expect(alert).toHaveTextContent("빅버드 머니 출금 요청 완료");
-    expect(alert).toHaveTextContent(
-      "2025년 6월 2일 10:30에 출금 요청이 접수되었습니다.",
-    );
-    await user.click(screen.getByRole("button", { name: "확인" }));
-    await waitFor(() => {
-      expect(router.state.location.search).not.toContain("panel");
-      expect(router.state.location.search).toContain("view=history");
-    });
+    expect(await screen.findByText("충전 상세 내역")).toBeInTheDocument();
   });
 
   it("결제 서버가 isPaid=true를 붙여 돌려보내면 접수 알럿을 띄우고 쿼리를 지운다", async () => {
@@ -857,25 +715,11 @@ describe("마이페이지 · 빅버드 머니", () => {
     await waitFor(() => expect(router.state.location.search).toBe(""));
   });
 
-  it.each(["USER_CANCELED", "PAYMENT_FAILED"])(
-    "결제 실패·취소(isPaid=false&code=%s)로 돌아오면 알럿 없이 쿼리만 지운다",
-    async (code) => {
-      mockViewport({ tablet: true, desktop: false });
-      const router = await renderRoute(
-        `${ROUTES.mypageMoney}?isPaid=false&code=${code}`,
-      );
-
-      await screen.findByRole("heading", { name: "상세 내역" });
-      await waitFor(() => expect(router.state.location.search).toBe(""));
-      expect(screen.queryByText("충전 요청 완료")).toBeNull();
-    },
-  );
-
   it("isPaid=true가 없으면 알럿을 띄우지 않는다", async () => {
     mockViewport({ tablet: true, desktop: false });
     await renderRoute(ROUTES.mypageMoney);
 
-    await screen.findByRole("heading", { name: "상세 내역" });
+    await screen.findByText("충전 상세 내역");
     expect(screen.queryByText("충전 요청 완료")).toBeNull();
   });
 });

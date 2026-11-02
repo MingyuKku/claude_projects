@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
 
-import { serverApi } from "@/shared/api";
+import { serverApi, signOutFirebase } from "@/shared/api";
 
 import { transformSwitchAccountsToViewModel } from "../lib/transform-switch-accounts";
 import {
@@ -47,6 +47,7 @@ async function switchAccount(
   );
   const result = switchAccountResultSchema.parse(response);
   if (!result.result) throw new Error("계정 전환이 거부되었습니다.");
+  await signOutFirebase();
 }
 
 export function useSwitchAccount() {

@@ -1,6 +1,10 @@
 import { z } from "zod";
 
-import { SUBSCRIPTION_PRODUCT_TYPES } from "./codes";
+import {
+  PAYMENT_METHODS,
+  PAYMENT_STATUSES,
+  SUBSCRIPTION_PRODUCT_TYPES,
+} from "./codes";
 
 /** `GET /v3/mypage/subscription/plans` 응답. */
 export const subscriptionPlanListSchema = z.object({
@@ -68,9 +72,8 @@ export const subscriptionPaymentListSchema = z.object({
         paidAt: z.string(),
         name: z.string(),
         amount: z.number(),
-        // 모르는 코드가 와도 목록이 깨지지 않게 문자열로 읽음. 표시는 `usePaymentMethodLabel`·`PaymentStatusBadge`가 코드면 번역, 아니면 서버 값 그대로.
-        method: z.string(),
-        status: z.string(),
+        method: z.enum(PAYMENT_METHODS),
+        status: z.enum(PAYMENT_STATUSES),
         receiptUrl: z.string().nullable().optional(),
       }),
     )

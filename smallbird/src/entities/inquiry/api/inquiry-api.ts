@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useMemo } from "react";
 import useSWR, { useSWRConfig } from "swr";
 import useSWRInfinite from "swr/infinite";
 
@@ -11,16 +11,22 @@ import {
   transformBuyerInquiryToViewModel,
   transformPurchaserQuestionInfoToViewModel,
   transformQnaListToViewModel,
+  transformInquiryCampaignDetailToViewModel,
   transformInquiryCampaignToViewModel,
   transformInquiryMessagesToViewModels,
+  transformBigbirdInquiryDetailMessages,
+  transformBigbirdInquiryListItemToViewModel,
   transformInquiryThreadToViewModel,
 } from "../lib/transform-inquiry";
 import {
+  bigbirdInquiryDetailSchema,
+  bigbirdInquiryListSchema,
   buyerInquiryDetailSchema,
   campaignTimelineSchema,
   buyerInquiryListSchema,
   buyerInfluencerOptionsSchema,
   createInquiryThreadResultSchema,
+  inquiryCampaignDetailSchema,
   inquiryCampaignListSchema,
   inquiryThreadListSchema,
   inquiryUserSchema,
@@ -55,62 +61,162 @@ function ensureSucceeded<T extends { result: boolean }>(response: T): T {
   return response;
 }
 
-export async function fetchBigbirdInquiries(
+/** 한 번에 받는 목록 건수. 스크롤이 끝에 닿으면 다음 건수를 이어 받음. */
+const BIGBIRD_INQUIRY_PAGE_SIZE = 20;
+
+export async function fetchBigbirdInquiryPage(
   threadUserIdx: number,
-  status: InquiryThreadStatusFilter = "ALL",
+  status: InquiryThreadStatusFilter,
+  offset: number,
 ) {
   try {
-    const response = await serverApiV3.get("/help/thread", {
-      params: { threadUserIdx, status },
+    const response = await serverApiV3.get("/help/bigbird-inquiry", {
+      params: {
+        threadUserIdx,
+        status,
+        offset,
+        limit: BIGBIRD_INQUIRY_PAGE_SIZE,
+      },
     });
-    const { data } = ensureSucceeded(inquiryThreadListSchema.parse(response));
-    // 마지막 문의·답변 일시가 최근인 순(REQ-23-0003·0005). 자동 선택도 이 순서의 첫 문의.
-    const lastActivity = (inquiry: BigbirdInquiryViewModel) =>
-      (inquiry.messages.at(-1)?.createdAt ?? inquiry.createdAt).getTime();
-    return data
-      .map(transformInquiryThreadToViewModel)
-      .sort((a, b) => lastActivity(b) - lastActivity(a));
+    const { list, hasMore } = ensureSucceeded(
+      bigbirdInquiryListSchema.parse(response),
+    );
+    return {
+      inquiries: list.map(transformBigbirdInquiryListItemToViewModel),
+      hasMore,
+    };
   } catch (error) {
     // 명세상 404는 "유저가 없거나 대화 내역이 없음". 세션의 내 threadUserIdx로
     // 조회하므로 문의가 없는 것으로 봄. 다른 오류는 문의 없음으로 바꾸지 않음.
-    if (isApiError(error) && error.status === 404) return [];
+    if (isApiError(error) && error.status === 404)
+      return { inquiries: [], hasMore: false };
     throw error;
   }
 }
 
-/** 빅버드 문의 목록과 각 문의의 대화. `threadUserIdx`는 세션 값. */
+type BigbirdInquiryPage = Awaited<ReturnType<typeof fetchBigbirdInquiryPage>>;
+
+/** 빅버드 문의 목록(무한 스크롤). 대화는 문의를 열 때 따로 받음. `threadUserIdx`는 세션 값. */
 export function useBigbirdInquiries(
   threadUserIdx: number | undefined,
   status: InquiryThreadStatusFilter = "ALL",
 ) {
-  const { data, isLoading, error, mutate } = useSWR(
-    threadUserIdx === undefined
-      ? null
-      : ["bigbird-inquiries", threadUserIdx, status],
-    ([, idx, selectedStatus]) => fetchBigbirdInquiries(idx, selectedStatus),
-    // 일반 문의 대화는 한 번 조회하는 REST라, 열어 둔 사이에 온 운영자 답장은 탭으로 돌아올 때 다시 받아 보여 줌.
-    // 앱 전체 기본은 꺼져 있어서(SWRProvider) 이 화면만 켬.
-    { revalidateOnFocus: true },
-  );
-  // 대화 화면이 쓰는 캠페인 타임라인도 같은 시점에 다시 받음.
+  const { data, isLoading, isValidating, error, size, setSize, mutate } =
+    useSWRInfinite(
+      (index, previous: BigbirdInquiryPage | null) =>
+        threadUserIdx === undefined || (previous && !previous.hasMore)
+          ? null
+          : [
+              "bigbird-inquiries",
+              threadUserIdx,
+              status,
+              index * BIGBIRD_INQUIRY_PAGE_SIZE,
+            ],
+      ([, idx, selectedStatus, offset]: readonly [
+        string,
+        number,
+        InquiryThreadStatusFilter,
+        number,
+      ]) => fetchBigbirdInquiryPage(idx, selectedStatus, offset),
+      // 운영자 답장은 탭으로 돌아올 때 다시 받아 보여 줌. 앱 전체 기본은 꺼져 있어서(SWRProvider) 이 화면만 켬.
+      // 첫 쪽만 다시 받으면 앞쪽 순서가 바뀐 만큼 offset이 밀려 쪽 사이 항목이 빠지거나 겹치므로 불러 둔 쪽을 모두 받음.
+      { revalidateOnFocus: true, revalidateAll: true },
+    );
+  // 열어 둔 대화(타임라인·상세)도 같은 시점에 다시 받음. 상세는 받으면 운영 답장이 읽음 처리되므로 탭이 가려져
+  // 있으면 받지 않고, 탭으로 돌아올 때 상세 훅의 포커스 재조회가 받음(보지 않은 답장이 읽음이 되지 않게).
   const { mutate: mutateGlobal } = useSWRConfig();
   const refreshAll = useCallback(
     () =>
       Promise.all([
         mutate(),
         mutateGlobal(
-          (key) => Array.isArray(key) && key[0] === CAMPAIGN_TIMELINE_KEY,
+          (key) =>
+            Array.isArray(key) &&
+            (key[0] === CAMPAIGN_TIMELINE_KEY ||
+              (key[0] === INQUIRY_DETAIL_KEY && isPageVisible())),
         ),
       ]),
     [mutate, mutateGlobal],
   );
   // 전송 직후 재조회와 Firestore 변경 신호가 겹쳐도 요청은 한 번만 보냄. 단순 재조회는 이것을 씀.
   const refresh = useCoalescedRefresh(refreshAll);
-  // 운영자 답장·상태 변경이 summary에 반영되면 목록(대화 포함)을 다시 받음.
+  // 운영자 답장·상태 변경이 summary에 반영되면 목록과 열어 둔 대화를 다시 받음.
   useInquirySummaryChanges(threadUserIdx, refresh);
+  const flat = useMemo(() => data?.flatMap((page) => page.inquiries), [data]);
   // 실시간 상담의 연결·종료 상태를 합침(상담 중·요청 실패 표시).
-  const inquiries = useLiveInquiries(threadUserIdx, data);
-  return { inquiries, isLoading, isError: Boolean(error), mutate, refresh };
+  const inquiries = useLiveInquiries(threadUserIdx, flat);
+  const hasMore = data?.at(-1)?.hasMore ?? false;
+
+  // 방금 만든 문의를 서버 목록이 오기 전에 맨 앞에 먼저 보여 줌(재조회가 끝나면 서버 값으로 바뀜).
+  function addInquiry(created: BigbirdInquiryViewModel) {
+    void mutate(
+      (pages) => {
+        const [first, ...rest] = pages ?? [];
+        if (pages?.some((page) => page.inquiries.some(isSameThread(created))))
+          return pages;
+        return [
+          {
+            inquiries: [created, ...(first?.inquiries ?? [])],
+            hasMore: first?.hasMore ?? false,
+          },
+          ...rest,
+        ];
+      },
+      { revalidate: false },
+    );
+    // revalidate 옵션은 첫 쪽만 다시 받아, 여러 쪽을 불러 둔 목록의 offset이 밀림. 불러 둔 쪽 전체를 다시 받음.
+    void mutate();
+  }
+
+  // 목록 끝 표식 effect가 렌더마다 다시 걸려 다음 쪽을 두 번 받지 않게 함수를 고정함.
+  const loadMore = useCallback(
+    () => void setSize((current) => current + 1),
+    [setSize],
+  );
+
+  return {
+    inquiries,
+    isLoading,
+    isError: Boolean(error),
+    hasMore,
+    isLoadingMore: isValidating && size > (data?.length ?? 0),
+    loadMore,
+    mutate,
+    addInquiry,
+    refresh,
+  };
+}
+
+const isSameThread =
+  (target: BigbirdInquiryViewModel) => (item: BigbirdInquiryViewModel) =>
+    item.threadIdx === target.threadIdx;
+
+const INQUIRY_DETAIL_KEY = "bigbird-inquiry-detail";
+
+const isPageVisible = () => document.visibilityState === "visible";
+
+/** 문의 한 건의 대화 전문. 이 API를 부르면 운영 답장이 읽음 처리됨. 캠페인 문의는 타임라인을 쓰므로 부르지 않음. */
+export function useBigbirdInquiryDetail(
+  threadUserIdx: number | undefined,
+  threadIdx: number | undefined,
+  isEnabled: boolean,
+) {
+  const { data, isLoading, error, mutate } = useSWR(
+    isEnabled && threadUserIdx !== undefined && threadIdx !== undefined
+      ? [INQUIRY_DETAIL_KEY, threadUserIdx, threadIdx]
+      : null,
+    async ([, userIdx, idx]) => {
+      const response = await serverApiV3.get(`/help/bigbird-inquiry/${idx}`, {
+        params: { threadUserIdx: userIdx },
+      });
+      const { data: thread } = ensureSucceeded(
+        bigbirdInquiryDetailSchema.parse(response),
+      );
+      return transformBigbirdInquiryDetailMessages(thread.messages);
+    },
+    { revalidateOnFocus: true },
+  );
+  return { messages: data, isLoading, isError: Boolean(error), mutate };
 }
 
 const CAMPAIGN_TIMELINE_KEY = "campaign-timeline";
@@ -132,12 +238,32 @@ export async function fetchCampaignTimeline(campaignIdx: number) {
 
 /** 선택한 캠페인 문의의 합쳐진 대화. 캠페인이 없는 기타 문의는 조회하지 않음. */
 export function useCampaignTimeline(campaignIdx: number | null | undefined) {
-  const { data, isLoading, error } = useSWR(
+  const { data, isLoading, error, mutate } = useSWR(
     campaignIdx == null ? null : [CAMPAIGN_TIMELINE_KEY, campaignIdx],
     ([, idx]) => fetchCampaignTimeline(idx),
     { revalidateOnFocus: true },
   );
-  return { messages: data, isLoading, isError: Boolean(error) };
+  return { messages: data, isLoading, isError: Boolean(error), mutate };
+}
+
+export async function fetchInquiryCampaignDetail(campaignIdx: number) {
+  const response = await serverApiV3.get(
+    `/help/thread/campaign/${campaignIdx}`,
+  );
+  return transformInquiryCampaignDetailToViewModel(
+    ensureSucceeded(inquiryCampaignDetailSchema.parse(response)),
+  );
+}
+
+/** 상세 정보 패널의 진행 상태·공구샵 코드 등. 캠페인이 없는(기타) 문의는 부르지 않음. */
+export function useInquiryCampaignDetail(campaignIdx: number | null) {
+  const { data, isLoading, error } = useSWR(
+    campaignIdx === null
+      ? null
+      : (["inquiry-campaign-detail", campaignIdx] as const),
+    ([, idx]) => fetchInquiryCampaignDetail(idx),
+  );
+  return { detail: data, isLoading, isError: Boolean(error) };
 }
 
 export async function fetchInquiryCampaigns() {
@@ -220,7 +346,7 @@ export async function uploadInquiryAttachment(file: File) {
   const form = new FormData();
   form.append("file", file);
   const response = await serverApiV3.post(
-    `/help/message/${kind === "file" ? "image" : kind}/${ATTACHMENT_UPLOAD_SERVICE}`,
+    `/help/message/${kind}/${ATTACHMENT_UPLOAD_SERVICE}`,
     form,
   );
   const { url, attachmentIdx, fileName, fileSize } = ensureSucceeded(

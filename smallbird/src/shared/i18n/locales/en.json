@@ -61,6 +61,10 @@
         "title": "Video too large",
         "description": "Videos can be up to 50MB."
       },
+      "fileSize": {
+        "title": "Document too large",
+        "description": "Documents can be up to 30MB."
+      },
       "imageCount": {
         "title": "Too many images",
         "description": "You can attach up to 10 files."
@@ -84,7 +88,8 @@
       "progress": "Uploading attachments ({{sent}}/{{total}})",
       "failed": "Couldn't send {{count}} attachment(s).",
       "retry": "Retry"
-    }
+    },
+    "download": "Download file"
   },
   "feedback": {
     "saved": "Saved.",
@@ -125,8 +130,7 @@
       "label": "Show {{size}}",
       "labelShort": "{{size}}/page",
       "aria": "Items per page"
-    },
-    "scrollTop": "Back to top"
+    }
   },
   "passwordConfirm": {
     "title": "Enter admin password",

@@ -8,6 +8,7 @@ import {
   ConversationFiles,
   groupAttachments,
   InquiryUploadStatus,
+  useBigbirdInquiryDetail,
   useCampaignTimeline,
   useInquiryCampaigns,
   useRealtimeConsultationMessages,
@@ -86,7 +87,17 @@ export function BigbirdInquiryConversation({
   const { campaigns } = useInquiryCampaigns(threadUserIdx);
   // 같은 캠페인에 종료 뒤 다시 열린 스레드가 있어도 하나의 대화로 이어 보여 줌. 받기 전·실패 때는 이 스레드의 메시지.
   const timeline = useCampaignTimeline(inquiry.campaignIdx);
-  const title = getInquiryTitleKey(inquiry);
+  // 캠페인이 없는 기타 문의는 타임라인이 없어 상세 API로 대화를 받음(이때 운영 답장이 읽음 처리됨).
+  const detail = useBigbirdInquiryDetail(
+    threadUserIdx,
+    inquiry.threadIdx,
+    inquiry.campaignIdx === null,
+  );
+  const title = getInquiryTitleKey(
+    inquiry,
+    campaigns?.find((campaign) => campaign.campaignIdx === inquiry.campaignIdx)
+      ?.productName,
+  );
   // 상세 정보는 캠페인 정보라 기타 문의에는 없음(기타 문의 동작은 시안에 없어 기획 확인 중).
   const [searchParams, setSearchParams] = useSearchParams();
   const hasDetail = inquiry.campaignIdx !== null;
@@ -97,7 +108,7 @@ export function BigbirdInquiryConversation({
   const endRef = useRef<HTMLDivElement>(null);
   // 일반·실시간 문의 모두 캠페인 카드를 표시하고, 운영 앱용 인사말 등 자동 안내만 숨김.
   // 실시간 상담도 같은 대화창에 이어 보임: 일반 문의 내용(REST)에 상담 문서의 실시간 메시지를 합침.
-  const history = timeline.messages ?? inquiry.messages;
+  const history = timeline.messages ?? detail.messages ?? inquiry.messages;
   const messages = (
     inquiry.isRealtime
       ? mergeConversationMessages(history, realtime.messages ?? [])
@@ -106,6 +117,10 @@ export function BigbirdInquiryConversation({
 
   // 타임라인(일반 문의 내용)이 있으면 상담 문서를 받는 중이거나 실패해도 대화를 가리지 않음.
   const hasNoMessages = messages.length === 0;
+  // 목록 응답에는 메시지가 없어 대화(타임라인·상세)를 받는 중·실패를 빈 대화와 구분해 보임. 꺼진 쪽 훅은 둘 다 false.
+  const isHistoryLoading =
+    hasNoMessages && (timeline.isLoading || detail.isLoading);
+  const isHistoryError = hasNoMessages && (timeline.isError || detail.isError);
   const rows = groupAttachments(messages);
   // 새 메시지가 오면 맨 아래로 내림. 처음 들어올 때도 최신 메시지가 보이게 함.
   const messageCount = messages.length;
@@ -318,11 +333,30 @@ export function BigbirdInquiryConversation({
       {/* 완료 카드는 대화 위에 고정됨(Figma 9298:260494). 종료된 문의는 입력창이 없음. */}
       <div className="relative flex min-h-0 flex-1 flex-col bg-muted">
         {renderTopCard()}
-        {hasNoMessages && inquiry.isRealtime && realtime.isLoading ? (
+        {isHistoryLoading ||
+        (hasNoMessages && inquiry.isRealtime && realtime.isLoading) ? (
           <LoaderCircle
             role="status"
             aria-label={tCommon("status.loading")}
             className="m-auto size-6 animate-spin text-muted-foreground"
+          />
+        ) : isHistoryError ? (
+          <EmptyState
+            type="no-message"
+            title={t("conversationError")}
+            action={
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => {
+                  void timeline.mutate();
+                  void detail.mutate();
+                }}
+              >
+                {tCommon("action.retry")}
+              </Button>
+            }
+            className="flex-1"
           />
         ) : hasNoMessages && inquiry.isRealtime && realtime.isError ? (
           <EmptyState

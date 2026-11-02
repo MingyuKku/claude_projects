@@ -92,6 +92,29 @@ describe("Combobox", () => {
     expect(screen.getByRole("option", { name: "부산" })).toBeInTheDocument();
   });
 
+  it("keywords로 라벨에 없는 값(코드)으로도 검색한다", async () => {
+    const user = userEvent.setup();
+    render(
+      <Combobox
+        options={[
+          { value: "1", label: "스킨케어 캠페인", keywords: ["Q-1234"] },
+          { value: "2", label: "헤어 캠페인", keywords: ["Q-5678"] },
+        ]}
+        placeholder="캠페인 선택"
+        searchPlaceholder="검색"
+        emptyText="결과 없음"
+      />,
+    );
+
+    await user.click(screen.getByRole("combobox"));
+    await user.type(screen.getByPlaceholderText("검색"), "Q-5678");
+
+    expect(screen.getAllByRole("option")).toHaveLength(1);
+    expect(
+      screen.getByRole("option", { name: "헤어 캠페인" }),
+    ).toBeInTheDocument();
+  });
+
   it("MO 폭에서는 아래 시트로 열리고 검색할 수 있다", async () => {
     stubWidth(false);
     const user = userEvent.setup();

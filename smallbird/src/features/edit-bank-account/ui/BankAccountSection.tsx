@@ -1,10 +1,9 @@
-import { useBankList } from "@/entities/account";
 import { EmptyState } from "@/shared/components/empty-state";
 import { SkeletonGroup } from "@/shared/components/skeleton-presets";
 import { useTranslation } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
 
-import { useBankAccount } from "../api/use-bank-account";
+import { useBankAccount, useBankList } from "../api/use-bank-account";
 import { BankAccountCard } from "./BankAccountCard";
 import { BankAccountFormSkeleton } from "./BankAccountFormSkeleton";
 

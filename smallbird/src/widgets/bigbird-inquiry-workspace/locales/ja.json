@@ -24,8 +24,10 @@
     "caption": "メッセージを残していただければ、確認後に順次回答します。"
   },
   "realtimeHistory": "相談メッセージはありません。",
+  "conversationError": "会話を読み込めませんでした。",
   "realtimeLoadError": "相談メッセージを読み込めませんでした。",
   "campaignCode": "キャンペーンコード",
+  "campaignShortcut": "キャンペーンへ移動",
   "copyCode": "キャンペーンコードをコピー",
   "copied": "クリップボードにコピーしました。",
   "backToList": "一覧へ",
@@ -59,5 +61,7 @@
   "campaignInfo": "キャンペーン情報",
   "campaignType": "キャンペーン種別",
   "productName": "商品名",
-  "period": "進行期間"
+  "period": "進行期間",
+  "progressStatus": "進行状況",
+  "shopCode": "ショップコード"
 }

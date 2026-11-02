@@ -19,13 +19,6 @@ import {
   DialogTrigger,
 } from "@/shared/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/shared/ui/select";
 
 import type { BuyerInquiryFilters } from "@/entities/inquiry";
 import type { ReactNode } from "react";
@@ -121,37 +114,30 @@ export function BuyerInquiryFilterDialog({
             ))}
           </div>
         </fieldset>
-        <label className="flex flex-col gap-2 text-sm font-medium">
-          {t("filter.campaign")}
-          <Select
-            value={draft.campaignIdx?.toString()}
-            onValueChange={(selected) =>
-              setDraft((current) => ({
-                ...current,
-                campaignIdx: selected === "all" ? undefined : Number(selected),
-                influencerThreadUserIdx: undefined,
-              }))
-            }
-          >
-            <SelectTrigger>
-              <SelectValue placeholder={t("filter.campaignPlaceholder")} />
-            </SelectTrigger>
-            {/* 선택 상자와 같은 폭, 항목 8개(32씩 + 위아래 4)를 넘으면 스크롤, 긴 이름은 한 줄 말줄임 */}
-            <SelectContent className="max-h-66 w-(--radix-select-trigger-width)">
-              <SelectItem value="all">{t("filter.all")}</SelectItem>
-              {campaigns?.map((campaign) => (
-                <SelectItem
-                  key={campaign.campaignIdx}
-                  value={campaign.campaignIdx.toString()}
-                  title={campaign.name}
-                  className="*:[span]:last:block *:[span]:last:min-w-0 *:[span]:last:truncate"
-                >
-                  {campaign.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-        </label>
+        {/* 캠페인명·캠페인 코드로 검색해 고름(REQ-24-0006). Figma는 Select지만 인플루언서와 같은 콤보박스를 씀 */}
+        <Combobox
+          label={t("filter.campaign")}
+          value={draft.campaignIdx?.toString() ?? ""}
+          onValueChange={(selected) =>
+            setDraft((current) => ({
+              ...current,
+              campaignIdx: selected === "all" ? undefined : Number(selected),
+              influencerThreadUserIdx: undefined,
+            }))
+          }
+          options={[
+            { value: "all", label: t("filter.all") },
+            ...(campaigns ?? []).map((campaign) => ({
+              value: campaign.campaignIdx.toString(),
+              label: campaign.name,
+              keywords: [campaign.campaignCode],
+            })),
+          ]}
+          placeholder={t("filter.campaignPlaceholder")}
+          searchPlaceholder={t("filter.campaignSearchPlaceholder")}
+          // 검색 결과 없음 문구는 시안에 없어 비워 둠(문구 확정 대기)
+          emptyText=""
+        />
         {/* 인플루언서는 검색되는 콤보박스(Figma Combobox 6777:61876) */}
         <Combobox
           label={t("filter.influencer")}
@@ -168,7 +154,9 @@ export function BuyerInquiryFilterDialog({
             { value: "all", label: t("filter.all") },
             ...(options ?? []).map((option) => ({
               value: option.threadUserIdx.toString(),
-              label: option.displayName,
+              label:
+                option.displayName ??
+                t("filter.influencerFallback", { idx: option.threadUserIdx }),
             })),
           ]}
           placeholder={t("filter.influencerPlaceholder")}

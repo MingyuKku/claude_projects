@@ -6,7 +6,7 @@ import {
   createQnaReply,
   deleteQnaReply,
   editQnaReply,
-  fetchBigbirdInquiries,
+  fetchBigbirdInquiryPage,
   fetchBuyerInquiryDetail,
   fetchPurchaserConversation,
   fetchQnaDetail,
@@ -31,58 +31,77 @@ vi.mock("@/shared/api", async (importOriginal) => {
   };
 });
 
-const thread = {
+const listItem = {
   threadIdx: 101,
   sequence: 7,
-  viewing: null,
-  toUserIdx: 1,
-  fmUserIdx: 5971,
   campaignIdx: null,
-  finishTime: null,
-  created: "2026-10-01T10:00:00",
-  messages: [],
-  boardType: true,
   status: "WAITING",
+  created: "2026-10-20 14:03",
+  finishTime: null,
+  boardType: true,
 };
 
-describe("fetchBigbirdInquiries", () => {
-  it("세션의 threadUserIdx로 조회해 뷰모델로 바꾼다", async () => {
+describe("fetchBigbirdInquiryPage", () => {
+  it("세션의 threadUserIdx와 offset·limit으로 조회해 메시지 없는 뷰모델로 바꾼다", async () => {
     vi.mocked(serverApiV3.get).mockResolvedValue({
       result: true,
-      data: [thread],
+      list: [listItem],
+      hasMore: true,
     });
-    const inquiries = await fetchBigbirdInquiries(5971);
-    expect(serverApiV3.get).toHaveBeenCalledWith("/help/thread", {
-      params: { threadUserIdx: 5971, status: "ALL" },
+    const page = await fetchBigbirdInquiryPage(5971, "ALL", 20);
+    expect(serverApiV3.get).toHaveBeenCalledWith("/help/bigbird-inquiry", {
+      params: { threadUserIdx: 5971, status: "ALL", offset: 20, limit: 20 },
     });
-    expect(inquiries.map((item) => item.threadIdx)).toEqual([101]);
+    expect(page.hasMore).toBe(true);
+    expect(page.inquiries[0]).toMatchObject({
+      threadIdx: 101,
+      isRealtime: false,
+      isFinished: false,
+      messages: [],
+    });
   });
 
   it("서버 상태 필터로 상담 중 문의만 조회한다", async () => {
     vi.mocked(serverApiV3.get).mockResolvedValue({
       result: true,
-      data: [{ ...thread, status: "IN_PROGRESS" }],
+      list: [{ ...listItem, status: "IN_PROGRESS", boardType: false }],
+      hasMore: false,
     });
-    const inquiries = await fetchBigbirdInquiries(5971, "IN_PROGRESS");
-    expect(serverApiV3.get).toHaveBeenCalledWith("/help/thread", {
-      params: { threadUserIdx: 5971, status: "IN_PROGRESS" },
+    const page = await fetchBigbirdInquiryPage(5971, "IN_PROGRESS", 0);
+    expect(serverApiV3.get).toHaveBeenCalledWith(
+      "/help/bigbird-inquiry",
+      expect.objectContaining({
+        params: expect.objectContaining({ status: "IN_PROGRESS" }),
+      }),
+    );
+    expect(page.inquiries[0]).toMatchObject({
+      status: "consulting",
+      isRealtime: true,
     });
-    expect(inquiries[0]?.status).toBe("consulting");
   });
 
   it("404(대화 내역 없음)는 빈 목록이다", async () => {
     vi.mocked(serverApiV3.get).mockRejectedValue(new ApiError(404, undefined));
-    await expect(fetchBigbirdInquiries(5971)).resolves.toEqual([]);
+    await expect(fetchBigbirdInquiryPage(5971, "ALL", 0)).resolves.toEqual({
+      inquiries: [],
+      hasMore: false,
+    });
   });
 
   it("다른 오류는 빈 목록으로 바꾸지 않는다", async () => {
     vi.mocked(serverApiV3.get).mockRejectedValue(new ApiError(500, undefined));
-    await expect(fetchBigbirdInquiries(5971)).rejects.toThrow();
+    await expect(fetchBigbirdInquiryPage(5971, "ALL", 0)).rejects.toThrow();
   });
 
   it("200이어도 result가 false면 실패다", async () => {
-    vi.mocked(serverApiV3.get).mockResolvedValue({ result: false, data: [] });
-    const error: unknown = await fetchBigbirdInquiries(5971).catch((e) => e);
+    vi.mocked(serverApiV3.get).mockResolvedValue({
+      result: false,
+      list: [],
+      hasMore: false,
+    });
+    const error: unknown = await fetchBigbirdInquiryPage(5971, "ALL", 0).catch(
+      (e: unknown) => e,
+    );
     expect(isApiError(error) && error.status).toBe(200);
   });
 });
@@ -138,6 +157,21 @@ describe("uploadInquiryAttachment", () => {
     const [path, body] = vi.mocked(serverApiV3.post).mock.calls.at(-1)!;
     expect(path).toBe("/help/message/image/help");
     expect((body as FormData).get("file")).toBe(file);
+  });
+
+  it("문서는 file 경로로 올린다", async () => {
+    vi.mocked(serverApiV3.post).mockResolvedValue({
+      result: true,
+      url: "https://cdn/a.pdf",
+      attachmentIdx: 10,
+      fileName: "a.pdf",
+      fileSize: 3,
+    });
+    await uploadInquiryAttachment(
+      new File(["abc"], "a.pdf", { type: "application/pdf" }),
+    );
+    const [path] = vi.mocked(serverApiV3.post).mock.calls.at(-1)!;
+    expect(path).toBe("/help/message/file/help");
   });
 
   it("허용하지 않는 형식은 요청하지 않고, result false는 실패다", async () => {

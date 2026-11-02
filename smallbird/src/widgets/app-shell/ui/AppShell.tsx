@@ -10,6 +10,7 @@ import {
 } from "@/shared/components/app-header";
 import { LoginRequiredAlert } from "@/shared/components/login-required-alert";
 import { SidebarNav } from "@/shared/components/sidebar-nav";
+import { ToggleTab } from "@/shared/components/toggle-tab";
 import { ROUTES } from "@/shared/config";
 import { formatNumber, useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
@@ -129,6 +130,19 @@ export function AppShell({
     // 비로그인의 이용 가이드는 헤더에만 둠(Figma 주석 5180:89119).
     guideLabel: session ? t("guide") : undefined,
     guideExtra: import.meta.env.DEV ? <DevLanguageSwitcher /> : undefined,
+    // 광고주·인플루언서 전환(Figma Sidebar Footer Toggle / Tab). 인플루언서 화면이 아직 없어 광고주에 고정함.
+    footerSwitch: session ? (
+      <ToggleTab
+        aria-label={t("role.label")}
+        className="w-full *:flex-1"
+        value="advertiser"
+        onValueChange={() => {}}
+        options={[
+          { value: "advertiser", label: t("role.advertiser") },
+          { value: "influencer", label: t("role.influencer"), disabled: true },
+        ]}
+      />
+    ) : undefined,
     onClickGuide: () =>
       window.open(CLIENT_GUIDE_URL, "_blank", "noopener,noreferrer"),
   };

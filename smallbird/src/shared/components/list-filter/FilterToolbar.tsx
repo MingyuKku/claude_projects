@@ -20,8 +20,6 @@ interface PageSizeSelect {
   value: number;
   options: readonly number[];
   onChange: (size: number) => void;
-  /** 서버가 허용하는 개수가 정해지기 전에는 고정값을 흐리게 보임(빅버드 머니). */
-  isDisabled?: boolean;
 }
 
 interface FilterToolbarProps {
@@ -44,13 +42,6 @@ interface FilterToolbarProps {
   pageSize?: PageSizeSelect;
   /** 인라인 Select 폭을 시안의 140px로 좁힘(구독 결제 내역). 기본은 222px. */
   isNarrowSelect?: boolean;
-  /**
-   * 필드가 많은 툴바(빅버드 머니 사용 내역: 검색 + 필드 4개)용. PC에서 필드를 178px(검색 204px)까지 늘어나게 하되
-   * 옆 패널이 열려 좁아지면 한 줄을 유지하도록 줄어듦. 기본은 고정 폭이고 모자라면 줄을 바꿈.
-   */
-  isCompact?: boolean;
-  /** PC에서 필드가 남은 폭을 똑같이 나눠 채움(빅버드 머니 충전/출금 내역에 옆 패널이 열렸을 때, 시안 187px씩). */
-  shouldFillFields?: boolean;
   /** 없으면 검색창을 그리지 않음(충전 내역은 검색 없음). */
   search?: {
     keyword: string;
@@ -70,8 +61,6 @@ export function FilterToolbar({
   inlineFrom = "tablet",
   pageSize,
   isNarrowSelect = false,
-  isCompact = false,
-  shouldFillFields = false,
   search,
 }: FilterToolbarProps) {
   const { t } = useTranslation();
@@ -93,17 +82,11 @@ export function FilterToolbar({
     <PageSizePicker
       pageSize={pageSize}
       isShort={!isTabletUp}
-      className={cn(
-        "shrink-0",
-        isTabletUp ? "w-30" : "w-25",
-        pageSize.isDisabled && "opacity-50",
-      )}
+      className={cn("shrink-0", isTabletUp ? "w-30" : "w-25")}
     />
   );
 
   if (!isInline) {
-    // 검색이 없는 툴바(빅버드 머니 충전/출금 내역)는 MO "필터" 버튼이 글자와 함께 남은 폭을 채움(시안).
-    const isIconOnlyFilter = Boolean(pageSize && search && !isTabletUp);
     const searchNode = search && (
       <ListSearch
         key={search.keyword}
@@ -120,13 +103,16 @@ export function FilterToolbar({
           <Button
             type="button"
             variant={hasActiveFilter(values) ? "outline" : "outline-foreground"}
-            size={isIconOnlyFilter ? "icon" : "default"}
-            aria-label={isIconOnlyFilter ? filterLabel : undefined}
-            className={cn(!isIconOnlyFilter && "min-w-20", !search && "flex-1")}
+            size={pageSize && !isTabletUp ? "icon" : "default"}
+            aria-label={pageSize && !isTabletUp ? filterLabel : undefined}
+            className={cn(
+              !(pageSize && !isTabletUp) && "min-w-20",
+              !search && !pageSize && "flex-1",
+            )}
             onClick={() => openPanel(FILTER_PANEL)}
           >
             <Settings2 />
-            {!isIconOnlyFilter && filterLabel}
+            {!(pageSize && !isTabletUp) && filterLabel}
           </Button>
           {pageSize && <div className="ml-auto">{pageSizeNode}</div>}
         </div>
@@ -150,28 +136,17 @@ export function FilterToolbar({
           keyword={search.keyword}
           onSubmitKeyword={search.onSubmit}
           isDisabled={search.isDisabled}
-          className={cn(
-            "order-last w-full desktop:order-first",
-            isCompact
-              ? "desktop:w-auto desktop:max-w-51 desktop:min-w-0 desktop:flex-1"
-              : "desktop:w-71.75",
-          )}
+          className="order-last w-full desktop:order-first desktop:w-71.75"
         />
       )}
       {fields.map((field) => (
         <div
           key={field.id}
           className={cn(
-            "min-w-0 flex-1",
-            isCompact && "desktop:max-w-44.5",
-            !isCompact &&
-              !shouldFillFields &&
-              cn(
-                "desktop:flex-none",
-                isNarrowSelect && field.type !== "date"
-                  ? "desktop:w-35"
-                  : "desktop:w-55.5",
-              ),
+            "min-w-0 flex-1 desktop:flex-none",
+            isNarrowSelect && field.type !== "date"
+              ? "desktop:w-35"
+              : "desktop:w-55.5",
           )}
         >
           {field.type === "date" ? (
@@ -200,10 +175,9 @@ export function FilterToolbar({
           )}
         </div>
       ))}
-      {/* 시안: 마이페이지 툴바의 새로고침은 모두 Icon Button Ghost Foreground(테두리 없음). */}
       <Button
         type="button"
-        variant="ghost-foreground"
+        variant="outline-foreground"
         size="icon"
         aria-label={t("list.filter.refresh")}
         onClick={onRefresh}
@@ -231,7 +205,6 @@ function PageSizePicker({ pageSize, isShort, className }: PageSizePickerProps) {
     <Combobox
       className={className}
       aria-label={t("list.pageSize.aria")}
-      disabled={pageSize.isDisabled}
       isSearchable={false}
       options={pageSize.options.map((size) => ({
         value: String(size),

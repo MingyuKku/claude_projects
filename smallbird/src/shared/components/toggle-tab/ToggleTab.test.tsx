@@ -35,4 +35,27 @@ describe("ToggleTab", () => {
     expect(screen.getByRole("radio", { name: /연간 결제/ })).toBeChecked();
     expect(container.querySelectorAll('[aria-hidden="true"]')).toHaveLength(1);
   });
+
+  it("disabled 항목은 고를 수 없다", async () => {
+    const user = userEvent.setup();
+    const onValueChange = vi.fn();
+    render(
+      <ToggleTab
+        aria-label="회원 유형"
+        options={[
+          { value: "advertiser", label: "광고주" },
+          { value: "influencer", label: "인플루언서", disabled: true },
+        ]}
+        value="advertiser"
+        onValueChange={onValueChange}
+      />,
+    );
+
+    const influencer = screen.getByRole("radio", { name: "인플루언서" });
+    expect(influencer).toBeDisabled();
+    await user.click(influencer);
+
+    expect(onValueChange).not.toHaveBeenCalled();
+    expect(screen.getByRole("radio", { name: "광고주" })).toBeChecked();
+  });
 });

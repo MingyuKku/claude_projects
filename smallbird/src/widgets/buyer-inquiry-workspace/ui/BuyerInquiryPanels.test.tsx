@@ -45,6 +45,10 @@ const inquiry: BuyerInquiryViewModel = {
   userIdx: null,
   preview: "마지막 메시지",
   lastActivityAt: new Date("2026-10-01T10:00"),
+  hasUnread: false,
+  brandName: null,
+  campaignName: null,
+  shopName: null,
 };
 
 const message = (
@@ -195,6 +199,42 @@ describe("구매자 문의 오른쪽 패널", () => {
     renderPanels();
     expect(await screen.findByText("배송이 언제 되나요?")).toBeInTheDocument();
     expect(screen.queryByText(/campaignCode/)).not.toBeInTheDocument();
+  });
+
+  it("삭제된 메시지는 삭제 표시 없이 대화에서 뺀다", async () => {
+    vi.mocked(serverApiV3.get).mockImplementation(async (path: string) => {
+      if (path !== "/help/thread") return detail;
+      return {
+        result: true,
+        data: [
+          {
+            threadIdx: 1,
+            sequence: 1,
+            viewing: null,
+            toUserIdx: 1,
+            fmUserIdx: 77,
+            campaignIdx: 10,
+            finishTime: null,
+            created: "2026-10-01T10:00:00",
+            boardType: true,
+            status: "WAITING",
+            messages: [
+              message(1, "배송이 언제 되나요?", false, "2026-10-01T10:00:00"),
+              {
+                ...message(2, "지운 답변", true, "2026-10-01T10:01:00"),
+                deleteTime: "2026-10-01T10:02:00",
+              },
+            ],
+          },
+        ],
+      };
+    });
+    renderPanels();
+    expect(await screen.findByText("배송이 언제 되나요?")).toBeInTheDocument();
+    expect(screen.queryByText("지운 답변")).not.toBeInTheDocument();
+    expect(
+      screen.queryByText("메시지가 삭제되었습니다."),
+    ).not.toBeInTheDocument();
   });
 
   it("상세 정보를 문의 상세 API로 보여 준다", async () => {

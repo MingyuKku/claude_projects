@@ -24,8 +24,10 @@
     "caption": "Leave a message and we'll reply in order after review."
   },
   "realtimeHistory": "There are no consultation messages.",
+  "conversationError": "Couldn't load the conversation.",
   "realtimeLoadError": "Could not load consultation messages.",
   "campaignCode": "Campaign code",
+  "campaignShortcut": "Go to campaign",
   "copyCode": "Copy campaign code",
   "copied": "Copied to clipboard.",
   "backToList": "Back to list",
@@ -59,5 +61,7 @@
   "campaignInfo": "Campaign",
   "campaignType": "Campaign type",
   "productName": "Product",
-  "period": "Period"
+  "period": "Period",
+  "progressStatus": "Status",
+  "shopCode": "Shop code"
 }

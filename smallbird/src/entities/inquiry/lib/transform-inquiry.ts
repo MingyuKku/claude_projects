@@ -4,6 +4,7 @@ import { campaignCardSchema } from "../model/schema";
 import { REALTIME_CLOSED_MESSAGE } from "./consultation-write";
 
 import type {
+  BigbirdInquiryListItem,
   BigbirdInquiryStatus,
   BigbirdInquiryViewModel,
   BuyerInquiry,
@@ -13,6 +14,8 @@ import type {
   BuyerProductViewModel,
   CampaignCard,
   InquiryCampaign,
+  InquiryCampaignDetail,
+  InquiryCampaignDetailViewModel,
   InquiryCampaignViewModel,
   InquiryMessage,
   InquiryMessageKind,
@@ -187,7 +190,10 @@ export function transformRealtimeConsultationMessages(
   );
 }
 
-const THREAD_STATUS: Record<InquiryThread["status"], BigbirdInquiryStatus> = {
+const THREAD_STATUS: Record<
+  BigbirdInquiryListItem["status"],
+  BigbirdInquiryStatus
+> = {
   WAITING: "waiting",
   IN_PROGRESS: "consulting",
   ANSWERED: "done",
@@ -209,6 +215,32 @@ export function transformInquiryThreadToViewModel(
     messages: transformInquiryMessagesToViewModels(
       dropRepeatedAutoMessages(messages),
     ),
+  };
+}
+
+/** 상세 API의 대화 전문. 목록의 스레드와 같은 방식으로 반복 자동 메시지를 걸러 냄. */
+export function transformBigbirdInquiryDetailMessages(
+  messages: InquiryMessage[] | null,
+) {
+  return transformInquiryMessagesToViewModels(
+    dropRepeatedAutoMessages(messages ?? []),
+  );
+}
+
+/** 목록 항목은 메시지가 없어 대화는 비워 둠. 대화는 상세·타임라인 API로 받음. */
+export function transformBigbirdInquiryListItemToViewModel(
+  item: BigbirdInquiryListItem,
+): BigbirdInquiryViewModel {
+  return {
+    threadIdx: item.threadIdx,
+    sequence: item.sequence ?? 0,
+    campaignIdx: item.campaignIdx,
+    isRealtime: item.boardType === false,
+    isFinished: item.finishTime !== null,
+    status: THREAD_STATUS[item.status],
+    realtimePhase: null,
+    createdAt: toDate(item.created),
+    messages: [],
   };
 }
 
@@ -288,6 +320,21 @@ export function buildSubmittedInquiryViewModel(input: {
   };
 }
 
+export function transformInquiryCampaignDetailToViewModel(
+  detail: InquiryCampaignDetail,
+): InquiryCampaignDetailViewModel {
+  return {
+    imageUrl: detail.mainImageUrl || null,
+    typeName: detail.campaignType || null,
+    progressStatus: detail.progressStatus || null,
+    period: toCampaignPeriod(
+      detail.progressStartDate ?? null,
+      detail.progressEndDate ?? null,
+    ),
+    shopCode: detail.shopCode || null,
+  };
+}
+
 /** `2026-10-01`·`2026-10-31`을 시안 표기 `2026.10.01 ~ 2026.10.31`로 바꿈. 둘 중 하나라도 없으면 null. */
 function toCampaignPeriod(start: string | null, end: string | null) {
   if (!start || !end) return null;
@@ -313,6 +360,15 @@ function toListDate(value: string | null): Date | null {
   return value === null ? null : new Date(value.replace(" ", "T"));
 }
 
+const BUYER_STATUS = {
+  WAITING: "waiting",
+  IN_PROGRESS: "consulting",
+  ANSWERED: "done",
+} as const satisfies Record<
+  BuyerInquiry["status"],
+  BuyerInquiryViewModel["status"]
+>;
+
 export function transformBuyerInquiryToViewModel(
   inquiry: BuyerInquiry,
 ): BuyerInquiryViewModel {
@@ -321,7 +377,7 @@ export function transformBuyerInquiryToViewModel(
     key: `${source}-${inquiry.inquiryIdx}`,
     inquiryIdx: inquiry.inquiryIdx,
     source,
-    status: inquiry.status === "ANSWERED" ? "done" : "waiting",
+    status: BUYER_STATUS[inquiry.status],
     campaignIdx: inquiry.campaignIdx,
     orderNumber: inquiry.orderNumber,
     writerName: inquiry.writerName,
@@ -331,6 +387,10 @@ export function transformBuyerInquiryToViewModel(
     userIdx: inquiry.userIdx,
     preview: toPlainBody(inquiry.body ?? ""),
     lastActivityAt: toListDate(inquiry.writeTime),
+    hasUnread: inquiry.hasUnread,
+    brandName: inquiry.brandName || null,
+    campaignName: inquiry.campaignName || null,
+    shopName: inquiry.shopName || null,
   };
 }
 

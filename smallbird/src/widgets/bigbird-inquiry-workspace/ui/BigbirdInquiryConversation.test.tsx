@@ -10,11 +10,21 @@ import { BigbirdInquiryConversation } from "./BigbirdInquiryConversation";
 import type { BigbirdInquiryViewModel } from "@/entities/inquiry";
 
 // 상담 문서 구독은 네트워크 경계라 응답을 주지 않는 것으로 대신함(대화 목록은 로딩 상태).
-vi.mock("@/shared/api", () => ({ getFirestoreDb: async () => ({}) }));
+const get = vi.hoisted(() => vi.fn());
+vi.mock("@/shared/api", () => ({
+  getFirestoreDb: async () => ({}),
+  serverApiV3: { get },
+  isApiError: () => false,
+}));
 vi.mock("firebase/firestore", () => ({
   doc: () => ({}),
   onSnapshot: () => () => {},
 }));
+
+// 기타 문의 대화(상세 API)는 기본으로 빈 대화를 줌.
+beforeEach(() => {
+  get.mockResolvedValue({ result: true, data: { messages: [] } });
+});
 
 // Radix ScrollArea가 쓰는 브라우저 API가 jsdom에 없어 이 파일에서만 채움.
 beforeAll(() => {
@@ -177,6 +187,8 @@ describe("첨부 메시지", () => {
 
   it("연달아 보낸 첨부를 한 줄 썸네일로 보여 주고, 누르면 뷰어에서 넘겨 볼 수 있다", async () => {
     const user = userEvent.setup();
+    // 상세 응답 전에는 뷰모델에 담긴 메시지를 보여 줌.
+    get.mockReturnValue(new Promise(() => {}));
     renderConversation(
       inquiry({
         isRealtime: false,
@@ -222,9 +234,7 @@ describe("첨부 업로드 진행", () => {
       jobs: { 101: { files, sentCount: 1, status: "uploading" } },
     });
     renderConversation(inquiry({ isRealtime: false, realtimePhase: null }));
-    expect(screen.getByRole("status")).toHaveTextContent(
-      "첨부 업로드 중 (1/2)",
-    );
+    expect(await screen.findByText("첨부 업로드 중 (1/2)")).toBeInTheDocument();
 
     useInquiryUploadStore.setState({
       jobs: { 101: { files, sentCount: 1, status: "failed" } },
@@ -242,6 +252,20 @@ describe("첨부 업로드 진행", () => {
       jobs: { 999: { files, sentCount: 0, status: "uploading" } },
     });
     renderConversation(inquiry({ isRealtime: false, realtimePhase: null }));
-    expect(screen.queryByRole("status")).not.toBeInTheDocument();
+    expect(screen.queryByText(/첨부 업로드 중/)).not.toBeInTheDocument();
+  });
+});
+
+describe("대화 불러오기", () => {
+  it("대화를 받지 못하면 빈 대화 대신 오류와 다시 시도를 보이고, 다시 시도하면 다시 받는다", async () => {
+    get.mockRejectedValue(new Error("network"));
+    renderConversation(inquiry({ isRealtime: false, realtimePhase: null }));
+
+    expect(
+      await screen.findByText("대화를 불러오지 못했습니다."),
+    ).toBeInTheDocument();
+    const callCount = get.mock.calls.length;
+    await userEvent.click(screen.getByRole("button", { name: "다시 시도" }));
+    expect(get.mock.calls.length).toBeGreaterThan(callCount);
   });
 });

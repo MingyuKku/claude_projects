@@ -4,6 +4,7 @@
   "waiting": "返信待ち",
   "done": "回答済み",
   "status": {
+    "consulting": "相談中",
     "waiting": "返信待ち",
     "done": "回答済み"
   },
@@ -30,6 +31,7 @@
     "source": "問い合わせ種別",
     "campaign": "キャンペーン",
     "campaignPlaceholder": "キャンペーンを選択",
+    "campaignSearchPlaceholder": "キャンペーン名またはコードを検索してください。",
     "influencer": "インフルエンサー",
     "influencerPlaceholder": "インフルエンサーを選択",
     "influencerSearchPlaceholder": "インフルエンサーを検索",
@@ -77,5 +79,8 @@
     "deleteTitle": "返信を削除しますか?",
     "deleteDescription": "削除した返信は元に戻せません。"
   },
-  "messageDeleted": "メッセージが削除されました。"
+  "card": {
+    "campaignInquiry": "{{label}} お問い合わせ",
+    "unread": "未読メッセージ"
+  }
 }

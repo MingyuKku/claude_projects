@@ -33,6 +33,8 @@ interface SidebarNavProps {
   isGuideDisabled?: boolean;
   // 이용 가이드 옆에 붙는 추가 요소 (예: 개발용 언어 전환)
   guideExtra?: ReactNode;
+  // 이용 가이드 아래 전체 폭 요소 (Figma Footer의 Toggle / Tab, 예: 광고주·인플루언서 전환). 레일에서는 숨김
+  footerSwitch?: ReactNode;
   navLabel: string;
   // SPA 라우터 링크를 쓰려면 href를 받는 컴포넌트를 넘김 (기본 <a>)
   linkAs?: SidebarLinkComponent;
@@ -74,6 +76,7 @@ export function SidebarNav({
   onClickGuide,
   isGuideDisabled = false,
   guideExtra,
+  footerSwitch,
   navLabel,
   linkAs,
   className,
@@ -154,19 +157,25 @@ export function SidebarNav({
           </ul>
         </nav>
       </div>
-      {guideLabel && !isCollapsed && (
-        <div className="hidden items-center gap-1 px-2.5 pt-2.5 pb-4 tablet:flex">
-          <Button
-            variant="ghost-muted"
-            size="sm"
-            className="cursor-pointer"
-            onClick={onClickGuide}
-            disabled={isGuideDisabled}
-          >
-            <FileQuestionMark />
-            {guideLabel}
-          </Button>
-          {guideExtra}
+      {/* Figma Footer(5058:74731): 이용 가이드 아래 전환 탭, 간격 10, 위 10·아래 16·좌우 10 */}
+      {(guideLabel || footerSwitch) && !isCollapsed && (
+        <div className="flex flex-col items-start gap-2.5 px-2.5 pt-2.5 pb-4">
+          {guideLabel && (
+            <div className="flex items-center gap-1">
+              <Button
+                variant="ghost-muted"
+                size="sm"
+                className="cursor-pointer"
+                onClick={onClickGuide}
+                disabled={isGuideDisabled}
+              >
+                <FileQuestionMark />
+                {guideLabel}
+              </Button>
+              {guideExtra}
+            </div>
+          )}
+          {footerSwitch}
         </div>
       )}
     </aside>

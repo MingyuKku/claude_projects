@@ -1,4 +1,5 @@
 import { LoaderCircle, Plus } from "lucide-react";
+import { useEffect, useRef } from "react";
 import { generatePath, Link, useNavigate, useSearchParams } from "react-router";
 
 import { useInquiryCampaigns } from "@/entities/inquiry";
@@ -42,6 +43,10 @@ interface BigbirdInquiryWorkspaceProps {
   inquiries: BigbirdInquiryViewModel[] | undefined;
   isLoading: boolean;
   isError: boolean;
+  /** 서버에 더 불러올 문의가 있는지. 목록 끝에 닿으면 `onLoadMore`로 이어 받음. */
+  hasMore?: boolean;
+  isLoadingMore?: boolean;
+  onLoadMore?: () => void;
   onClickRefresh: () => void;
   selectedThreadIdx?: number;
   /** TAB·MO에서 목록 대신 오른쪽 패널(대화·새 문의)을 보여 줄지. PC는 항상 둘 다 보임. */
@@ -61,6 +66,9 @@ export function BigbirdInquiryWorkspace({
   inquiries,
   isLoading,
   isError,
+  hasMore = false,
+  isLoadingMore = false,
+  onLoadMore,
   onClickRefresh,
   selectedThreadIdx,
   isPanelOpen,
@@ -82,7 +90,13 @@ export function BigbirdInquiryWorkspace({
 
   // 목록이 비었으면 PC 오른쪽 패널을 그리지 않습니다(Figma 빈 목록 6790:100192). 특정 문의 URL로 들어온 경우
   // (isPanelOpen)는 "찾을 수 없음" 안내가 필요해 그대로 둡니다.
-  const isEmptyList = !isLoading && !isError && visible.length === 0;
+  const isEmptyList =
+    !isLoading && !isError && visible.length === 0 && !hasMore;
+  // 다음 쪽 실패는 불러 둔 목록을 가리지 않고 목록 아래에서 다시 시도함. 첫 쪽이 실패했을 때만 오류 화면.
+  const isFirstPageError = isError && !inquiries?.length;
+  // 탭으로 걸러 비었어도 더 받을 쪽이 있으면 표식을 그려 이어 받음.
+  const isListEmpty =
+    isLoading || isFirstPageError || (visible.length === 0 && !hasMore);
 
   function handleChangeStatus(value: string) {
     setSearchParams(
@@ -105,7 +119,7 @@ export function BigbirdInquiryWorkspace({
         />
       );
     }
-    if (isError) {
+    if (isFirstPageError) {
       return (
         <EmptyState
           type="no-list"
@@ -153,7 +167,7 @@ export function BigbirdInquiryWorkspace({
             </TabsList>
           </Tabs>
         }
-        isEmpty={isLoading || isError || visible.length === 0}
+        isEmpty={isListEmpty}
         empty={renderListBody()}
         className={cn(
           "min-h-0 flex-1 rounded-none border-0 tablet:rounded-lg tablet:border desktop:w-94.25 desktop:flex-none",
@@ -161,10 +175,11 @@ export function BigbirdInquiryWorkspace({
         )}
       >
         {visible.map((inquiry) => {
-          const title = getInquiryTitleKey(inquiry);
-          const brandName = campaigns?.find(
-            (campaign) => campaign.campaignIdx === inquiry.campaignIdx,
-          )?.brandName;
+          const campaign = campaigns?.find(
+            (item) => item.campaignIdx === inquiry.campaignIdx,
+          );
+          const title = getInquiryTitleKey(inquiry, campaign?.productName);
+          const brandName = campaign?.brandName;
           const isConsulting = inquiry.status === "consulting";
           // 기타 문의는 회색 "기타 문의" 뒤에 최근 메시지를 보여 줌(Figma 3.0.6 카드, REQ-23-0002).
           const preview =
@@ -210,6 +225,21 @@ export function BigbirdInquiryWorkspace({
             />
           );
         })}
+        {isError && !isFirstPageError && (
+          <div className="flex flex-col items-center gap-2 py-4 text-sm text-muted-foreground">
+            {t("loadError")}
+            <Button variant="outline" size="sm" onClick={onClickRefresh}>
+              {tCommon("action.retry")}
+            </Button>
+          </div>
+        )}
+        {hasMore && !isError && onLoadMore && (
+          <LoadMoreSentinel
+            isLoading={isLoadingMore}
+            label={tCommon("status.loading")}
+            onReach={onLoadMore}
+          />
+        )}
       </ChatListPanel>
 
       <div
@@ -239,6 +269,42 @@ export function BigbirdInquiryWorkspace({
           </section>
         )}
       </div>
+    </div>
+  );
+}
+
+/** 목록 맨 아래에 두는 표식. 화면에 들어오면 다음 문의를 이어 받음(무한 스크롤). */
+function LoadMoreSentinel({
+  isLoading,
+  label,
+  onReach,
+}: {
+  isLoading: boolean;
+  label: string;
+  onReach: () => void;
+}) {
+  const ref = useRef<HTMLDivElement>(null);
+  // 받는 중에는 관찰을 멈추고, 끝나면 다시 걸어 표식이 아직 보이면 바로 다음 쪽을 받음.
+  useEffect(() => {
+    const element = ref.current;
+    if (!element || isLoading || typeof IntersectionObserver === "undefined")
+      return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (entry?.isIntersecting) onReach();
+    });
+    observer.observe(element);
+    return () => observer.disconnect();
+  }, [isLoading, onReach]);
+
+  return (
+    <div ref={ref} className="flex h-12 items-center justify-center">
+      {isLoading && (
+        <LoaderCircle
+          role="status"
+          aria-label={label}
+          className="size-5 animate-spin text-muted-foreground"
+        />
+      )}
     </div>
   );
 }

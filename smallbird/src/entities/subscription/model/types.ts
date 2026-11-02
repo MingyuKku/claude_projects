@@ -1,4 +1,9 @@
-import type { SubscriptionProductType, UsageMetric } from "./codes";
+import type {
+  PaymentMethod,
+  PaymentStatus,
+  SubscriptionProductType,
+  UsageMetric,
+} from "./codes";
 
 /** 구독 탭의 상품 카드 한 장. 가격은 정책이 없어 더미(스펙 §1·§7 P-1). */
 export interface SubscriptionPlan {
@@ -88,10 +93,8 @@ export interface PaymentRecord {
   /** 결제 내역 이름(서버가 만드는 상품명, 그대로 표시). */
   name: string;
   amount: number;
-  /** 서버 결제 수단 값. 코드(`PAYMENT_METHODS`)가 아니면 그대로 표시함. */
-  method: string;
-  /** 서버 결제 상태 값. 코드(`PAYMENT_STATUSES`)가 아니면 그대로 표시함. */
-  status: string;
+  method: PaymentMethod;
+  status: PaymentStatus;
   /** 거래명세서 주소. 결제 완료 건에만 있음. */
   receiptUrl: string | null;
 }

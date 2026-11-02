@@ -1,9 +1,8 @@
 {
   "chargeStatus": {
-    "paid": "Deposited",
-    "withdrawn": "Withdrawn",
+    "paid": "Paid",
     "pending": "Pending",
-    "canceled": "Unpaid, canceled"
+    "canceled": "Canceled"
   },
   "balance": {
     "title": "Bigbird Money balance",

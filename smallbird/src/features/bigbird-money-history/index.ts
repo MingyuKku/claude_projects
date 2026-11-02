@@ -1,8 +1,5 @@
 export { LIST_QUERY_PARAMS } from "./model/constants";
-export {
-  useChargeRecord,
-  useReloadChargeHistory,
-} from "./api/use-charge-history";
+export { useChargeHistory, useChargeRecord } from "./api/use-charge-history";
 export { useUsageRecord } from "./api/use-usage-history";
 export { ChargeDetail } from "./ui/ChargeDetail";
 export { ChargeHistory } from "./ui/ChargeHistory";

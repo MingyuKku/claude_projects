@@ -4,11 +4,3 @@ export function parsePageParam(value: string | null) {
   const page = Number(value);
   return Number.isSafeInteger(page) && page >= 1 ? page : 1;
 }
-
-/** 주소의 "N개 보기". 선택지에 없는 값은 맨 앞 값(기본)으로 봄. */
-export function parsePageSizeParam(
-  value: string | null,
-  options: readonly [number, ...number[]],
-) {
-  return options.find((option) => String(option) === value) ?? options[0];
-}

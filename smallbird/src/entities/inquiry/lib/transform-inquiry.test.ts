@@ -7,8 +7,10 @@ import {
 import {
   buildSubmittedInquiryViewModel,
   toCampaignCardBody,
+  transformBigbirdInquiryDetailMessages,
   transformBuyerInquiryDetailToViewModel,
   transformBuyerInquiryToViewModel,
+  transformInquiryCampaignDetailToViewModel,
   transformInquiryCampaignToViewModel,
   transformInquiryMessagesToViewModels,
   transformInquiryThreadToViewModel,
@@ -413,6 +415,7 @@ describe("transformBuyerInquiryToViewModel", () => {
     body: "배송이 언제 되나요?",
     writeTime: "2026-10-01 10:00",
     threadUserIdx: 77,
+    hasUnread: false,
     userIdx: null,
     ...overrides,
   });
@@ -437,6 +440,9 @@ describe("transformBuyerInquiryToViewModel", () => {
       threadUserIdx: 77,
       userIdx: null,
     });
+    expect(
+      transformBuyerInquiryToViewModel(buyer({ status: "IN_PROGRESS" })).status,
+    ).toBe("consulting");
     const qna = transformBuyerInquiryToViewModel(
       buyer({ sourceType: "PRODUCT_QNA", threadUserIdx: null, userIdx: 9 }),
     );
@@ -660,5 +666,50 @@ describe("자동 메시지 분류", () => {
 
     expect(closed?.kind).toBe("text");
     expect(greeting?.kind).toBe("system");
+  });
+});
+
+describe("transformInquiryCampaignDetailToViewModel", () => {
+  it("빈 값은 null로 두고 기간은 시안 표기로 합친다", () => {
+    expect(
+      transformInquiryCampaignDetailToViewModel({
+        result: true,
+        mainImageUrl: "",
+        campaignType: "PICK형",
+        progressStatus: "구매중",
+        progressStartDate: "2026-10-01",
+        progressEndDate: "2026-10-31",
+        shopCode: null,
+      }),
+    ).toEqual({
+      imageUrl: null,
+      typeName: "PICK형",
+      progressStatus: "구매중",
+      period: "2026.10.01 ~ 2026.10.31",
+      shopCode: null,
+    });
+  });
+
+  it("기간 중 하나라도 없으면 기간은 null", () => {
+    expect(
+      transformInquiryCampaignDetailToViewModel({
+        result: true,
+        progressStartDate: "2026-10-01",
+        progressEndDate: null,
+      }).period,
+    ).toBeNull();
+  });
+});
+
+describe("transformBigbirdInquiryDetailMessages", () => {
+  it("메시지가 null이면 빈 대화, 연속된 같은 자동 안내는 하나만 남긴다", () => {
+    expect(transformBigbirdInquiryDetailMessages(null)).toEqual([]);
+    const notice = { auto: true, body: "상담이 종료되었습니다." };
+    const views = transformBigbirdInquiryDetailMessages([
+      message({ messageIdx: 1, ...notice }),
+      message({ messageIdx: 2, ...notice }),
+      message({ messageIdx: 3, body: "다시 문의합니다." }),
+    ]);
+    expect(views.map((view) => view.id)).toEqual([1, 3]);
   });
 });

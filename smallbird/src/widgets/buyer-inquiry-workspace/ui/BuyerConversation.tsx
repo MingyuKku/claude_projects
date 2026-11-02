@@ -63,9 +63,11 @@ function PurchaserConversation({ inquiry }: BuyerConversationProps) {
     );
   }
   // 구매자 앱이 문의를 시작할 때 보내는 캠페인 JSON auto 메시지는 상세 패널과 내용이 겹쳐 숨깁니다.
+  // 삭제된 메시지는 "삭제됨" 표시 없이 자리째 뺌(REQ-24-0044 대신 사용자 결정 2026-10-29).
   const rows = groupAttachments(
     (messages ?? []).filter(
-      (message) => message.kind !== "system" && !message.campaign,
+      (message) =>
+        message.kind !== "system" && !message.campaign && !message.isDeleted,
     ),
   );
   if (rows.length === 0) {
@@ -111,10 +113,6 @@ function PurchaserConversation({ inquiry }: BuyerConversationProps) {
                   row.text ? formatMessageTime(row.text.createdAt) : undefined
                 }
               />
-            ) : row.message.isDeleted ? (
-              <ChatDivider className="self-center">
-                {t("messageDeleted")}
-              </ChatDivider>
             ) : (
               <Fragment>
                 <EditableChatMessage

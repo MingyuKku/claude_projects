@@ -50,6 +50,36 @@ export const inquiryThreadSchema = z.object({
 });
 export type InquiryThread = z.infer<typeof inquiryThreadSchema>;
 
+/** `GET /v3/help/bigbird-inquiry`의 항목. 메시지는 없고 대화는 상세·타임라인 API로 받음. */
+export const bigbirdInquiryListItemSchema = z.object({
+  threadIdx: z.number(),
+  sequence: z.number().nullable(),
+  campaignIdx: z.number().nullable(),
+  status: z.enum(["WAITING", "IN_PROGRESS", "ANSWERED"]),
+  /** 포맷 완료 문자열(`2026-10-20 14:03`). */
+  created: z.string(),
+  /** null이면 진행 중. */
+  finishTime: z.string().nullable(),
+  /** 명세에 required가 아니라 없을 수 있음. 없으면 문의 남기기로 봄. */
+  boardType: z.boolean().optional(),
+});
+export type BigbirdInquiryListItem = z.infer<
+  typeof bigbirdInquiryListItemSchema
+>;
+
+/** 무한 스크롤 목록(`offset`·`limit`). `hasMore`가 false면 요청을 멈춤. */
+export const bigbirdInquiryListSchema = z.object({
+  result: z.boolean(),
+  list: z.array(bigbirdInquiryListItemSchema),
+  hasMore: z.boolean(),
+});
+
+/** `GET /v3/help/bigbird-inquiry/{threadIdx}`. 스레드 한 건과 대화 전문. */
+export const bigbirdInquiryDetailSchema = z.object({
+  result: z.boolean(),
+  data: z.object({ messages: z.array(inquiryMessageSchema).nullable() }),
+});
+
 /** `GET /v3/help/thread/campaign-timeline`. 캠페인에 걸린 모든 스레드의 메시지를 시간순으로 합친 목록. */
 export const campaignTimelineSchema = z.object({
   result: z.boolean(),
@@ -75,6 +105,21 @@ export const inquiryCampaignSchema = z.object({
   campaignServiceName: z.string().nullish(),
 });
 export type InquiryCampaign = z.infer<typeof inquiryCampaignSchema>;
+
+/**
+ * `GET /v3/help/thread/campaign/{campaignIdx}`: 대화 캠페인 카드·상세 정보 패널용 캠페인 정보.
+ * 유형·진행 상태는 서버가 주는 표시 문구. 공구샵이 없으면 이미지·공구샵 코드가 null, 내 캠페인이 아니면 404.
+ */
+export const inquiryCampaignDetailSchema = z.object({
+  result: z.boolean(),
+  mainImageUrl: z.string().nullish(),
+  campaignType: z.string().nullish(),
+  progressStatus: z.string().nullish(),
+  progressStartDate: z.string().nullish(),
+  progressEndDate: z.string().nullish(),
+  shopCode: z.string().nullish(),
+});
+export type InquiryCampaignDetail = z.infer<typeof inquiryCampaignDetailSchema>;
 
 export const inquiryCampaignListSchema = z.object({
   result: z.boolean(),
@@ -214,6 +259,15 @@ export interface BigbirdInquiryViewModel {
   messages: InquiryMessageViewModel[];
 }
 
+export interface InquiryCampaignDetailViewModel {
+  imageUrl: string | null;
+  typeName: string | null;
+  progressStatus: string | null;
+  /** `yyyy.MM.dd ~ yyyy.MM.dd`. 기간이 없으면 null. */
+  period: string | null;
+  shopCode: string | null;
+}
+
 export interface InquiryCampaignViewModel {
   campaignIdx: number;
   /** 캠페인 유형 표시명. 없으면 null. */
@@ -232,7 +286,8 @@ export interface InquiryCampaignViewModel {
 export const buyerInquirySchema = z.object({
   inquiryIdx: z.number(),
   sourceType: z.enum(["PURCHASER_QUESTION", "PRODUCT_QNA"]),
-  status: z.enum(["WAITING", "ANSWERED"]),
+  /** IN_PROGRESS는 구매자가 실시간 상담으로 바꾼 문의(2026-10-30 명세 추가). */
+  status: z.enum(["WAITING", "ANSWERED", "IN_PROGRESS"]),
   campaignIdx: z.number().nullable(),
   orderNumber: z.string().nullable(),
   writerName: z.string().nullable(),
@@ -243,6 +298,11 @@ export const buyerInquirySchema = z.object({
   threadUserIdx: z.number().nullable(),
   /** 상품 Q&A 상세 조회 키(`POST /v3/help/qna`의 userIdx). 구매자 문의면 null. */
   userIdx: z.number().nullable(),
+  hasUnread: z.boolean().default(false),
+  /** 카드 문구(REQ-24-0001)용. 백엔드 요청 중이라 아직 오지 않음. */
+  brandName: z.string().nullish(),
+  campaignName: z.string().nullish(),
+  shopName: z.string().nullish(),
 });
 export type BuyerInquiry = z.infer<typeof buyerInquirySchema>;
 
@@ -260,7 +320,8 @@ export const buyerInquiryListSchema = z.object({
 export const buyerInfluencerOptionsSchema = z.object({
   result: z.boolean(),
   list: z.array(
-    z.object({ threadUserIdx: z.number(), displayName: z.string() }),
+    // 이름이 없는 인플루언서는 null(2026-10-30 명세 변경). 화면이 번호로 대신 보여 줌.
+    z.object({ threadUserIdx: z.number(), displayName: z.string().nullable() }),
   ),
 });
 
@@ -379,7 +440,7 @@ export const replyResultSchema = z.object({
 });
 
 export type BuyerInquirySource = "purchaser" | "qna";
-export type BuyerInquiryStatus = "waiting" | "done";
+export type BuyerInquiryStatus = "waiting" | "consulting" | "done";
 
 export interface BuyerInquiryViewModel {
   /** URL용 임시 키 `{출처}-{inquiryIdx}`. 상세 조회 키가 확정되면 바꿈. */
@@ -400,6 +461,11 @@ export interface BuyerInquiryViewModel {
   preview: string;
   /** 마지막 활동 시각. 메시지가 없는 스레드는 null. */
   lastActivityAt: Date | null;
+  hasUnread: boolean;
+  /** 서버가 준 카드 문구 값. 없으면 null이고 화면이 캠페인 목록에서 찾음. */
+  brandName: string | null;
+  campaignName: string | null;
+  shopName: string | null;
 }
 
 export interface BuyerInquiryDetailViewModel {

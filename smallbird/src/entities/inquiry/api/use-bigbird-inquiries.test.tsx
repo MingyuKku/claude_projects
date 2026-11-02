@@ -3,7 +3,7 @@ import { SWRConfig } from "swr";
 
 import { serverApiV3 } from "@/shared/api";
 
-import { useBigbirdInquiries } from "./inquiry-api";
+import { useBigbirdInquiries, useBigbirdInquiryDetail } from "./inquiry-api";
 
 import type { ReactNode } from "react";
 
@@ -19,78 +19,159 @@ vi.mock("./use-live-inquiries", () => ({
   useLiveInquiries: (_threadUserIdx: unknown, inquiries: unknown) => inquiries,
 }));
 
-const message = (messageIdx: number, body: string) => ({
-  messageIdx,
-  threadIdx: 101,
-  body,
-  userIdx: 1,
-  attachmentIdx: null,
-  writeTime: "2026-10-01T10:00:00",
-  readTime: null,
-  modifyTime: null,
-  deleteTime: null,
-  identifier: "id",
-  isUserMessage: false,
-  fileName: null,
-  fileSize: null,
-  fileType: null,
-  auto: false,
+const item = (threadIdx: number) => ({
+  threadIdx,
+  sequence: threadIdx,
+  campaignIdx: null,
+  status: "WAITING",
+  created: "2026-10-01 10:00",
+  finishTime: null,
+  boardType: true,
 });
 
-const response = (body: string) => ({
-  result: true,
-  data: [
-    {
-      threadIdx: 101,
-      sequence: 7,
-      viewing: null,
-      toUserIdx: 1,
-      fmUserIdx: 5971,
-      campaignIdx: null,
-      finishTime: null,
-      created: "2026-10-01T10:00:00",
-      boardType: true,
-      status: "WAITING",
-      messages: [message(1, body)],
-    },
-  ],
-});
+const wrapper = ({ children }: { children: ReactNode }) => (
+  <SWRConfig
+    value={{
+      provider: () => new Map(),
+      revalidateOnFocus: false,
+      focusThrottleInterval: 0,
+      dedupingInterval: 0,
+    }}
+  >
+    {children}
+  </SWRConfig>
+);
 
 describe("useBigbirdInquiries", () => {
-  it("탭으로 돌아오면 목록·대화를 다시 받아 새 운영자 답장을 보여 준다", async () => {
-    vi.mocked(serverApiV3.get)
-      .mockResolvedValueOnce(response("처음 메시지"))
-      .mockResolvedValue(response("운영자가 답장했습니다."));
-    // 앱의 SWRProvider와 같이 전역 기본은 포커스 재조회를 끔. 이 훅이 스스로 켜는지 확인함.
-    // SWR은 첫 조회 직후 몇 초 안의 포커스는 건너뛰므로(실제 사용에서는 정상), 테스트에서만 간격을 0으로 줌.
-    const wrapper = ({ children }: { children: ReactNode }) => (
-      <SWRConfig
-        value={{
-          provider: () => new Map(),
-          revalidateOnFocus: false,
-          focusThrottleInterval: 0,
-          dedupingInterval: 0,
-        }}
-      >
-        {children}
-      </SWRConfig>
+  it("끝까지 내리면 다음 쪽을 이어 받고, 더 없으면 멈춘다", async () => {
+    // 첫 쪽은 다시 받을 수 있어 호출 순서가 아니라 offset으로 답함.
+    vi.mocked(serverApiV3.get).mockImplementation((_path, config) =>
+      Promise.resolve(
+        config?.params?.offset === 0
+          ? { result: true, list: [item(2)], hasMore: true }
+          : { result: true, list: [item(1)], hasMore: false },
+      ),
     );
     const { result } = renderHook(() => useBigbirdInquiries(5971), { wrapper });
+    await waitFor(() => expect(result.current.hasMore).toBe(true));
+    expect(result.current.inquiries?.map((i) => i.threadIdx)).toEqual([2]);
+
+    act(() => result.current.loadMore());
+
     await waitFor(() =>
-      expect(result.current.inquiries?.[0]?.messages[0]?.body).toBe(
-        "처음 메시지",
-      ),
+      expect(result.current.inquiries?.map((i) => i.threadIdx)).toEqual([2, 1]),
+    );
+    expect(result.current.hasMore).toBe(false);
+    expect(serverApiV3.get).toHaveBeenLastCalledWith(
+      "/help/bigbird-inquiry",
+      expect.objectContaining({
+        params: expect.objectContaining({ offset: 20 }),
+      }),
+    );
+  });
+
+  it("방금 만든 문의를 서버 목록이 오기 전에 맨 앞에 넣는다", async () => {
+    vi.mocked(serverApiV3.get).mockResolvedValue({
+      result: true,
+      list: [item(1)],
+      hasMore: false,
+    });
+    const { result } = renderHook(() => useBigbirdInquiries(5971), { wrapper });
+    await waitFor(() => expect(result.current.inquiries).toHaveLength(1));
+
+    act(() =>
+      result.current.addInquiry({
+        ...result.current.inquiries![0]!,
+        threadIdx: 9,
+      }),
     );
 
-    act(() => {
-      window.dispatchEvent(new Event("focus"));
+    await waitFor(() =>
+      expect(result.current.inquiries?.[0]?.threadIdx).toBe(9),
+    );
+  });
+
+  it("여러 쪽을 불러 둔 뒤 새 문의를 넣으면 불러 둔 쪽을 모두 다시 받는다", async () => {
+    vi.mocked(serverApiV3.get).mockImplementation((_path, config) =>
+      Promise.resolve(
+        config?.params?.offset === 0
+          ? { result: true, list: [item(2)], hasMore: true }
+          : { result: true, list: [item(1)], hasMore: false },
+      ),
+    );
+    const { result } = renderHook(() => useBigbirdInquiries(5971), { wrapper });
+    await waitFor(() => expect(result.current.hasMore).toBe(true));
+    act(() => result.current.loadMore());
+    await waitFor(() => expect(result.current.inquiries).toHaveLength(2));
+    vi.mocked(serverApiV3.get).mockClear();
+
+    act(() =>
+      result.current.addInquiry({
+        ...result.current.inquiries![0]!,
+        threadIdx: 9,
+      }),
+    );
+
+    // 첫 쪽만 다시 받으면 offset이 밀려 둘째 쪽 항목이 빠지거나 겹침.
+    await waitFor(() => {
+      const offsets = vi
+        .mocked(serverApiV3.get)
+        .mock.calls.map(([, config]) => config?.params?.offset);
+      expect(offsets).toEqual(expect.arrayContaining([0, 20]));
+    });
+  });
+
+  describe("운영 답장 신호로 열어 둔 상세를 다시 받기", () => {
+    afterEach(() => {
+      Object.defineProperty(document, "visibilityState", {
+        configurable: true,
+        value: "visible",
+      });
     });
 
-    await waitFor(() =>
-      expect(result.current.inquiries?.[0]?.messages[0]?.body).toBe(
-        "운영자가 답장했습니다.",
-      ),
-    );
-    expect(serverApiV3.get).toHaveBeenCalledTimes(2);
+    function setVisibility(value: DocumentVisibilityState) {
+      Object.defineProperty(document, "visibilityState", {
+        configurable: true,
+        value,
+      });
+    }
+
+    const detailCalls = () =>
+      vi
+        .mocked(serverApiV3.get)
+        .mock.calls.filter(([path]) => path === "/help/bigbird-inquiry/7");
+
+    it("탭이 가려져 있으면 상세(읽음 처리)를 받지 않고, 보일 때는 받는다", async () => {
+      vi.mocked(serverApiV3.get).mockImplementation((path) =>
+        Promise.resolve(
+          path === "/help/bigbird-inquiry"
+            ? { result: true, list: [item(7)], hasMore: false }
+            : { result: true, data: { messages: [] } },
+        ),
+      );
+      const { result } = renderHook(
+        () => ({
+          list: useBigbirdInquiries(5971),
+          detail: useBigbirdInquiryDetail(5971, 7, true),
+        }),
+        { wrapper },
+      );
+      await waitFor(() => expect(result.current.detail.messages).toEqual([]));
+      vi.mocked(serverApiV3.get).mockClear();
+
+      setVisibility("hidden");
+      act(() => result.current.list.refresh());
+      await waitFor(() =>
+        expect(serverApiV3.get).toHaveBeenCalledWith(
+          "/help/bigbird-inquiry",
+          expect.anything(),
+        ),
+      );
+      expect(detailCalls()).toHaveLength(0);
+
+      setVisibility("visible");
+      act(() => result.current.list.refresh());
+      await waitFor(() => expect(detailCalls()).toHaveLength(1));
+    });
   });
 });

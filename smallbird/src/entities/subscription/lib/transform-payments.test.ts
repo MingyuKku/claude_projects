@@ -1,4 +1,3 @@
-import { subscriptionPaymentListSchema } from "../model/schema";
 import { transformPayments } from "./transform-payments";
 
 const item = {
@@ -32,16 +31,5 @@ describe("transformPayments", () => {
       ],
     });
     expect(records.map((record) => record.receiptUrl)).toEqual([null, null]);
-  });
-
-  it("모르는 결제 수단·상태 코드가 와도 목록 전체를 거부하지 않고 서버 값을 그대로 둔다", () => {
-    const parsed = subscriptionPaymentListSchema.parse({
-      totalCount: 1,
-      items: [{ ...item, method: "virtualAccount", status: "canceled" }],
-    });
-    expect(transformPayments(parsed).records[0]).toMatchObject({
-      method: "virtualAccount",
-      status: "canceled",
-    });
   });
 });

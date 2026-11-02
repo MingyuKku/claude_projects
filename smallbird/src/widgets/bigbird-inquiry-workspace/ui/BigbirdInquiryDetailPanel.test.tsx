@@ -38,21 +38,38 @@ function mountPanel(onClickClose = vi.fn()) {
   return onClickClose;
 }
 
-function renderPanel(onClickClose = vi.fn()) {
-  vi.mocked(serverApiV3.get).mockResolvedValue({
+const CAMPAIGN_LIST = {
+  result: true,
+  list: [
+    {
+      campaignIdx: 10,
+      campaignCode: "Q-123412341234",
+      brandName: "빅버드",
+      productName: "스킨케어 캠페인",
+      mainImageUrl: null,
+      progressStartDate: "2026-10-01",
+      progressEndDate: "2026-10-31",
+      campaignServiceName: "PICK형",
+    },
+  ],
+};
+
+function renderPanel(
+  onClickClose = vi.fn(),
+  detail: Record<string, unknown> | Error = {
     result: true,
-    list: [
-      {
-        campaignIdx: 10,
-        campaignCode: "Q-123412341234",
-        brandName: "빅버드",
-        productName: "스킨케어 캠페인",
-        mainImageUrl: null,
-        progressStartDate: "2026-10-01",
-        progressEndDate: "2026-10-31",
-        campaignServiceName: "PICK형",
-      },
-    ],
+    mainImageUrl: null,
+    campaignType: "PICK형",
+    progressStatus: "진행 중",
+    progressStartDate: "2026-10-01",
+    progressEndDate: "2026-10-31",
+    shopCode: "LM-55710521825519",
+  },
+) {
+  vi.mocked(serverApiV3.get).mockImplementation(async (path: string) => {
+    if (path !== "/help/thread/campaign/10") return CAMPAIGN_LIST;
+    if (detail instanceof Error) throw detail;
+    return detail;
   });
   return mountPanel(onClickClose);
 }
@@ -67,6 +84,37 @@ describe("BigbirdInquiryDetailPanel", () => {
     expect(screen.getByText("스킨케어 캠페인")).toBeVisible();
     expect(screen.getByText("2026.10.01~2026.10.31")).toBeVisible();
     expect(screen.getByText("Q-123412341234")).toBeVisible();
+    expect(await screen.findByText("진행 중")).toBeVisible();
+    expect(screen.getByText("LM-55710521825519")).toBeVisible();
+    // 이동할 v3 화면이 없어 비활성(P9)
+    expect(
+      screen.getByRole("button", { name: "캠페인 바로가기" }),
+    ).toBeDisabled();
+  });
+
+  it("공구샵이 없으면 공구샵 코드를 -로 보이고 복사하지 않는다", async () => {
+    renderPanel(vi.fn(), {
+      result: true,
+      mainImageUrl: null,
+      campaignType: "PICK형",
+      progressStatus: "진행 중",
+      progressStartDate: "2026-10-01",
+      progressEndDate: "2026-10-31",
+      shopCode: null,
+    });
+
+    const shopCode = await screen.findByRole("button", { name: /공구샵 코드/ });
+    expect(shopCode).toHaveTextContent("-");
+    expect(shopCode).toBeDisabled();
+  });
+
+  it("캠페인 정보 API가 실패하면 목록 값으로 보이고 진행 상태·공구샵 코드는 그리지 않는다", async () => {
+    renderPanel(vi.fn(), new Error("404"));
+
+    expect(await screen.findByText("빅버드 스킨케어 캠페인")).toBeVisible();
+    expect(screen.getByText("2026.10.01~2026.10.31")).toBeVisible();
+    expect(screen.queryByText("진행 상태")).not.toBeInTheDocument();
+    expect(screen.queryByText("공구샵 코드")).not.toBeInTheDocument();
   });
 
   it("닫기 버튼을 누르면 닫기 요청을 보낸다", async () => {

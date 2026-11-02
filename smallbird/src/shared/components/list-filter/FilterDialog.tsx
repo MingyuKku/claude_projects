@@ -60,7 +60,7 @@ export function FilterDialog({
         className="top-0 left-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none border-0 p-0"
         aria-describedby={undefined}
       >
-        <DialogHeader className="border-b border-border px-4 py-4 text-left">
+        <DialogHeader className="border-b border-border px-5 py-4 text-left">
           <DialogTitle className="text-base">
             {t("list.filter.title")}
           </DialogTitle>
@@ -78,7 +78,7 @@ interface FilterDialogBodyProps {
   fields: FilterField[];
   values: FilterValues;
   onApply: (values: FilterValues) => void;
-  /** `modal`은 MO 모달(자체 좌우 여백 16), `screen`은 TAB 본문 대체 화면(페이지 여백을 따름). */
+  /** `modal`은 MO 모달(자체 좌우 여백·구분선), `screen`은 TAB 본문 대체 화면(페이지 여백을 따르고 구분선 없음). */
   variant?: "modal" | "screen";
 }
 
@@ -108,9 +108,8 @@ export function FilterDialogBody({
     <>
       <div
         className={cn(
-          "flex flex-1 flex-col overflow-y-auto",
-          // MO 모달 시안(빅버드 머니 `11224:105649`): 본문 16/16/12/16, 하단 16 여백에 구분선 없음.
-          isScreen ? "gap-3 py-5" : "gap-4 px-4 pt-4 pb-3",
+          "flex flex-1 flex-col overflow-y-auto py-5",
+          isScreen ? "gap-3" : "gap-4 px-5",
         )}
       >
         {fields.map((field) => {
@@ -146,7 +145,12 @@ export function FilterDialogBody({
           );
         })}
       </div>
-      <div className={cn("flex gap-2", isScreen ? "pt-5" : "p-4")}>
+      <div
+        className={cn(
+          "flex gap-2",
+          isScreen ? "pt-5" : "border-t border-border px-5 py-4",
+        )}
+      >
         <Button
           type="button"
           variant="outline"

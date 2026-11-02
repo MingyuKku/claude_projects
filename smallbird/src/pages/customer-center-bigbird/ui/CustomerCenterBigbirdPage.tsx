@@ -60,10 +60,15 @@ export function CustomerCenterBigbirdPage() {
     consulting: "IN_PROGRESS",
     done: "ANSWERED",
   } as const;
-  const { inquiries, isLoading, isError, refresh } = useBigbirdInquiries(
-    session.threadUserIdx,
-    serverStatus[status],
-  );
+  const {
+    inquiries,
+    isLoading,
+    isError,
+    hasMore,
+    isLoadingMore,
+    loadMore,
+    refresh,
+  } = useBigbirdInquiries(session.threadUserIdx, serverStatus[status]);
   // 문의를 고르지 않고 들어오면 PC에서 최신 문의를 보여 줌(캡션 "최신 채팅 Focus").
   // 목록의 상태 탭과 어긋나지 않게 같은 필터를 적용한 첫 문의를 고름.
   const selectedThreadIdx =
@@ -115,12 +120,12 @@ export function CustomerCenterBigbirdPage() {
   const { request: requestRealtime, isRequesting: isRealtimeRequesting } =
     useRequestRealtimeConsultation(session);
 
-  // 운영 시간(평일 10~18시) 밖에서 실시간 상담하기를 누르면 안내만 띄움.
+  // 운영 시간(평일 10~18시) 밖에서 실시간 상담하기를 누르면 안내만 띄움. 개발 서버에서는 시간과 상관없이 시험할 수 있게 건너뜀.
   const [isHoursAlertOpen, setIsHoursAlertOpen] = useState(false);
 
   async function handleClickRealtime() {
     if (!selected) return;
-    if (!isRealtimeOpenHours(new Date())) {
+    if (!import.meta.env.DEV && !isRealtimeOpenHours(new Date())) {
       setIsHoursAlertOpen(true);
       return;
     }
@@ -180,6 +185,9 @@ export function CustomerCenterBigbirdPage() {
         inquiries={inquiries}
         isLoading={isLoading}
         isError={isError}
+        hasMore={hasMore}
+        isLoadingMore={isLoadingMore}
+        onLoadMore={loadMore}
         onClickRefresh={refresh}
         selectedThreadIdx={listSelectedThreadIdx}
         isPanelOpen={threadIdx !== undefined}

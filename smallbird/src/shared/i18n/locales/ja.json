@@ -61,6 +61,10 @@
         "title": "動画の容量超過",
         "description": "動画は最大50MBまでです。"
       },
+      "fileSize": {
+        "title": "文書の容量超過",
+        "description": "文書は最大30MBまでです。"
+      },
       "imageCount": {
         "title": "画像の数超過",
         "description": "ファイルは最大10個までです。"
@@ -84,7 +88,8 @@
       "progress": "添付をアップロード中 ({{sent}}/{{total}})",
       "failed": "{{count}}件の添付を送信できませんでした。",
       "retry": "再試行"
-    }
+    },
+    "download": "ファイルをダウンロード"
   },
   "feedback": {
     "saved": "保存しました。",
@@ -125,8 +130,7 @@
       "label": "{{size}}件表示",
       "labelShort": "{{size}}件",
       "aria": "表示件数"
-    },
-    "scrollTop": "トップへ"
+    }
   },
   "passwordConfirm": {
     "title": "管理者パスワード入力",

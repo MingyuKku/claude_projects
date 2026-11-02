@@ -8,7 +8,7 @@ import {
   mockSession,
   mockSessionError,
   mockV3GetError,
-  mockV3GetValue,
+  mockV3Get,
   renderRoute,
   resetSession,
 } from "./test-utils";
@@ -182,14 +182,42 @@ describe("고객센터 진입", () => {
       };
     }
 
-    beforeEach(() => {
-      mockV3GetValue({
-        result: true,
-        data: [
-          thread(1, "2026-10-01T10:00:00", "예전 문의"),
-          thread(2, "2026-10-02T10:00:00", "최신 문의"),
-        ],
+    // 서버처럼 최신 생성순으로 목록(메시지 없음)을 주고, 상태 필터를 적용하며, 문의를 열면 대화 전문을 줌.
+    function mockThreads(threads: ReturnType<typeof thread>[]) {
+      mockV3Get((path, config) => {
+        const params = (config as { params?: { status?: string } } | undefined)
+          ?.params;
+        if (path === "/help/bigbird-inquiry") {
+          const status = params?.status ?? "ALL";
+          const list = threads
+            .filter((item) => status === "ALL" || item.status === status)
+            .sort((a, b) => b.created.localeCompare(a.created))
+            .map((item) => ({
+              threadIdx: item.threadIdx,
+              sequence: item.sequence,
+              campaignIdx: item.campaignIdx,
+              status: item.status,
+              created: item.created,
+              finishTime: item.finishTime,
+              boardType: item.boardType,
+            }));
+          return Promise.resolve({ result: true, list, hasMore: false });
+        }
+        const detail = /^\/help\/bigbird-inquiry\/(\d+)$/.exec(path);
+        const found = threads.find(
+          (item) => item.threadIdx === Number(detail?.[1]),
+        );
+        return found
+          ? Promise.resolve({ result: true, data: found })
+          : Promise.reject(new Error("unmocked"));
       });
+    }
+
+    beforeEach(() => {
+      mockThreads([
+        thread(1, "2026-10-01 10:00", "예전 문의"),
+        thread(2, "2026-10-02 10:00", "최신 문의"),
+      ]);
     });
 
     it("고객센터 화면에서는 LNB 고객센터 그룹이 펼쳐져 있다", async () => {
@@ -202,7 +230,6 @@ describe("고객센터 진입", () => {
 
     it("문의를 고르지 않고 들어오면 최신 문의 대화를 보여 준다", async () => {
       await renderRoute(ROUTES.customerCenterBigbird);
-      // 기타 문의 카드도 최근 메시지를 미리 보여 주므로 대화 영역에서 찾음
       expect(
         await within(
           await screen.findByRole("region", { name: "문의 대화" }),
@@ -216,7 +243,7 @@ describe("고객센터 진입", () => {
     });
 
     it("상태 탭을 고른 채 들어오면 그 탭의 최신 문의를 보여 준다", async () => {
-      const answered = thread(1, "2026-10-01T10:00:00", "답변 받은 문의");
+      const answered = thread(1, "2026-10-01 10:00", "답변 받은 문의");
       answered.status = "ANSWERED";
       answered.messages.push({
         ...answered.messages[0]!,
@@ -224,10 +251,7 @@ describe("고객센터 진입", () => {
         body: "운영자 답변",
         isUserMessage: false,
       });
-      mockV3GetValue({
-        result: true,
-        data: [answered, thread(2, "2026-10-02T10:00:00", "최신 문의")],
-      });
+      mockThreads([answered, thread(2, "2026-10-02 10:00", "최신 문의")]);
       await renderRoute(`${ROUTES.customerCenterBigbird}?status=done`);
       expect(await screen.findByText("답변 받은 문의")).toBeInTheDocument();
       expect(screen.queryByText("최신 문의")).not.toBeInTheDocument();
@@ -246,7 +270,7 @@ describe("고객센터 진입", () => {
     });
 
     it("캠페인 카드가 아닌 자동 메시지는 보여 주지 않는다", async () => {
-      const withAuto = thread(1, "2026-10-01T10:00:00", "본문");
+      const withAuto = thread(1, "2026-10-01 10:00", "본문");
       withAuto.messages.unshift(
         {
           ...withAuto.messages[0]!,
@@ -261,10 +285,7 @@ describe("고객센터 진입", () => {
           auto: true,
         },
       );
-      mockV3GetValue({
-        result: true,
-        data: [withAuto],
-      });
+      mockThreads([withAuto]);
       await renderRoute("/customer-center/bigbird/1");
       expect(
         await within(

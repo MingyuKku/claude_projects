@@ -17,7 +17,7 @@ interface SocialLinkCardProps {
   className?: string;
 }
 
-// Figma 간편 로그인 연동(10061:200931): 카드 안 4행(브랜드 아이콘 24 + 이름 | Switch sm), 행 높이 48. 시안의 페이스북 행은 그리지 않음.
+// Figma 간편 로그인 연동(10061:200931): 카드 안 5행(브랜드 아이콘 24 + 이름 | Switch sm), 행 높이 48.
 // 연동·해제 API가 공개되기 전(스펙 §7 B-3, B-10)이라 켜기·해제 확인 모두 "준비 중" 토스트만 띄우고 스위치는 서버 값으로 둠(controlled).
 // 켜기는 SNS 인증으로 이동하고, 끄기는 확인 알럿을 거치는 흐름은 스펙 §3.
 export function SocialLinkCard({ links, className }: SocialLinkCardProps) {

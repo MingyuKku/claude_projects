@@ -4,6 +4,7 @@
   "waiting": "待回复",
   "done": "已回复",
   "status": {
+    "consulting": "咨询中",
     "waiting": "待回复",
     "done": "已回复"
   },
@@ -30,6 +31,7 @@
     "source": "咨询类型",
     "campaign": "活动",
     "campaignPlaceholder": "选择活动",
+    "campaignSearchPlaceholder": "搜索活动名称或活动代码。",
     "influencer": "达人",
     "influencerPlaceholder": "选择达人",
     "influencerSearchPlaceholder": "搜索达人",
@@ -77,5 +79,8 @@
     "deleteTitle": "删除该回复？",
     "deleteDescription": "删除后无法恢复。"
   },
-  "messageDeleted": "消息已删除。"
+  "card": {
+    "campaignInquiry": "{{label}} 咨询",
+    "unread": "未读消息"
+  }
 }

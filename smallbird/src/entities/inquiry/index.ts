@@ -10,6 +10,7 @@ export {
   sendInquiryMessage,
   uploadInquiryAttachment,
   useBigbirdInquiries,
+  useBigbirdInquiryDetail,
   useCampaignTimeline,
   useBuyerInquiryDetail,
   useBuyerProduct,
@@ -19,6 +20,7 @@ export {
   useQnaDetail,
   useBuyerInquiries,
   useBuyerInfluencerOptions,
+  useInquiryCampaignDetail,
   useInquiryCampaigns,
 } from "./api/inquiry-api";
 export type {
@@ -102,6 +104,7 @@ export type {
   QnaItemViewModel,
   CampaignCard,
   InquiryAttachment,
+  InquiryCampaignDetailViewModel,
   InquiryCampaignViewModel,
   InquiryMessageKind,
   InquiryMessageViewModel,

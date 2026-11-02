@@ -1,7 +1,7 @@
 import { Paperclip } from "lucide-react";
 import { useRef, useState } from "react";
 
-import { FileThumbnail } from "@/shared/components/file-list";
+import { FileItem, FileThumbnail } from "@/shared/components/file-list";
 import { TextField } from "@/shared/components/text-field";
 import { useTranslation } from "@/shared/i18n";
 import {
@@ -16,7 +16,11 @@ import {
 } from "@/shared/ui/alert-dialog";
 import { Button } from "@/shared/ui/button";
 
-import { ATTACHMENT_LIMITS, getAttachmentKind } from "../lib/attachment-rules";
+import {
+  ATTACHMENT_LIMITS,
+  formatFileSize,
+  getAttachmentKind,
+} from "../lib/attachment-rules";
 
 import type { InquiryAttachments } from "../model/useInquiryAttachments";
 import type { ComponentProps } from "react";
@@ -90,22 +94,28 @@ export function AttachmentTextField({
           event.preventDefault();
           attachments.add(files);
         }}
-        // 시안은 한 줄(3개)만 있어, 늘어나도 입력창이 화면을 넘지 않게 두 줄 높이까지만 보이고 나머지는 스크롤함.
+        // Figma 텍스트 필드 파일 업로드 예시(11315:50778): 입력창 위 한 줄, 넘치면 가로 스크롤(간격 6).
+        // 이미지·동영상(80px 칸)과 문서(190px 카드)가 섞여도 같은 줄에 고른 순서대로 놓음(섞인 시안은 없음).
         attachments={
           attachments.items.length > 0 && (
-            <div className="flex max-h-41 w-full flex-wrap gap-1 overflow-y-auto">
+            <div className="flex w-full items-start gap-1.5 overflow-x-auto">
               {attachments.items.map(({ file, url, poster }, index) => {
                 const kind = getAttachmentKind(file) ?? "image";
+                if (kind === "file")
+                  return (
+                    <FileItem
+                      key={url}
+                      className="w-47.5 shrink-0"
+                      name={file.name}
+                      sizeLabel={formatFileSize(file.size)}
+                      removeLabel={t("attachment.remove")}
+                      onClickRemove={() => attachments.remove(index)}
+                    />
+                  );
                 return (
                   <FileThumbnail
                     key={url}
-                    src={
-                      kind === "image"
-                        ? url
-                        : kind === "video"
-                          ? (poster ?? BLANK_POSTER)
-                          : undefined
-                    }
+                    src={kind === "image" ? url : (poster ?? BLANK_POSTER)}
                     alt={file.name}
                     type={kind}
                     removeLabel={t("attachment.remove")}

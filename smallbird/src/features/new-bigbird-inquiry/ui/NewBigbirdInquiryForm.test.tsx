@@ -13,45 +13,25 @@ beforeAll(() => {
 });
 
 describe("새 문의 UI", () => {
-  it("유형과 방식을 전환해도 작성 내용을 보존하고 연동 전에는 전송하지 않는다", async () => {
+  it("유형을 전환하면 캠페인 표를 숨기고, 방식 선택과 본문 입력은 없다", async () => {
     const user = userEvent.setup();
     render(<NewBigbirdInquiryForm campaigns={[]} />);
     expect(
       screen.getByRole("table", { name: "캠페인 선택" }),
     ).toBeInTheDocument();
     expect(
-      screen.getByRole("columnheader", { name: "기간" }),
-    ).toBeInTheDocument();
-    // 캠페인이 없으면 안내 문구를 보여 주고 유형 카드 외 입력을 막음.
-    expect(
       screen.getByText("캠페인 내역이 존재하지 않습니다."),
     ).toBeInTheDocument();
-    expect(
-      screen.getByRole("radio", { name: /^실시간 상담하기/ }),
-    ).toBeDisabled();
-    expect(screen.getByRole("textbox", { name: "문의 남기기" })).toBeDisabled();
-    await user.click(screen.getByRole("radio", { name: /^기타 문의/ }));
-    expect(
-      screen.getByRole("radio", { name: /^실시간 상담하기/ }),
-    ).toBeEnabled();
-    expect(screen.queryByRole("table")).not.toBeInTheDocument();
-    await user.type(
-      screen.getByRole("textbox", { name: "문의 남기기" }),
-      "작성 중인 질문",
-    );
-    await user.click(screen.getByRole("radio", { name: /^실시간 상담하기/ }));
     expect(screen.queryByRole("textbox")).not.toBeInTheDocument();
     expect(
-      screen.getByRole("radio", { name: /^실시간 상담하기/ }),
-    ).toHaveAttribute("aria-checked", "true");
-    await user.click(screen.getByRole("radio", { name: /^문의 남기기/ }));
-    expect(screen.getByRole("textbox")).toHaveValue("작성 중인 질문");
-    expect(screen.getByRole("button", { name: "첨부" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "전송" })).toBeDisabled();
+      screen.queryByRole("radio", { name: /^실시간 상담하기/ }),
+    ).not.toBeInTheDocument();
     expect(screen.getByRole("button", { name: "문의하기" })).toBeDisabled();
+    await user.click(screen.getByRole("radio", { name: /^기타 문의/ }));
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
   });
 
-  it("캠페인을 하나만 선택하고 선택한 문의 방식을 제출 데이터로 전달한다", async () => {
+  it("캠페인을 하나만 선택하고 선택한 캠페인을 제출 데이터로 전달한다", async () => {
     const user = userEvent.setup();
     const onSubmit = vi.fn();
     render(
@@ -77,14 +57,8 @@ describe("새 문의 UI", () => {
     ).not.toBeChecked();
     expect(screen.getByRole("button", { name: "문의하기" })).toBeDisabled();
     await user.click(screen.getByText("두 번째 캠페인", { selector: "label" }));
-    await user.click(screen.getByRole("radio", { name: /^실시간 상담하기/ }));
     await user.click(screen.getByRole("button", { name: "문의하기" }));
-    expect(onSubmit).toHaveBeenCalledWith({
-      campaignId: 2,
-      method: "realtime",
-      body: "",
-      files: [],
-    });
+    expect(onSubmit).toHaveBeenCalledWith({ campaignId: 2 });
   });
 
   it("캠페인 목록 조회에 실패하면 '캠페인 없음' 대신 오류와 다시 시도를 보여 준다", async () => {
@@ -104,75 +78,5 @@ describe("새 문의 UI", () => {
     ).not.toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "다시 시도" }));
     expect(onClickRetryCampaigns).toHaveBeenCalledOnce();
-  });
-});
-
-describe("첨부", () => {
-  beforeEach(() => {
-    URL.createObjectURL = vi.fn(() => "blob:preview");
-    URL.revokeObjectURL = vi.fn();
-  });
-  const campaigns = [{ id: 1, name: "첫 캠페인" }];
-  const fileInput = () =>
-    document.querySelector<HTMLInputElement>("input[type=file]")!;
-
-  it("파일을 고르면 입력창 위에 썸네일이 생기고 본문 없이도 제출할 수 있다", async () => {
-    const user = userEvent.setup();
-    const onSubmit = vi.fn();
-    render(<NewBigbirdInquiryForm campaigns={campaigns} onSubmit={onSubmit} />);
-    await user.click(screen.getByRole("checkbox", { name: "첫 캠페인" }));
-    expect(screen.getByRole("button", { name: "문의하기" })).toBeDisabled();
-    const file = new File(["x"], "a.png", { type: "image/png" });
-    await user.upload(fileInput(), file);
-    expect(screen.getByRole("img", { name: "a.png" })).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "문의하기" })).toBeEnabled();
-    await user.click(screen.getByRole("button", { name: "문의하기" }));
-    expect(onSubmit).toHaveBeenCalledWith(
-      expect.objectContaining({ body: "", files: [file] }),
-    );
-  });
-
-  it("담은 파일은 썸네일의 삭제 버튼으로 뺀다", async () => {
-    const user = userEvent.setup();
-    render(<NewBigbirdInquiryForm campaigns={campaigns} />);
-    await user.upload(fileInput(), new File(["x"], "a.png"));
-    await user.click(screen.getByRole("button", { name: "첨부 삭제" }));
-    expect(
-      screen.queryByRole("img", { name: "a.png" }),
-    ).not.toBeInTheDocument();
-  });
-
-  it("허용하지 않는 형식은 담지 않고 취소·확인이 있는 안내를 띄운다", async () => {
-    const user = userEvent.setup({ applyAccept: false });
-    render(<NewBigbirdInquiryForm campaigns={campaigns} />);
-    await user.upload(fileInput(), new File(["x"], "a.gif"));
-    const dialog = await screen.findByRole("alertdialog");
-    expect(dialog).toHaveTextContent("첨부파일 형식 불일치");
-    expect(
-      screen.queryByRole("img", { name: "a.gif" }),
-    ).not.toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "확인" }));
-    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
-
-    await user.upload(fileInput(), new File(["x"], "a.gif"));
-    await screen.findByRole("alertdialog");
-    await user.click(screen.getByRole("button", { name: "취소" }));
-    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
-  });
-
-  it("이미 10개가 담겨 있으면 첨부를 눌렀을 때 파일 선택창 대신 개수 초과 안내를 바로 띄운다", async () => {
-    const user = userEvent.setup();
-    render(<NewBigbirdInquiryForm campaigns={campaigns} />);
-    const files = Array.from(
-      { length: 10 },
-      (_, i) => new File(["x"], `${i}.png`),
-    );
-    await user.upload(fileInput(), files);
-    const click = vi.spyOn(fileInput(), "click");
-    await user.click(screen.getByRole("button", { name: "첨부" }));
-    expect(await screen.findByRole("alertdialog")).toHaveTextContent(
-      "이미지 최대 업로드 개수 초과",
-    );
-    expect(click).not.toHaveBeenCalled();
   });
 });

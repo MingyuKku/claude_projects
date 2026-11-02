@@ -18,10 +18,6 @@ import {
   NewBigbirdInquiryForm,
   useRegisterBigbirdInquiry,
 } from "@/features/new-bigbird-inquiry";
-import {
-  IS_REALTIME_WRITE_ENABLED,
-  useRequestRealtimeConsultation,
-} from "@/features/realtime-consultation";
 import { ROUTES } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
@@ -54,8 +50,17 @@ export function CustomerCenterBigbirdNewPage() {
   const location = useLocation();
   const initialCampaignId = (location.state as NewInquiryLocationState | null)
     ?.campaignIdx;
-  const { inquiries, isLoading, isError, mutate, refresh } =
-    useBigbirdInquiries(session.threadUserIdx);
+  const {
+    inquiries,
+    isLoading,
+    isError,
+    hasMore,
+    isLoadingMore,
+    loadMore,
+    mutate,
+    addInquiry,
+    refresh,
+  } = useBigbirdInquiries(session.threadUserIdx);
   const {
     campaigns,
     isLoading: isCampaignsLoading,
@@ -68,7 +73,6 @@ export function CustomerCenterBigbirdNewPage() {
     isError: isCampaignsError,
   });
   const { register, isSubmitting } = useRegisterBigbirdInquiry();
-  const { request, isRequesting } = useRequestRealtimeConsultation(session);
 
   // 목록 재조회는 수 초 걸릴 수 있어(stage 실측 9초) 기다리지 않고 바로 이동함. 방금 보낸 내용을 목록에
   // 먼저 넣어 대화가 바로 보이게 하고, 재조회가 끝나면 서버 값으로 바뀜.
@@ -82,13 +86,7 @@ export function CustomerCenterBigbirdNewPage() {
         threadIdx,
         ...submitted,
       });
-      void mutate(
-        (current) =>
-          current?.some((item) => item.threadIdx === threadIdx)
-            ? current
-            : [created, ...(current ?? [])],
-        { revalidate: true },
-      );
+      addInquiry(created);
     }
     void navigate(
       generatePath(ROUTES.customerCenterBigbirdThread, {
@@ -98,29 +96,15 @@ export function CustomerCenterBigbirdNewPage() {
     );
   }
 
-  async function handleSubmit({
-    campaignId,
-    method,
-    body,
-    files,
-  }: NewBigbirdInquiryDraft) {
+  async function handleSubmit({ campaignId }: NewBigbirdInquiryDraft) {
     const campaign =
       campaigns?.find((item) => item.campaignIdx === campaignId) ?? null;
-    if (method === "realtime") {
-      const requested = await request(campaign);
-      if (requested.status !== "requested") {
-        toast.error(t("requestFailed"));
-        return;
-      }
-      goToThread(requested.threadIdx);
-      return;
-    }
-    const result = await register(campaign, body, files);
+    const result = await register(campaign, "");
     if (result.status !== "registered") {
       toast.error(t(result.status));
       return;
     }
-    goToThread(result.threadIdx, { campaign, body });
+    goToThread(result.threadIdx, { campaign, body: "" });
   }
 
   return (
@@ -129,6 +113,9 @@ export function CustomerCenterBigbirdNewPage() {
       inquiries={inquiries}
       isLoading={isLoading}
       isError={isError}
+      hasMore={hasMore}
+      isLoadingMore={isLoadingMore}
+      onLoadMore={loadMore}
       onClickRefresh={refresh}
       isPanelOpen
       panelLabel={t("title")}
@@ -159,17 +146,13 @@ export function CustomerCenterBigbirdNewPage() {
         }))}
         // 핸들러를 주지 않으면 폼이 문의하기 버튼을 비활성화함.
         onSubmit={
-          IS_REGISTRATION_ENABLED || IS_REALTIME_WRITE_ENABLED
+          IS_REGISTRATION_ENABLED
             ? (draft) => void handleSubmit(draft)
             : undefined
         }
         campaignsState={campaignsState}
         onClickRetryCampaigns={() => void mutateCampaigns()}
-        isSubmitting={isSubmitting || isRequesting}
-        isRealtimeAvailable={IS_REALTIME_WRITE_ENABLED}
-        // 실시간만 켜고 문의 남기기 등록은 보류인 경우에만 문의 남기기를 막음. 둘 다 꺼져 있으면
-        // 기존처럼 입력은 볼 수 있고 제출만 비활성.
-        isBoardAvailable={IS_REGISTRATION_ENABLED || !IS_REALTIME_WRITE_ENABLED}
+        isSubmitting={isSubmitting}
         initialCampaignId={initialCampaignId}
       />
     </BigbirdInquiryWorkspace>

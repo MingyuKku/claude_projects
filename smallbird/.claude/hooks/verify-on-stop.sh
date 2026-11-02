@@ -8,6 +8,7 @@
 #   지문 계산은 scripts/verify.sh 에 있다. 에이전트가 `pnpm verify` 로 이미 통과시켰으면 여기서 다시 돌지 않는다.
 # - block 을 내면 Claude 가 다시 돌므로 무한 루프를 카운터로 막는다.
 #   MAX_ATTEMPTS 번까지 되돌리고, 그 뒤로는 사람에게 넘긴다.
+#   되돌릴 때 테스트를 고쳐 통과시키지 말라고 함께 알린다. 횟수 제한 안에 통과시켜야 하는 압박이 그쪽으로 새지 않게.
 # - pnpm typecheck / pnpm i18n:check / pnpm test 스크립트가 없으면 해당 검사는 건너뛴다.
 #   lint 는 편집 직후 훅(format-and-check.sh)이 파일 단위로 처리하므로 여기서 돌리지 않는다.
 
@@ -106,6 +107,6 @@ $failures" '{systemMessage: $m}'
 fi
 
 echo "$attempts" > "$COUNTER"
-jq -n --arg reason "작업을 끝내기 전에 아래를 고치세요. 고친 뒤 pnpm verify 로 직접 확인하세요. 이번 작업과 무관한 기존 실패(사용자가 작업 중인 코드 등)는 고치지 말고 사용자에게 보고하세요.
+jq -n --arg reason "작업을 끝내기 전에 아래를 고치세요. 고친 뒤 pnpm verify 로 직접 확인하세요. 이번 작업과 무관한 기존 실패(사용자가 작업 중인 코드 등)는 고치지 말고 사용자에게 보고하세요. 테스트를 통과시키려고 기대값을 바꾸거나 테스트를 지우거나 건너뛰게(.skip) 하지 말고 구현을 고치세요. 기획 변경으로 기대값이 달라져야 하면 바꾸기 전에 사유를 사용자에게 먼저 설명하세요.
 
 $failures" '{decision: "block", reason: $reason}'

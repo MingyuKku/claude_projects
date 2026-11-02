@@ -1,4 +1,4 @@
-import { getOtherInquiryPreview } from "./format";
+import { getInquiryTitleKey, getOtherInquiryPreview } from "./format";
 
 import type {
   BigbirdInquiryViewModel,
@@ -62,5 +62,42 @@ describe("getOtherInquiryPreview", () => {
         inquiry([message({ kind: "image", body: "url" })]),
       ),
     ).toBeNull();
+  });
+});
+
+describe("getInquiryTitleKey", () => {
+  const card = message({
+    kind: "campaignCard",
+    campaign: {
+      mainImageUrl: null,
+      campaignCode: "C1",
+      brandName: "빅버드",
+      productName: "카드 상품",
+    },
+  });
+
+  it("캠페인 목록의 상품명을 먼저 쓴다", () => {
+    expect(
+      getInquiryTitleKey({ ...inquiry([card]), campaignIdx: 10 }, "목록 상품"),
+    ).toEqual({ key: "inquiryTitle.campaign", name: "목록 상품" });
+  });
+
+  it("목록에 없으면 대화의 캠페인 카드 상품명을 쓴다", () => {
+    expect(getInquiryTitleKey({ ...inquiry([card]), campaignIdx: 10 })).toEqual(
+      { key: "inquiryTitle.campaign", name: "카드 상품" },
+    );
+    // 목록의 상품명이 비어 있어도 카드 상품명으로 넘어감.
+    expect(
+      getInquiryTitleKey({ ...inquiry([card]), campaignIdx: 10 }, " "),
+    ).toEqual({ key: "inquiryTitle.campaign", name: "카드 상품" });
+  });
+
+  it("이름을 못 찾으면 캠페인 문의는 미확인, 캠페인이 없으면 기타 문의", () => {
+    expect(getInquiryTitleKey({ ...inquiry([]), campaignIdx: 10 })).toEqual({
+      key: "inquiryTitle.campaignUnknown",
+    });
+    expect(getInquiryTitleKey(inquiry([]))).toEqual({
+      key: "inquiryTitle.other",
+    });
   });
 });

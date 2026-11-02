@@ -24,6 +24,7 @@ paths:
 - 슬라이스 내부 파일은 상대 경로로, 다른 슬라이스는 Public API(`index.ts`)로 임포트합니다.
 - `shared/`·`entities/` 변경 시 소비처의 테스트까지 통과해야 합니다.
 - 버그를 고칠 때는 먼저 실패하는 테스트로 재현합니다.
+- 서버 응답을 `await`한 뒤 `navigate`·`setSearchParams` 하는 흐름은 이동 결과(주소 확인용 요소, 다음 화면 문구)를 `findBy*`나 `waitFor`로 확인합니다. 라우터가 주소 변경을 transition으로 늦게 반영해 로컬에서는 통과해도 CI에서 간헐 실패합니다(`CheckoutPanel.test.tsx` 사례). 클릭 핸들러에서 바로 이동하면 즉시 확인해도 됩니다.
 
 ## 라우터 통합 테스트 (`src/app/router/*.test.tsx`)
 

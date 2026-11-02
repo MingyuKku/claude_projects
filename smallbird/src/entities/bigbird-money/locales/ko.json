@@ -1,9 +1,8 @@
 {
   "chargeStatus": {
-    "paid": "입금 완료",
-    "withdrawn": "출금 완료",
+    "paid": "결제 완료",
     "pending": "대기 중",
-    "canceled": "미입금 취소"
+    "canceled": "결제 취소"
   },
   "balance": {
     "title": "보유 빅버드 머니",

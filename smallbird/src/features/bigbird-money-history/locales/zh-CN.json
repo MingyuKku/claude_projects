@@ -6,50 +6,36 @@
       "label": "使用明细"
     },
     "column": {
-      "type": "类型",
-      "date": "日期",
       "campaignName": "活动名称",
-      "usage": "内容",
-      "amount": "金额",
-      "remaining": "余额",
+      "usedAt": "使用日期",
+      "usage": "使用内容",
+      "amount": "使用金额",
+      "campaignCode": "活动代码",
       "detail": "详情"
+    },
+    "card": {
+      "usedAt": "使用日期",
+      "campaignName": "活动名称",
+      "campaignType": "活动类型",
+      "campaignCode": "活动代码",
+      "usage": "使用内容",
+      "amount": "使用金额",
+      "remaining": "使用后余额"
     },
     "action": {
       "detail": "查看详情"
     },
     "detail": {
-      "title": "使用详情",
-      "type": "类型",
-      "date": {
-        "use": "使用日期",
-        "refund": "退还日期",
-        "charge": "充值日期",
-        "withdraw": "提现日期"
-      },
+      "title": "详情",
+      "usedAt": "使用日期",
       "campaignName": "活动名称",
       "campaignType": "活动类型",
       "campaignCode": "活动代码",
       "usage": "使用内容",
-      "contractTarget": "合同对象",
-      "amount": {
-        "use": "使用金额",
-        "refund": "使用金额",
-        "charge": "充值金额",
-        "withdraw": "提现金额"
-      },
+      "amount": "使用金额",
       "remaining": "使用后余额"
     },
     "filter": {
-      "type": {
-        "label": "类型",
-        "placeholder": "请选择类型。",
-        "option": {
-          "use": "使用",
-          "refund": "退还",
-          "charge": "充值",
-          "withdraw": "提现"
-        }
-      },
       "date": {
         "label": "使用日期",
         "placeholder": "请选择日期。"
@@ -64,40 +50,27 @@
       }
     },
     "empty": {
-      "none": "暂无使用记录。"
-    },
-    "type": {
-      "use": "使用",
-      "refund": "退还",
-      "charge": "充值",
-      "withdraw": "提现"
-    },
-    "campaignType": {
-      "recruit": "招募型",
-      "pick": "PICK型"
-    },
-    "usageDetail": {
-      "contractPick": "网红合同费用(PICK型)",
-      "contractRecruit": "网红合同费用(招募型)",
-      "aiManuscriptConfirm": "附加服务(AI稿件审核)",
-      "aiPostingGuide": "附加服务(AI发帖指南)"
+      "none": "暂无 Bigbird 余额使用记录。"
     }
   },
   "charge": {
-    "title": "交易明细",
+    "title": "充值明细",
     "list": {
-      "label": "交易明细"
+      "label": "充值明细"
     },
     "column": {
-      "type": "类型",
-      "date": "日期",
-      "amount": "金额",
-      "bank": "银行",
-      "account": "账号",
-      "holder": "汇款人",
+      "requestedAt": "充值日期",
+      "amount": "申请金额",
+      "method": "支付方式",
       "status": "到账状态",
       "receipt": "交易明细",
       "detail": "详情"
+    },
+    "card": {
+      "requestedAt": "充值日期",
+      "amount": "申请金额",
+      "method": "支付方式",
+      "status": "到账状态"
     },
     "action": {
       "detail": "查看详情",
@@ -109,35 +82,17 @@
     },
     "detail": {
       "title": "交易详情",
-      "type": "充值类型",
+      "approvedAt": "确认日期",
       "requestedAt": "申请日期",
-      "amount": "充值金额",
+      "amount": "申请金额",
       "method": "支付方式",
       "bank": "银行名称",
-      "account": "账号",
-      "holder": "汇款人",
+      "account": "虚拟账号",
       "depositedAt": "到账日期",
       "status": "到账状态",
-      "receipt": "获取交易明细",
-      "withdraw": {
-        "requestedAt": "提现申请日期",
-        "amount": "提现金额",
-        "method": "处理方式",
-        "methodValue": "提现至所填账户",
-        "holder": "账户持有人",
-        "completedAt": "提现完成日期",
-        "status": "提现状态"
-      }
+      "receipt": "获取交易明细"
     },
     "filter": {
-      "type": {
-        "label": "类型",
-        "placeholder": "请选择类型。",
-        "option": {
-          "charge": "充值",
-          "withdraw": "提现"
-        }
-      },
       "date": {
         "label": "充值日期",
         "placeholder": "请选择日期。"
@@ -146,15 +101,14 @@
         "label": "到账状态",
         "placeholder": "请选择到账状态。",
         "option": {
-          "paid": "已到账",
-          "withdrawn": "已提现",
+          "paid": "支付完成",
           "pending": "等待中",
-          "canceled": "未到账取消"
+          "canceled": "支付取消"
         }
       }
     },
     "empty": {
-      "none": "暂无充值/提现记录。"
+      "none": "暂无 Bigbird 余额充值记录。"
     },
     "notice": {
       "title": "须知",
@@ -162,10 +116,6 @@
       "validity": "虚拟账户有效期至2天后的午夜。",
       "instant": "确认到账后立即充值。",
       "delay": "到账后，余额更新最长可能需要5分钟。"
-    },
-    "type": {
-      "charge": "充值",
-      "withdraw": "提现"
     }
   }
 }

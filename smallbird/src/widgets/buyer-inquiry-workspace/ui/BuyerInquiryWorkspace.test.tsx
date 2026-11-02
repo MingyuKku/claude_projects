@@ -46,6 +46,10 @@ function inquiry(
     userIdx: null,
     preview: "배송이 언제 되나요?",
     lastActivityAt: new Date("2026-10-01T10:00"),
+    hasUnread: false,
+    brandName: null,
+    campaignName: null,
+    shopName: null,
     ...overrides,
   };
 }
@@ -92,13 +96,33 @@ describe("구매자 문의 목록", () => {
     expect(router.state.location.search).toBe("?source=qna");
   });
 
-  it("상태·출처 배지와 작성자·미리보기를 보여 준다", () => {
+  it("상태·출처 배지와 작성자, 캠페인을 못 찾은 문의는 내용 처음 10자를 보여 준다", () => {
     renderWorkspace();
     const card = screen.getByRole("button", { name: "김하루" });
     expect(card).toBeInTheDocument();
-    expect(screen.getByText("배송이 언제 되나요?")).toBeInTheDocument();
+    expect(screen.getByText("배송이 언제 되나요...")).toBeInTheDocument();
     expect(screen.getAllByText("답변 대기").length).toBeGreaterThan(0);
     expect(screen.getByText("구매자 문의")).toBeInTheDocument();
+  });
+
+  it("서버가 준 캠페인 값으로 카드 문구를 만들고, 안 읽은 문의에 점을 보여 준다", () => {
+    renderWorkspace({
+      inquiries: [
+        inquiry({
+          brandName: "빅버드",
+          campaignName: "스킨케어",
+          hasUnread: true,
+        }),
+      ],
+    });
+    expect(screen.getByText("[빅버드][스킨케어] 문의")).toBeInTheDocument();
+    expect(screen.getByText("읽지 않은 메시지")).toBeInTheDocument();
+  });
+
+  it("상담 중(실시간) 문의에는 상담 중 배지를 붙인다", () => {
+    renderWorkspace({ inquiries: [inquiry({ status: "consulting" })] });
+    const card = screen.getByText("구매자 문의").closest("li");
+    expect(within(card!).getByText("상담 중")).toBeInTheDocument();
   });
 
   it("답변 완료 문의에는 상태 배지 없이 출처 배지만 보여 준다", () => {

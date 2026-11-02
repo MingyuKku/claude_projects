@@ -3,6 +3,8 @@ import { MemoryRouter } from "react-router";
 
 import { BigbirdInquiryWorkspace } from "./BigbirdInquiryWorkspace";
 
+import type { BigbirdInquiryViewModel } from "@/entities/inquiry";
+
 function renderWorkspace(props: { isPanelOpen: boolean; isError?: boolean }) {
   render(
     <MemoryRouter>
@@ -41,5 +43,60 @@ describe("BigbirdInquiryWorkspace 빈 목록", () => {
     expect(
       renderWorkspace({ isPanelOpen: false, isError: true }),
     ).not.toHaveClass("desktop:hidden");
+  });
+});
+
+describe("BigbirdInquiryWorkspace 무한 스크롤", () => {
+  const done: BigbirdInquiryViewModel = {
+    threadIdx: 1,
+    sequence: 1,
+    campaignIdx: null,
+    isRealtime: false,
+    isFinished: true,
+    status: "done",
+    realtimePhase: null,
+    createdAt: new Date("2026-10-29T09:00:00"),
+    messages: [],
+  };
+
+  function renderList(
+    path: string,
+    props: { isError?: boolean; hasMore?: boolean },
+  ) {
+    render(
+      <MemoryRouter initialEntries={[path]}>
+        <BigbirdInquiryWorkspace
+          threadUserIdx={undefined}
+          inquiries={[done]}
+          isLoading={false}
+          isError={props.isError ?? false}
+          hasMore={props.hasMore ?? false}
+          onLoadMore={() => {}}
+          onClickRefresh={() => {}}
+          isPanelOpen={false}
+          panelLabel="대화"
+        >
+          <p>패널 내용</p>
+        </BigbirdInquiryWorkspace>
+      </MemoryRouter>,
+    );
+  }
+
+  it("탭으로 걸러 비어도 더 받을 쪽이 있으면 빈 상태 대신 이어 받는다", () => {
+    renderList("/?status=waiting", { hasMore: true });
+    expect(
+      screen.queryByText("문의사항이 존재하지 않습니다."),
+    ).not.toBeInTheDocument();
+  });
+
+  it("다음 쪽을 받지 못하면 불러 둔 목록을 남기고 아래에 다시 시도를 보인다", () => {
+    renderList("/", { isError: true, hasMore: true });
+    expect(
+      screen.getByText("문의 목록을 불러오지 못했습니다."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "다시 시도" }),
+    ).toBeInTheDocument();
+    expect(screen.getAllByRole("listitem").length).toBeGreaterThan(0);
   });
 });

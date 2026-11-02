@@ -11,15 +11,6 @@ vi.mock("@/entities/bigbird-money", () => ({
 }));
 vi.mock("../api/charge-request-api", () => ({ requestCharge }));
 
-// Radix ScrollArea(패널 본문 스크롤)가 쓰는 브라우저 API가 jsdom에 없어 이 파일에서만 채움.
-beforeAll(() => {
-  globalThis.ResizeObserver = class {
-    observe() {}
-    unobserve() {}
-    disconnect() {}
-  };
-});
-
 beforeEach(() => requestCharge.mockReset().mockResolvedValue(undefined));
 
 function setup() {
@@ -42,15 +33,15 @@ describe("ChargePanel", () => {
 
   it("숫자만 받고 천 단위로 보이며 버튼에 금액이 반영된다", async () => {
     const { user, input, cta } = setup();
-    await user.type(input, "155a500");
-    expect(input).toHaveValue("155,500");
-    expect(cta()).toHaveTextContent("155,500원 충전하기");
+    await user.type(input, "15a500");
+    expect(input).toHaveValue("15,500");
+    expect(cta()).toHaveTextContent("15,500원 충전하기");
     expect(cta()).toBeEnabled();
   });
 
   it("충전하기를 누르면 약관 팝업이 열리고 동의 전에는 결제를 요청하지 않는다", async () => {
     const { user, input, cta } = setup();
-    await user.type(input, "155500");
+    await user.type(input, "15500");
     await user.click(cta());
     const dialog = screen.getByRole("dialog", {
       name: "광고주 결제 정보 수집 및 약관",
@@ -63,7 +54,7 @@ describe("ChargePanel", () => {
 
   it("약관 팝업에서 취소하면 결제를 요청하지 않고 닫는다", async () => {
     const { user, input, cta } = setup();
-    await user.type(input, "155500");
+    await user.type(input, "15500");
     await user.click(cta());
     await user.click(screen.getByRole("button", { name: "취소" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
@@ -72,37 +63,38 @@ describe("ChargePanel", () => {
 
   it("빠른 금액은 입력값에 더한다", async () => {
     const { user, input } = setup();
-    await user.click(screen.getByRole("button", { name: "10만 원" }));
-    await user.click(screen.getByRole("button", { name: "50만 원" }));
-    expect(input).toHaveValue("600,000");
+    await user.click(screen.getByRole("button", { name: "1만 원" }));
+    await user.click(screen.getByRole("button", { name: "3만 원" }));
+    expect(input).toHaveValue("40,000");
   });
 
   it("최소 미만이면 오류 문구를 보이고 버튼이 비활성이다", async () => {
     const { user, input, cta } = setup();
-    await user.type(input, "99999");
+    await user.type(input, "999");
     expect(screen.getByRole("alert")).toHaveTextContent(
-      "최소 100,000원부터 충전할 수 있습니다.",
+      "최소 1,000원부터 충전할 수 있습니다.",
     );
     expect(cta()).toBeDisabled();
   });
 
   it("한도를 넘기면 값은 두고 오류 문구를 보이며 버튼이 비활성이다", async () => {
     const { user, cta } = setup();
-    for (let i = 0; i < 11; i += 1) {
-      await user.click(screen.getByRole("button", { name: "1,000만 원" }));
+    await user.click(screen.getByRole("button", { name: "10만 원" }));
+    for (let i = 0; i < 10; i += 1) {
+      await user.click(screen.getByRole("button", { name: "10만 원" }));
     }
     expect(screen.getByRole("alert")).toHaveTextContent(
-      "1회 최대 100,000,000원까지 충전할 수 있습니다.",
+      "1회 최대 1,000,000원까지 충전할 수 있습니다.",
     );
     expect(cta()).toBeDisabled();
   });
 
   it("약관에 동의하면 입력 금액으로 결제를 요청한다", async () => {
     const { user, input, cta } = setup();
-    await user.type(input, "155500");
+    await user.type(input, "15500");
     await user.click(cta());
     await user.click(screen.getByRole("button", { name: "동의 및 충전하기" }));
-    expect(requestCharge).toHaveBeenCalledWith(155500);
+    expect(requestCharge).toHaveBeenCalledWith(15500);
   });
 
   it("닫기를 누르면 닫는다", async () => {

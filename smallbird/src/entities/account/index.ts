@@ -32,8 +32,6 @@ export type {
   DuplicateCheckResult,
   DuplicateCheckType,
 } from "./api/mypage-api";
-export { useBankList } from "./api/use-bank-list";
-export type { BankOption } from "./model/bank-schema";
 export { useMasterAccount } from "./api/use-master-account";
 export { useSubSelfAccount } from "./api/use-sub-self-account";
 export {

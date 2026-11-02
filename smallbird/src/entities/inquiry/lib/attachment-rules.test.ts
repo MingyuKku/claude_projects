@@ -1,4 +1,8 @@
-import { checkAttachments, getAttachmentKind } from "./attachment-rules";
+import {
+  checkAttachments,
+  formatFileSize,
+  getAttachmentKind,
+} from "./attachment-rules";
 
 const MB = 1024 * 1024;
 const file = (name: string, size = 1) => ({ name, size });
@@ -39,6 +43,8 @@ describe("checkAttachments", () => {
     expect(checkAttachments([], [file("a.mp4", 50 * MB + 1)])).toBe(
       "videoSize",
     );
+    expect(checkAttachments([], [file("a.pdf", 30 * MB + 1)])).toBe("fileSize");
+    expect(checkAttachments([], [file("a.pdf", 30 * MB)])).toBeNull();
   });
 
   it("이미 담긴 파일까지 합쳐 전체 10개를 넘으면 막는다", () => {
@@ -65,4 +71,11 @@ describe("checkAttachments", () => {
       "format",
     );
   });
+});
+
+it("파일 용량을 카드 표기로 바꾼다", () => {
+  expect(formatFileSize(512)).toBe("512B");
+  expect(formatFileSize(2560)).toBe("2.5KB");
+  expect(formatFileSize(2.5 * MB)).toBe("2.5MB");
+  expect(formatFileSize(30 * MB)).toBe("30MB");
 });

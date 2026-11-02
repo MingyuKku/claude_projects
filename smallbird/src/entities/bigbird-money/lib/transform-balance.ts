@@ -5,8 +5,5 @@ import type { z } from "zod";
 export function transformBalance(
   response: z.infer<typeof bigbirdMoneyBalanceSchema>,
 ): BigbirdMoneyBalance {
-  return {
-    amount: response.bigbirdMoney,
-    isWithdrawable: response.withdrawable,
-  };
+  return { amount: response.bizMoney };
 }

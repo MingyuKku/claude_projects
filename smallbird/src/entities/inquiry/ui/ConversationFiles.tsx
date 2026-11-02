@@ -1,12 +1,13 @@
 import { useState } from "react";
 
 import { ChatMessage } from "@/shared/components/chat-message";
-import { FileThumbnail } from "@/shared/components/file-list";
+import { FileItem, FileThumbnail } from "@/shared/components/file-list";
 import { MediaViewer } from "@/shared/components/media-viewer";
 import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
 
 import { getAttachmentDownloadUrl } from "../api/inquiry-api";
+import { formatFileSize } from "../lib/attachment-rules";
 
 import type { ConversationRow } from "../lib/group-attachments";
 
@@ -20,14 +21,17 @@ interface ConversationFilesProps {
 }
 
 /**
- * 대화의 첨부 묶음: 말풍선(있으면) 아래 80px 썸네일 격자 + 누르면 열리는 뷰어. 칸 덩어리는 보낸 쪽 끝에 붙고
- * 마지막 줄은 첫 칸부터 채움. 빅버드 문의와 구매자 문의 대화가 같이 씀.
+ * 대화의 첨부 묶음: 말풍선(있으면) 아래 이미지·동영상 80px 썸네일 격자 + 누르면 열리는 뷰어, 그 아래 문서 카드
+ * (Figma 11315:49676, 190px 카드에 이름·용량·다운로드). 보낸 쪽 끝에 붙음. 빅버드 문의와 구매자 문의 대화가 같이 씀.
  */
 export function ConversationFiles({ row, name, time }: ConversationFilesProps) {
   const { t: tCommon } = useTranslation();
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   // 문서는 뷰어 대상이 아니라 누르면 바로 내려받음. 뷰어는 이미지·동영상만 넘김.
   const media = row.messages.filter((message) => message.kind !== "file");
+  const documents = row.messages.filter(
+    (message) => message.kind === "file" && message.attachment,
+  );
   const items = media.flatMap((message) =>
     message.attachment
       ? [
@@ -55,52 +59,73 @@ export function ConversationFiles({ row, name, time }: ConversationFilesProps) {
         message={row.text?.body}
         time={time}
         attachments={
-          <ul
+          <div
             className={cn(
-              "grid w-full grid-cols-[repeat(auto-fit,80px)] gap-1",
-              row.isMine ? "justify-end" : "justify-start",
+              "flex w-full flex-col gap-1",
+              row.isMine ? "items-end" : "items-start",
             )}
           >
-            {row.messages.map((message) => {
-              const fileName = message.attachment?.fileName ?? "";
-              if (message.kind === "file" && message.attachment)
-                return (
-                  <li key={message.id}>
-                    <a
-                      href={getAttachmentDownloadUrl(
-                        "image",
-                        message.attachment.attachmentIdx,
-                      )}
-                      download={fileName || undefined}
-                      aria-label={fileName}
-                      className="block rounded-md outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                    >
-                      <FileThumbnail type="file" alt={fileName} />
-                    </a>
-                  </li>
-                );
-              const index = media.indexOf(message);
-              return (
-                <li key={message.id}>
-                  <button
-                    type="button"
-                    aria-label={fileName}
-                    onClick={() => setViewerIndex(index)}
-                    className="block rounded-md outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                  >
-                    <FileThumbnail
-                      type={message.kind === "video" ? "video" : "image"}
-                      src={message.kind === "video" ? undefined : message.body}
-                      videoSrc={
-                        message.kind === "video" ? message.body : undefined
-                      }
-                      alt={fileName}
-                    />
-                  </button>
-                </li>
-              );
-            })}
-          </ul>
+            {media.length > 0 && (
+              <ul
+                className={cn(
+                  "grid w-full grid-cols-[repeat(auto-fit,80px)] gap-1",
+                  row.isMine ? "justify-end" : "justify-start",
+                )}
+              >
+                {media.map((message, index) => {
+                  const fileName = message.attachment?.fileName ?? "";
+                  return (
+                    <li key={message.id}>
+                      <button
+                        type="button"
+                        aria-label={fileName}
+                        onClick={() => setViewerIndex(index)}
+                        className="block rounded-md outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                      >
+                        <FileThumbnail
+                          type={message.kind === "video" ? "video" : "image"}
+                          src={
+                            message.kind === "video" ? undefined : message.body
+                          }
+                          videoSrc={
+                            message.kind === "video" ? message.body : undefined
+                          }
+                          alt={fileName}
+                        />
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+            {documents.length > 0 && (
+              <ul className="flex flex-col gap-1">
+                {documents.map(({ id, attachment }) => {
+                  if (!attachment) return null;
+                  const fileName = attachment.fileName ?? "";
+                  return (
+                    <li key={id}>
+                      {/* 문서는 받기 경로가 이미지와 같고(type=image), 이 경로만 파일 이름을 붙여 내려줌 */}
+                      <FileItem
+                        className="w-47.5"
+                        name={fileName}
+                        sizeLabel={
+                          attachment.fileSize === null
+                            ? ""
+                            : formatFileSize(attachment.fileSize)
+                        }
+                        downloadLabel={tCommon("attachment.download")}
+                        downloadHref={getAttachmentDownloadUrl(
+                          "image",
+                          attachment.attachmentIdx,
+                        )}
+                      />
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
         }
       />
       <MediaViewer

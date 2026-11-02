@@ -4,6 +4,7 @@
   "waiting": "Waiting",
   "done": "Answered",
   "status": {
+    "consulting": "Consulting",
     "waiting": "Waiting",
     "done": "Answered"
   },
@@ -30,6 +31,7 @@
     "source": "Inquiry Type",
     "campaign": "Campaign",
     "campaignPlaceholder": "Select a campaign",
+    "campaignSearchPlaceholder": "Search campaign name or code.",
     "influencer": "Influencer",
     "influencerPlaceholder": "Select an influencer",
     "influencerSearchPlaceholder": "Search influencers",
@@ -77,5 +79,8 @@
     "deleteTitle": "Delete this reply?",
     "deleteDescription": "A deleted reply can't be restored."
   },
-  "messageDeleted": "This message was deleted."
+  "card": {
+    "campaignInquiry": "{{label}} inquiry",
+    "unread": "Unread message"
+  }
 }

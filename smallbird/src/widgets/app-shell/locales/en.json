@@ -56,5 +56,10 @@
   "session": {
     "checking": "Checking sign-in status",
     "checkFailed": "Couldn't check sign-in status. Try again."
+  },
+  "role": {
+    "label": "Switch between advertiser and influencer",
+    "advertiser": "Advertiser",
+    "influencer": "Influencer"
   }
 }

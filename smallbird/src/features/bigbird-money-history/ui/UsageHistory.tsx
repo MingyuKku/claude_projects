@@ -1,23 +1,21 @@
+import { useEffect } from "react";
+
+import { EmptyState } from "@/shared/components/empty-state";
 import {
-  FilterScreen,
   FilterToolbar,
   hasActiveFilter,
   ListEmptyState,
+  ListPagination,
   resolveEmptyKind,
-  useFilterScreen,
 } from "@/shared/components/list-filter";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery } from "@/shared/lib";
+import { Button } from "@/shared/ui/button";
 
-import { useUsageHistory, useUsageScrollList } from "../api/use-usage-history";
-import { useUsageListParams } from "../lib/use-usage-list-params";
-import {
-  DESKTOP_QUERY,
-  LIST_PAGE_SIZE_OPTIONS,
-  TABLET_QUERY,
-} from "../model/constants";
-import { HistoryPagedList } from "./HistoryPagedList";
-import { HistoryScrollList } from "./HistoryScrollList";
+import { useUsageHistory } from "../api/use-usage-history";
+import { useListParams } from "../lib/use-list-params";
+import { useUsageFilterFields } from "../lib/use-usage-filter-fields";
+import { TABLET_QUERY } from "../model/constants";
 import { UsageCardList } from "./UsageCardList";
 import { UsageListSkeleton } from "./UsageListSkeleton";
 import { UsageTable } from "./UsageTable";
@@ -25,52 +23,37 @@ import { UsageTable } from "./UsageTable";
 interface UsageHistoryProps {
   /** 상세 보기를 열어 둔 사용 내역(쿼리 `id`). 그 행을 활성 처리함. */
   activeId: string | null;
-  /** 옆 패널(사용 상세·충전·출금)이 열려 있음. 열려 있으면 캠페인 명·잔액 열을 숨김. */
-  isPanelOpen: boolean;
   onClickDetail: (id: string) => void;
 }
 
-// 사용 내역. PC는 표 + 인라인 툴바, TAB은 2열 카드 + "필터" 화면(`?panel=filter`), MO는 1열 카드 + 스크롤로 이어 읽기(맨 위로 버튼) + 필터 모달.
-// 필터(구분·사용 일자·캠페인 명·사용 내역)와 "N개 보기"(10·20·50)는 주소 쿼리가 소유하고 서버에 함께 보냄. 검색은 대상이 정해지기 전(Q-8)이라 비활성.
-export function UsageHistory({
-  activeId,
-  isPanelOpen,
-  onClickDetail,
-}: UsageHistoryProps) {
+// 사용 상세 내역. PC·TAB은 표 + 인라인 툴바, MO는 카드 + 필터 모달. 쪽은 URL 쿼리가 소유하고 쪽 나눔은 서버가 함.
+// 필터·검색은 서버 지원 전까지 모두 비활성이라 목록 요청에는 쪽만 보냄.
+export function UsageHistory({ activeId, onClickDetail }: UsageHistoryProps) {
   const { t } = useTranslation("features/bigbird-money-history");
+  const { t: tCommon } = useTranslation();
   const isTabletUp = useMediaQuery(TABLET_QUERY);
-  const isDesktop = useMediaQuery(DESKTOP_QUERY);
-  const { fields, params, baseQuery } = useUsageListParams();
-  const filterScreen = useFilterScreen("desktop");
-  // 쪽 나눔 목록(PC·TAB)과 이어 읽는 목록(MO)은 폭에 따라 한쪽만 읽음.
-  const paged = useUsageHistory(
-    isTabletUp ? { ...baseQuery, page: params.page } : null,
-  );
-  const scroll = useUsageScrollList(baseQuery, !isTabletUp);
+  const fields = useUsageFilterFields();
+  const params = useListParams(fields);
+  const { list, isLoading, isError, mutate } = useUsageHistory(params.page);
 
-  const emptyContent = (
-    <ListEmptyState
-      kind={resolveEmptyKind(params.keyword, hasActiveFilter(params.filters))}
-      keyword={params.keyword}
-      noneTitle={t("usage.empty.none")}
-    />
-  );
-  const skeleton = <UsageListSkeleton isTable={isDesktop} />;
-  const refresh = () => {
-    params.reset();
-    void (isTabletUp ? paged.mutate() : scroll.reload());
-  };
+  const { clampPage } = params;
+  const totalPages = list?.totalPages ?? 0;
+  // 주소를 직접 고쳐 범위를 벗어난 쪽은 마지막 쪽으로 당김.
+  const isPageOutOfRange =
+    list !== undefined && totalPages > 0 && params.page > totalPages;
+  useEffect(() => {
+    if (isPageOutOfRange) clampPage(totalPages);
+  }, [isPageOutOfRange, totalPages, clampPage]);
 
-  if (filterScreen.isOpen) {
-    return (
-      <FilterScreen
-        onClose={filterScreen.close}
-        fields={fields}
-        values={params.filters}
-        onApply={params.applyFiltersAndClosePanel}
+  const records = list?.records ?? [];
+  const emptyContent =
+    list?.totalCount === 0 ? (
+      <ListEmptyState
+        kind={resolveEmptyKind(params.keyword, hasActiveFilter(params.filters))}
+        keyword={params.keyword}
+        noneTitle={t("usage.empty.none")}
       />
-    );
-  }
+    ) : undefined;
 
   return (
     <section className="flex flex-col gap-4" aria-labelledby="usage-title">
@@ -82,16 +65,11 @@ export function UsageHistory({
         values={params.filters}
         onChangeValues={params.setFilters}
         onApplyFromDialog={params.applyFiltersAndClosePanel}
-        onRefresh={refresh}
-        // TAB은 "필터" 버튼 → 본문을 대체하는 "필터 검색 설정" 화면(구독 결제 내역과 같음).
-        inlineFrom="desktop"
-        isCompact
-        pageSize={{
-          value: params.pageSize,
-          options: LIST_PAGE_SIZE_OPTIONS,
-          onChange: params.setPageSize,
+        onRefresh={() => {
+          params.reset();
+          void mutate();
         }}
-        // 검색은 검색 대상이 정해진 뒤 개발(그 전에는 비활성, 스펙 §3, API 명세 Q-8).
+        // 검색은 세부 기획 정책이 정해진 뒤 개발(그 전에는 비활성, 스펙 §3).
         search={{
           keyword: params.keyword,
           onSubmit: params.setKeyword,
@@ -99,55 +77,40 @@ export function UsageHistory({
         }}
       />
 
-      {isTabletUp ? (
-        <HistoryPagedList
-          list={paged.list}
-          isLoading={paged.isLoading}
-          isError={paged.isError}
-          onRetry={() => void paged.mutate()}
-          page={params.page}
-          onChangePage={params.setPage}
-          onClampPage={params.clampPage}
-          buildPageHref={params.buildPageHref}
-          skeleton={skeleton}
-          emptyContent={emptyContent}
-          isTable={isDesktop}
-          renderTable={(records, empty) => (
+      {isLoading ? (
+        <UsageListSkeleton isTable={isTabletUp} />
+      ) : isError || !list ? (
+        <EmptyState
+          type="alarm"
+          title={tCommon("error.unexpected")}
+          className="py-20"
+          action={
+            <Button variant="outline" onClick={() => void mutate()}>
+              {tCommon("action.retry")}
+            </Button>
+          }
+        />
+      ) : (
+        // 표(또는 카드)와 쪽 이동은 12px 간격으로 한 묶음(시안).
+        <div className="flex flex-col gap-3">
+          {isTabletUp ? (
             <UsageTable
               records={records}
               activeId={activeId}
-              isPanelOpen={isPanelOpen}
               onClickDetail={(record) => onClickDetail(record.id)}
-              emptyContent={empty}
+              emptyContent={emptyContent}
             />
+          ) : (
+            (emptyContent ?? <UsageCardList records={records} />)
           )}
-          renderCards={(records) => (
-            <UsageCardList
-              records={records}
-              onClickDetail={(record) => onClickDetail(record.id)}
-            />
-          )}
-        />
-      ) : (
-        <HistoryScrollList
-          records={scroll.records}
-          totalCount={scroll.totalCount}
-          hasMore={scroll.hasMore}
-          isLoading={scroll.isLoading}
-          isLoadingMore={scroll.isLoadingMore}
-          isError={scroll.isError}
-          isLoadMoreError={scroll.isLoadMoreError}
-          onLoadMore={scroll.loadMore}
-          onRetry={() => void scroll.reload()}
-          skeleton={skeleton}
-          emptyContent={emptyContent}
-          renderCards={(records) => (
-            <UsageCardList
-              records={records}
-              onClickDetail={(record) => onClickDetail(record.id)}
-            />
-          )}
-        />
+          <ListPagination
+            page={list.page}
+            totalPages={totalPages}
+            totalCount={list.totalCount}
+            buildHref={params.buildPageHref}
+            onChangePage={params.setPage}
+          />
+        </div>
       )}
     </section>
   );

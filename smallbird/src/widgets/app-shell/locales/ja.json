@@ -56,5 +56,10 @@
   "session": {
     "checking": "ログイン状態を確認中",
     "checkFailed": "ログイン状態を確認できませんでした。もう一度お試しください。"
+  },
+  "role": {
+    "label": "広告主・インフルエンサー切り替え",
+    "advertiser": "広告主",
+    "influencer": "インフルエンサー"
   }
 }

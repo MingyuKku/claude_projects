@@ -1,7 +1,12 @@
 import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
 
-import { ApiError, serverApi, serverApiV3 } from "@/shared/api";
+import {
+  ApiError,
+  serverApi,
+  serverApiV3,
+  signOutFirebase,
+} from "@/shared/api";
 import { ENV } from "@/shared/config";
 
 import { clearLoginCredential } from "../lib/login-handoff";
@@ -76,6 +81,7 @@ export async function formLogin(
   password: string,
 ): Promise<FormLoginResult> {
   clearLastAllowedSession();
+  await signOutFirebase();
   const body = new FormData();
   body.append("username", username);
   body.append("password", password);
@@ -110,6 +116,7 @@ export async function logout(): Promise<void> {
   }
   clearLoginCredential();
   clearLastAllowedSession();
+  await signOutFirebase();
 }
 
 export function useLogout() {

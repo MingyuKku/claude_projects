@@ -45,6 +45,10 @@ const inquiry: BuyerInquiryViewModel = {
   userIdx: null,
   preview: "문의",
   lastActivityAt: new Date("2026-10-01T10:00"),
+  hasUnread: false,
+  brandName: null,
+  campaignName: null,
+  shopName: null,
 };
 
 const thread = (threadIdx: number, created: string) => ({

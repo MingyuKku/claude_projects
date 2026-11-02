@@ -1,7 +1,6 @@
-import { CircleHelp, Handshake, Headset, Pencil } from "lucide-react";
+import { CircleHelp, Handshake } from "lucide-react";
 import { useId, useState, type CSSProperties, type ReactNode } from "react";
 
-import { AttachmentTextField, useInquiryAttachments } from "@/entities/inquiry";
 import { EmptyState } from "@/shared/components/empty-state";
 import { useTranslation } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
@@ -31,10 +30,6 @@ export interface InquiryCampaignOption {
 
 export interface NewBigbirdInquiryDraft {
   campaignId: number | null;
-  method: "board" | "realtime";
-  body: string;
-  /** 입력창에 담은 첨부 파일. 실시간 상담하기에서는 비어 있음. */
-  files: File[];
 }
 
 /** 캠페인 목록 조회 상태. 조회 실패·로딩을 "캠페인 없음"으로 보이지 않게 구분함. */
@@ -47,10 +42,6 @@ interface NewBigbirdInquiryFormProps {
   onSubmit?: (draft: NewBigbirdInquiryDraft) => void;
   /** 등록 요청 중. 같은 문의를 두 번 보내지 않도록 제출을 막음. */
   isSubmitting?: boolean;
-  /** false면 실시간 상담하기를 고를 수 없음(실시간 쓰기를 켜기 전). */
-  isRealtimeAvailable?: boolean;
-  /** false면 문의 남기기를 고를 수 없음(복수 문의 호환 검증 전). */
-  isBoardAvailable?: boolean;
   /**
    * 처음 선택해 둘 캠페인. 값이 있으면 캠페인 문의, null이면 기타 문의로 시작함
    * (실시간 요청 실패 뒤 "문의 메시지로 남기기"로 넘어올 때).
@@ -64,8 +55,6 @@ export function NewBigbirdInquiryForm({
   onClickRetryCampaigns,
   onSubmit,
   isSubmitting = false,
-  isRealtimeAvailable = true,
-  isBoardAvailable = true,
   initialCampaignId,
 }: NewBigbirdInquiryFormProps) {
   const { t } = useTranslation("features/new-bigbird-inquiry");
@@ -74,27 +63,16 @@ export function NewBigbirdInquiryForm({
   const [type, setType] = useState<"campaign" | "other">(
     initialCampaignId === null ? "other" : "campaign",
   );
-  const [method, setMethod] = useState<"board" | "realtime">(
-    isBoardAvailable ? "board" : "realtime",
-  );
   const [campaignId, setCampaignId] = useState<number | null>(
     initialCampaignId ?? null,
   );
-  const [body, setBody] = useState("");
-  const attachments = useInquiryAttachments();
   const selectedCampaign = campaigns.find(
     (campaign) => campaign.id === campaignId,
   );
-  // 문의할 캠페인이 없으면 유형 카드 외 입력을 막아 기타 문의로만 진행하게 함.
-  const hasNoCampaign =
-    type === "campaign" && campaignsState === "ready" && campaigns.length === 0;
   const canSubmit =
     Boolean(onSubmit) &&
     !isSubmitting &&
-    (type === "other" || Boolean(selectedCampaign)) &&
-    (method === "realtime" ||
-      Boolean(body.trim()) ||
-      attachments.files.length > 0);
+    (type === "other" || Boolean(selectedCampaign));
 
   return (
     <form
@@ -105,9 +83,6 @@ export function NewBigbirdInquiryForm({
           onSubmit?.({
             campaignId:
               type === "campaign" ? (selectedCampaign?.id ?? null) : null,
-            method,
-            body: method === "board" ? body : "",
-            files: method === "board" ? attachments.files : [],
           });
       }}
     >
@@ -151,11 +126,12 @@ export function NewBigbirdInquiryForm({
             >
               <Table
                 className="table-fixed"
+                headerTone="gray"
                 containerClassName="overflow-visible rounded-none border-0"
                 aria-label={t("campaignListLabel")}
               >
                 {/* sticky 머리글은 border-collapse에서 테두리가 따라오지 않아 그림자로 아래 선을 그림. */}
-                <TableHeader className="sticky top-0 z-10 bg-background [&_th]:bg-muted/40 [&_th]:shadow-[inset_0_-1px_0_var(--color-border)] [&_tr]:border-b-0">
+                <TableHeader className="sticky top-0 z-10 [&_th]:shadow-[inset_0_-1px_0_var(--color-border)] [&_tr]:border-b-0">
                   <TableRow>
                     <TableHead className="w-12">
                       <span className="sr-only">{t("select")}</span>
@@ -232,56 +208,6 @@ export function NewBigbirdInquiryForm({
               </Table>
             </ScrollArea>
           </fieldset>
-        )}
-
-        <InquiryChoiceGroup
-          label={t("methodLabel")}
-          value={method}
-          onValueChange={(value) => {
-            if (value === "board" || value === "realtime") setMethod(value);
-          }}
-          disabled={hasNoCampaign}
-          options={[
-            {
-              value: "board",
-              label: t("board"),
-              description: t("boardDescription"),
-              icon: <Pencil aria-hidden className="size-4 shrink-0" />,
-              disabled: !isBoardAvailable,
-            },
-            {
-              value: "realtime",
-              label: t("realtime"),
-              description: t("realtimeDescription"),
-              icon: <Headset aria-hidden className="size-4 shrink-0" />,
-              disabled: !isRealtimeAvailable,
-            },
-          ]}
-        />
-
-        {method === "board" && (
-          <div className="space-y-3 tablet:space-y-4">
-            <label
-              htmlFor={`${id}-body`}
-              className="block text-sm leading-none font-semibold"
-            >
-              {t("board")}
-            </label>
-            <AttachmentTextField
-              id={`${id}-body`}
-              attachments={attachments}
-              maxLength={3000}
-              value={body}
-              onChange={(event) => setBody(event.target.value)}
-              disabled={hasNoCampaign}
-              placeholder={t("messagePlaceholder")}
-              submit={
-                <Button type="submit" size="sm" disabled={!canSubmit}>
-                  {t("send")}
-                </Button>
-              }
-            />
-          </div>
         )}
       </div>
       <footer className="shrink-0 p-4">

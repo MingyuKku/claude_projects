@@ -10,6 +10,7 @@ import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { ScrollArea } from "@/shared/ui/scroll-area";
 
+import { STATUS_BADGE_VARIANT } from "../lib/format";
 import { BuyerConversation } from "./BuyerConversation";
 import { BuyerInquiryDetailPanel } from "./BuyerInquiryDetailPanel";
 import { BuyerReplyComposer } from "./BuyerReplyComposer";
@@ -79,7 +80,7 @@ export function BuyerInquiryPanels({
           >
             <ChevronLeft className="size-4" />
           </Button>
-          <Badge variant={inquiry.status === "waiting" ? "blue" : "gray"}>
+          <Badge variant={STATUS_BADGE_VARIANT[inquiry.status]}>
             {t(`status.${inquiry.status}`)}
           </Badge>
           <Avatar size="md">

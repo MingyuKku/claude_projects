@@ -2,6 +2,7 @@ import { LoaderCircle } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { generatePath, useNavigate, useSearchParams } from "react-router";
 
+import { useInquiryCampaigns } from "@/entities/inquiry";
 import { ChatListItem, ChatListPanel } from "@/shared/components/chat-list";
 import { EmptyState } from "@/shared/components/empty-state";
 import { SearchInput } from "@/shared/components/search-input";
@@ -16,7 +17,11 @@ import {
   toBuyerInquiryFilters,
   toBuyerStatusFilter,
 } from "../lib/filters";
-import { formatListDate, STATUS_BADGE_VARIANT } from "../lib/format";
+import {
+  formatListDate,
+  getBuyerCardText,
+  STATUS_BADGE_VARIANT,
+} from "../lib/format";
 import { BuyerFilterChips } from "./BuyerFilterChips";
 import { BuyerInquiryFilterDialog } from "./BuyerInquiryFilterDialog";
 
@@ -68,6 +73,7 @@ export function BuyerInquiryWorkspace({
   const statusFilter = toBuyerStatusFilter(searchParams.get("status"));
   const filters = toBuyerInquiryFilters(searchParams);
   const sentinelRef = useRef<HTMLLIElement>(null);
+  const { campaigns } = useInquiryCampaigns(threadUserIdx);
 
   // 목록 끝이 보이면 다음 쪽을 받음. 받는 중에는 다시 부르지 않음.
   useEffect(() => {
@@ -79,6 +85,13 @@ export function BuyerInquiryWorkspace({
     observer.observe(sentinel);
     return () => observer.disconnect();
   }, [hasMore, isLoadingMore, onLoadMore, inquiries?.length]);
+
+  function toCardPreview(inquiry: BuyerInquiryViewModel) {
+    const text = getBuyerCardText(inquiry, campaigns);
+    return text.kind === "campaign"
+      ? t("card.campaignInquiry", { label: text.label })
+      : text.text;
+  }
 
   function handleChangeStatus(value: string) {
     setSearchParams(
@@ -246,9 +259,9 @@ export function BuyerInquiryWorkspace({
         {inquiries?.map((inquiry) => (
           <ChatListItem
             key={inquiry.key}
-            // 상태 배지는 답변 대기일 때만 붙임(Figma MO 6791:63495, 사용자 결정 2026-10-20).
+            // 상태 배지는 답변 완료가 아닐 때만 붙임(Figma MO 6791:63495, 사용자 결정 2026-10-20).
             badges={[
-              ...(inquiry.status === "waiting"
+              ...(inquiry.status !== "done"
                 ? [
                     {
                       label: t(`status.${inquiry.status}`),
@@ -265,7 +278,10 @@ export function BuyerInquiryWorkspace({
                 : ""
             }
             user={{ name: inquiry.writerName ?? t("unknownWriter") }}
-            preview={inquiry.preview}
+            // 카드 문구는 REQ-24-0001(파랑)을 따름. Figma는 최근 메시지 미리보기.
+            preview={toCardPreview(inquiry)}
+            hasAlert={inquiry.hasUnread}
+            alertLabel={t("card.unread")}
             highlight={filters.keyword}
             isSelected={inquiry.key === selectedKey}
             onClickItem={() =>

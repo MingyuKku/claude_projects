@@ -28,7 +28,6 @@ import type featuresSocialLogin from "../../features/social-login/locales/ko.jso
 import type featuresSwitchAccount from "../../features/switch-account/locales/ko.json";
 import type featuresViewSubscriptionUsage from "../../features/view-subscription-usage/locales/ko.json";
 import type featuresWithdrawAccount from "../../features/withdraw-account/locales/ko.json";
-import type featuresWithdrawBigbirdMoney from "../../features/withdraw-bigbird-money/locales/ko.json";
 import type pagesCertSuccess from "../../pages/cert-success/locales/ko.json";
 import type pagesChangePassword from "../../pages/change-password/locales/ko.json";
 import type pagesComingSoon from "../../pages/coming-soon/locales/ko.json";
@@ -88,7 +87,6 @@ declare module "i18next" {
       "features/switch-account": typeof featuresSwitchAccount;
       "features/view-subscription-usage": typeof featuresViewSubscriptionUsage;
       "features/withdraw-account": typeof featuresWithdrawAccount;
-      "features/withdraw-bigbird-money": typeof featuresWithdrawBigbirdMoney;
       "pages/cert-success": typeof pagesCertSuccess;
       "pages/change-password": typeof pagesChangePassword;
       "pages/coming-soon": typeof pagesComingSoon;

@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, useLocation } from "react-router";
 import { toast } from "sonner";
@@ -187,8 +187,11 @@ describe("CheckoutPanel", () => {
     expect(requestSavedCardSubscription).toHaveBeenCalledWith("pick", "yearly");
     expect(requestSubscriptionIssuance).not.toHaveBeenCalled();
     expect(submitIssuanceForm).not.toHaveBeenCalled();
-    expect(screen.getByTestId("location")).toHaveTextContent(
-      "/mypage/subscribe?result=success",
+    // 결제 응답을 기다린 뒤 이동하고, MemoryRouter 는 주소 변경을 transition 으로 반영해 클릭 직후에는 아직 바뀌지 않았을 수 있음.
+    await waitFor(() =>
+      expect(screen.getByTestId("location")).toHaveTextContent(
+        "/mypage/subscribe?result=success",
+      ),
     );
   });
 

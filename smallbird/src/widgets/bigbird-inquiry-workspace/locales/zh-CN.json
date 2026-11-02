@@ -24,8 +24,10 @@
     "caption": "留言后我们将核实并依次回复。"
   },
   "realtimeHistory": "暂无咨询消息。",
+  "conversationError": "无法加载对话。",
   "realtimeLoadError": "无法加载咨询消息。",
   "campaignCode": "活动代码",
+  "campaignShortcut": "前往活动",
   "copyCode": "复制活动代码",
   "copied": "已复制到剪贴板。",
   "backToList": "返回列表",
@@ -59,5 +61,7 @@
   "campaignInfo": "活动信息",
   "campaignType": "活动类型",
   "productName": "商品名称",
-  "period": "进行期间"
+  "period": "进行期间",
+  "progressStatus": "进行状态",
+  "shopCode": "店铺代码"
 }

@@ -44,6 +44,10 @@ const inquiry: BuyerInquiryViewModel = {
   userIdx: 9,
   preview: "질문",
   lastActivityAt: new Date("2026-10-01T10:00"),
+  hasUnread: false,
+  brandName: null,
+  campaignName: null,
+  shopName: null,
 };
 
 function qna(replyInfo: Record<string, unknown>) {

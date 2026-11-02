@@ -13,6 +13,8 @@ export interface ToggleTabOption {
   label: ReactNode;
   /** 라벨 옆 보조 문구(예: 할인율). 선택되면 destructive 색. */
   description?: ReactNode;
+  /** 고를 수 없는 항목. 모양은 선택되지 않은 항목과 같음. */
+  disabled?: boolean;
 }
 
 interface ToggleTabProps {
@@ -56,6 +58,7 @@ export function ToggleTab({
           <RadioGroupPrimitive.Item
             key={option.value}
             value={option.value}
+            disabled={option.disabled}
             className={cn(
               "relative z-10 flex items-center justify-center gap-1.5 rounded-md px-3 py-1.5 text-center whitespace-nowrap transition-colors outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
               isSelected

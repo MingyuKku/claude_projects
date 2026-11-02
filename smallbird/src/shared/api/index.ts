@@ -8,4 +8,4 @@ export {
 } from "./clients";
 export { ApiError, isApiError } from "./http-client";
 export type { DownloadedFile, HttpClient, RequestOptions } from "./http-client";
-export { getFirestoreDb } from "./firebase";
+export { getFirestoreDb, signOutFirebase } from "./firebase";

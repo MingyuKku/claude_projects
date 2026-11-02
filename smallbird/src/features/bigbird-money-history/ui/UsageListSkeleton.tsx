@@ -7,10 +7,10 @@ import { Skeleton } from "@/shared/ui/skeleton";
 import { LIST_PAGE_SIZE } from "../model/constants";
 
 const CARD_SKELETON_COUNT = 3;
-const CARD_ROW_COUNT = 6;
+const CARD_ROW_COUNT = 7;
 
 interface UsageListSkeletonProps {
-  /** PC는 표, TAB·MO는 카드. */
+  /** PC·TAB은 표, MO는 카드. */
   isTable: boolean;
 }
 
@@ -20,15 +20,7 @@ export function UsageListSkeleton({ isTable }: UsageListSkeletonProps) {
     return (
       <SkeletonGroup>
         <TableSkeleton
-          columnClassNames={[
-            "w-10",
-            "w-28",
-            "w-40",
-            "w-32",
-            "w-20",
-            "w-20",
-            "w-8",
-          ]}
+          columnClassNames={["w-40", "w-28", "w-36", "w-20", "w-24", "w-8"]}
           rowCount={LIST_PAGE_SIZE}
         />
       </SkeletonGroup>
@@ -36,23 +28,18 @@ export function UsageListSkeleton({ isTable }: UsageListSkeletonProps) {
   }
 
   return (
-    <SkeletonGroup className="grid grid-cols-1 gap-5 tablet:grid-cols-2 tablet:gap-3">
+    <SkeletonGroup className="flex flex-col gap-5">
       {Array.from({ length: CARD_SKELETON_COUNT }, (_, card) => (
-        <div key={card} className="flex flex-col gap-2">
-          <div className="flex justify-end">
-            <Skeleton className="h-9 w-20" />
-          </div>
-          <div className="overflow-hidden rounded-lg border">
-            {Array.from({ length: CARD_ROW_COUNT }, (_, row) => (
-              <div
-                key={row}
-                className="flex h-12 items-center gap-4 border-b px-4 last:border-b-0"
-              >
-                <Skeleton className="h-4 w-14" />
-                <Skeleton className="h-4 w-28" />
-              </div>
-            ))}
-          </div>
+        <div key={card} className="overflow-hidden rounded-lg border">
+          {Array.from({ length: CARD_ROW_COUNT }, (_, row) => (
+            <div
+              key={row}
+              className="flex h-12 items-center gap-4 border-b px-4 last:border-b-0"
+            >
+              <Skeleton className="h-4 w-14" />
+              <Skeleton className="h-4 w-28" />
+            </div>
+          ))}
         </div>
       ))}
     </SkeletonGroup>

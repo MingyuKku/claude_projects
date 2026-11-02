@@ -44,6 +44,8 @@ const triggerVariants = cva(
 export interface ComboboxOption {
   value: string;
   label: string;
+  /** 라벨 말고도 검색에 걸릴 값(예: 캠페인 코드). */
+  keywords?: string[];
 }
 
 // 나머지 속성(data-*, aria-* 등)은 트리거 버튼에 전달함.
@@ -132,7 +134,7 @@ export function Combobox({
               <CommandItem
                 key={option.value}
                 value={option.value}
-                keywords={[option.label]}
+                keywords={[option.label, ...(option.keywords ?? [])]}
                 onSelect={() => handleSelectOption(option.value)}
               >
                 {option.label}

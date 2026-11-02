@@ -10,9 +10,8 @@ import {
   DETAIL_QUERY_PARAMS,
   KEYWORD_PARAM,
   PAGE_PARAM,
-  SIZE_PARAM,
 } from "../model/constants";
-import { parsePageParam, parsePageSizeParam } from "./page-param";
+import { parsePageParam } from "./page-param";
 
 import type {
   FilterField,
@@ -23,19 +22,11 @@ import type {
  * 목록의 검색어·필터·쪽. URL 쿼리가 소유함(새로고침·뒤로 가기에도 유지).
  * 탭을 바꿀 때 이 쿼리를 지우는 일은 탭을 가진 페이지가 함.
  */
-export function useListParams(
-  fields: FilterField[],
-  /** "N개 보기" 선택지. 맨 앞 값이 기본. */
-  pageSizeOptions: readonly [number, ...number[]],
-) {
+export function useListParams(fields: FilterField[]) {
   const [searchParams, setSearchParams] = useSearchParams();
 
   const keyword = searchParams.get(KEYWORD_PARAM) ?? "";
   const page = parsePageParam(searchParams.get(PAGE_PARAM));
-  const pageSize = parsePageSizeParam(
-    searchParams.get(SIZE_PARAM),
-    pageSizeOptions,
-  );
   const filters = readFilterValues(searchParams, fields);
 
   function update(change: (params: URLSearchParams) => void) {
@@ -49,7 +40,6 @@ export function useListParams(
   return {
     keyword,
     page,
-    pageSize,
     filters,
     setKeyword: (next: string) =>
       update((params) => {
@@ -78,13 +68,6 @@ export function useListParams(
       update((params) => {
         applyFilterValues(params, fields, {}, PAGE_PARAM);
         params.delete(KEYWORD_PARAM);
-      }),
-    /** "N개 보기" 변경. 개수가 바뀌면 보던 쪽이 의미가 없어져 처음 쪽으로 돌아가고 열린 상세를 닫음. */
-    setPageSize: (next: number) =>
-      update((params) => {
-        params.set(SIZE_PARAM, String(next));
-        params.delete(PAGE_PARAM);
-        for (const key of DETAIL_QUERY_PARAMS) params.delete(key);
       }),
     setPage: (next: number) =>
       update((params) => {

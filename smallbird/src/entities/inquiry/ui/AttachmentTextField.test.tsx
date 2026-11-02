@@ -43,6 +43,31 @@ describe("AttachmentTextField", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("문서는 이름·용량이 있는 카드로 보이고 빼기 버튼으로 뺀다", async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+    await user.upload(
+      fileInput(),
+      new File([new Uint8Array(2560)], "견적서.docx"),
+    );
+    expect(screen.getByText("견적서.docx")).toBeInTheDocument();
+    expect(screen.getByText("2.5KB")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "첨부 삭제" }));
+    expect(screen.queryByText("견적서.docx")).not.toBeInTheDocument();
+  });
+
+  it("30MB가 넘는 문서는 담지 않고 문서 용량 안내를 띄운다", async () => {
+    const user = userEvent.setup();
+    render(<Harness />);
+    const big = new File(["x"], "big.pdf");
+    Object.defineProperty(big, "size", { value: 30 * 1024 * 1024 + 1 });
+    await user.upload(fileInput(), big);
+    expect(
+      await screen.findByText("문서 첨부파일 용량 초과"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("big.pdf")).not.toBeInTheDocument();
+  });
+
   it("허용하지 않는 형식은 담지 않고 취소·확인이 있는 안내를 띄운다", async () => {
     const user = userEvent.setup({ applyAccept: false });
     render(<Harness />);
