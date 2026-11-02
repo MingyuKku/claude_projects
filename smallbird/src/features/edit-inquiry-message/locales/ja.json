@@ -1,0 +1,12 @@
+{
+  "edit": "編集",
+  "delete": "削除",
+  "edited": "編集済み",
+  "editLabel": "メッセージを編集",
+  "save": "完了",
+  "cancel": "キャンセル",
+  "deleteTitle": "メッセージを削除しますか?",
+  "deleteDescription": "削除したメッセージは元に戻せません。",
+  "alreadyRead": "既読のメッセージは編集・削除できません。",
+  "failed": "処理できませんでした。もう一度お試しください。"
+}

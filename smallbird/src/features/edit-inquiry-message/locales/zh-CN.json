@@ -1,0 +1,12 @@
+{
+  "edit": "编辑",
+  "delete": "删除",
+  "edited": "已编辑",
+  "editLabel": "编辑消息",
+  "save": "完成",
+  "cancel": "取消",
+  "deleteTitle": "删除这条消息?",
+  "deleteDescription": "删除后的消息无法恢复。",
+  "alreadyRead": "已读消息无法编辑或删除。",
+  "failed": "处理失败,请重试。"
+}

@@ -1,0 +1,12 @@
+{
+  "chargeStatus": {
+    "paid": "Deposited",
+    "withdrawn": "Withdrawn",
+    "pending": "Pending",
+    "canceled": "Unpaid, canceled"
+  },
+  "balance": {
+    "title": "Bigbird Money balance",
+    "unit": "KRW"
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "title": "定期扣款卡",
+  "card": {
+    "default": "默认卡",
+    "add": "添加卡",
+    "registerResult": {
+      "success": "卡已登记。",
+      "failure": "无法登记该卡，请重试。"
+    }
+  },
+  "menu": {
+    "label": "{{issuer}} {{number}} 卡菜单",
+    "delete": "删除卡",
+    "setDefault": "设为支付卡"
+  },
+  "delete": {
+    "title": "删除卡",
+    "description": "确定要删除 {{issuer}} {{number}} 卡吗？删除后需重新登记才能使用。",
+    "confirm": "删除",
+    "completed": "卡已删除。"
+  },
+  "change": {
+    "title": "更换支付卡",
+    "description": "确定要更换支付卡吗？从下一次扣款起，将使用该卡进行订阅付款。",
+    "completed": {
+      "title": "支付卡更换完成",
+      "description": "支付卡已更换。"
+    }
+  },
+  "error": {
+    "defaultCardInUse": "订阅进行中，无法删除默认卡。请先将其他卡设为付款卡后再删除。",
+    "notFound": "该卡已被删除或不存在。"
+  }
+}

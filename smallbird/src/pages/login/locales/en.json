@@ -1,0 +1,26 @@
+{
+  "title": "Log in",
+  "questionLabel": "Contact",
+  "moreLabel": "More",
+  "brand": {
+    "bigbird": {
+      "logoAlt": "Bigbird logo",
+      "tagline": "Experience big-data AI marketing,\nnot a marketer's hunch."
+    },
+    "petplay": {
+      "logoAlt": "Petplay logo",
+      "tagline": "Come play at Petplay,\nfull of pet-friendly information!"
+    }
+  },
+  "startFailed": "Couldn't start login.",
+  "locked": {
+    "title": "Bigbird advertiser review",
+    "message": "The Biglink operations team is reviewing your company information to approve your advertiser membership.<br />We will contact you with the result as soon as the review is complete."
+  },
+  "question": {
+    "title": "Contact",
+    "kakao": "Chat on KakaoTalk",
+    "tel": "Tel. {{phone}}",
+    "hours": "Weekdays: 10:00 ~ 18:30\nBreak: 12:30 ~ 13:30\n(Closed on public holidays)"
+  }
+}

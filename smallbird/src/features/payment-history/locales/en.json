@@ -1,0 +1,40 @@
+{
+  "title": "Subscription payment history",
+  "won": "{{amount}} KRW",
+  "list": {
+    "label": "Subscription payment history"
+  },
+  "column": {
+    "paidAt": "Payment date",
+    "name": "Description",
+    "amount": "Amount",
+    "method": "Payment method",
+    "status": "Status",
+    "receipt": "Receipt"
+  },
+  "action": {
+    "receipt": "Receipt"
+  },
+  "status": {
+    "paid": "Paid",
+    "refunding": "Refund pending",
+    "refunded": "Refunded"
+  },
+  "filter": {
+    "date": {
+      "label": "Payment date",
+      "placeholder": "Select a date."
+    },
+    "method": {
+      "label": "Payment method",
+      "placeholder": "Select a payment method."
+    },
+    "status": {
+      "label": "Status",
+      "placeholder": "Select a status."
+    }
+  },
+  "empty": {
+    "none": "No subscription payments yet."
+  }
+}

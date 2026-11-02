@@ -1,0 +1,26 @@
+{
+  "title": "로그인",
+  "questionLabel": "문의",
+  "moreLabel": "더보기",
+  "brand": {
+    "bigbird": {
+      "logoAlt": "빅버드 로고",
+      "tagline": "마케터의 감이 아닌\n빅데이터 AI 마케팅을 경험하세요."
+    },
+    "petplay": {
+      "logoAlt": "펫플레이 로고",
+      "tagline": "펫프렌들리한 정보가 가득한\n펫플레이에서 놀자!"
+    }
+  },
+  "startFailed": "로그인을 시작하지 못했습니다.",
+  "locked": {
+    "title": "빅버드 광고주 회원 검토중",
+    "message": "빅링크 운영팀에서 광고주 회원 승인을 위해 기업 정보를 검토중이에요.<br />빠르게 검토 후 연락처로 안내드릴게요."
+  },
+  "question": {
+    "title": "문의",
+    "kakao": "카카오톡 상담하기",
+    "tel": "Tel. {{phone}}",
+    "hours": "평일: 10:00 ~ 18:30\noff-time: 12:30 ~ 13:30\n(공휴일 휴무)"
+  }
+}

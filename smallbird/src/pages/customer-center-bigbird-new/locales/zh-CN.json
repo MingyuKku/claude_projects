@@ -1,0 +1,6 @@
+{
+  "title": "新建咨询",
+  "createFailed": "无法创建咨询，请重试。",
+  "messageFailed": "咨询已创建，但内容未发送，请重试。",
+  "requestFailed": "咨询请求失败,请重试。"
+}

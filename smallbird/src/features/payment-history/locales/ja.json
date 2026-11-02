@@ -1,0 +1,40 @@
+{
+  "title": "サブスクリプション決済履歴",
+  "won": "{{amount}}ウォン",
+  "list": {
+    "label": "サブスクリプション決済履歴"
+  },
+  "column": {
+    "paidAt": "決済日",
+    "name": "決済内容",
+    "amount": "決済金額",
+    "method": "決済方法",
+    "status": "決済状態",
+    "receipt": "取引明細書"
+  },
+  "action": {
+    "receipt": "取引明細書"
+  },
+  "status": {
+    "paid": "決済完了",
+    "refunding": "返金処理中",
+    "refunded": "返金完了"
+  },
+  "filter": {
+    "date": {
+      "label": "決済日",
+      "placeholder": "日付を選択してください。"
+    },
+    "method": {
+      "label": "決済方法",
+      "placeholder": "決済方法を選択してください。"
+    },
+    "status": {
+      "label": "決済状態",
+      "placeholder": "決済状態を選択してください。"
+    }
+  },
+  "empty": {
+    "none": "サブスクリプションの決済履歴がありません。"
+  }
+}

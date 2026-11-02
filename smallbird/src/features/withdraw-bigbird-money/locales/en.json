@@ -1,0 +1,60 @@
+{
+  "title": "Withdraw Bigbird Money",
+  "won": "{{amount}} KRW",
+  "notice": {
+    "fullOnly": "Only full withdrawals are available.",
+    "corporate": "For corporate businesses, the account holder must match the company name on the business registration.",
+    "personal": "For sole proprietors, the account holder must match the representative's name.",
+    "processing": "Requests may take 1–2 business days to process.",
+    "reflected": "Your balance updates as soon as the withdrawal completes."
+  },
+  "field": {
+    "bank": {
+      "label": "Bank",
+      "placeholder": "Select a bank."
+    },
+    "accountNumber": {
+      "label": "Account number",
+      "placeholder": "Enter the account number."
+    },
+    "accountHolder": {
+      "label": "Account holder",
+      "placeholder": "Enter the account holder."
+    },
+    "bankBook": {
+      "label": "Bankbook copy",
+      "placeholder": "Upload a bankbook copy.",
+      "upload": "Upload",
+      "uploadFor": "Upload {{label}}"
+    }
+  },
+  "next": "Next",
+  "confirm": {
+    "amount": "Amount",
+    "bank": "Bank",
+    "accountNumber": "Account number",
+    "accountHolder": "Account holder",
+    "method": "Method",
+    "methodValue": "To the entered account",
+    "bankBook": "Bankbook copy",
+    "bankBookDownload": "Download {{name}}",
+    "expected": "Balance after withdrawal",
+    "notice": "Your request will be sent for the entered account.",
+    "submit": "Withdraw full amount"
+  },
+  "error": {
+    "invalidBank": "Select the bank again.",
+    "invalidAccountNumber": "Enter the account number, digits only.",
+    "invalidAccountHolder": "Enter the account holder.",
+    "bankBookRequired": "Attach a bankbook copy.",
+    "fileExtension": "Only JPG, PNG and PDF files are allowed.",
+    "fileSize": "Max file size is 10MB.",
+    "bankList": "Couldn't load the bank list."
+  },
+  "toast": {
+    "zeroBalance": "No Bigbird Money to withdraw.",
+    "pending": "A withdrawal is already in progress. Try again after it completes.",
+    "balanceChanged": "Your balance has changed. Check the amount again.",
+    "failed": "Withdrawal request failed. Please try again later."
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "chargeStatus": {
+    "paid": "入金完了",
+    "withdrawn": "出金完了",
+    "pending": "待機中",
+    "canceled": "未入金キャンセル"
+  },
+  "balance": {
+    "title": "保有ビッグバードマネー",
+    "unit": "ウォン"
+  }
+}

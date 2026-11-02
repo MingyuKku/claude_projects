@@ -1,0 +1,17 @@
+{
+  "query": {
+    "placeholder": "例：护肤新品推广，20多岁女性，主打Instagram"
+  },
+  "platform": {
+    "label": "平台",
+    "instagram": "Instagram",
+    "naver": "Naver",
+    "tiktok": "TikTok",
+    "facebook": "Facebook"
+  },
+  "submit": "查找网红",
+  "expand": {
+    "open": "放大",
+    "close": "缩小"
+  }
+}

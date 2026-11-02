@@ -1,0 +1,60 @@
+{
+  "title": "빅버드 머니 출금",
+  "won": "{{amount}}원",
+  "notice": {
+    "fullOnly": "전액 출금만 가능합니다.",
+    "corporate": "법인 사업자는 사업자등록증 상호명과 예금주 명이 동일해야합니다.",
+    "personal": "개인 사업자는 대표자명과 예금주 명이 동일해야합니다.",
+    "processing": "출금 요청 후 영업일 기준 1~2일 내 처리될 수 있습니다.",
+    "reflected": "출금 완료 후 빅버드머니 잔액이 즉시 반영됩니다."
+  },
+  "field": {
+    "bank": {
+      "label": "출금 은행",
+      "placeholder": "은행을 선택하세요."
+    },
+    "accountNumber": {
+      "label": "출금 계좌번호",
+      "placeholder": "계좌번호를 입력하세요."
+    },
+    "accountHolder": {
+      "label": "출금 예금주 명",
+      "placeholder": "예금주 명을 입력하세요."
+    },
+    "bankBook": {
+      "label": "통장 사본",
+      "placeholder": "통장 사본을 업로드 해주세요.",
+      "upload": "업로드",
+      "uploadFor": "{{label}} 업로드"
+    }
+  },
+  "next": "다음",
+  "confirm": {
+    "amount": "출금 금액",
+    "bank": "출금 은행",
+    "accountNumber": "출금 계좌번호",
+    "accountHolder": "예금주",
+    "method": "처리 방식",
+    "methodValue": "입력된 계좌로 출금",
+    "bankBook": "통장 사본",
+    "bankBookDownload": "{{name}} 내려받기",
+    "expected": "출금 후 예상 잔액",
+    "notice": "출금 요청 시, 입력된 계좌로 출금 요청이 접수됩니다.",
+    "submit": "전액 출금 요청하기"
+  },
+  "error": {
+    "invalidBank": "출금 은행을 다시 선택해 주세요.",
+    "invalidAccountNumber": "계좌번호를 숫자만 정확히 입력해 주세요.",
+    "invalidAccountHolder": "예금주 명을 입력해 주세요.",
+    "bankBookRequired": "통장 사본을 첨부해 주세요.",
+    "fileExtension": "JPG, PNG, PDF 파일만 업로드할 수 있습니다.",
+    "fileSize": "최대 10MB까지 업로드할 수 있습니다.",
+    "bankList": "은행 목록을 불러오지 못했습니다."
+  },
+  "toast": {
+    "zeroBalance": "출금할 빅버드 머니가 없습니다.",
+    "pending": "처리 중인 출금 요청이 있습니다. 처리가 끝난 뒤 다시 요청해 주세요.",
+    "balanceChanged": "보유 빅버드 머니가 바뀌었습니다. 출금 금액을 다시 확인해 주세요.",
+    "failed": "출금 요청에 실패했습니다. 잠시 후 다시 시도해 주세요."
+  }
+}

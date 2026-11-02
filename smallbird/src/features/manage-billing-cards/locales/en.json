@@ -1,0 +1,34 @@
+{
+  "title": "Recurring payment cards",
+  "card": {
+    "default": "Default card",
+    "add": "Add card",
+    "registerResult": {
+      "success": "Card registered.",
+      "failure": "Couldn't register the card. Please try again."
+    }
+  },
+  "menu": {
+    "label": "{{issuer}} {{number}} card menu",
+    "delete": "Delete card",
+    "setDefault": "Set as payment card"
+  },
+  "delete": {
+    "title": "Delete card",
+    "description": "Delete {{issuer}} {{number}}? You'll need to register it again to use it.",
+    "confirm": "Delete",
+    "completed": "The card has been deleted."
+  },
+  "change": {
+    "title": "Change payment card",
+    "description": "Change your payment card? Starting with the next payment, subscription payments will be charged to this card.",
+    "completed": {
+      "title": "Payment card changed",
+      "description": "Your payment card has been changed."
+    }
+  },
+  "error": {
+    "defaultCardInUse": "The default card can't be deleted while a subscription is active. Set another card as the default first.",
+    "notFound": "This card was already deleted or doesn't exist."
+  }
+}

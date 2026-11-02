@@ -1,0 +1,26 @@
+{
+  "title": "登录",
+  "questionLabel": "咨询",
+  "moreLabel": "更多",
+  "brand": {
+    "bigbird": {
+      "logoAlt": "Bigbird标志",
+      "tagline": "告别营销人员的直觉，\n体验大数据 AI 营销。"
+    },
+    "petplay": {
+      "logoAlt": "Petplay标志",
+      "tagline": "来 Petplay 玩吧，\n这里有满满的宠物友好信息！"
+    }
+  },
+  "startFailed": "无法开始登录。",
+  "locked": {
+    "title": "Bigbird广告主会员审核中",
+    "message": "Biglink运营团队正在审核您的企业信息，以批准广告主会员资格。<br />审核完成后将尽快通过联系方式通知您。"
+  },
+  "question": {
+    "title": "咨询",
+    "kakao": "通过 KakaoTalk 咨询",
+    "tel": "电话 {{phone}}",
+    "hours": "工作日：10:00 ~ 18:30\n休息时间：12:30 ~ 13:30\n（公休日休息）"
+  }
+}

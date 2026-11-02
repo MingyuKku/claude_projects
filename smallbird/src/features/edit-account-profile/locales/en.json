@@ -1,0 +1,64 @@
+{
+  "info": {
+    "title": "Basic info",
+    "id": "ID",
+    "password": "Password",
+    "name": "Contact name",
+    "phone": "Phone",
+    "email": "Email",
+    "joinedAt": "Joined"
+  },
+  "sub": {
+    "id": "ID",
+    "name": "Contact name",
+    "email": "Email address",
+    "joinedAt": "Created"
+  },
+  "form": {
+    "title": "Edit info",
+    "profileImage": {
+      "label": "Profile image",
+      "edit": "Change profile image",
+      "alt": "Profile image",
+      "error": {
+        "extension": "Only JPG and PNG files are allowed.",
+        "size": "Max file size is 10MB."
+      }
+    },
+    "password": {
+      "label": "Change password",
+      "error": {
+        "format": "8–20 characters with letters, numbers and symbols.",
+        "containsId": "Must not contain your ID",
+        "repeated": "No repeated or sequential characters"
+      }
+    },
+    "passwordCheck": {
+      "label": "Confirm password",
+      "mismatch": "Passwords don't match."
+    },
+    "phone": {
+      "label": "Phone",
+      "verify": "Verify",
+      "verification": {
+        "success": "Identity verified.",
+        "failed": "Verification failed.",
+        "duplicate": "Already registered user.",
+        "popupBlocked": "Allow pop-ups in your browser and try again."
+      }
+    },
+    "email": {
+      "label": "Email",
+      "error": {
+        "format": "Enter a valid email address."
+      }
+    },
+    "withdraw": "Withdraw"
+  },
+  "toast": {
+    "save": {
+      "tooManyRequests": "Try again in 5 minutes.",
+      "personalInfo": "Passwords containing personal info aren't allowed."
+    }
+  }
+}

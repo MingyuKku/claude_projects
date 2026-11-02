@@ -1,0 +1,23 @@
+{
+  "title": "关联社交账号",
+  "tab": {
+    "signup": "注册",
+    "link": "关联账号"
+  },
+  "signup": {
+    "heading": "欢迎。",
+    "message": "愿意成为 Bigbird 的合作伙伴吗？<br />注册后即可使用社交账号<br />登录。",
+    "submit": "注册"
+  },
+  "link": {
+    "heading": "Bigbird 企业会员登录",
+    "message": "如果您已是 Bigbird 合作伙伴，登录时<br />社交账号将自动关联。"
+  },
+  "error": {
+    "credentialRequired": "输入账号和密码",
+    "credentialMismatch": "您输入的账号和密码与登记信息不一致",
+    "missingSnsData": "没有社交账号关联信息",
+    "linkFailed": "关联失败，请联系管理员",
+    "loginError": "登录时发生错误"
+  }
+}

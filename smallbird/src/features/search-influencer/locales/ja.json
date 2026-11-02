@@ -1,0 +1,17 @@
+{
+  "query": {
+    "placeholder": "例）スキンケア新商品PR、20代女性、Instagram中心"
+  },
+  "platform": {
+    "label": "媒体",
+    "instagram": "Instagram",
+    "naver": "ネイバー",
+    "tiktok": "TikTok",
+    "facebook": "Facebook"
+  },
+  "submit": "インフルエンサーを探す",
+  "expand": {
+    "open": "拡大",
+    "close": "縮小"
+  }
+}

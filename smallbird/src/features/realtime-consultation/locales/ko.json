@@ -1,0 +1,47 @@
+{
+  "composer": "실시간 상담 메시지",
+  "composerPlaceholder": "문의 내용을 입력하세요. (최대 3,000자)",
+  "send": "전송",
+  "lock": {
+    "title": "이미 상담이 진행 중입니다.",
+    "description": "현재 다른 접속 화면에서 빅버드 운영팀과 상담을 진행 중입니다. 기존 상담이 종료된 후 이용해 주세요.",
+    "cancel": "취소",
+    "confirm": "확인"
+  },
+  "requestFailed": "상담을 요청하지 못했습니다. 잠시 후 다시 시도해 주세요.",
+  "sendFailed": "메시지를 보내지 못했습니다. 다시 시도해 주세요.",
+  "endFailed": "상담을 종료하지 못했습니다. 다시 시도해 주세요.",
+  "retryFailed": "상담을 다시 요청하지 못했습니다.",
+  "cancelFailed": "요청을 취소하지 못했습니다. 다시 시도해 주세요.",
+  "closed": "이미 종료된 상담입니다.",
+  "closing": "상담을 종료하는 중입니다.",
+  "notConnected": "상담원이 연결된 뒤에 보낼 수 있습니다.",
+  "lockLost": "다른 계정이 이 상담을 처리 중입니다.",
+  "alreadyConnected": "이미 상담원이 연결되었습니다.",
+  "failed": "상담 정보를 확인하지 못했습니다.",
+  "lockCheckFailed": "상담 상태를 확인하지 못했습니다. 잠시 후 자동으로 다시 시도합니다.",
+  "idle": {
+    "advertiserWarning": {
+      "title": "실시간 상담 자동종료",
+      "description": "10분 내에 신규 문의가 없을 경우, 실시간 상담이 자동종료됩니다"
+    },
+    "advertiserClosed": {
+      "title": "실시간 상담 자동종료",
+      "description": "추가 문의가 없으셔서 실시간 상담이 자동종료되었습니다"
+    },
+    "operatorDelay": {
+      "title": "실시간 상담 연결 중",
+      "description": "상담원이 다른 상담을 응대하고 있어 답변이 지연되고 있었습니다. 잠시만 기다려 주세요"
+    },
+    "operatorUnavailable": {
+      "title": "실시간 상담 연결 지연",
+      "description": "현재 상담원의 실시간 응대가 어려운 상황입니다. 문의를 남겨주시면 빠르게 답변드리도록 하겠습니다."
+    },
+    "cancel": "취소",
+    "confirm": "확인"
+  },
+  "hours": {
+    "title": "실시간 상담하기",
+    "description": "실시간 상담하기는 평일 오전 10시부터 오후 6시까지 이용하실 수 있습니다. 운영시간 외에는 일반 문의를 이용해 주세요"
+  }
+}

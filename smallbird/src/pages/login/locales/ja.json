@@ -1,0 +1,26 @@
+{
+  "title": "ログイン",
+  "questionLabel": "お問い合わせ",
+  "moreLabel": "その他",
+  "brand": {
+    "bigbird": {
+      "logoAlt": "Bigbirdロゴ",
+      "tagline": "マーケターの勘ではなく、\nビッグデータAIマーケティングを体験してください。"
+    },
+    "petplay": {
+      "logoAlt": "Petplayロゴ",
+      "tagline": "ペットフレンドリーな情報がいっぱいの\nPetplayで遊ぼう！"
+    }
+  },
+  "startFailed": "ログインを開始できませんでした。",
+  "locked": {
+    "title": "Bigbird広告主会員 審査中",
+    "message": "Biglink運営チームが、広告主会員の承認のため企業情報を審査中です。<br />審査後、すみやかにご連絡先へご案内いたします。"
+  },
+  "question": {
+    "title": "お問い合わせ",
+    "kakao": "KakaoTalkで相談する",
+    "tel": "電話 {{phone}}",
+    "hours": "平日：10:00 ~ 18:30\n休憩時間：12:30 ~ 13:30\n（祝日休業）"
+  }
+}

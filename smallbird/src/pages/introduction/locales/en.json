@@ -1,0 +1,213 @@
+{
+  "seo": {
+    "title": "Bigbird — Influencer marketing, now more accurate with data",
+    "description": "Bigbird matches influencers to your product and campaign goals, covering everything from content execution to monitoring and performance analysis.",
+    "siteName": "Bigbird",
+    "ogImageAlt": "From matching to collaboration, work with influencers easily"
+  },
+  "header": {
+    "guide": "Guide",
+    "start": "Start"
+  },
+  "hero": {
+    "title": {
+      "line1": "Influencer marketing,",
+      "line2": "start smarter",
+      "line3": "with data"
+    },
+    "brochure": "Request brochure",
+    "start": "Get started",
+    "downloadName": "빅버드 서비스 소개서.pdf"
+  },
+  "section1": {
+    "title": "The advertiser-only marketing platform\nconnecting brands and influencers",
+    "description": "Bigbird matches influencers to your product and campaign goals, covering everything from content execution to monitoring and performance analysis.",
+    "cards": {
+      "advertiser": {
+        "title": "Advertiser platform",
+        "description": "Manage campaign requests, influencer selection,\ncampaign status and performance analysis."
+      },
+      "influencer": {
+        "title": "Influencer platform",
+        "description": "Influencers join campaigns\nand create and register content."
+      },
+      "buyer": {
+        "title": "Buyer platform",
+        "description": "Group buying, live commerce, payment,\nreturns and exchanges, and customer support."
+      }
+    }
+  },
+  "section2": {
+    "awardsAlt": "2015 SMBA Commissioner's Award, KIPO patent registration",
+    "title": "Leading brands and institutions chose Bigbird",
+    "description": "Backed by major brand collaborations and results, we deliver trusted influencer marketing.",
+    "partners": {
+      "samsung": "Samsung Electronics Mobile Division influencer marketing\n'삼성피켓' co-business selected",
+      "aws": "2020 Startup Leap Package\nAmazon final selection",
+      "google": "2020 Startup Leap Package\nGoogle final selection"
+    }
+  },
+  "section3": {
+    "title": "Many brands have worked with Bigbird",
+    "description": "Bigbird has run influencer marketing for brand campaigns, group buying, live commerce and consumer data analysis, tailored to each advertising goal.",
+    "brandsLabel": "Brands that worked with Bigbird"
+  },
+  "section4": {
+    "title": "Manage everything influencer marketing needs\n<accent>in one place</accent>",
+    "description": "Find influencers that fit your campaign, and easily manage every step\nfrom SNS channel execution to performance review.",
+    "cards": {
+      "authentic": {
+        "label": "Authentic influencer matching",
+        "title": "Find authentic influencers,\nnot just follower counts",
+        "description": "Beyond follower counts, we analyze content engagement and influence to find influencers that fit your product"
+      },
+      "target": {
+        "label": "Target influencer analysis",
+        "title": "Find more finely segmented\ntargets for your product",
+        "description": "Analyze influencers by primary and secondary categories to find target influencer groups that suit your product"
+      },
+      "evaluation": {
+        "label": "Influencer evaluation by campaign type",
+        "title": "Evaluate influencers\nfor your campaign goal",
+        "description": "Evaluate and select suitable influencers by campaign goal, such as brand awareness, group buying and live commerce"
+      },
+      "channel": {
+        "label": "Campaign execution by SNS channel",
+        "title": "Run campaigns across\nvarious SNS channels",
+        "description": "Run marketing on channels that fit your campaign goal, including Instagram, Naver Blog, Facebook, YouTube and TikTok"
+      },
+      "global": {
+        "label": "Global influencer platform",
+        "title": "Beyond Korea,\nconnect with global influencers",
+        "description": "Based on language analysis by country and influencer data, expand into overseas influencer marketing"
+      }
+    }
+  },
+  "section5": {
+    "title": "Choose the <accent>campaign product</accent> for your brand goals",
+    "description": "Choose the product that fits your campaign goal",
+    "columns": {
+      "brand": {
+        "badge": "브랜드형",
+        "title": "Raise brand awareness and\ncreate natural buzz",
+        "description": "We match influencers to your product\nto run brand content and viral issue campaigns",
+        "items": {
+          "basic": {
+            "title": "베이직형",
+            "description": "Run diffusion-type viral campaigns with many influencers at a reasonable cost"
+          },
+          "premium": {
+            "title": "프리미엄형",
+            "description": "Run premium branding campaigns with authentic influencers who cause little ad fatigue"
+          }
+        }
+      },
+      "groupBuy": {
+        "badge": "공구형",
+        "title": "Use influencer fandom to\nlead to purchases",
+        "description": "Run group buying, open market and live commerce with influencers whose followers are likely to buy",
+        "items": {
+          "openMarket": {
+            "title": "오픈마켓형",
+            "description": "Run group buying with many influencers, and connect payment and sales management through the buyer platform"
+          },
+          "performance": {
+            "title": "퍼포먼스형",
+            "description": "Run purchase-focused group-buying campaigns with influencers who have loyal followers likely to buy"
+          },
+          "liveCommerce": {
+            "title": "라이브커머스형",
+            "description": "Through influencer live broadcasts, connect product reviews, real-time engagement and purchase conversion"
+          }
+        }
+      }
+    }
+  },
+  "section6": {
+    "title": "See how to use Bigbird through <accent>real campaign cases</accent>",
+    "description": "See real campaign cases for each product type",
+    "groups": {
+      "brand": {
+        "heading": "브랜드형 campaign cases",
+        "cards": {
+          "request": {
+            "title": "Advertiser campaign request",
+            "description": "Galaxy Tab S6 Lite new product launch"
+          },
+          "opinion": {
+            "title": "Big-data opinion analysis by product",
+            "description": "Big-data analysis of consumer opinion on previous Galaxy Tab models and the new product"
+          },
+          "insight": {
+            "title": "Key consumer insights",
+            "description": "Analysis of the main Galaxy Tab user base and the consumer types most likely to buy"
+          },
+          "matching": {
+            "title": "Target influencer matching",
+            "description": "Matching target influencers whose followers include the main users most likely to buy"
+          }
+        }
+      },
+      "groupBuy": {
+        "heading": "공구형 campaign cases",
+        "cards": {
+          "collect": {
+            "title": "Collecting target influencers",
+            "description": "Collecting big data on group-buying hashtags and keywords by SNS channel"
+          },
+          "select": {
+            "title": "Influencer selection by advertiser",
+            "description": "Matching the best AI-based influencers for the advertiser's product type"
+          },
+          "explore": {
+            "title": "Finding loyal buyers",
+            "description": "Marketing through influencers with a devoted fan base drives high sales efficiency"
+          },
+          "purchase": {
+            "title": "Running group buying",
+            "description": "Running influencer live commerce and influencer group buying"
+          }
+        }
+      }
+    }
+  },
+  "banner": {
+    "title": "Looking for influencers that fit your brand?",
+    "description": "We recommend influencers for your brand goals and product"
+  },
+  "contact": {
+    "title": "Adoption inquiry",
+    "fields": {
+      "name": {
+        "label": "Name",
+        "placeholder": "Enter your name."
+      },
+      "company": {
+        "label": "Company",
+        "placeholder": "Enter your company name."
+      },
+      "email": {
+        "label": "Email",
+        "placeholder": "Enter your email."
+      },
+      "phone": {
+        "label": "Phone",
+        "placeholder": "Numbers only, no hyphens",
+        "title": "Enter 9–11 digits, no hyphens."
+      },
+      "message": {
+        "label": "Message",
+        "placeholder": "Enter your inquiry."
+      }
+    },
+    "agree": "[Required] I agree to provide the minimum personal information needed to respond to my inquiry.",
+    "submit": "Submit",
+    "unavailable": "Inquiry sending is not set up. Contact the administrator."
+  },
+  "footer": {
+    "company": {
+      "line1": "Biglink AI Co., Ltd. | CEO: KIM SI YOUNG | Business Registration No.: 721-86-03336 | Mail-Order Business Report No.: 2025-서울강남-01564",
+      "line2": "Customer Center: info@biglinkai.com / 1661-6213 | Address: 2012, 310 Gangnam-daero, Gangnam-gu, Seoul (Yeoksam-dong, Union Center Building)"
+    }
+  }
+}

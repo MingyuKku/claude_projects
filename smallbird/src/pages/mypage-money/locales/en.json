@@ -1,0 +1,26 @@
+{
+  "title": "Bigbird Money",
+  "tabs": {
+    "charge": "Charge/Withdraw",
+    "chargeShort": "Charges",
+    "usage": "Usage"
+  },
+  "views": {
+    "balance": "Charge",
+    "history": "Details"
+  },
+  "charge": {
+    "action": "Charge"
+  },
+  "requested": {
+    "title": "Charge request received",
+    "description": "Your charge request has been received. You can find the virtual account and deposit deadline in the transaction details of your charge history."
+  },
+  "withdraw": {
+    "action": "Withdraw"
+  },
+  "withdrawn": {
+    "title": "Withdrawal request received",
+    "description": "Your withdrawal request was received on {{requestedAt}}.\nYou can find the details on your statement."
+  }
+}

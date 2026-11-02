@@ -1,0 +1,9 @@
+{
+  "loading": "Loading the account list.",
+  "loadFailed": "Couldn't load accounts.",
+  "empty": "No accounts to switch to.",
+  "listLabel": "Accounts to switch to",
+  "switch": "Switch",
+  "switchLabel": "Switch to account {{identifier}}",
+  "switchFailed": "Couldn't switch accounts. Try again."
+}

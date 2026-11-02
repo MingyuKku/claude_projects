@@ -1,0 +1,26 @@
+{
+  "title": "ビッグバードマネー",
+  "tabs": {
+    "charge": "チャージ/出金履歴",
+    "chargeShort": "チャージ履歴",
+    "usage": "利用履歴"
+  },
+  "views": {
+    "balance": "チャージ",
+    "history": "履歴詳細"
+  },
+  "charge": {
+    "action": "チャージする"
+  },
+  "requested": {
+    "title": "チャージリクエスト完了",
+    "description": "チャージリクエストを受け付けました。入金先の仮想口座と入金期限は、チャージ履歴の取引詳細でご確認いただけます。"
+  },
+  "withdraw": {
+    "action": "出金"
+  },
+  "withdrawn": {
+    "title": "出金リクエスト完了",
+    "description": "{{requestedAt}}に出金リクエストを受け付けました。\n出金履歴は取引明細書でご確認いただけます。"
+  }
+}

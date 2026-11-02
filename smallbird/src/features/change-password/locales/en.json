@@ -1,0 +1,26 @@
+{
+  "hint": "8–20 characters with letters, numbers and symbols.",
+  "placeholder": "8+ characters, letters and numbers",
+  "mismatch": "Doesn't match. Re-enter.",
+  "checkLabel": "Confirm password",
+  "checkPlaceholder": "Confirm password",
+  "submit": "Change",
+  "passwordError": {
+    "format": "8–20 characters with letters, numbers and symbols.",
+    "containsId": "Must not contain your ID",
+    "repeated": "No repeated or sequential characters"
+  },
+  "submitError": {
+    "submitRequired": "Enter a password",
+    "containsId": "Passwords that match or contain your ID are not allowed",
+    "containsPersonalInfo": "Passwords containing personal info are not allowed",
+    "timeOut": "Change failed (change your password within 5 minutes)",
+    "fallback": "Password change failed"
+  },
+  "done": {
+    "title": "Password changed",
+    "message": "Your password has been changed.<br />Log in with your new password.",
+    "notice": "※ For security, accounts logged in on<br />other devices may be logged out.",
+    "login": "Go to login"
+  }
+}

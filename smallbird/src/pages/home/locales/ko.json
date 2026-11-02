@@ -1,0 +1,22 @@
+{
+  "title": "홈",
+  "hero": {
+    "title": "제품 정보를 입력하면\nAI가 딱 맞는 인플루언서를 찾아드려요",
+    "subtitle": "AI가 브랜드와 목표에 맞는 인플루언서를 빠르게 추천해 드립니다"
+  },
+  "card": {
+    "comingSoon": "준비 중",
+    "recommend": {
+      "title": "인플루언서 추천",
+      "description": "AI 데이터 기반으로 최적의 인플루언서를 추천드려요."
+    },
+    "campaign": {
+      "title": "캠페인 등록/운영",
+      "description": "캠페인 모집부터 관리 및 정산까지 원스톱으로 해결해요."
+    },
+    "pricing": {
+      "title": "요금 안내",
+      "description": "캠페인 상품 및 구독 요금제를 한눈에 비교하고 선택하세요."
+    }
+  }
+}

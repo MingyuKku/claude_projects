@@ -1,0 +1,17 @@
+{
+  "query": {
+    "placeholder": "ex) 스킨케어 신제품 홍보, 20대 여성 타깃, 인스타 중심"
+  },
+  "platform": {
+    "label": "플랫폼",
+    "instagram": "인스타그램",
+    "naver": "네이버",
+    "tiktok": "틱톡",
+    "facebook": "페이스북"
+  },
+  "submit": "인플루언서 탐색",
+  "expand": {
+    "open": "펼치기",
+    "close": "축소"
+  }
+}

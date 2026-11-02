@@ -1,0 +1,167 @@
+#!/bin/sh
+# 저장소 안의 파일을 건드린 직후 실행된다.
+#
+# 1) 기계적으로 고칠 수 있는 것(import 순서, 포맷)은 조용히 고친다.
+# 2) 고칠 수 없는 것(FSD 경계 위반 등 ESLint error)은 additionalContext 로 되먹인다.
+#
+# 검사 대상 제외는 .prettierignore 와 eslint.config.js 의 ignores 가 정한다. CI(format:check, lint)와 같은 범위다.
+# Bash 도 매처에 포함한다: sed·perl·python 으로 한 편집이 훅을 우회하지 못하게.
+# Bash 는 파일 경로를 안 주므로 "직전 실행 이후 바뀐 파일"을 스탬프로 찾는다.
+# eslint/prettier 가 설치되기 전에는 아무것도 하지 않는다.
+
+STAMP=".claude/.last-format-check"
+ESLINT="node_modules/.bin/eslint"
+PRETTIER="node_modules/.bin/prettier"
+
+[ -x "$ESLINT" ] && [ -x "$PRETTIER" ] || exit 0
+if ! command -v jq >/dev/null 2>&1; then
+  printf '%s\n' '{"hookSpecificOutput":{"hookEventName":"PostToolUse","additionalContext":"jq 가 설치되어 있지 않아 컨벤션 자동 교정 훅이 동작하지 않습니다. jq 를 설치하세요."}}'
+  exit 0
+fi
+
+payload=$(cat)
+target=$(printf '%s' "$payload" |
+  jq -r '.tool_response.filePath // .tool_input.file_path // empty')
+
+DELETED=".claude/.last-deleted"
+had_stamp=0
+[ -f "$STAMP" ] && had_stamp=1
+new_deleted=""
+
+if [ -n "$target" ]; then
+  files="$target"
+else
+  # 커밋 이후 바뀐 파일과 새 파일 중 직전 실행 이후 수정된 것. 스탬프가 없으면(첫 실행) 전부 본다.
+  files=$( { git -c core.quotePath=false diff --name-only HEAD 2>/dev/null
+             git -c core.quotePath=false ls-files --others --exclude-standard 2>/dev/null; } |
+    sort -u | while IFS= read -r f; do
+      if [ ! -f "$STAMP" ] || [ "$f" -nt "$STAMP" ]; then printf '%s\n' "$f"; fi
+    done)
+  # 지운 파일은 수정 시각으로 비교할 수 없어, 직전 실행의 삭제 목록에 없던 것을 새로 지운 파일로 본다.
+  deleted=$(git -c core.quotePath=false diff --name-only --diff-filter=D HEAD 2>/dev/null)
+  if [ -f "$DELETED" ]; then
+    new_deleted=$(printf '%s\n' "$deleted" | grep -vxF -f "$DELETED" | sed '/^$/d')
+  fi
+  mkdir -p "$(dirname "$DELETED")" && printf '%s\n' "$deleted" > "$DELETED"
+fi
+
+mkdir -p "$(dirname "$STAMP")" && touch "$STAMP"
+
+# 저장소 밖 파일(메모·임시 파일)은 건드리지 않는다. 경로는 줄 단위로 다뤄 공백이 있어도 쪼개지지 않는다.
+in_repo() {
+  case "$1" in
+    "$PWD"/*) return 0 ;;
+    /*) return 1 ;;
+    *) return 0 ;;
+  esac
+}
+
+is_lintable() {
+  case "$1" in
+    *.ts | *.tsx | *.js | *.mjs | *.cjs) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+
+# 검증 입력(scripts/verify.sh 의 WATCH)을 바꿨으면 Stop 훅이 검증하도록 표시를 남긴다.
+# Bash 경로에서 스탬프가 없던 첫 실행(새 클론, 스탬프 삭제 직후)은 누가 바꿨는지 알 수 없어 표시하지 않는다.
+# 스탬프 이후 사용자가 에디터에서 고친 파일도 Claude 변경으로 보이는 것은 알려진 한계다(검증이 더 도는 쪽이라 허용).
+if [ -n "$target" ]; then
+  attributed="$target"
+elif [ "$had_stamp" = 1 ]; then
+  attributed=$(printf '%s\n%s\n' "$files" "$new_deleted" | sed '/^$/d')
+else
+  attributed=""
+fi
+if [ -n "$attributed" ] && [ -f scripts/verify.sh ]; then
+  watch=$(sh scripts/verify.sh --watch-list)
+  touched=$(printf '%s\n' "$attributed" | while IFS= read -r f; do
+    in_repo "$f" || continue
+    rel=${f#"$PWD"/}
+    for w in $watch; do
+      # $( ) 안의 case 는 패턴 앞 ( 가 있어야 괄호 짝이 맞는다.
+      case "$rel" in ("$w" | "$w"/*) echo x; break ;; esac
+    done
+  done)
+  [ -n "$touched" ] && touch .claude/.unverified-edits
+fi
+
+checked=$(printf '%s\n' "$files" | while IFS= read -r f; do
+  if in_repo "$f" && [ -f "$f" ]; then printf '%s\n' "$f"; fi
+done)
+
+[ -n "$checked" ] || exit 0
+
+linted=$(printf '%s\n' "$checked" | while IFS= read -r f; do
+  if is_lintable "$f"; then printf '%s\n' "$f"; fi
+done)
+
+run_on() { list="$1"; shift; printf '%s\n' "$list" | tr '\n' '\0' | xargs -0 "$@"; }
+
+# --no-warn-ignored: ignores 대상 파일을 넘겨도 경고를 만들지 않는다. Prettier 는 모르는 형식을 건너뛴다.
+# ESLint 는 한 번만 실행한다. --fix 와 함께 쓴 --format json 은 교정 후 남은 문제를 보고한다.
+# Prettier 는 그 뒤에 돌린다. ESLint 교정(import 정렬, 빈 줄)이 만든 코드도 포맷 검사를 통과하게 하기 위해서다.
+# Prettier 와 충돌하는 규칙은 eslint-config-prettier 가 꺼서 보고 내용은 그대로이고, 줄 번호만 조금 어긋날 수 있다.
+report="[]"
+eslint_rc=0
+if [ -n "$linted" ]; then
+  report=$(run_on "$linted" "$ESLINT" --no-warn-ignored --fix --format json 2>/dev/null)
+  eslint_rc=$?
+fi
+run_on "$checked" "$PRETTIER" --write --ignore-unknown >/dev/null 2>&1
+touch "$STAMP"
+
+[ -n "$linted" ] || exit 0
+
+# ESLint 가 lint 오류 없이 실패(설정·실행 오류, 종료 코드 2 이상)하면 조용히 넘기지 않고 알린다.
+eslint_failure=""
+if ! printf '%s' "$report" | jq -e . >/dev/null 2>&1 || [ "$eslint_rc" -gt 1 ]; then
+  eslint_failure="ESLint 가 정상 실행되지 않았습니다(종료 코드 $eslint_rc). eslint.config.js 와 의존성을 확인하세요. 검사 결과를 믿을 수 없습니다."
+  report="[]"
+fi
+
+remaining=$(printf '%s' "$report" |
+  jq -r '.[] | .filePath as $p | .messages[]? | select(.severity == 2)
+         | "  \($p | split("/") | last):\(.line):\(.column)  \(.message)  [\(.ruleId)]"' |
+  head -8)
+
+# 어떤 규칙이 실제로 걸리는지 남긴다 (gitignore). 안 걸리는 규칙은 지우고,
+# 매번 걸리는 규칙은 훅이 대신 고칠 후보다.
+printf '%s' "$report" |
+  jq -r --arg t "$(date +%Y-%m-%dT%H:%M:%S)" \
+    '.[] | .filePath as $p | .messages[]?
+     | [$t, (if .severity == 2 then "error" else "warn" end), (.ruleId // "none"),
+        ($p | split("/") | last)] | @tsv' \
+    >> .claude/hook-log.tsv 2>/dev/null
+
+# 린트·타입 에러를 억제 주석으로 덮는 우회를 되먹인다. 규칙을 끄지 말고 코드를 고쳐야 한다.
+# (@ts-expect-error 는 사유를 적는 정당한 용법이 있어 제외한다.)
+# 추적 중인 파일은 이번 변경(diff)에서 추가된 줄만, 새 파일은 전체를 본다. 기존 주석으로 매번 경고하지 않기 위해서다.
+SUPPRESS_RE='eslint-disable|@ts-ignore|@ts-nocheck'
+suppressed=$(printf '%s\n' "$linted" | while IFS= read -r f; do
+  if git ls-files --error-unmatch -- "$f" >/dev/null 2>&1; then
+    git diff -U0 HEAD -- "$f" 2>/dev/null | grep -E "^\+[^+].*($SUPPRESS_RE)" | head -3 | sed "s|^+|  $f: |"
+  else
+    grep -nE "$SUPPRESS_RE" "$f" 2>/dev/null | head -3 | sed "s|^|  $f:|"
+  fi
+done | head -5)
+
+msg=""
+[ -n "$eslint_failure" ] && msg="$eslint_failure"
+[ -n "$remaining" ] && msg="${msg:+$msg
+
+}자동 교정으로 해결되지 않은 ESLint 오류가 남았습니다. AGENTS.md 와 .claude/rules 의 규약에 맞게 고치세요:
+$remaining"
+if [ -n "$suppressed" ]; then
+  [ -n "$msg" ] && msg="$msg
+
+"
+  msg="${msg}린트/타입 억제 주석이 발견되었습니다. 규칙을 끄거나 억제하지 말고 근본 원인을 고치세요. 불가피하면 사유를 사용자에게 먼저 설명하세요:
+$suppressed"
+fi
+
+if [ -n "$msg" ]; then
+  jq -n --arg m "$msg" '{
+    hookSpecificOutput: { hookEventName: "PostToolUse", additionalContext: $m }
+  }'
+fi

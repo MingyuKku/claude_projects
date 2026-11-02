@@ -1,0 +1,6 @@
+# 51개 라우트가 전부 로그인 뒤라 크롤링할 것이 없다.
+# SPA fallback 때문에 어떤 경로를 요청해도 index.html 이 나가므로,
+# 막지 않으면 크롤러가 존재하지도 않는 페이지를 계속 긁는다.
+User-agent: *
+Allow: /introduction
+Disallow: /

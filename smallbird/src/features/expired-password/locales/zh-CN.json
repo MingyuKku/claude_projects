@@ -1,0 +1,38 @@
+{
+  "header": "请修改密码",
+  "intro": "为保护您的个人信息，需要修改密码。<br />距离上次修改已满6个月，特此提醒；选择“以后再改”，将在6个月后再次提醒。",
+  "current": {
+    "label": "当前密码",
+    "placeholder": "含字母和数字，至少8位",
+    "wrong": "不是当前密码，请重新输入。"
+  },
+  "new": {
+    "label": "新密码",
+    "placeholder": "含字母和数字，至少8位"
+  },
+  "check": {
+    "label": "确认新密码",
+    "placeholder": "确认密码"
+  },
+  "hint": "字母、数字、符号组合，8-20位",
+  "formatError": "至少8位（含字母、数字、符号，8-20位）",
+  "mismatch": "密码不一致，请重新输入。",
+  "delay": "以后再改",
+  "submit": "修改",
+  "submitError": {
+    "submitRequired": "输入密码。",
+    "unknown": "发生未知错误。",
+    "delay": "请稍后重试。",
+    "containsPersonalInfo": "禁止使用包含个人信息的密码。",
+    "passwordsDiffer": "新密码与确认密码必须一致。",
+    "notReachedSemiAnnual": "尚未满6个月。",
+    "sameAsOriginal": "新密码不能与原密码相同。",
+    "originalInvalid": "当前密码错误。",
+    "fallback": "发生错误，请联系管理员。"
+  },
+  "done": {
+    "title": "密码修改完成",
+    "message": "密码修改完成。<br />为保障账号安全，此前已登录的设备已退出登录。<br />请重新登录。",
+    "login": "去登录"
+  }
+}

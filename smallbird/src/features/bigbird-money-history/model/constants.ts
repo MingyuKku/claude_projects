@@ -1,0 +1,32 @@
+/** 목록 한 쪽의 기본 건수(스켈레톤 행 수도 이 값). 서버 기본값과 달라 요청마다 `entrySize`를 명시함. */
+export const LIST_PAGE_SIZE = 10;
+
+/** 충전/출금·사용 내역 "N개 보기" 선택지(서버 `entrySize` 10·20·50, docs/mypage-api.md §2). 기본은 맨 앞 값. */
+export const LIST_PAGE_SIZE_OPTIONS = [10, 20, 50] as const;
+
+/** "대기 중" 건이 보이는 동안 충전/출금 내역(과 잔액)을 다시 읽는 간격. 입금·출금 처리 시점을 알 수 없어 주기적으로 확인함. */
+export const CHARGE_PENDING_REFRESH_INTERVAL_MS = 180_000;
+/** 탭 복귀·포커스로 다시 읽는 최소 간격(`visibilitychange`와 `focus`가 연달아 오는 경우 한 번만 읽음). */
+export const CHARGE_FOCUS_REFRESH_THROTTLE_MS = 5_000;
+
+export const PAGE_PARAM = "page";
+export const SIZE_PARAM = "size";
+export const KEYWORD_PARAM = "keyword";
+/** 상세 보기(`?panel=…&id=…`) 쿼리. 쪽을 옮기면 열린 상세를 닫음. */
+export const DETAIL_QUERY_PARAMS = ["panel", "id"] as const;
+
+/** 필터·검색·쪽 쿼리. 탭이나 세그먼트를 바꾸면 페이지가 지움. */
+export const LIST_QUERY_PARAMS = [
+  PAGE_PARAM,
+  SIZE_PARAM,
+  KEYWORD_PARAM,
+  "dateFrom",
+  "dateTo",
+  "type",
+  "status",
+  "campaign",
+  "usage",
+] as const;
+
+export const TABLET_QUERY = "(min-width: 768px)";
+export const DESKTOP_QUERY = "(min-width: 1440px)";

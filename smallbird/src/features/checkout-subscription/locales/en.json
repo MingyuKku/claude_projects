@@ -1,0 +1,51 @@
+{
+  "product": {
+    "title": "Selected plan",
+    "serviceType": "Service type",
+    "fee": "Fee",
+    "start": "Start",
+    "startValue": {
+      "monthly": "Starts now, for 1 month",
+      "yearly": "Starts now, for 1 year"
+    }
+  },
+  "notice": {
+    "title": "Notice",
+    "agree": "I have read the notices below and agree to recurring payments and auto-renewal.",
+    "items": {
+      "1": "Your subscription starts on payment. Cancellation and refunds follow each plan's policy."
+    },
+    "renewal": {
+      "monthly": "Plans renew automatically every month, with monthly recurring payments.",
+      "yearly": "Plans renew automatically every year, with yearly recurring payments."
+    }
+  },
+  "summary": {
+    "title": "Payment summary",
+    "product": "Plan",
+    "card": "Payment card",
+    "amount": "Amount",
+    "pay": "Pay",
+    "cancel": "Cancel"
+  },
+  "price": {
+    "won": "{{amount}} KRW",
+    "fee": {
+      "monthly": "{{amount}} KRW/mo",
+      "yearly": "{{amount}} KRW/yr"
+    }
+  },
+  "completed": {
+    "title": "Payment complete",
+    "description": "Your subscription payment is complete."
+  },
+  "error": {
+    "noBillingCard": "No registered card. Please add a card.",
+    "cardsLoadFailed": "Failed to load card information.",
+    "alreadySubscribed": "You already subscribe to this plan.",
+    "productNotAvailable": "This plan isn't available right now.",
+    "cardLimitExceeded": "You can register up to 2 cards.",
+    "cardRegisterFailed": "Couldn't register the card. Please try again.",
+    "paymentFailed": "Payment failed. Please try again."
+  }
+}

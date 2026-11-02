@@ -1,0 +1,15 @@
+{
+  "title": "注销账号",
+  "agree": "同意并注销",
+  "password": {
+    "description": "注销账号需要输入密码。",
+    "submit": "注销账号",
+    "error": {
+      "mismatch": "密码不正确。",
+      "failed": "无法完成注销，请重试。"
+    }
+  },
+  "done": {
+    "title": "账号已注销。"
+  }
+}

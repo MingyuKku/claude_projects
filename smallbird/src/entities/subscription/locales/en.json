@@ -1,0 +1,100 @@
+{
+  "productType": {
+    "recruit": "Recruitment",
+    "pick": "PICK",
+    "live": "Live",
+    "applicator": "어플리에이터형"
+  },
+  "paymentStatus": {
+    "paid": "Paid",
+    "refunding": "Refund pending",
+    "refunded": "Refunded"
+  },
+  "paymentMethod": {
+    "card": "Credit card",
+    "cardInstallment": "Credit card (installments)"
+  },
+  "plan": {
+    "price": {
+      "monthly": "{{price}} KRW/mo",
+      "yearly": "{{price}} KRW/yr"
+    },
+    "detail": "Details",
+    "subscribe": "Subscribe",
+    "subscribed": "Subscribed",
+    "comingSoon": "Coming soon",
+    "comingSoonText": {
+      "line1": "Coming soon.",
+      "line2": "Stay tuned!"
+    },
+    "badge": {
+      "brand": "Brand",
+      "groupBuy": "Group Buy",
+      "liveCommerce": "Live Commerce",
+      "liveClass": "Live Class",
+      "ota": "OTA",
+      "smallBusiness": "Small Business"
+    },
+    "recruit": {
+      "features": {
+        "1": "Run influencer recruitment campaigns",
+        "2": "Brand and Group Buy both included",
+        "3": "Supports various campaign types"
+      },
+      "intro": {
+        "title": "About Recruitment",
+        "items": {
+          "1": "You register a campaign, influencers apply, and you pick from the applicants.",
+          "2": "One Recruitment subscription covers both Brand and Group Buy.",
+          "3": "Well suited to running diverse campaign types."
+        }
+      },
+      "steps": {
+        "1": "Register",
+        "2": "Recruit",
+        "3": "Review",
+        "4": "Select",
+        "5": "Run"
+      }
+    },
+    "pick": {
+      "features": {
+        "1": "Pick and propose to influencers directly",
+        "2": "Brand and Group Buy both included",
+        "3": "Supports tailored collaborations"
+      },
+      "intro": {
+        "title": "About PICK",
+        "items": {
+          "1": "You search for the influencers you want, pick them, and send a proposal.",
+          "2": "One PICK subscription covers both Brand and Group Buy.",
+          "3": "Well suited to tailored collaborations."
+        }
+      },
+      "steps": {
+        "1": "Search",
+        "2": "Pick",
+        "3": "Propose",
+        "4": "Accept",
+        "5": "Run"
+      }
+    },
+    "stepsTitle": "How it works",
+    "brand": {
+      "title": "About Brand",
+      "items": {
+        "1": "Campaigns for brand promotion and content reach.",
+        "2": "Run as product sponsorship, visits, reviews, and more.",
+        "3": "Good for raising brand awareness and spreading content."
+      }
+    },
+    "groupBuy": {
+      "title": "About Group Buy",
+      "items": {
+        "1": "Campaigns that sell products through group buying.",
+        "2": "Connect product sales with influencers.",
+        "3": "Good for operations focused on sales, orders, and results."
+      }
+    }
+  }
+}

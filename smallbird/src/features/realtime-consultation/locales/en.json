@@ -1,0 +1,47 @@
+{
+  "composer": "Live chat message",
+  "composerPlaceholder": "Enter your message. (up to 3,000 characters)",
+  "send": "Send",
+  "lock": {
+    "title": "A chat is already in progress.",
+    "description": "You're already chatting with the Bigbird team on another screen. Please try again after that chat ends.",
+    "cancel": "Cancel",
+    "confirm": "OK"
+  },
+  "requestFailed": "Couldn't request a chat. Please try again shortly.",
+  "sendFailed": "Couldn't send the message. Please try again.",
+  "endFailed": "Couldn't end the chat. Please try again.",
+  "retryFailed": "Couldn't request the chat again.",
+  "cancelFailed": "Couldn't cancel the request. Please try again.",
+  "closed": "This chat has already ended.",
+  "closing": "The chat is ending.",
+  "notConnected": "You can send messages after an agent connects.",
+  "lockLost": "Another account is handling this chat.",
+  "alreadyConnected": "An agent is already connected.",
+  "failed": "Couldn't check the chat.",
+  "lockCheckFailed": "Couldn't check the chat status. We'll try again shortly.",
+  "idle": {
+    "advertiserWarning": {
+      "title": "Live chat auto-end",
+      "description": "Live chat will end automatically if there are no new messages within 10 minutes"
+    },
+    "advertiserClosed": {
+      "title": "Live chat auto-end",
+      "description": "Live chat ended automatically because there were no further messages"
+    },
+    "operatorDelay": {
+      "title": "Connecting to live chat",
+      "description": "Our agent is helping another customer, so replies are delayed. Please wait a moment"
+    },
+    "operatorUnavailable": {
+      "title": "Live chat delayed",
+      "description": "Our agents can't chat live right now. Leave a message and we'll reply soon."
+    },
+    "cancel": "Cancel",
+    "confirm": "OK"
+  },
+  "hours": {
+    "title": "Live chat",
+    "description": "Live chat is available weekdays from 10 AM to 6 PM. Outside these hours, please leave a message."
+  }
+}

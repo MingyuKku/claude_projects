@@ -1,0 +1,26 @@
+{
+  "hint": "字母、数字、符号组合，8-20位",
+  "placeholder": "含字母和数字，至少8位",
+  "mismatch": "不一致，请重新输入。",
+  "checkLabel": "确认密码",
+  "checkPlaceholder": "确认密码",
+  "submit": "修改",
+  "passwordError": {
+    "format": "字母、数字、符号组合，8-20位",
+    "containsId": "不可包含账号",
+    "repeated": "不可重复或连续使用相同字符"
+  },
+  "submitError": {
+    "submitRequired": "输入密码",
+    "containsId": "禁止使用与账号相同或包含账号的密码",
+    "containsPersonalInfo": "禁止使用包含个人信息的密码",
+    "timeOut": "修改失败（请在5分钟内修改密码）",
+    "fallback": "密码修改失败"
+  },
+  "done": {
+    "title": "密码修改完成",
+    "message": "密码已成功修改。<br />请使用新密码登录。",
+    "notice": "※ 为了安全，其他设备上已登录的账号<br />可能会自动退出。",
+    "login": "去登录"
+  }
+}

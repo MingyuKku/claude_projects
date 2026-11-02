@@ -1,0 +1,9 @@
+{
+  "title": "Bigbird問合せ",
+  "noSelection": "選択した問合せはありません。",
+  "notFound": "問合せが見つかりません。",
+  "loadError": "問合せを読み込めませんでした。",
+  "backToList": "一覧へ",
+  "conversation": "問合せの会話",
+  "requestFailed": "相談をリクエストできませんでした。もう一度お試しください。"
+}

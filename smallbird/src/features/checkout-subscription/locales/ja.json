@@ -1,0 +1,51 @@
+{
+  "product": {
+    "title": "選択したプラン",
+    "serviceType": "サービス種別",
+    "fee": "利用料金",
+    "start": "利用開始",
+    "startValue": {
+      "monthly": "決済後すぐに1か月利用開始",
+      "yearly": "決済後すぐに1年利用開始"
+    }
+  },
+  "notice": {
+    "title": "案内事項の確認",
+    "agree": "以下の案内事項をすべて確認し、定期決済と自動更新に同意します。",
+    "items": {
+      "1": "決済完了後すぐに購読が始まります。キャンセル・返金は商品ごとの規定に従います。"
+    },
+    "renewal": {
+      "monthly": "1か月ごとに自動更新され、毎月定期決済が行われます。",
+      "yearly": "1年ごとに自動更新され、毎年定期決済が行われます。"
+    }
+  },
+  "summary": {
+    "title": "決済概要",
+    "product": "決済商品",
+    "card": "決済カード",
+    "amount": "決済金額",
+    "pay": "決済",
+    "cancel": "キャンセル"
+  },
+  "price": {
+    "won": "{{amount}}ウォン",
+    "fee": {
+      "monthly": "月{{amount}}ウォン",
+      "yearly": "年{{amount}}ウォン"
+    }
+  },
+  "completed": {
+    "title": "決済完了",
+    "description": "サブスクの決済が完了しました。"
+  },
+  "error": {
+    "noBillingCard": "登録されたカードがありません。カードを追加してください。",
+    "cardsLoadFailed": "カード情報を読み込めませんでした。",
+    "alreadySubscribed": "すでに契約中のプランです。",
+    "productNotAvailable": "現在ご契約いただけないプランです。",
+    "cardLimitExceeded": "登録できるカードは最大2枚です。",
+    "cardRegisterFailed": "カードを登録できませんでした。もう一度お試しください。",
+    "paymentFailed": "決済に失敗しました。もう一度お試しください。"
+  }
+}
