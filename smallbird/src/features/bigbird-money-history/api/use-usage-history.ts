@@ -1,9 +1,9 @@
 import useSWR from "swr";
 
+import { MEDIA_QUERY } from "@/shared/config";
 import { useInfinitePages, useMediaQuery } from "@/shared/lib";
 
 import { useUsageListParams } from "../lib/use-usage-list-params";
-import { TABLET_QUERY } from "../model/constants";
 import { fetchUsageList } from "./usage-api";
 
 import type { UsageQuery } from "../model/usage-types";
@@ -46,7 +46,7 @@ export function useUsageScrollList(
  * 목록이 이미 읽어 둔 캐시를 그대로 쓰므로 상세를 열 때 같은 요청을 다시 보내지 않음(캐시가 없을 때, 예: 주소로 바로 열 때만 읽음).
  */
 export function useUsageRecord(id: string | null) {
-  const isTabletUp = useMediaQuery(TABLET_QUERY);
+  const isTabletUp = useMediaQuery(MEDIA_QUERY.tabletUp);
   const { params, baseQuery, isOptionsPending } = useUsageListParams();
   const isReady = id !== null && !isOptionsPending;
   const paged = useUsageHistory(

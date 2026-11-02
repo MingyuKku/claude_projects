@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { usePaymentMethodLabel } from "@/entities/subscription";
 import { EmptyState } from "@/shared/components/empty-state";
+import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery } from "@/shared/lib";
 import { useDialogTarget } from "@/shared/lib/useDialogTarget";
@@ -23,7 +24,6 @@ import { SubscribedProductCards } from "./SubscribedProductCards";
 
 import type { Subscription } from "@/entities/subscription";
 
-const TABLET_QUERY = "(min-width: 768px)";
 const COLUMN_COUNT = 6;
 
 interface SubscribedProductTableProps {
@@ -36,7 +36,7 @@ export function SubscribedProductTable({
   subscriptions,
 }: SubscribedProductTableProps) {
   const { t } = useTranslation("features/manage-subscription");
-  const isTabletUp = useMediaQuery(TABLET_QUERY);
+  const isTabletUp = useMediaQuery(MEDIA_QUERY.tabletUp);
   const cancelDialog = useDialogTarget<Subscription>();
   const { cancel } = useCancelSubscription();
   const [isCompletedOpen, setIsCompletedOpen] = useState(false);

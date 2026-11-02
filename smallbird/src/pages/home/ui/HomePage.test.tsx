@@ -4,6 +4,7 @@ import { MemoryRouter, useLocation } from "react-router";
 import { SWRConfig } from "swr";
 
 import { ApiError, serverApiV3 } from "@/shared/api";
+import { MEDIA_QUERY } from "@/shared/config";
 
 import { HomePage } from "./HomePage";
 
@@ -55,7 +56,9 @@ describe("HomePage", () => {
       ),
     ).toBeInTheDocument();
     expect(screen.getByRole("textbox")).toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "플랫폼" })).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { name: "플랫폼" })).toHaveTextContent(
+      "인스타그램",
+    );
     expect(
       screen.getByRole("button", { name: "내 프로필" }),
     ).toBeInTheDocument();
@@ -243,7 +246,8 @@ describe("HomePage", () => {
     function stubKeyboard(visibleHeight: number) {
       vi.stubGlobal("innerHeight", 800);
       vi.stubGlobal("matchMedia", (query: string) => ({
-        matches: ["(pointer: coarse)", "(max-width: 1439px)"].includes(query),
+        matches:
+          query === MEDIA_QUERY.touch || query === MEDIA_QUERY.belowDesktop,
         addEventListener: () => {},
         removeEventListener: () => {},
       }));
@@ -263,7 +267,7 @@ describe("HomePage", () => {
       vi.restoreAllMocks();
     });
 
-    it("키보드가 떠 있는 동안 카드 묶음이 입력창 위로 올라간다", async () => {
+    it("키보드가 떠 있는 동안 카드가 입력창 위로 올라가고 입력창은 본문 아래에 고정된다", async () => {
       stubKeyboard(450);
       const user = userEvent.setup();
       renderHome();
@@ -274,7 +278,10 @@ describe("HomePage", () => {
       expect(container).toHaveAttribute("data-keyboard", "open");
       const cards = screen.getByRole("button", { name: /요금 안내/ })
         .parentElement?.parentElement;
-      expect(cards?.className).toContain("order-first");
+      expect(cards?.className).toContain("in-data-[keyboard=open]:order-1");
+      expect(screen.getByRole("textbox").closest("form")?.className).toContain(
+        "in-data-[keyboard=open]:sticky",
+      );
     });
 
     it("키보드가 열리는 순간 한 번만 입력 영역(버튼 줄 포함)이 보이게 스크롤한다", async () => {

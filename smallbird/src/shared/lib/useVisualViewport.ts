@@ -1,4 +1,4 @@
-import { useSyncExternalStore } from "react";
+import { useCallback, useSyncExternalStore } from "react";
 
 interface VisualViewportBox {
   height: number;
@@ -46,7 +46,27 @@ function subscribe(onChange: () => void) {
   };
 }
 
-/** 가상 키보드를 뺀 보이는 영역(`visualViewport`)의 크기·위치와 레이아웃 뷰포트 높이. 지원하지 않는 환경에서는 null. */
-export function useVisualViewport() {
-  return useSyncExternalStore(subscribe, read, () => null);
+function readNothing() {
+  return null;
+}
+
+function subscribeNothing() {
+  return () => {};
+}
+
+/**
+ * 가상 키보드를 뺀 보이는 영역(`visualViewport`)의 크기·위치와 레이아웃 뷰포트 높이. 지원하지 않는 환경에서는 null.
+ * 보이는 영역은 주소창이 접힐 때·핀치 확대로 끌 때도 바뀌어 그때마다 다시 그리므로, 필요 없는 동안은 `isEnabled`를 꺼 구독하지 않음(null).
+ */
+export function useVisualViewport(isEnabled = true) {
+  const subscribeIfEnabled = useCallback(
+    (onChange: () => void) =>
+      isEnabled ? subscribe(onChange) : subscribeNothing(),
+    [isEnabled],
+  );
+  return useSyncExternalStore(
+    subscribeIfEnabled,
+    isEnabled ? read : readNothing,
+    readNothing,
+  );
 }

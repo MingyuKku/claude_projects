@@ -5,6 +5,7 @@ import {
   LIST_QUERY_PARAMS,
   UsageHistory,
 } from "@/features/bigbird-money-history";
+import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery, usePanelParam, useTabParam } from "@/shared/lib";
 import { cn } from "@/shared/lib/utils";
@@ -23,8 +24,6 @@ import type { MoneyLayout, MoneyPanel, MoneyTab } from "../model/tabs";
 import type { ReactNode } from "react";
 
 // 레이아웃 breakpoint는 홈·계정 설정과 같음(TAB 768~1439, PC 1440~).
-const TABLET_QUERY = "(min-width: 768px)";
-const DESKTOP_QUERY = "(min-width: 1440px)";
 // 본문의 최대 폭(시안 PC 1440 화면의 본문 폭 1170). 더 넓은 화면에서는 가운데 정렬함.
 const CONTENT_WIDTH_CLASS_NAME = "mx-auto w-full max-w-292.5";
 // 탭이나 세그먼트를 바꾸면 하위 화면과 목록 쿼리를 지움.
@@ -73,8 +72,8 @@ export function MyPageMoneyPage() {
   const { isRequested, closeAlert } = usePaymentReturn();
   const withdrawn = useWithdrawnAlert();
 
-  const isDesktop = useMediaQuery(DESKTOP_QUERY);
-  const isTabletUp = useMediaQuery(TABLET_QUERY);
+  const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
+  const isTabletUp = useMediaQuery(MEDIA_QUERY.tabletUp);
   const layout: MoneyLayout = isDesktop
     ? "desktop"
     : isTabletUp

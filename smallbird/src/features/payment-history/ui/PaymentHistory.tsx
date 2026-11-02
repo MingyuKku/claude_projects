@@ -11,6 +11,7 @@ import {
   resolveEmptyKind,
   useFilterScreen,
 } from "@/shared/components/list-filter";
+import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
@@ -19,7 +20,7 @@ import { Skeleton } from "@/shared/ui/skeleton";
 import { countPages } from "../lib/count-pages";
 import { useListParams } from "../lib/use-list-params";
 import { usePaymentFilterFields } from "../lib/use-payment-filter-fields";
-import { DESKTOP_QUERY, PAGE_SIZE_OPTIONS } from "../model/constants";
+import { PAGE_SIZE_OPTIONS } from "../model/constants";
 import { PaymentCardList } from "./PaymentCardList";
 import { PaymentTable } from "./PaymentTable";
 
@@ -31,7 +32,8 @@ function ignoreSearch() {}
 export function PaymentHistory() {
   const { t } = useTranslation("features/payment-history");
   const { t: tCommon } = useTranslation();
-  const isDesktop = useMediaQuery(DESKTOP_QUERY);
+  // 표는 PC(1440~)만 씀. TAB은 2열 카드, MO는 1열 카드.
+  const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
   // TAB은 "필터" 버튼으로 본문을 대체하는 필터 화면을 엶(스펙 §3). PC는 인라인, MO는 모달.
   const filterScreen = useFilterScreen("desktop");
   const fields = usePaymentFilterFields();

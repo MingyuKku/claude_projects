@@ -3,6 +3,7 @@ import { useSearchParams } from "react-router";
 
 import { EmptyState } from "@/shared/components/empty-state";
 import { PageNavigator } from "@/shared/components/page-navigator";
+import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
@@ -19,7 +20,6 @@ import { SubAccountTable } from "./SubAccountTable";
 import type { SubAccountViewModel } from "../model/types";
 
 // 표는 PC(1440~)만 쓰고 TAB·MO는 카드(2026-10-27 시안).
-const DESKTOP_QUERY = "(min-width: 1440px)";
 
 interface SubAccountListProps {
   /** 권한 부여·수정을 열어 둔 Sub ID. 그 행을 활성(accent) 처리함. */
@@ -42,7 +42,7 @@ export function SubAccountList({
   const { t } = useTranslation("features/manage-sub-accounts");
   const { t: tCommon } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
-  const isDesktop = useMediaQuery(DESKTOP_QUERY);
+  const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
 
   const { keyword, page: requestedPage } = useListParams();
   const { list, isLoading, isError, mutate } = useSubAccounts({

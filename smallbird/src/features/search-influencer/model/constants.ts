@@ -1,7 +1,7 @@
-export const MAX_QUERY_LENGTH = 1000;
+import type { InfluencerPlatform } from "@/entities/platform";
 
-export const MOBILE_MEDIA_QUERY = "(max-width: 767px)";
-export const TOUCH_MEDIA_QUERY = "(pointer: coarse)";
+// 처음 보이는 플랫폼. 선택 해제는 지원하지 않으므로 검색은 항상 플랫폼 하나를 가짐.
+export const DEFAULT_PLATFORM: InfluencerPlatform = "instagram";
 
 // `leading-5`(20px). getComputedStyle이 line-height를 숫자로 주지 못하는 환경의 대비값.
 export const FALLBACK_LINE_HEIGHT = 20;
@@ -25,4 +25,3 @@ export const EXPAND_TRANSITION_EASING = "cubic-bezier(0.22, 1, 0.36, 1)";
 export const COLLAPSE_TRANSITION_EASING = "cubic-bezier(0.32, 0.72, 0, 1)";
 // 클릭 뒤 렌더·레이아웃에 쓴 시간(약 11ms)과 진행 0인 첫 프레임 때문에 눈에 보이는 움직임이 늦어지므로, 전환을 한 프레임 앞선 지점에서 시작함.
 export const EXPAND_TRANSITION_LEAD = 16;
-export const REDUCED_MOTION_MEDIA_QUERY = "(prefers-reduced-motion: reduce)";

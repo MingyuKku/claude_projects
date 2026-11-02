@@ -1,5 +1,7 @@
 import { act, renderHook } from "@testing-library/react";
 
+import { MEDIA_QUERY } from "@/shared/config";
+
 import { useVirtualKeyboardOpen } from "./useVirtualKeyboardOpen";
 
 function stubMedia(...matching: string[]) {
@@ -14,6 +16,7 @@ function stubViewport(height: number) {
   const viewport = Object.assign(new EventTarget(), { height, offsetTop: 0 });
   vi.stubGlobal("visualViewport", viewport);
   return {
+    target: viewport,
     resize(next: number) {
       viewport.height = next;
       viewport.dispatchEvent(new Event("resize"));
@@ -21,7 +24,7 @@ function stubViewport(height: number) {
   };
 }
 
-const TOUCH_BELOW_DESKTOP = ["(pointer: coarse)", "(max-width: 1439px)"];
+const TOUCH_BELOW_DESKTOP = [MEDIA_QUERY.touch, MEDIA_QUERY.belowDesktop];
 
 beforeEach(() => vi.stubGlobal("innerHeight", 800));
 afterEach(() => vi.unstubAllGlobals());
@@ -30,7 +33,9 @@ describe("useVirtualKeyboardOpen", () => {
   it("포커스가 있고 보이는 영역이 150px 넘게 줄면 열림으로 본다", () => {
     stubMedia(...TOUCH_BELOW_DESKTOP);
     const viewport = stubViewport(800);
-    const { result } = renderHook(() => useVirtualKeyboardOpen(true));
+    const { result } = renderHook(() =>
+      useVirtualKeyboardOpen({ isEnabled: true, isFocused: true }),
+    );
     expect(result.current).toBe(false);
     act(() => viewport.resize(450));
     expect(result.current).toBe(true);
@@ -41,32 +46,53 @@ describe("useVirtualKeyboardOpen", () => {
   it("주소창 접힘 같은 작은 변화는 열림으로 보지 않는다", () => {
     stubMedia(...TOUCH_BELOW_DESKTOP);
     stubViewport(720);
-    const { result } = renderHook(() => useVirtualKeyboardOpen(true));
+    const { result } = renderHook(() =>
+      useVirtualKeyboardOpen({ isEnabled: true, isFocused: true }),
+    );
     expect(result.current).toBe(false);
   });
 
   it("포커스가 없으면 닫힘이다", () => {
     stubMedia(...TOUCH_BELOW_DESKTOP);
     stubViewport(450);
-    const { result } = renderHook(() => useVirtualKeyboardOpen(false));
+    const { result } = renderHook(() =>
+      useVirtualKeyboardOpen({ isEnabled: true, isFocused: false }),
+    );
     expect(result.current).toBe(false);
   });
 
   it("터치 기기가 아니거나 데스크톱 폭이면 닫힘이다", () => {
     stubViewport(450);
-    stubMedia("(max-width: 1439px)");
-    expect(renderHook(() => useVirtualKeyboardOpen(true)).result.current).toBe(
-      false,
+    stubMedia(MEDIA_QUERY.belowDesktop);
+    expect(
+      renderHook(() =>
+        useVirtualKeyboardOpen({ isEnabled: true, isFocused: true }),
+      ).result.current,
+    ).toBe(false);
+    stubMedia(MEDIA_QUERY.touch);
+    expect(
+      renderHook(() =>
+        useVirtualKeyboardOpen({ isEnabled: true, isFocused: true }),
+      ).result.current,
+    ).toBe(false);
+  });
+
+  it("감지를 쓰지 않으면 보이는 영역을 구독하지 않고 닫힘이다", () => {
+    stubMedia(...TOUCH_BELOW_DESKTOP);
+    const viewport = stubViewport(450);
+    const addEventListener = vi.spyOn(viewport.target, "addEventListener");
+    const { result } = renderHook(() =>
+      useVirtualKeyboardOpen({ isEnabled: false, isFocused: true }),
     );
-    stubMedia("(pointer: coarse)");
-    expect(renderHook(() => useVirtualKeyboardOpen(true)).result.current).toBe(
-      false,
-    );
+    expect(result.current).toBe(false);
+    expect(addEventListener).not.toHaveBeenCalled();
   });
 
   it("visualViewport를 지원하지 않으면 닫힘이다", () => {
     stubMedia(...TOUCH_BELOW_DESKTOP);
-    const { result } = renderHook(() => useVirtualKeyboardOpen(true));
+    const { result } = renderHook(() =>
+      useVirtualKeyboardOpen({ isEnabled: true, isFocused: true }),
+    );
     expect(result.current).toBe(false);
   });
 
@@ -74,7 +100,8 @@ describe("useVirtualKeyboardOpen", () => {
     stubMedia(...TOUCH_BELOW_DESKTOP);
     const viewport = stubViewport(800);
     const { result, rerender } = renderHook(
-      ({ focused }) => useVirtualKeyboardOpen(focused),
+      ({ focused }) =>
+        useVirtualKeyboardOpen({ isEnabled: true, isFocused: focused }),
       { initialProps: { focused: false } },
     );
     expect(result.current).toBe(false);

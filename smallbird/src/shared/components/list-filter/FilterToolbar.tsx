@@ -1,13 +1,14 @@
 import { RotateCw, Settings2 } from "lucide-react";
 
 import { Combobox } from "@/shared/components/combobox";
+import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery } from "@/shared/lib";
 import { usePanelParam } from "@/shared/lib/usePanelParam";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 
-import { DESKTOP_QUERY, FILTER_PANEL, TABLET_QUERY } from "./constants";
+import { FILTER_PANEL } from "./constants";
 import { hasActiveFilter } from "./filter-values";
 import { FilterDialog } from "./FilterDialog";
 import { InlineDateField, SelectField } from "./FilterFields";
@@ -77,8 +78,8 @@ export function FilterToolbar({
 }: FilterToolbarProps) {
   const { t } = useTranslation();
   const filterLabel = t("list.filter.action");
-  const isTabletUp = useMediaQuery(TABLET_QUERY);
-  const isDesktop = useMediaQuery(DESKTOP_QUERY);
+  const isTabletUp = useMediaQuery(MEDIA_QUERY.tabletUp);
+  const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
   const isInline = inlineFrom === "desktop" ? isDesktop : isTabletUp;
   const { panel, openPanel, closePanel } = usePanelParam({
     panels: [FILTER_PANEL],

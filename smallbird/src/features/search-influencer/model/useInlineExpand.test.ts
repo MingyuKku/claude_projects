@@ -4,28 +4,51 @@ import { useInlineExpand } from "./useInlineExpand";
 
 const PADDING = 16;
 const SLOT_HEIGHT = 142;
+// 입력창 박스 142 = 입력 영역 80 + 테두리·패딩·간격·버튼 줄 62.
+const TEXTAREA_HEIGHT = 80;
+const CHROME_HEIGHT = SLOT_HEIGHT - TEXTAREA_HEIGHT;
+const LINE_HEIGHT = 20;
 
 interface Layout {
   boundaryTop: number;
   formBottom: number;
   scrollportHeight: number;
+  // 위·아래 패딩이 다른 경우(태블릿 키보드: 위 40·아래 16). 없으면 둘 다 PADDING.
+  paddingTop?: number;
+  paddingBottom?: number;
+  // 셸의 키보드 열림 표식.
+  isKeyboardOpen?: boolean;
+  // 접힌 입력창 박스 높이. 없으면 SLOT_HEIGHT.
+  boxHeight?: number;
 }
 
 function rect(box: { top?: number; bottom?: number }) {
   return { top: 0, bottom: 0, ...box } as DOMRect;
 }
 
-// jsdom에는 레이아웃이 없어 위치·크기를 직접 정함. 본문(boundary) 안에 스크롤 영역(main)이 있는 홈과 같은 구조.
+// jsdom에는 레이아웃이 없어 위치·크기를 직접 정함. 셸(data-keyboard) > 스크롤 영역(main) > 본문(boundary) > 폼 > 입력창 박스 > 입력 영역, 홈과 같은 구조.
 function setup(layout: Layout) {
+  const shell = document.createElement("div");
+  shell.setAttribute(
+    "data-keyboard",
+    layout.isKeyboardOpen ? "open" : "closed",
+  );
   const scrollport = document.createElement("main");
   scrollport.style.overflowY = "auto";
   const boundary = document.createElement("div");
   boundary.setAttribute("data-search-expand-boundary", "");
-  boundary.style.paddingTop = `${PADDING}px`;
+  boundary.style.paddingTop = `${layout.paddingTop ?? PADDING}px`;
+  boundary.style.paddingBottom = `${layout.paddingBottom ?? PADDING}px`;
   const form = document.createElement("form");
+  const box = document.createElement("div");
+  const textarea = document.createElement("textarea");
+  textarea.style.lineHeight = `${LINE_HEIGHT}px`;
+  box.append(textarea);
+  form.append(box);
   boundary.append(form);
   scrollport.append(boundary);
-  document.body.append(scrollport);
+  shell.append(scrollport);
+  document.body.append(shell);
 
   const state = { ...layout };
   vi.spyOn(boundary, "getBoundingClientRect").mockImplementation(() =>
@@ -38,11 +61,16 @@ function setup(layout: Layout) {
     get: () => state.scrollportHeight,
   });
   Object.defineProperty(form, "offsetHeight", { value: SLOT_HEIGHT });
+  const boxHeight = layout.boxHeight ?? SLOT_HEIGHT;
+  Object.defineProperty(box, "offsetHeight", { value: boxHeight });
+  Object.defineProperty(textarea, "offsetHeight", {
+    value: boxHeight - CHROME_HEIGHT,
+  });
 
-  const { result } = renderHook(() =>
+  const { result, unmount } = renderHook(() =>
     useInlineExpand({ formRef: { current: form } }),
   );
-  return { result, state };
+  return { result, state, shell, unmount };
 }
 
 let observerCallback: (() => void) | undefined;
@@ -105,6 +133,19 @@ describe("useInlineExpand", () => {
     expect(result.current.metrics?.overlayHeight).toBe(368);
   });
 
+  it("위·아래 패딩이 다르면 각각 뺀다", () => {
+    const { result } = setup({
+      boundaryTop: -300,
+      formBottom: 900,
+      scrollportHeight: 400,
+      paddingTop: 40,
+      paddingBottom: 16,
+    });
+    act(() => result.current.expand());
+    // 400 − (40 + 16) = 344. 위쪽 여백 40은 본문 안쪽 위(펼친 입력창의 위 끝) 계산에도 쓰임.
+    expect(result.current.metrics?.overlayHeight).toBe(344);
+  });
+
   it("입력창 자리 높이보다 작아지지 않는다", () => {
     const { result } = setup({
       boundaryTop: 0,
@@ -113,6 +154,78 @@ describe("useInlineExpand", () => {
     });
     act(() => result.current.expand());
     expect(result.current.metrics?.overlayHeight).toBe(SLOT_HEIGHT);
+  });
+
+  describe("키보드가 열린 동안", () => {
+    it("펼친 높이는 본문 위치와 관계없이 보이는 영역 전체이고, 입력 영역 한도는 버튼 줄·패딩을 뺀 값이다", () => {
+      const { result } = setup({
+        boundaryTop: -500,
+        formBottom: 300,
+        scrollportHeight: 400,
+        isKeyboardOpen: true,
+      });
+      // 400 − 32 = 368. 본문이 스크롤되어 입력창 아래 끝과 본문 위 끝 사이가 달라져도 같음.
+      expect(result.current.limit).toEqual({
+        maxFieldHeight: 368,
+        maxTextareaHeight: 368 - CHROME_HEIGHT,
+        canExpand: true,
+      });
+      act(() => result.current.expand());
+      expect(result.current.metrics?.overlayHeight).toBe(368);
+    });
+
+    it("보이는 영역이 낮아도 입력 1줄은 남긴다", () => {
+      const { result } = setup({
+        boundaryTop: 0,
+        formBottom: 100,
+        scrollportHeight: 80,
+        isKeyboardOpen: true,
+      });
+      // 80 − 32 = 48 < 버튼 줄·패딩 62 + 1줄 20.
+      expect(result.current.limit?.maxFieldHeight).toBe(
+        CHROME_HEIGHT + LINE_HEIGHT,
+      );
+      expect(result.current.limit?.maxTextareaHeight).toBe(LINE_HEIGHT);
+    });
+
+    it("접힌 입력창이 이미 한도만큼 크면 펼칠 공간이 없다", () => {
+      const { result } = setup({
+        boundaryTop: 0,
+        formBottom: 300,
+        scrollportHeight: 232,
+        isKeyboardOpen: true,
+        boxHeight: 200,
+      });
+      // 232 − 32 = 200 = 접힌 박스 높이.
+      expect(result.current.limit?.canExpand).toBe(false);
+    });
+
+    it("키보드 열림 배치로 바뀌면 다시 잰다", async () => {
+      const { result, shell } = setup({
+        boundaryTop: 0,
+        formBottom: 200,
+        scrollportHeight: 400,
+      });
+      act(() => result.current.expand());
+      // 키보드가 없을 때는 입력창 아래 끝에서 본문 안쪽 위까지: 200 − 16 = 184.
+      expect(result.current.metrics?.overlayHeight).toBe(184);
+      await act(async () => {
+        shell.setAttribute("data-keyboard", "open");
+        await Promise.resolve();
+      });
+      expect(result.current.metrics?.overlayHeight).toBe(368);
+      expect(result.current.limit?.canExpand).toBe(true);
+    });
+  });
+
+  it("키보드가 없을 때 펼칠 공간이 없으면 canExpand가 false다", () => {
+    const { result } = setup({
+      boundaryTop: 0,
+      formBottom: 158,
+      scrollportHeight: 700,
+    });
+    // 158 − 16 = 142 = 접힌 박스 높이.
+    expect(result.current.limit?.canExpand).toBe(false);
   });
 
   it("스크롤 영역이 줄면(키보드) 펼친 높이를 다시 잰다", () => {
@@ -129,8 +242,8 @@ describe("useInlineExpand", () => {
     expect(result.current.metrics?.slotHeight).toBe(SLOT_HEIGHT);
   });
 
-  it("높이가 같으면 다시 그리지 않고, 접으면 관찰을 멈춘다", () => {
-    const { result } = setup({
+  it("높이가 같으면 다시 그리지 않고, 사라지면 관찰을 멈춘다", () => {
+    const { result, unmount } = setup({
       boundaryTop: 0,
       formBottom: 300,
       scrollportHeight: 700,
@@ -141,6 +254,7 @@ describe("useInlineExpand", () => {
     expect(result.current.metrics).toBe(before);
     act(() => result.current.collapse());
     expect(result.current.isExpanded).toBe(false);
+    unmount();
     expect(disconnect).toHaveBeenCalled();
   });
 

@@ -6,15 +6,14 @@ import {
   resolveEmptyKind,
   useFilterScreen,
 } from "@/shared/components/list-filter";
+import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery } from "@/shared/lib";
 
 import { useUsageHistory, useUsageScrollList } from "../api/use-usage-history";
 import { useUsageListParams } from "../lib/use-usage-list-params";
 import {
-  DESKTOP_QUERY,
   LIST_PAGE_SIZE_OPTIONS,
-  TABLET_QUERY,
   USAGE_KEYWORD_MAX_LENGTH,
 } from "../model/constants";
 import { HistoryPagedList } from "./HistoryPagedList";
@@ -39,8 +38,8 @@ export function UsageHistory({
   onClickDetail,
 }: UsageHistoryProps) {
   const { t } = useTranslation("features/bigbird-money-history");
-  const isTabletUp = useMediaQuery(TABLET_QUERY);
-  const isDesktop = useMediaQuery(DESKTOP_QUERY);
+  const isTabletUp = useMediaQuery(MEDIA_QUERY.tabletUp);
+  const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
   const { fields, params, baseQuery, isOptionsPending } = useUsageListParams();
   const filterScreen = useFilterScreen("desktop");
   // 쪽 나눔 목록(PC·TAB)과 이어 읽는 목록(MO)은 폭에 따라 한쪽만 읽음.

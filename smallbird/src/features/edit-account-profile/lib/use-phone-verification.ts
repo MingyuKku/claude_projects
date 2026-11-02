@@ -2,6 +2,7 @@ import { tryit } from "radash";
 import { useEffect, useEffectEvent, useRef, useState } from "react";
 import { useLocation, useSearchParams } from "react-router";
 
+import { MEDIA_QUERY } from "@/shared/config";
 import {
   KMC_RESULT_PARAMS,
   openKmcPopup,
@@ -23,9 +24,6 @@ import type {
 } from "./phone-verification";
 import type { KmcResult } from "@/shared/lib";
 
-/** 터치 기기는 팝업이 막히거나 새 탭으로 열려 페이지 이동으로 인증함. */
-const TOUCH_MEDIA_QUERY = "(pointer: coarse)";
-
 /**
  * 휴대폰 변경용 KMC 본인인증. PC는 팝업, 터치 기기는 페이지 이동 뒤 결과 쿼리(`rec_cert`·`certNum`)를 달고 돌아옴.
  * 인증만 하고 서버 반영은 폼의 "저장"이 `certIdx`로 함(v2와 같음).
@@ -36,7 +34,8 @@ export function usePhoneVerification(
   const [state, setState] = useState<PhoneVerificationState>({
     status: "idle",
   });
-  const isTouch = useMediaQuery(TOUCH_MEDIA_QUERY);
+  // 터치 기기는 팝업이 막히거나 새 탭으로 열려 페이지 이동으로 인증함.
+  const isTouch = useMediaQuery(MEDIA_QUERY.touch);
   const location = useLocation();
   const [searchParams, setSearchParams] = useSearchParams();
   /** StrictMode에서 effect가 두 번 돌아도 복귀 결과를 한 번만 복호화함. */

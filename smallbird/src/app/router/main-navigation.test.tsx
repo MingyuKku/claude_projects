@@ -393,11 +393,7 @@ describe("홈 본문과 검색 경로", () => {
   it("검색을 제출하면 셸 안의 준비 중 화면으로 이동한다", async () => {
     const user = userEvent.setup();
     const router = await renderRoute(ROUTES.main);
-    await user.click(await screen.findByRole("button", { name: "플랫폼" }));
-    await user.click(
-      await screen.findByRole("menuitemcheckbox", { name: "인스타그램" }),
-    );
-    await user.type(screen.getByRole("textbox"), "스킨케어");
+    await user.type(await screen.findByRole("textbox"), "스킨케어");
     await user.click(screen.getByRole("button", { name: "인플루언서 탐색" }));
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(ROUTES.influencerSearch),

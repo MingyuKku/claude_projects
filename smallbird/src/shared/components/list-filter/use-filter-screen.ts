@@ -1,7 +1,8 @@
+import { MEDIA_QUERY } from "@/shared/config";
 import { useMediaQuery } from "@/shared/lib";
 import { usePanelParam } from "@/shared/lib/usePanelParam";
 
-import { DESKTOP_QUERY, FILTER_PANEL, TABLET_QUERY } from "./constants";
+import { FILTER_PANEL } from "./constants";
 
 /** 툴바가 인라인으로 바뀌는 폭. `tablet`은 TAB부터(기본), `desktop`은 PC부터(TAB·MO는 "필터" 버튼). */
 export type InlineFrom = "tablet" | "desktop";
@@ -12,8 +13,8 @@ export type InlineFrom = "tablet" | "desktop";
  * 화면을 쓰는 쪽이 목록과 툴바 대신 `FilterScreen`을 그림.
  */
 export function useFilterScreen(inlineFrom: InlineFrom) {
-  const isTabletUp = useMediaQuery(TABLET_QUERY);
-  const isDesktop = useMediaQuery(DESKTOP_QUERY);
+  const isTabletUp = useMediaQuery(MEDIA_QUERY.tabletUp);
+  const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
   const { panel, closePanel } = usePanelParam({ panels: [FILTER_PANEL] });
   const isScreenWidth = inlineFrom === "desktop" && isTabletUp && !isDesktop;
 

@@ -4,6 +4,7 @@ import { useSubAccount } from "@/features/manage-sub-accounts";
 import { NotificationConsentCards } from "@/features/notification-consent";
 import { WithdrawFlow } from "@/features/withdraw-account";
 import { EmptyState } from "@/shared/components/empty-state";
+import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery, usePanelParam, useTabParam } from "@/shared/lib";
 import { cn } from "@/shared/lib/utils";
@@ -22,8 +23,6 @@ import type { SessionViewModel } from "@/entities/session";
 
 const SUB_PANELS = ["create", "permission", "edit", "withdraw"] as const;
 // 레이아웃 breakpoint는 홈과 같음(TAB 768~1439, PC 1440~).
-const TABLET_QUERY = "(min-width: 768px)";
-const DESKTOP_QUERY = "(min-width: 1440px)";
 // 모든 탭 본문이 공유하는 콘텐츠 폭. 시안(10061:200877)의 PC 1440 화면에서 본문 폭 1170을 최대 너비로 두고, 더 넓은 화면에서는
 // 가로 가운데 정렬함. 그보다 좁으면 가용 폭을 다 씀.
 const TAB_CONTENT_WIDTH_CLASS_NAME = "mx-auto w-full max-w-292.5";
@@ -66,8 +65,8 @@ export function MyPageAccountPage() {
       : null;
   // 수정 대상은 지금 보이는 목록에 있는 Sub ID만 엶(지워졌거나 주소를 고친 subId는 열지 않음).
   const editAccount = useSubAccount(panel === "edit" ? panelAccountIdx : null);
-  const isDesktop = useMediaQuery(DESKTOP_QUERY);
-  const isTabletUp = useMediaQuery(TABLET_QUERY);
+  const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
+  const isTabletUp = useMediaQuery(MEDIA_QUERY.tabletUp);
   const subLayout: SubAccountLayout = isDesktop
     ? "desktop"
     : isTabletUp

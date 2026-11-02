@@ -1,6 +1,7 @@
 import { useCallback } from "react";
 import useSWR, { useSWRConfig } from "swr";
 
+import { MEDIA_QUERY } from "@/shared/config";
 import {
   infinitePagesCacheKey,
   useInfinitePages,
@@ -8,7 +9,6 @@ import {
 } from "@/shared/lib";
 
 import { useChargeListParams } from "../lib/use-charge-list-params";
-import { TABLET_QUERY } from "../model/constants";
 import { fetchChargeList } from "./charge-api";
 
 import type { ChargeQuery } from "../model/charge-types";
@@ -51,7 +51,7 @@ export function useChargeScrollList(
  * 목록이 이미 읽어 둔 캐시를 그대로 쓰므로 상세를 열 때 같은 요청을 다시 보내지 않음(캐시가 없을 때, 예: 주소로 바로 열 때만 읽음).
  */
 export function useChargeRecord(id: string | null) {
-  const isTabletUp = useMediaQuery(TABLET_QUERY);
+  const isTabletUp = useMediaQuery(MEDIA_QUERY.tabletUp);
   const { params, baseQuery } = useChargeListParams();
   const paged = useChargeHistory(
     id !== null && isTabletUp ? { ...baseQuery, page: params.page } : null,

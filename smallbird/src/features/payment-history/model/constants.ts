@@ -14,6 +14,3 @@ export const LIST_QUERY_PARAMS = [
   "method",
   "status",
 ] as const;
-
-/** 결제 내역 표는 PC(1440~)만 씀. TAB은 2열 카드, MO는 1열 카드. */
-export const DESKTOP_QUERY = "(min-width: 1440px)";

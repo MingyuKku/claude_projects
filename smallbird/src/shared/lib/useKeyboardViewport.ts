@@ -20,7 +20,8 @@ export interface KeyboardViewport {
 export function useKeyboardViewport(
   isKeyboardOpen: boolean,
 ): KeyboardViewport | null {
-  const viewport = useVisualViewport();
+  // 키보드가 열린 동안만 맞추므로 그때만 구독함.
+  const viewport = useVisualViewport(isKeyboardOpen);
 
   if (!isKeyboardOpen || !viewport || viewport.scale !== 1) return null;
   const gap = Math.max(0, viewport.layoutHeight - viewport.height);

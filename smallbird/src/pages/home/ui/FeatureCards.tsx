@@ -4,13 +4,13 @@ import { useNavigate } from "react-router";
 import { useSession } from "@/entities/session";
 import { MainCard } from "@/shared/components/cards";
 import { LoginRequiredAlert } from "@/shared/components/login-required-alert";
+import { MEDIA_QUERY } from "@/shared/config";
 import { ROUTES } from "@/shared/config/routes";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery } from "@/shared/lib/useMediaQuery";
 import { cn } from "@/shared/lib/utils";
 
 import { useTapAction } from "../lib/use-tap-action";
-import { MOBILE_QUERY } from "../model/constants";
 
 // to가 없는 카드는 갈 화면이 아직 없어 비활성. 시안의 기본 모습은 유지하고 클릭만 막으며, 화면이 연결될 때 to를 채움.
 // isLoginRequired 카드는 비로그인이 누르면 로그인 안내 알럿을 띄움(디자인팀 QA 2026-10-28).
@@ -47,7 +47,7 @@ interface FeatureCardsProps {
 // 인플루언서 추천·캠페인 등록/운영은 비로그인이 누르면 로그인 안내 알럿을 띄움.
 export function FeatureCards({ className }: FeatureCardsProps) {
   const { t } = useTranslation("pages/home");
-  const isMobile = useMediaQuery(MOBILE_QUERY);
+  const isMobile = useMediaQuery(MEDIA_QUERY.mobile);
   const navigate = useNavigate();
   const { session, isLoading } = useSession(ROUTES.main);
   const [isLoginAlertOpen, setIsLoginAlertOpen] = useState(false);

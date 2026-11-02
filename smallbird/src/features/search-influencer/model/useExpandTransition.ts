@@ -1,5 +1,7 @@
 import { useLayoutEffect, useRef } from "react";
 
+import { KEYBOARD_OPEN_SELECTOR } from "@/shared/config";
+
 import {
   findHeightTargets,
   measureHeights,
@@ -66,7 +68,7 @@ export function useExpandTransition({
         getAnimations(element).forEach((animation) => animation.cancel());
     });
     const heights = measureHeights(form);
-    if (phase === "closing" && !form.closest('[data-keyboard="open"]')) {
+    if (phase === "closing" && !form.closest(KEYBOARD_OPEN_SELECTOR)) {
       // 접은 뒤 폼 높이는 입력창 높이와 같아짐(키보드가 열린 동안은 고정 자리라 그대로).
       heights[0] = heights[1];
     }

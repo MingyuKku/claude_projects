@@ -2,6 +2,8 @@ import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { createMemoryRouter, RouterProvider, useLocation } from "react-router";
 
+import { MEDIA_QUERY } from "@/shared/config";
+
 import { InfluencerSearchForm } from "./InfluencerSearchForm";
 
 function LocationProbe() {
@@ -44,6 +46,14 @@ function getSubmit() {
   return screen.getByRole("button", { name: "인플루언서 탐색" });
 }
 
+// jsdom에는 Radix Select가 쓰는 포인터 캡처·스크롤 API가 없음.
+beforeAll(() => {
+  Element.prototype.hasPointerCapture = () => false;
+  Element.prototype.setPointerCapture = () => {};
+  Element.prototype.releasePointerCapture = () => {};
+  Element.prototype.scrollIntoView = () => {};
+});
+
 describe("InfluencerSearchForm", () => {
   it("공백만 있으면 제출 버튼이 비활성화된다", async () => {
     const user = userEvent.setup();
@@ -55,20 +65,14 @@ describe("InfluencerSearchForm", () => {
     expect(getSubmit()).toBeEnabled();
   });
 
-  it("최대 1000자까지만 입력할 수 있다", () => {
-    renderForm();
-    expect(screen.getByRole("textbox")).toHaveAttribute("maxlength", "1000");
-  });
-
-  it("버튼으로 제출하면 플랫폼 없이 검색 경로로 이동한다", async () => {
+  it("버튼으로 제출하면 기본 플랫폼(인스타그램)으로 검색 경로로 이동한다", async () => {
     const user = userEvent.setup();
     renderForm();
     await user.type(screen.getByRole("textbox"), " 스킨케어 ");
     await user.click(getSubmit());
     expect(await screen.findByTestId("location")).toHaveTextContent(
-      "/influencers/search?q=%EC%8A%A4%ED%82%A8%EC%BC%80%EC%96%B4",
+      "/influencers/search?q=%EC%8A%A4%ED%82%A8%EC%BC%80%EC%96%B4&platform=instagram",
     );
-    expect(screen.getByTestId("location")).not.toHaveTextContent("platform");
   });
 
   describe("PC", () => {
@@ -81,7 +85,7 @@ describe("InfluencerSearchForm", () => {
       expect(router.state.location.pathname).toBe("/");
       await user.keyboard("{Enter}");
       expect(router.state.location.pathname).toBe("/influencers/search");
-      expect(router.state.location.search).toBe("?q=a%0Ab");
+      expect(router.state.location.search).toBe("?q=a%0Ab&platform=instagram");
     });
 
     it("한글 조합 중 Enter는 제출하지 않는다", () => {
@@ -94,7 +98,7 @@ describe("InfluencerSearchForm", () => {
   });
 
   it("터치 기기에서는 Enter가 줄바꿈이고 제출하지 않는다", async () => {
-    stubMedia("(pointer: coarse)");
+    stubMedia(MEDIA_QUERY.touch);
     const user = userEvent.setup();
     const router = renderForm();
     const textbox = screen.getByRole("textbox");
@@ -104,40 +108,49 @@ describe("InfluencerSearchForm", () => {
   });
 
   describe("플랫폼", () => {
-    it("항상 버튼에 이름이 보이고 플랫폼을 고르면 쿼리에 platform이 붙는다", async () => {
+    const getPlatform = () => screen.getByRole("combobox", { name: "플랫폼" });
+
+    it("처음에는 인스타그램이 선택되어 있다", () => {
+      renderForm();
+      expect(getPlatform()).toHaveTextContent("인스타그램");
+    });
+
+    it("항상 버튼에 이름이 보이고 플랫폼을 바꾸면 쿼리의 platform도 바뀐다", async () => {
       const user = userEvent.setup();
       const router = renderForm();
       expect(getSubmit()).toHaveTextContent("인플루언서 탐색");
-      await user.click(screen.getByRole("button", { name: "플랫폼" }));
-      await user.click(
-        await screen.findByRole("menuitemcheckbox", { name: "인스타그램" }),
-      );
+      await user.click(getPlatform());
+      await user.click(await screen.findByRole("option", { name: "네이버" }));
       expect(getSubmit()).toHaveTextContent("인플루언서 탐색");
-      expect(
-        screen.getByRole("button", { name: "인스타그램" }),
-      ).toBeInTheDocument();
+      expect(getPlatform()).toHaveTextContent("네이버");
       await user.type(screen.getByRole("textbox"), "hi");
       await user.click(getSubmit());
-      expect(router.state.location.search).toBe("?q=hi&platform=instagram");
+      expect(router.state.location.search).toBe("?q=hi&platform=naver");
     });
 
     it("선택한 플랫폼을 다시 눌러도 해제되지 않는다", async () => {
       const user = userEvent.setup();
       renderForm();
-      await user.click(screen.getByRole("button", { name: "플랫폼" }));
-      await user.click(
-        await screen.findByRole("menuitemcheckbox", { name: "틱톡" }),
-      );
-      await user.click(screen.getByRole("button", { name: "틱톡" }));
-      await user.click(
-        await screen.findByRole("menuitemcheckbox", { name: "틱톡" }),
-      );
-      expect(screen.getByRole("button", { name: "틱톡" })).toBeInTheDocument();
+      await user.click(getPlatform());
+      await user.click(await screen.findByRole("option", { name: "틱톡" }));
+      await user.click(getPlatform());
+      await user.click(await screen.findByRole("option", { name: "틱톡" }));
+      expect(getPlatform()).toHaveTextContent("틱톡");
     });
   });
 
   describe("긴 글 펼치기", () => {
     const LINE_HEIGHT = 20;
+
+    // jsdom에는 레이아웃이 없어 펼칠 공간이 0으로 잡히므로, 입력창 아래 끝을 화면 안쪽에 둬 펼칠 공간을 만듦.
+    beforeEach(() => {
+      vi.spyOn(
+        HTMLFormElement.prototype,
+        "getBoundingClientRect",
+      ).mockReturnValue({ top: 0, bottom: 400 } as DOMRect);
+    });
+
+    afterEach(() => vi.restoreAllMocks());
 
     // 글의 줄 수를 scrollHeight로 흉내 냄(jsdom은 레이아웃이 없음).
     function mockLines(lines: number) {
@@ -174,7 +187,7 @@ describe("InfluencerSearchForm", () => {
     });
 
     it("모바일은 8줄을 넘어 입력창 안에서 스크롤이 생길 때만 펼치기 아이콘을 보여 준다", async () => {
-      stubMedia("(max-width: 767px)");
+      stubMedia(MEDIA_QUERY.mobile);
       const user = await typeLines(8);
       expect(
         screen.queryByRole("button", { name: "펼치기" }),
@@ -195,6 +208,25 @@ describe("InfluencerSearchForm", () => {
       expect(fireEvent.mouseDown(button)).toBe(false);
       expect(textbox).toHaveFocus();
       await user.click(button);
+      expect(textbox).toHaveFocus();
+    });
+
+    it("터치 기기에서 키보드가 내려가 있으면 펼치거나 접어도 입력창에 포커스를 주지 않는다", async () => {
+      stubMedia(MEDIA_QUERY.touch);
+      const user = await typeLines(6);
+      const textbox = screen.getByRole("textbox");
+      textbox.blur();
+      await user.click(await screen.findByRole("button", { name: "펼치기" }));
+      expect(textbox).not.toHaveFocus();
+      await user.click(screen.getByRole("button", { name: "축소" }));
+      expect(textbox).not.toHaveFocus();
+    });
+
+    it("터치 기기에서 쓰던 중이면 펼친 뒤에도 입력창 포커스를 유지한다", async () => {
+      stubMedia(MEDIA_QUERY.touch);
+      const user = await typeLines(6);
+      const textbox = screen.getByRole("textbox");
+      await user.click(await screen.findByRole("button", { name: "펼치기" }));
       expect(textbox).toHaveFocus();
     });
 

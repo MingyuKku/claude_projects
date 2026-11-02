@@ -1,5 +1,6 @@
 import { useLayoutEffect, useRef, useState } from "react";
 
+import { KEYBOARD_STATE_ATTRIBUTE } from "@/shared/config";
 import { useKeyboardViewport } from "@/shared/lib/useKeyboardViewport";
 import { usePreventViewportPan } from "@/shared/lib/usePreventViewportPan";
 import { useVirtualKeyboardOpen } from "@/shared/lib/useVirtualKeyboardOpen";
@@ -50,9 +51,10 @@ function getAlignStage(
  */
 export function useKeyboardAwareShell(isKeyboardAware: boolean) {
   const [isEditingText, setIsEditingText] = useState(false);
-  const isKeyboardOpen = useVirtualKeyboardOpen(
-    isKeyboardAware && isEditingText,
-  );
+  const isKeyboardOpen = useVirtualKeyboardOpen({
+    isEnabled: isKeyboardAware,
+    isFocused: isEditingText,
+  });
   const keyboardViewport = useKeyboardViewport(isKeyboardOpen);
   const isFittedToViewport = keyboardViewport !== null;
   // 셸을 맞춘 동안에는 바깥(키보드 뒤 영역)을 터치로 끌지 못하게 함.
@@ -60,7 +62,7 @@ export function useKeyboardAwareShell(isKeyboardAware: boolean) {
 
   // 키보드가 열리는 순간 한 번만, 포커스한 입력을 감싼 `[data-keyboard-anchor]`(없으면 입력 자신)의 아래 끝이 보이게 스크롤함.
   // iOS는 포커스한 입력(커서)까지만 보이게 스크롤해 그 아래 버튼 줄이 키보드에 가려지기 때문. 여백은 앵커의
-  // scroll-margin-bottom을 따름(CSSOM View scrollIntoView). iOS는 셸이 보이는 영역 높이로 줄어든 직후에 한 번 더 맞춤.
+  // scroll-margin-bottom(CSSOM View scrollIntoView)이나 앵커 안쪽 아래 패딩을 따름. iOS는 셸이 보이는 영역 높이로 줄어든 직후에 한 번 더 맞춤.
   // 열려 있는 동안 다시 맞추지는 않음(사용자 스크롤과 충돌). 핀치 확대로 맞춤이 풀릴 때도 맞추지 않음.
   const alignStage = getAlignStage(isKeyboardOpen, isFittedToViewport);
   const previousAlignStageRef = useRef(alignStage);
@@ -99,7 +101,7 @@ export function useKeyboardAwareShell(isKeyboardAware: boolean) {
 
   return {
     rootProps: {
-      "data-keyboard": keyboardState,
+      [KEYBOARD_STATE_ATTRIBUTE]: keyboardState,
       style: keyboardViewport ? toViewportStyle(keyboardViewport) : undefined,
       onFocus: handleFocusTextEntry,
       onBlur: handleBlurTextEntry,

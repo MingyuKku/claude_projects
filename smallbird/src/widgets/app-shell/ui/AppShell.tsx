@@ -64,7 +64,8 @@ interface AppShellProps {
   mainClassName?: string;
   /**
    * 가상 키보드가 떠 있는지를 셸 루트의 `data-keyboard="open"`으로 알림. 본문은 Tailwind `in-data-[keyboard=open]:`으로 키보드 열림 배치를 정하고,
-   * 키보드가 열릴 때 보이게 할 영역에 `data-keyboard-anchor`와 `scroll-mb-(--keyboard-anchor-gap)`을 둠. 키보드가 열리면 셸이 보이는 영역만큼 줄어듦(Android는 index.html의
+   * 키보드가 열릴 때 보이게 할 영역에 `data-keyboard-anchor`를 두고, 그 아래 끝과 보이는 영역 아래 끝 사이 여백을 `--keyboard-anchor-gap`으로 맞춤
+   * (앵커의 `scroll-mb-(--keyboard-anchor-gap)`, 또는 앵커가 감싼 내용 아래 패딩). 키보드가 열리면 셸이 보이는 영역만큼 줄어듦(Android는 index.html의
    * `interactive-widget=resizes-content`, 이를 지원하지 않는 iOS Safari는 셸을 visualViewport 높이에 맞춤). 규칙은 `.claude/skills/mobile-keyboard/SKILL.md`.
    */
   isKeyboardAware?: boolean;
@@ -159,7 +160,7 @@ export function AppShell({
       <div
         {...keyboardRootProps}
         className={cn(
-          // --keyboard-anchor-gap: 키보드가 열릴 때 [data-keyboard-anchor]를 키보드 위로 띄우는 여백. 본문이 scroll-margin-bottom으로 씀.
+          // --keyboard-anchor-gap: 키보드가 열릴 때 [data-keyboard-anchor]를 키보드 위로 띄우는 여백. 본문이 scroll-margin-bottom이나 아래 패딩으로 씀.
           "flex h-dvh overflow-hidden bg-background [--keyboard-anchor-gap:--spacing(4)]",
           // 본문 아래 끝이 흐려질 때 비치는 셸 배경을 셸 아래 블록과 같게 해 이음매 없이 이어지게 함.
           isFittedToViewport && keyboardGapClassName,

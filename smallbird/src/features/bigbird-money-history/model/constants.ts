@@ -30,6 +30,3 @@ export const LIST_QUERY_PARAMS = [
   "campaign",
   "usage",
 ] as const;
-
-export const TABLET_QUERY = "(min-width: 768px)";
-export const DESKTOP_QUERY = "(min-width: 1440px)";

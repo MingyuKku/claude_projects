@@ -2,6 +2,7 @@
 //
 // 대상은 클래스 목록이 아니라 `data-reveal` 로 표시해, 안쪽 클래스 이름을 바꿔도 여기를 같이 고칠 필요가 없게 함.
 // 히어로는 일부러 표시하지 않음: 로드 때 이미 화면에 있어서, 애니메이션을 주면 로딩이 느린 것처럼 보임.
+import { MEDIA_QUERY } from "@/shared/config";
 
 // 같은 부모 아래 형제는 하나씩 조금씩 늦게 나타나 한 줄의 카드가 차례로 떠오름.
 // 네 번째에서 상한을 둠: 한 그룹에 카드가 8장이면 마지막 카드가 나머지보다 한참 뒤에 나타나 멈춘 것처럼 느껴짐.
@@ -14,7 +15,6 @@ const TRIGGER_RATIO = 0.88;
 
 const REVEAL_SELECTOR = "[data-reveal]";
 const REVEALED_ATTRIBUTE = "data-revealed";
-const REDUCED_MOTION_QUERY = "(prefers-reduced-motion: reduce)";
 
 export interface Reveal {
   check(): void;
@@ -48,7 +48,7 @@ export function createReveal(root: HTMLElement | null): Reveal {
   if (!pending.length) return NOOP;
 
   // 모션 감소를 쓰는 사용자에게는 모두 한 번에 보여 줌. CSS 는 `data-revealed` 를 보이는 상태로 취급함.
-  if (window.matchMedia?.(REDUCED_MOTION_QUERY).matches) {
+  if (window.matchMedia?.(MEDIA_QUERY.reducedMotion).matches) {
     pending.forEach((element) => element.setAttribute(REVEALED_ATTRIBUTE, ""));
     return NOOP;
   }

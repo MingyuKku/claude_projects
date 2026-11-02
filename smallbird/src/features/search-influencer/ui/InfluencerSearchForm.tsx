@@ -4,6 +4,7 @@ import { useId, useRef, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { TextField } from "@/shared/components/text-field";
+import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery } from "@/shared/lib/useMediaQuery";
 import { cn } from "@/shared/lib/utils";
@@ -11,11 +12,9 @@ import { Button } from "@/shared/ui/button";
 
 import { buildInfluencerSearchUrl } from "../lib/build-search-url";
 import {
+  DEFAULT_PLATFORM,
   EXPAND_ACTION_MIN_LINES,
-  MAX_QUERY_LENGTH,
   MOBILE_EXPAND_ACTION_MIN_LINES,
-  MOBILE_MEDIA_QUERY,
-  TOUCH_MEDIA_QUERY,
 } from "../model/constants";
 import { useExpandTransition } from "../model/useExpandTransition";
 import { useInlineExpand } from "../model/useInlineExpand";
@@ -32,12 +31,14 @@ import type {
 } from "react";
 
 // 높이를 줄 수(lh = 이 입력의 line-height)로 정해 글자 크기·줄 간격이 바뀌어도 최소 4줄·최대 8줄을 유지함.
+// 키보드가 열린 동안은 입력창이 보이는 영역 안에 들어와야 하므로 4줄·8줄도 입력 영역 한도(useInlineExpand)를 넘지 않음.
 // 아이콘이 스크롤바 오른쪽에 붙으므로 스크롤바 자리를 미리 잡아 줄 수가 바뀔 때 글 폭이 흔들리지 않게 함.
 const textareaVariants = cva("h-auto", {
   variants: {
     isExpanded: {
       true: "min-h-0 max-h-none flex-1",
-      false: "min-h-[4lh] max-h-[8lh]",
+      false:
+        "min-h-[4lh] max-h-[8lh] in-data-[keyboard=open]:min-h-[min(4lh,var(--search-textarea-max-height))] in-data-[keyboard=open]:max-h-[min(8lh,var(--search-textarea-max-height))]",
     },
     hasExpandAction: {
       true: "[scrollbar-gutter:stable]",
@@ -61,7 +62,9 @@ const fieldVariants = cva("", {
 
 // 키보드가 열린 동안 입력창은 자리를 차지하지 않으므로(위 fieldVariants) 기본 높이만큼 자리를 비워 둠.
 // 142px = 입력 4줄 80 + 위아래 패딩·테두리 20 + 간격 6 + 버튼 줄 36. 카드 위치가 글 길이에 따라 움직이지 않게 함.
-const KEYBOARD_OPEN_SLOT_CLASS_NAME = "in-data-[keyboard=open]:h-35.5";
+// 보이는 영역이 이보다 낮으면 입력창 한도만큼만 비워 둠.
+const KEYBOARD_OPEN_SLOT_CLASS_NAME =
+  "in-data-[keyboard=open]:h-[min(--spacing(35.5),var(--search-field-max-height))]";
 
 // 확대·축소 아이콘이 바뀔 때 흐려지며 살짝 커지게 함. 모션 줄이기를 켜면 바로 바뀜.
 const ICON_SWAP_CLASS_NAME =
@@ -83,9 +86,10 @@ export function InfluencerSearchForm({ className }: InfluencerSearchFormProps) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const [query, setQuery] = useState("");
-  const [platform, setPlatform] = useState<InfluencerPlatform>();
-  const isTouch = useMediaQuery(TOUCH_MEDIA_QUERY);
-  const isMobile = useMediaQuery(MOBILE_MEDIA_QUERY);
+  const [platform, setPlatform] =
+    useState<InfluencerPlatform>(DEFAULT_PLATFORM);
+  const isTouch = useMediaQuery(MEDIA_QUERY.touch);
+  const isMobile = useMediaQuery(MEDIA_QUERY.mobile);
   const expand = useInlineExpand({ formRef });
 
   const { isOverflowing } = useTextareaOverflow({
@@ -102,10 +106,19 @@ export function InfluencerSearchForm({ className }: InfluencerSearchFormProps) {
     onCollapsed: expand.finishCollapse,
   });
   const canSubmit = query.trim() !== "";
-  const shouldShowExpandAction = isOverflowing || expand.isExpanded;
-  const formStyle: CssVariableStyle | undefined = expand.metrics && {
-    height: expand.metrics.slotHeight,
-    "--search-expanded-height": `${expand.metrics.overlayHeight}px`,
+  // 펼쳐도 커질 공간이 없으면 펼치기 버튼을 숨김. 펼친 뒤에는 접을 수 있게 축소 버튼을 둠.
+  const canExpand = expand.limit?.canExpand ?? true;
+  const shouldShowExpandAction =
+    expand.isExpanded || (isOverflowing && canExpand);
+  const formStyle: CssVariableStyle = {
+    ...(expand.limit && {
+      "--search-field-max-height": `${expand.limit.maxFieldHeight}px`,
+      "--search-textarea-max-height": `${expand.limit.maxTextareaHeight}px`,
+    }),
+    ...(expand.metrics && {
+      height: expand.metrics.slotHeight,
+      "--search-expanded-height": `${expand.metrics.overlayHeight}px`,
+    }),
   };
 
   function submitQuery() {
@@ -133,10 +146,13 @@ export function InfluencerSearchForm({ className }: InfluencerSearchFormProps) {
   }
 
   function handleClickExpand() {
+    // 버튼이 mousedown에서 포커스를 가져가지 않으므로, 쓰던 중이었다면 지금도 입력창에 포커스가 있음.
+    const wasTyping = document.activeElement === textareaRef.current;
     if (expand.isExpanded) expand.collapse();
     else expand.expand();
     // 버튼을 눌러도 계속 쓰고 Esc가 듣도록 입력창으로 포커스를 돌림. iOS는 탭 이벤트 안에서 동기로 focus해야 키보드가 유지됨.
-    textareaRef.current?.focus();
+    // 터치 기기에서 키보드가 내려가 있었으면 포커스를 주지 않아 키보드를 올리지 않음(읽으려고 펼치는 경우, 2026-11-02 사용자 결정).
+    if (wasTyping || !isTouch) textareaRef.current?.focus();
   }
 
   function handleSubmitForm(event: FormEvent) {
@@ -183,7 +199,6 @@ export function InfluencerSearchForm({ className }: InfluencerSearchFormProps) {
           )
         }
         value={query}
-        maxLength={MAX_QUERY_LENGTH}
         // Figma에 입력창 라벨이 없어 안내 문구를 접근성 이름으로 함께 씀.
         aria-label={t("query.placeholder")}
         placeholder={t("query.placeholder")}

@@ -4,6 +4,7 @@ import {
   ListEmptyState,
   resolveEmptyKind,
 } from "@/shared/components/list-filter";
+import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery } from "@/shared/lib";
 
@@ -14,11 +15,7 @@ import {
 } from "../api/use-charge-history";
 import { useChargeAutoRefresh } from "../lib/use-charge-auto-refresh";
 import { useChargeListParams } from "../lib/use-charge-list-params";
-import {
-  LIST_PAGE_SIZE_OPTIONS,
-  DESKTOP_QUERY,
-  TABLET_QUERY,
-} from "../model/constants";
+import { LIST_PAGE_SIZE_OPTIONS } from "../model/constants";
 import { ChargeCardList } from "./ChargeCardList";
 import { ChargeListSkeleton } from "./ChargeListSkeleton";
 import { ChargeTable } from "./ChargeTable";
@@ -41,8 +38,8 @@ export function ChargeHistory({
   onClickDetail,
 }: ChargeHistoryProps) {
   const { t } = useTranslation("features/bigbird-money-history");
-  const isTabletUp = useMediaQuery(TABLET_QUERY);
-  const isDesktop = useMediaQuery(DESKTOP_QUERY);
+  const isTabletUp = useMediaQuery(MEDIA_QUERY.tabletUp);
+  const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
   const { fields, params, baseQuery } = useChargeListParams();
   const reload = useReloadChargeHistory();
   // 쪽 나눔 목록(PC·TAB)과 이어 읽는 목록(MO)은 폭에 따라 한쪽만 읽음.
