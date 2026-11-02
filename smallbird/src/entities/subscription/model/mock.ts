@@ -28,6 +28,7 @@ const MOCK_SUBSCRIPTIONS: Record<ActiveProductType, Subscription> = {
     endsAt: "2026-10-31",
     amount: 99999,
     paymentMethod: "card",
+    cardKind: "credit",
     isCancelScheduled: false,
   },
   pick: {
@@ -38,6 +39,7 @@ const MOCK_SUBSCRIPTIONS: Record<ActiveProductType, Subscription> = {
     endsAt: "2026-10-14",
     amount: 199999,
     paymentMethod: "cardInstallment",
+    cardKind: "credit",
     isCancelScheduled: true,
   },
 };

@@ -252,8 +252,9 @@ export function transformInquiryCampaignToViewModel(
     typeName: campaign.campaignServiceName ?? null,
     campaignCode: campaign.campaignCode,
     brandName: campaign.brandName,
-    productName: campaign.productName,
-    name: toProductName(campaign.brandName, campaign.productName),
+    // 상품명 null은 빈 문자열로 둬서 소비처의 `trim() ||` 대체 처리를 그대로 탐.
+    productName: campaign.productName ?? "",
+    name: toProductName(campaign.brandName, campaign.productName ?? ""),
     imageUrl: campaign.mainImageUrl,
     period: toCampaignPeriod(
       campaign.progressStartDate,

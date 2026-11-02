@@ -4,3 +4,5 @@ export {
   BigbirdInquiryWorkspace,
   toStatusFilter,
 } from "./ui/BigbirdInquiryWorkspace";
+export { WithdrawalRequestCard } from "./ui/WithdrawalRequestCard";
+export type { WithdrawalRequestStatus } from "./ui/WithdrawalRequestCard";

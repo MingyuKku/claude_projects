@@ -69,7 +69,7 @@ export function BuyerInquiryDetailPanel({
   const productImageUrl = product?.imageUrl ?? detail.imageUrl;
   const productName = product?.name ?? detail.name;
   const campaignImageUrl = campaign?.imageUrl ?? detail.imageUrl;
-  const campaignName = campaign?.name ?? detail.name;
+  const campaignName = campaign?.name || detail.name;
   const period =
     detail.progressStartDate && detail.progressEndDate
       ? `${detail.progressStartDate}~${detail.progressEndDate}`

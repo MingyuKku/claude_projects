@@ -1,3 +1,4 @@
+import { subscriptionPaymentListSchema } from "../model/schema";
 import { transformPayments } from "./transform-payments";
 
 const item = {
@@ -18,7 +19,13 @@ describe("transformPayments", () => {
       }),
     ).toEqual({
       totalCount: 23,
-      records: [{ ...item, receiptUrl: "https://iniweb.inicis.com/receipt" }],
+      records: [
+        {
+          ...item,
+          cardKind: null,
+          receiptUrl: "https://iniweb.inicis.com/receipt",
+        },
+      ],
     });
   });
 
@@ -31,5 +38,32 @@ describe("transformPayments", () => {
       ],
     });
     expect(records.map((record) => record.receiptUrl)).toEqual([null, null]);
+  });
+
+  it("모르는 결제 수단·상태 코드가 와도 목록 전체를 거부하지 않고 서버 값을 그대로 둔다", () => {
+    const parsed = subscriptionPaymentListSchema.parse({
+      totalCount: 1,
+      items: [{ ...item, method: "virtualAccount", status: "canceled" }],
+    });
+    expect(transformPayments(parsed).records[0]).toMatchObject({
+      method: "virtualAccount",
+      status: "canceled",
+    });
+  });
+
+  it("카드 종류 코드를 담고, 없거나 모르는 값은 null로 둔다", () => {
+    const { records } = transformPayments({
+      totalCount: 3,
+      items: [
+        { ...item, cardKind: "debit" },
+        { ...item, id: "42", cardKind: null },
+        { ...item, id: "43", cardKind: "prepaid" },
+      ],
+    });
+    expect(records.map((record) => record.cardKind)).toEqual([
+      "debit",
+      null,
+      null,
+    ]);
   });
 });

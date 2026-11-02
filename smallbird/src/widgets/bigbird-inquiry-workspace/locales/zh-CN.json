@@ -63,5 +63,25 @@
   "productName": "商品名称",
   "period": "进行期间",
   "progressStatus": "进行状态",
-  "shopCode": "店铺代码"
+  "shopCode": "店铺代码",
+  "otherTag": "其他",
+  "withdrawal": {
+    "title": "Bigbird 余额提现申请",
+    "status": {
+      "requested": "待审批",
+      "approved": "已批准",
+      "rejected": "已拒绝"
+    },
+    "notice": {
+      "approved": "申请已批准。",
+      "rejected": "申请已被拒绝。"
+    },
+    "amount": "提现金额",
+    "won": "{{amount}}韩元",
+    "applicant": "申请人",
+    "applicantValue": "{{name}} (@{{id}})",
+    "account": "收款账户",
+    "requestedAt": "申请时间",
+    "rejectReason": "拒绝原因"
+  }
 }

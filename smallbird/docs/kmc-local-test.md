@@ -32,10 +32,10 @@ stage.client.bigbird.co.kr {
 }
 
 # 구독 결제용: hosts가 이 도메인을 127.0.0.1로 돌리므로 :3101도 로컬로 오는데, 받는 쪽이 없어 ERR_CONNECTION_REFUSED가 남.
-# 그래서 실제 Stage 결제 서버 IP로 직접 연결해 넘김(IP가 바뀌면 dig +short stage.client.bigbird.co.kr @8.8.8.8 로 다시 확인).
+# 그래서 실제 Stage 결제 서버 IP로 직접 연결해 넘김. IP는 Caddy를 띄울 때 STAGE_PAY_IP 환경변수로 넣음(IP가 바뀌면 Caddy를 다시 띄움).
 stage.client.bigbird.co.kr:3101 {
 	tls internal
-	reverse_proxy https://3.37.34.183:3101 {
+	reverse_proxy https://{$STAGE_PAY_IP}:3101 {
 		header_up Host stage.client.bigbird.co.kr
 		header_up -X-Forwarded-For
 		transport http {
@@ -47,7 +47,7 @@ EOF
 ```
 
 - `tls internal`: 공개 도메인이라 기본값이면 Let's Encrypt에서 실제 인증서를 받으려 하고 실패합니다. Caddy 로컬 인증서를 쓰게 합니다.
-- 두 번째 블록(`:3101`)은 구독 결제를 확인할 때만 필요합니다. KMC만 확인한다면 없어도 됩니다. 실제 서버 IP 두 개(`3.37.34.183`, `3.38.254.149`)가 3101에서 같은 응답을 줘서 아무 쪽이나 써도 됩니다(2026-10-28 확인). 이미 첫 블록만 있는 파일을 쓰고 있다면 두 번째 블록을 붙이고 Caddy를 다시 띄우거나 `caddy reload --config ~/.config/caddy/kmc-local.Caddyfile`을 실행합니다.
+- 두 번째 블록(`:3101`)은 구독 결제를 확인할 때만 필요합니다. KMC만 확인한다면 없어도 됩니다. 결제 서버 IP는 고정이 아니어서(2026-10-28 `3.37.34.183`·`3.38.254.149` → 2026-11-02 `13.124.36.145`·`54.116.184.146`) 파일에 적지 않고, Caddy를 띄울 때 `STAGE_PAY_IP` 환경변수로 넣습니다(아래 "켜기" 3). Caddyfile의 `{$STAGE_PAY_IP}`는 설정을 읽을 때 한 번만 바뀌므로, 띄운 뒤 IP가 바뀌면 Caddy를 다시 띄웁니다. IP가 바뀌는 원인(로드밸런서 등)은 확인하지 못했습니다. 이미 첫 블록만 있는 파일을 쓰고 있다면 두 번째 블록을 붙이고 Caddy를 다시 띄웁니다. `caddy reload`를 쓸 때도 같은 셸에서 `STAGE_PAY_IP`를 먼저 export해야 합니다(설정을 reload를 실행한 셸에서 읽음).
 - `header_up -X-Forwarded-For`: Caddy는 기본으로 이 헤더를 붙이는데, Stage 백엔드는 이 헤더가 있으면 값과 상관없이 `GET /sec` 등에서 500을 냅니다(2026-10-26 확인). 그래서 한 줄 명령(`caddy reverse-proxy`)은 쓰지 않습니다. 헤더를 뺄 수 없습니다.
 
 ## 켜기
@@ -62,8 +62,13 @@ EOF
 3. Caddy를 띄웁니다(터미널을 열어 둔 채로). macOS는 sudo 없이도 443을 열 수 있습니다.
 
    ```bash
+   export STAGE_PAY_IP=$(dig +short A stage.client.bigbird.co.kr @8.8.8.8 | grep -E '^[0-9]+(\.[0-9]+){3}$' | head -1)
+   : "${STAGE_PAY_IP:?dig 실패: 결제 서버 IP를 못 찾음}"
    caddy run --config ~/.config/caddy/kmc-local.Caddyfile
    ```
+
+   - `dig @8.8.8.8`은 hosts를 거치지 않아 hosts를 바꾼 뒤에도 실제 IP를 가져옵니다. `grep`은 IP 줄만 남깁니다. dig가 응답을 못 받으면 `;; connection timed out ...`을 표준 출력으로 내고, CNAME이면 첫 줄이 호스트명이라 그대로 쓰면 안 됩니다.
+   - 두 번째 줄은 값이 비면 멈춥니다. 빈 값이면 upstream이 `:3101`(Caddy 자신)이 되어 에러 없이 떠서 결제 요청이 자기 자신으로 돕니다.
 
    처음 실행하면 Caddy의 로컬 인증서를 시스템에 신뢰 등록하느라 비밀번호를 물을 수 있습니다. 등록이 안 됐으면 Caddy가 떠 있는 상태에서 `sudo caddy trust`를 한 번 실행합니다. 등록 뒤 브라우저를 완전히 껐다 켭니다. Chrome을 끄기 어려우면 Safari나 별도 프로필 Chrome(`open -na "Google Chrome" --args --user-data-dir=/tmp/chrome-kmc-test`)을 씁니다. Firefox는 macOS 키체인을 쓰지 않아 경고가 계속 뜹니다.
 
@@ -80,7 +85,7 @@ EOF
 - 테스트 상점(`INIBillTst`)입니다. 2026-10-28에 이 절차로 결제가 되어 서버에 구독 1건(모집형 월 99,000원)·기본 카드 1장·결제 1건(`paid`)이 반영된 것을 `GET /v3/mypage/subscription/{subscriptions,billing-cards,payments}`로 확인했습니다. 실제 청구 여부는 확인하지 못했으니 테스트 카드 정보를 백엔드에 문의하고(Q-9) 실제 카드는 쓰지 마세요.
 - 테스트 뒤 구독이 남으면 같은 상품을 다시 구독할 수 없습니다(`ALREADY_SUBSCRIBED`). 결제내역 탭의 "구독해지"로 정리하거나 다른 상품(PICK형)으로 확인합니다.
 - 같은 토큰으로 `issuance`를 부르면 주문번호가 서버에 남을 수 있으니 반복 호출은 피합니다.
-- 연결이 안 될 때: `ERR_CONNECTION_REFUSED` → Caddy에 `:3101` 블록이 없거나 Caddy가 꺼져 있음. CORS 오류 → `https://stage.client.bigbird.co.kr`가 아닌 주소(localhost·내부 IP)로 접속함.
+- 연결이 안 될 때: `ERR_CONNECTION_REFUSED` → Caddy에 `:3101` 블록이 없거나 Caddy가 꺼져 있음. CORS 오류 → `https://stage.client.bigbird.co.kr`가 아닌 주소(localhost·내부 IP)로 접속함. `502` → Caddy를 띄운 뒤 결제 서버 IP가 바뀌었을 수 있음. dig 값을 다시 확인하고 Caddy를 다시 띄움(위 "켜기" 3).
 
 ## 끄기 (반드시)
 
@@ -98,7 +103,7 @@ sudo dscacheutil -flushcache; sudo killall -HUP mDNSResponder
 ```bash
 grep -c "stage.client.bigbird.co.kr" /etc/hosts       # 0이면 정상
 lsof -nP -iTCP:443 -iTCP:3101 -sTCP:LISTEN            # 비어 있으면 Caddy 종료됨
-ping -c1 stage.client.bigbird.co.kr                   # 127.0.0.1이 아닌 실제 IP(3.37.34.183 등)가 나오면 정상
+ping -c1 stage.client.bigbird.co.kr                   # 127.0.0.1이 아닌 실제 IP가 나오면 정상
 ```
 
 ## 확인 방법

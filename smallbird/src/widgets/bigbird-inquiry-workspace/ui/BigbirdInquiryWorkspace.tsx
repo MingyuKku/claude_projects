@@ -30,12 +30,6 @@ export function toStatusFilter(value: string | null): StatusFilter {
   return STATUS_FILTERS.find((filter) => filter === value) ?? "all";
 }
 
-// Figma 브랜드명 배지의 최대 폭: 실시간 상담중 카드 104px, 그 외 128px.
-const BRAND_BADGE_MAX_WIDTH = {
-  consulting: "max-w-26",
-  other: "max-w-32",
-} as const;
-
 interface BigbirdInquiryWorkspaceProps {
   /** 브랜드명 배지를 채울 캠페인 목록 조회에 쓰는 세션 값. */
   threadUserIdx: number | undefined;
@@ -179,37 +173,31 @@ export function BigbirdInquiryWorkspace({
             (item) => item.campaignIdx === inquiry.campaignIdx,
           );
           const title = getInquiryTitleKey(inquiry, campaign?.productName);
-          const brandName = campaign?.brandName;
-          const isConsulting = inquiry.status === "consulting";
-          // 기타 문의는 회색 "기타 문의" 뒤에 최근 메시지를 보여 줌(Figma 3.0.6 카드, REQ-23-0002).
-          const preview =
-            title.key === "inquiryTitle.other"
-              ? getOtherInquiryPreview(inquiry)
-              : null;
+          const isOther = title.key === "inquiryTitle.other";
+          // Figma 26/10/29 카드(11315:49602·49659): 1행은 상태 배지 + 기타 문의일 때만 "기타문의" 태그,
+          // 2행은 캠페인 문의면 회색 브랜드명 + 제목, 기타 문의는 캠페인이 없어 최근 글 메시지 20자만(REQ-23-0002).
+          // 최근 메시지는 목록 API에 아직 없어 값이 없으면 그리지 않음(백엔드 요청 중).
+          const otherPreview = isOther ? getOtherInquiryPreview(inquiry) : null;
           return (
             <ChatListItem
               key={inquiry.threadIdx}
-              titlePrefix={preview ? t("inquiryTitle.other") : undefined}
+              titlePrefix={isOther ? undefined : campaign?.brandName}
               title={
-                preview ??
-                t(title.key, { name: "name" in title ? title.name : "" })
+                isOther
+                  ? (otherPreview ?? "")
+                  : t(title.key, { name: "name" in title ? title.name : "" })
               }
               badges={[
                 {
-                  label: t(isConsulting ? "consultingBadge" : inquiry.status),
+                  label: t(
+                    inquiry.status === "consulting"
+                      ? "consultingBadge"
+                      : inquiry.status,
+                  ),
                   variant: STATUS_BADGE_VARIANT[inquiry.status],
                 },
-                ...(brandName
-                  ? [
-                      {
-                        label: brandName,
-                        variant: "outline" as const,
-                        className:
-                          BRAND_BADGE_MAX_WIDTH[
-                            isConsulting ? "consulting" : "other"
-                          ],
-                      },
-                    ]
+                ...(isOther
+                  ? [{ label: t("otherTag"), variant: "outline" as const }]
                   : []),
               ]}
               date={formatListDate(getLastActivity(inquiry))}

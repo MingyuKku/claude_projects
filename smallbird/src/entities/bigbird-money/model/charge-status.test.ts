@@ -1,14 +1,16 @@
 import { toChargeStatus } from "./charge-status";
 
 describe("toChargeStatus", () => {
-  it("서버의 한글 입금 상태를 코드로 바꾼다", () => {
-    expect(toChargeStatus("결제완료")).toBe("paid");
-    expect(toChargeStatus("대기중")).toBe("pending");
-    expect(toChargeStatus("결제취소")).toBe("canceled");
+  it("서버 상태 코드를 화면용 코드로 바꾼다", () => {
+    expect(toChargeStatus("DEPOSIT_COMPLETED")).toBe("paid");
+    expect(toChargeStatus("WITHDRAWAL_COMPLETED")).toBe("withdrawn");
+    expect(toChargeStatus("PENDING")).toBe("pending");
+    expect(toChargeStatus("DEPOSIT_EXPIRED")).toBe("canceled");
   });
 
-  it("모르는 값은 null이다", () => {
-    expect(toChargeStatus("입금완료")).toBeNull();
+  it("모르는 값과 옛 한글 값은 null이다", () => {
+    expect(toChargeStatus("WITHDRAWAL_REJECTED")).toBeNull();
+    expect(toChargeStatus("결제완료")).toBeNull();
     expect(toChargeStatus("")).toBeNull();
   });
 

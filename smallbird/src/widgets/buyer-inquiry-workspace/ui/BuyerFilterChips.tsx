@@ -38,7 +38,7 @@ export function BuyerFilterChips({
           key: "campaign",
           label:
             campaigns?.find((campaign) => campaign.campaignIdx === campaignIdx)
-              ?.name ?? t("filter.campaignFallback", { idx: campaignIdx }),
+              ?.name || t("filter.campaignFallback", { idx: campaignIdx }),
           onRemove: onRemoveCampaign,
         },
     influencerThreadUserIdx === undefined

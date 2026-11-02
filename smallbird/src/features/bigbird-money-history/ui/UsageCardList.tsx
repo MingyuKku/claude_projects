@@ -1,61 +1,66 @@
 import { FullTextHint } from "@/shared/components/full-text-hint";
 import { useTranslation } from "@/shared/i18n";
+import { Button } from "@/shared/ui/button";
 
 import { useMoneyFormat } from "../lib/use-money-format";
+import { useUsageLabels } from "../lib/use-usage-labels";
 import { UsageAmount } from "./UsageAmount";
+import { UsageTypeBadge } from "./UsageTypeBadge";
 
 import type { UsageRecord } from "../model/usage-types";
 
 interface UsageCardListProps {
   records: UsageRecord[];
+  onClickDetail: (record: UsageRecord) => void;
 }
 
-// Figma MO 카드(7053:272961): 상세 보기 버튼 없이 모든 정보를 인라인으로. 라벨 열(회색)·값 열의 7행 표.
-// 값이 없는 항목도 행을 숨기지 않고 "-"로 둠(스펙 §3).
-export function UsageCardList({ records }: UsageCardListProps) {
+// Figma 건별 카드(TAB 2열 11224:104580, MO 1열 11224:105677): 위쪽 오른쪽 정렬 "상세 보기" 버튼, 아래 라벨 열(회색)·값 열 6행 표.
+// 캠페인 유형·캠페인 코드는 상세 보기에만 있음. 캠페인 썸네일은 응답에 이미지 필드가 없어 그리지 않음.
+// 값이 없는 항목도 행을 숨기지 않고 "-"로 둠(스펙 §3). TAB은 카드 사이 12px로 2열이고 같은 줄 카드는 높이를 맞춤.
+export function UsageCardList({ records, onClickDetail }: UsageCardListProps) {
   const { t } = useTranslation("features/bigbird-money-history");
   const { formatDateTime, formatWon } = useMoneyFormat();
+  const labels = useUsageLabels();
 
   return (
-    <ul aria-label={t("usage.list.label")} className="flex flex-col gap-5">
+    <ul
+      aria-label={t("usage.list.label")}
+      className="grid grid-cols-1 gap-5 tablet:grid-cols-2 tablet:gap-3"
+    >
       {records.map((record) => {
         const rows = [
+          { key: "type", value: <UsageTypeBadge record={record} /> },
           {
-            key: "usedAt",
+            key: "date",
             value: formatDateTime(record.usedAt, record.usedAtText),
           },
           {
             key: "campaignName",
             value: <FullTextHint text={record.campaignName} lines={2} />,
           },
-          { key: "campaignType", value: record.campaignType },
-          { key: "campaignCode", value: record.campaignCode },
-          { key: "usage", value: record.usageLabel },
-          {
-            key: "amount",
-            value: (
-              <UsageAmount amount={record.amount} className="font-semibold" />
-            ),
-          },
-          {
-            key: "remaining",
-            value: (
-              <span className="font-semibold">
-                {formatWon(record.remainingAmount)}
-              </span>
-            ),
-          },
+          { key: "usage", value: labels.usageDetail(record) },
+          { key: "amount", value: <UsageAmount amount={record.amount} /> },
+          { key: "remaining", value: formatWon(record.remainingAmount) },
         ] as const;
 
         return (
-          <li key={record.id}>
-            <dl className="grid grid-cols-[minmax(6.25rem,max-content)_minmax(0,1fr)] overflow-hidden rounded-lg border">
+          <li key={record.id} className="flex flex-col gap-2">
+            <div className="flex items-center justify-end gap-2">
+              <Button
+                variant="outline-foreground"
+                size="sm"
+                onClick={() => onClickDetail(record)}
+              >
+                {t("usage.action.detail")}
+              </Button>
+            </div>
+            <dl className="grid flex-1 grid-cols-[minmax(6.25rem,7rem)_minmax(0,1fr)] overflow-hidden rounded-lg border">
               {rows.map(({ key, value }) => (
                 <div key={key} className="contents">
                   <dt className="flex min-h-12 items-center border-b bg-muted/40 px-4 text-sm leading-6 font-medium text-muted-foreground [div:last-child>&]:border-b-0">
-                    {t(`usage.card.${key}`)}
+                    {t(`usage.column.${key}`)}
                   </dt>
-                  <dd className="flex min-h-12 min-w-0 items-center border-b px-4 py-2 text-sm leading-5 text-foreground [div:last-child>&]:border-b-0">
+                  <dd className="flex min-h-12 min-w-0 items-center border-b px-4 py-2 text-sm leading-5 break-all text-foreground [div:last-child>&]:border-b-0">
                     {value}
                   </dd>
                 </div>

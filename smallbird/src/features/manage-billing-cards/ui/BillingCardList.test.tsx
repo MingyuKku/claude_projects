@@ -31,12 +31,14 @@ const defaultCard: BillingCard = {
   issuer: "하나카드",
   maskedNumber: "1234-56**-****-***7",
   isDefault: true,
+  cardKind: "credit",
 };
 const extraCard: BillingCard = {
   id: "card-2",
   issuer: "신한카드",
   maskedNumber: "5678-12**-****-***9",
   isDefault: false,
+  cardKind: "debit",
 };
 
 function setup(cards: BillingCard[]) {

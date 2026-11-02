@@ -30,7 +30,10 @@ export function PaymentCardList({ records }: PaymentCardListProps) {
           { key: "paidAt", value: formatDateTime(record.paidAt) },
           { key: "name", value: record.name },
           { key: "amount", value: formatWon(record.amount) },
-          { key: "method", value: paymentMethodLabel(record.method) },
+          {
+            key: "method",
+            value: paymentMethodLabel(record.method, record.cardKind),
+          },
           {
             key: "status",
             value: <PaymentStatusBadge serverValue={record.status} size="sm" />,

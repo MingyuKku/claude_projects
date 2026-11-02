@@ -48,6 +48,7 @@ const SUBSCRIPTIONS: Subscription[] = [
     endsAt: "2026-10-31",
     amount: 99999,
     paymentMethod: "card",
+    cardKind: "credit",
     isCancelScheduled: false,
   },
 ];

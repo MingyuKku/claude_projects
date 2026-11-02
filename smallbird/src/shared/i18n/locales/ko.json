@@ -130,7 +130,8 @@
       "label": "{{size}}개 보기",
       "labelShort": "{{size}}개",
       "aria": "한 번에 볼 개수"
-    }
+    },
+    "scrollTop": "맨 위로"
   },
   "passwordConfirm": {
     "title": "관리자 비밀번호 입력",

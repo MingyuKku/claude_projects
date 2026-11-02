@@ -13,11 +13,6 @@ export const bankAccountResponseSchema = z.object({
   bankBookFileName: z.string().nullish(),
 });
 
-/** `GET /v3/mypage/account/bank/list`. */
-export const bankListSchema = z.object({
-  bankList: z.array(z.object({ idx: z.number(), name: z.string() })),
-});
-
 export interface BankAccountViewModel {
   bankName: string;
   accountNumber: string;

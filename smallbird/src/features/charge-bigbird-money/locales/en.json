@@ -6,10 +6,10 @@
     "placeholder": "Enter an amount."
   },
   "quick": {
-    "10000": "10K",
-    "30000": "30K",
-    "50000": "50K",
-    "100000": "100K"
+    "100000": "100K",
+    "500000": "500K",
+    "1000000": "1M",
+    "10000000": "10M"
   },
   "error": {
     "min": "The minimum charge is {{amount}} KRW.",

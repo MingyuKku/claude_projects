@@ -37,39 +37,39 @@ const campaign = {
 } as InquiryCampaignViewModel;
 
 describe("getBuyerCardText", () => {
-  it("캠페인 문의는 캠페인 목록에서 찾은 브랜드·캠페인명을 대괄호로 잇는다", () => {
+  it("캠페인 목록에서 찾은 브랜드명과 캠페인명을 나눠 준다", () => {
     expect(getBuyerCardText(inquiry(), [campaign])).toEqual({
       kind: "campaign",
-      label: "[빅버드][스킨케어 세트]",
+      brandName: "빅버드",
+      campaignName: "스킨케어 세트",
     });
   });
 
-  it("서버가 준 값이 먼저이고 공구샵명도 붙인다", () => {
+  it("서버가 준 값이 먼저다", () => {
     expect(
       getBuyerCardText(
-        inquiry({
-          brandName: "브랜드",
-          campaignName: "캠페인",
-          shopName: "샵",
-        }),
+        inquiry({ brandName: "브랜드", campaignName: "캠페인" }),
         [campaign],
       ),
-    ).toEqual({ kind: "campaign", label: "[브랜드][캠페인][샵]" });
+    ).toEqual({
+      kind: "campaign",
+      brandName: "브랜드",
+      campaignName: "캠페인",
+    });
   });
 
-  it("기타 문의(캠페인 없음)와 캠페인을 못 찾은 문의는 내용 처음 10자를 보인다", () => {
-    const expected = { kind: "preview", text: "주문했는데 배송 시..." };
+  it("브랜드명이 없으면 캠페인명만, 캠페인명을 못 찾으면 내용 처음 10자를 보인다", () => {
+    expect(getBuyerCardText(inquiry({ campaignName: "캠페인" }), [])).toEqual({
+      kind: "campaign",
+      brandName: null,
+      campaignName: "캠페인",
+    });
+    expect(getBuyerCardText(inquiry({ campaignIdx: 99 }), [campaign])).toEqual({
+      kind: "preview",
+      text: "주문했는데 배송 시...",
+    });
     expect(
-      getBuyerCardText(inquiry({ campaignIdx: null }), [campaign]),
-    ).toEqual(expected);
-    expect(getBuyerCardText(inquiry({ campaignIdx: 99 }), [campaign])).toEqual(
-      expected,
-    );
-    expect(
-      getBuyerCardText(
-        inquiry({ campaignIdx: null, preview: "짧은 문의" }),
-        [],
-      ),
+      getBuyerCardText(inquiry({ campaignIdx: 99, preview: "짧은 문의" }), []),
     ).toEqual({ kind: "preview", text: "짧은 문의" });
   });
 });

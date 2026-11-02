@@ -130,7 +130,8 @@
       "label": "{{size}}件表示",
       "labelShort": "{{size}}件",
       "aria": "表示件数"
-    }
+    },
+    "scrollTop": "トップへ"
   },
   "passwordConfirm": {
     "title": "管理者パスワード入力",

@@ -23,6 +23,7 @@ function record(
     name: `상품 ${id}`,
     amount: 99999,
     method: "card",
+    cardKind: "credit",
     status: "paid",
     receiptUrl: "https://example.com/receipt",
     ...overrides,

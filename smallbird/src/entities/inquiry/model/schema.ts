@@ -96,7 +96,8 @@ export const inquiryCampaignSchema = z.object({
   campaignIdx: z.number(),
   campaignCode: z.string(),
   brandName: z.string(),
-  productName: z.string(),
+  /** 스웨거는 required string이지만 stage가 null을 줌(2026-11-02 실측 3,054건 중 1,224건, 백엔드 수정 요청 중). */
+  productName: z.string().nullable(),
   mainImageUrl: z.string().nullable(),
   /** 진행기간(`yyyy-MM-dd`). 값이 없을 수 있음(Swagger required + nullable). */
   progressStartDate: z.string().nullable(),

@@ -108,7 +108,7 @@ describe("BankAccountForm", () => {
     );
     await user.click(screen.getByRole("button", { name: "저장" }));
     await waitFor(() => expect(toast).toHaveBeenCalledWith("저장되었습니다."));
-    expect(screen.getByRole("textbox", { name: /통장사본/ })).toHaveValue(
+    expect(screen.getByRole("textbox", { name: /통장 사본/ })).toHaveValue(
       "bank-copy.pdf",
     );
   });

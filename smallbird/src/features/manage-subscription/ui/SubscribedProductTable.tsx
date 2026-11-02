@@ -102,7 +102,10 @@ export function SubscribedProductTable({
                   </TableCell>
                   <TableCell>{formatWon(subscription.amount)}</TableCell>
                   <TableCell className="whitespace-normal">
-                    {paymentMethodLabel(subscription.paymentMethod)}
+                    {paymentMethodLabel(
+                      subscription.paymentMethod,
+                      subscription.cardKind,
+                    )}
                   </TableCell>
                   <TableCell>
                     <CancelSubscriptionButton

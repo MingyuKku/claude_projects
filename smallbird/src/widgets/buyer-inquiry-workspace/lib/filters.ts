@@ -5,7 +5,8 @@ import type {
   BuyerInquiryFilters,
 } from "@/entities/inquiry";
 
-export const STATUS_FILTERS = ["all", "waiting", "done"] as const;
+// Figma 26/10/29(11315:50439) 탭 순서: 전체 · 답변 대기 · 상담 중 · 답변 완료
+export const STATUS_FILTERS = ["all", "waiting", "consulting", "done"] as const;
 
 function toPositiveNumber(value: string | null) {
   const number = Number(value);

@@ -12,6 +12,7 @@
   },
   "paymentMethod": {
     "card": "신용카드(일반)",
+    "cardDebit": "체크카드",
     "cardInstallment": "신용카드(할부)"
   },
   "plan": {

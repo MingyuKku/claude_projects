@@ -86,11 +86,14 @@ export function BuyerInquiryWorkspace({
     return () => observer.disconnect();
   }, [hasMore, isLoadingMore, onLoadMore, inquiries?.length]);
 
-  function toCardPreview(inquiry: BuyerInquiryViewModel) {
+  function toCardTitle(inquiry: BuyerInquiryViewModel) {
     const text = getBuyerCardText(inquiry, campaigns);
     return text.kind === "campaign"
-      ? t("card.campaignInquiry", { label: text.label })
-      : text.text;
+      ? {
+          titlePrefix: text.brandName ?? undefined,
+          title: t("card.campaignInquiry", { label: text.campaignName }),
+        }
+      : { title: text.text };
   }
 
   function handleChangeStatus(value: string) {
@@ -259,17 +262,13 @@ export function BuyerInquiryWorkspace({
         {inquiries?.map((inquiry) => (
           <ChatListItem
             key={inquiry.key}
-            // 상태 배지는 답변 완료가 아닐 때만 붙임(Figma MO 6791:63495, 사용자 결정 2026-10-20).
+            // 상태 배지는 항상 붙임(Figma 26/10/29 11315:50439, 사용자 결정 2026-10-30).
             badges={[
-              ...(inquiry.status !== "done"
-                ? [
-                    {
-                      label: t(`status.${inquiry.status}`),
-                      variant: STATUS_BADGE_VARIANT[inquiry.status],
-                    },
-                  ]
-                : []),
-              { label: t(`source.${inquiry.source}`), variant: "gray" },
+              {
+                label: t(`status.${inquiry.status}`),
+                variant: STATUS_BADGE_VARIANT[inquiry.status],
+              },
+              { label: t(`source.${inquiry.source}`), variant: "outline" },
             ]}
             // 메시지가 없는 스레드는 작성 시각이 없어 날짜를 비움.
             date={
@@ -277,9 +276,9 @@ export function BuyerInquiryWorkspace({
                 ? formatListDate(inquiry.lastActivityAt)
                 : ""
             }
-            user={{ name: inquiry.writerName ?? t("unknownWriter") }}
-            // 카드 문구는 REQ-24-0001(파랑)을 따름. Figma는 최근 메시지 미리보기.
-            preview={toCardPreview(inquiry)}
+            // 첫 줄 브랜드명 + "캠페인명 문의", 둘째 줄 "@작성자"(Figma 26/10/29 11315:50439, 사용자 결정 2026-10-30).
+            {...toCardTitle(inquiry)}
+            caption={`@${inquiry.writerName ?? t("unknownWriter")}`}
             hasAlert={inquiry.hasUnread}
             alertLabel={t("card.unread")}
             highlight={filters.keyword}

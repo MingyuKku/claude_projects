@@ -21,7 +21,6 @@ function setup() {
   const links: Record<SocialProvider, SocialLinkViewModel> = {
     kakao: LINKED,
     naver: LINKED,
-    facebook: LINKED,
     google: UNLINKED,
     apple: UNLINKED,
   };
@@ -30,18 +29,16 @@ function setup() {
 }
 
 describe("SocialLinkCard", () => {
-  it("5개 SNS를 시안 순서로 보이고 연동 상태를 스위치로 나타낸다", () => {
+  it("4개 SNS를 시안 순서로 보이고 연동 상태를 스위치로 나타낸다", () => {
     setup();
     const switches = screen.getAllByRole("switch");
     expect(switches.map((item) => item.getAttribute("aria-label"))).toEqual([
       "카카오 간편 로그인 연동",
       "네이버 간편 로그인 연동",
-      "페이스북 간편 로그인 연동",
       "구글 간편 로그인 연동",
       "애플 간편 로그인 연동",
     ]);
     expect(switches.map((item) => item.getAttribute("aria-checked"))).toEqual([
-      "true",
       "true",
       "true",
       "false",

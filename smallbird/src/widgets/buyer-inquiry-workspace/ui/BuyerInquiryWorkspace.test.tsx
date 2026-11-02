@@ -96,10 +96,9 @@ describe("구매자 문의 목록", () => {
     expect(router.state.location.search).toBe("?source=qna");
   });
 
-  it("상태·출처 배지와 작성자, 캠페인을 못 찾은 문의는 내용 처음 10자를 보여 준다", () => {
+  it("상태·출처 배지와 @작성자, 캠페인을 못 찾은 문의는 내용 처음 10자를 보여 준다", () => {
     renderWorkspace();
-    const card = screen.getByRole("button", { name: "김하루" });
-    expect(card).toBeInTheDocument();
+    expect(screen.getByText("@김하루")).toBeInTheDocument();
     expect(screen.getByText("배송이 언제 되나요...")).toBeInTheDocument();
     expect(screen.getAllByText("답변 대기").length).toBeGreaterThan(0);
     expect(screen.getByText("구매자 문의")).toBeInTheDocument();
@@ -115,23 +114,27 @@ describe("구매자 문의 목록", () => {
         }),
       ],
     });
-    expect(screen.getByText("[빅버드][스킨케어] 문의")).toBeInTheDocument();
+    // 첫 줄은 회색 브랜드명 + "캠페인명 문의"(Figma 26/10/29)
+    expect(screen.getByText("빅버드")).toBeInTheDocument();
+    expect(screen.getByText("스킨케어 문의")).toBeInTheDocument();
     expect(screen.getByText("읽지 않은 메시지")).toBeInTheDocument();
   });
 
-  it("상담 중(실시간) 문의에는 상담 중 배지를 붙인다", () => {
-    renderWorkspace({ inquiries: [inquiry({ status: "consulting" })] });
+  it.each([
+    ["consulting", "실시간 상담 중"],
+    ["done", "답변 완료"],
+  ] as const)("%s 문의 카드에도 상태 배지(%s)를 붙인다", (status, label) => {
+    renderWorkspace({ inquiries: [inquiry({ status })] });
+    // 탭에도 비슷한 이름이 있어 카드(li) 안에서만 찾음.
     const card = screen.getByText("구매자 문의").closest("li");
-    expect(within(card!).getByText("상담 중")).toBeInTheDocument();
+    expect(within(card!).getByText(label)).toBeInTheDocument();
   });
 
-  it("답변 완료 문의에는 상태 배지 없이 출처 배지만 보여 준다", () => {
-    renderWorkspace({ inquiries: [inquiry({ status: "done" })] });
-    // 탭에도 같은 이름이 있어 카드(li) 안에서만 찾음.
-    const card = screen.getByText("구매자 문의").closest("li");
-    expect(card).not.toBeNull();
-    expect(within(card!).queryByText("답변 완료")).not.toBeInTheDocument();
-    expect(within(card!).queryByText("답변 대기")).not.toBeInTheDocument();
+  it("상태 탭에 상담 중이 있고 누르면 status=consulting으로 바꾼다", async () => {
+    const user = userEvent.setup();
+    const router = renderWorkspace();
+    await user.click(screen.getByRole("tab", { name: "상담 중" }));
+    expect(router.state.location.search).toBe("?status=consulting");
   });
 
   it("문의를 누르면 출처가 담긴 키로 이동하고 목록 상태(탭)를 유지한다", async () => {
@@ -140,7 +143,7 @@ describe("구매자 문의 목록", () => {
       {},
       `${ROUTES.customerCenterBuyer}?status=waiting`,
     );
-    await user.click(screen.getByRole("button", { name: "김하루" }));
+    await user.click(screen.getByRole("button", { name: /@김하루/ }));
     expect(router.state.location.pathname).toBe(
       "/customer-center/buyer/purchaser-501",
     );

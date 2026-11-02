@@ -30,3 +30,5 @@ export {
 } from "./kmc";
 export type { KmcRequestToken, KmcResult } from "./kmc";
 export { fromIsoDate, toDateRange, toIsoDate } from "./date-range";
+export { infinitePagesCacheKey, useInfinitePages } from "./useInfinitePages";
+export type { PagedResult } from "./useInfinitePages";

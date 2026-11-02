@@ -2,9 +2,10 @@
   "listTitle": "お問い合わせ一覧",
   "all": "すべて",
   "waiting": "返信待ち",
+  "consulting": "相談中",
   "done": "回答済み",
   "status": {
-    "consulting": "相談中",
+    "consulting": "リアルタイム相談中",
     "waiting": "返信待ち",
     "done": "回答済み"
   },

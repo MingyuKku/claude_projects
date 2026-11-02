@@ -35,12 +35,10 @@ const masterUserSchema = z.object({
   // 간편 로그인 연동 상태. 연동하지 않았으면 null.
   idKakao: z.string().nullish(),
   idNaver: z.string().nullish(),
-  idFacebook: z.string().nullish(),
   idGoogle: z.string().nullish(),
   idApple: z.string().nullish(),
   emailKakao: z.string().nullish(),
   emailNaver: z.string().nullish(),
-  emailFacebook: z.string().nullish(),
   emailGoogle: z.string().nullish(),
   emailApple: z.string().nullish(),
 });
@@ -82,13 +80,8 @@ export const subSelfAccountSchema = z.object({
 });
 export type SubSelfAccount = z.infer<typeof subSelfAccountSchema>;
 
-export const SOCIAL_PROVIDERS = [
-  "kakao",
-  "naver",
-  "facebook",
-  "google",
-  "apple",
-] as const;
+/** 간편 로그인 연동 대상. 페이스북은 연동하지 않음(사용자 결정 2026-10-29). */
+export const SOCIAL_PROVIDERS = ["kakao", "naver", "google", "apple"] as const;
 export type SocialProvider = (typeof SOCIAL_PROVIDERS)[number];
 
 export interface SocialLinkViewModel {

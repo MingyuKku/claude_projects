@@ -1,10 +1,6 @@
 import { z } from "zod";
 
-import {
-  PAYMENT_METHODS,
-  PAYMENT_STATUSES,
-  SUBSCRIPTION_PRODUCT_TYPES,
-} from "./codes";
+import { SUBSCRIPTION_PRODUCT_TYPES } from "./codes";
 
 /** `GET /v3/mypage/subscription/plans` 응답. */
 export const subscriptionPlanListSchema = z.object({
@@ -43,6 +39,8 @@ export const subscriptionListSchema = z.array(
     endsAt: z.string(),
     amount: z.number(),
     paymentMethod: z.string(),
+    /** 가장 최근 결제에 쓴 카드의 종류(`credit`·`debit`). 결제 기록이 없거나 기프트카드면 null. 모르는 값도 읽도록 문자열로 받음. */
+    cardKind: z.string().nullish(),
     isCancelScheduled: z.boolean(),
   }),
 );
@@ -57,6 +55,8 @@ export const billingCardListSchema = z.array(
     /** 결제사가 앞 6자리·끝 1자리만 줘서 `1234-56**-****-***7` 모양. 그대로 표시. */
     maskedNumber: z.string(),
     isDefault: z.boolean(),
+    /** 카드 등록 때 결제사가 준 카드 종류. */
+    cardKind: z.string().nullish(),
   }),
 );
 
@@ -72,8 +72,11 @@ export const subscriptionPaymentListSchema = z.object({
         paidAt: z.string(),
         name: z.string(),
         amount: z.number(),
-        method: z.enum(PAYMENT_METHODS),
-        status: z.enum(PAYMENT_STATUSES),
+        // 모르는 코드가 와도 목록이 깨지지 않게 문자열로 읽음. 표시는 `usePaymentMethodLabel`·`PaymentStatusBadge`가 코드면 번역, 아니면 서버 값 그대로.
+        method: z.string(),
+        /** 결제 때 승인 응답의 카드 종류. 카드를 지워도 남음. */
+        cardKind: z.string().nullish(),
+        status: z.string(),
         receiptUrl: z.string().nullable().optional(),
       }),
     )

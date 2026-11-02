@@ -7,15 +7,15 @@ interface UsageAmountProps {
   className?: string;
 }
 
-// 차감(음수)은 모든 기기에서 빨강, 반환(양수)은 초록, 값이 없거나 0이면 기본색(스펙 §3).
+// 사용 금액은 w600. 차감(음수)은 검정 "-{n}원", 환급(양수)은 파랑 "+{n}원"(3.0.8 결정). 값이 없으면 "-"를 기본색으로 보임.
 export function UsageAmount({ amount, className }: UsageAmountProps) {
   const { formatSignedWon } = useMoneyFormat();
 
   return (
     <span
       className={cn(
-        amount !== null && amount < 0 && "text-destructive",
-        amount !== null && amount > 0 && "text-success",
+        amount !== null && "font-semibold",
+        amount !== null && amount > 0 && "text-primary",
         className,
       )}
     >

@@ -130,7 +130,8 @@
       "label": "显示{{size}}条",
       "labelShort": "{{size}}条",
       "aria": "每页显示数量"
-    }
+    },
+    "scrollTop": "回到顶部"
   },
   "passwordConfirm": {
     "title": "输入管理员密码",

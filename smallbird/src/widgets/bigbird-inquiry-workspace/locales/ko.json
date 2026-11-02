@@ -63,5 +63,25 @@
   "productName": "상품명",
   "period": "진행 기간",
   "progressStatus": "진행 상태",
-  "shopCode": "공구샵 코드"
+  "shopCode": "공구샵 코드",
+  "otherTag": "기타문의",
+  "withdrawal": {
+    "title": "빅버드 머니 출금 요청",
+    "status": {
+      "requested": "승인 요청",
+      "approved": "승인 완료",
+      "rejected": "승인 거절"
+    },
+    "notice": {
+      "approved": "요청이 승인되었습니다.",
+      "rejected": "요청이 거절되었습니다."
+    },
+    "amount": "출금 요청 금액",
+    "won": "{{amount}}원",
+    "applicant": "신청자",
+    "applicantValue": "{{name}} (@{{id}})",
+    "account": "입금 계좌",
+    "requestedAt": "신청 일시",
+    "rejectReason": "거절 사유"
+  }
 }

@@ -2,9 +2,10 @@
   "listTitle": "Inquiry list",
   "all": "All",
   "waiting": "Waiting",
+  "consulting": "Consulting",
   "done": "Answered",
   "status": {
-    "consulting": "Consulting",
+    "consulting": "Live chat",
     "waiting": "Waiting",
     "done": "Answered"
   },

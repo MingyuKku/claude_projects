@@ -139,11 +139,14 @@ export function CustomerCenterBigbirdNewPage() {
         </Button>
       </header>
       <NewBigbirdInquiryForm
-        campaigns={(campaigns ?? []).map((campaign) => ({
-          id: campaign.campaignIdx,
-          name: campaign.name,
-          periodLabel: campaign.period ?? undefined,
-        }))}
+        // 상품명이 없는 캠페인(stage 데이터 누락)은 고를 이름이 없어 표에서 뺌.
+        campaigns={(campaigns ?? [])
+          .filter((campaign) => campaign.productName.trim())
+          .map((campaign) => ({
+            id: campaign.campaignIdx,
+            name: campaign.name,
+            periodLabel: campaign.period ?? undefined,
+          }))}
         // 핸들러를 주지 않으면 폼이 문의하기 버튼을 비활성화함.
         onSubmit={
           IS_REGISTRATION_ENABLED

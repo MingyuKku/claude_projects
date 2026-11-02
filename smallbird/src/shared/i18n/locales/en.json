@@ -130,7 +130,8 @@
       "label": "Show {{size}}",
       "labelShort": "{{size}}/page",
       "aria": "Items per page"
-    }
+    },
+    "scrollTop": "Back to top"
   },
   "passwordConfirm": {
     "title": "Enter admin password",

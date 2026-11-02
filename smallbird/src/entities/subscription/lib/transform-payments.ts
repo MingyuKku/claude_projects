@@ -1,3 +1,5 @@
+import { toCardKind } from "../model/codes";
+
 import type { SubscriptionPaymentListResponse } from "../model/schema";
 import type { PaymentList } from "../model/types";
 
@@ -13,6 +15,7 @@ export function transformPayments(
       name: item.name,
       amount: item.amount,
       method: item.method,
+      cardKind: toCardKind(item.cardKind),
       status: item.status,
       receiptUrl: item.receiptUrl?.startsWith("https://")
         ? item.receiptUrl

@@ -9,6 +9,7 @@ describe("transformBillingCards", () => {
           issuer: "BC카드",
           maskedNumber: "1234-56**-****-***7",
           isDefault: true,
+          cardKind: "debit",
         },
       ]),
     ).toEqual([
@@ -17,6 +18,7 @@ describe("transformBillingCards", () => {
         issuer: "BC카드",
         maskedNumber: "1234-56**-****-***7",
         isDefault: true,
+        cardKind: "debit",
       },
     ]);
   });

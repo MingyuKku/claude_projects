@@ -18,11 +18,13 @@ export {
 export {
   ACTIVE_PRODUCT_TYPES,
   BILLING_PERIODS,
+  CARD_KINDS,
   isBillingPeriod,
   isActiveProductType,
   PAYMENT_METHODS,
   PAYMENT_STATUSES,
   SUBSCRIPTION_PRODUCT_TYPES,
+  toCardKind,
   toPaymentMethod,
   toPaymentStatus,
   USAGE_METRICS,
@@ -31,6 +33,7 @@ export {
 export type {
   ActiveProductType,
   BillingPeriod,
+  CardKind,
   PaymentMethod,
   PaymentStatus,
   SubscriptionProductType,

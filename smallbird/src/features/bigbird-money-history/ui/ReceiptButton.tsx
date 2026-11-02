@@ -36,8 +36,9 @@ export function ReceiptButton({ record, variant }: ReceiptButtonProps) {
   }
 
   return (
+    // 시안: 거래 상세 하단 "거래명세서 받기"는 Outline(파랑 글자, `11224:104200`), 카드 위 "거래명세서"는 Outline Foreground.
     <Button
-      variant="outline-foreground"
+      variant={variant === "detail" ? "outline" : "outline-foreground"}
       className={variant === "detail" ? "w-full" : undefined}
       size={variant === "card" ? "sm" : "default"}
       disabled={!receiptUrl}

@@ -67,7 +67,7 @@ export function PaymentTable({ records, emptyContent }: PaymentTableProps) {
               <TableCell className="whitespace-normal">{record.name}</TableCell>
               <TableCell>{formatWon(record.amount)}</TableCell>
               <TableCell className="whitespace-normal">
-                {paymentMethodLabel(record.method)}
+                {paymentMethodLabel(record.method, record.cardKind)}
               </TableCell>
               <TableCell>
                 <PaymentStatusBadge serverValue={record.status} size="sm" />

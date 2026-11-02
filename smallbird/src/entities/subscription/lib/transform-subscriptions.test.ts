@@ -22,9 +22,20 @@ describe("transformSubscriptions", () => {
         endsAt: "2026-10-30",
         amount: 99000,
         paymentMethod: "card",
+        cardKind: null,
         isCancelScheduled: false,
       },
     ]);
+  });
+
+  it("카드 종류 코드를 담고, 없거나 모르는 값은 null로 둔다", () => {
+    const kinds = transformSubscriptions([
+      { ...item, cardKind: "debit" },
+      { ...item, id: "13", cardKind: "credit" },
+      { ...item, id: "14", cardKind: null },
+      { ...item, id: "15", cardKind: "prepaid" },
+    ]).map((subscription) => subscription.cardKind);
+    expect(kinds).toEqual(["debit", "credit", null, null]);
   });
 
   it("구독이 없으면 빈 배열이다", () => {

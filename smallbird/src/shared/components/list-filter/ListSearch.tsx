@@ -12,6 +12,8 @@ interface ListSearchProps {
   onSubmitKeyword: (keyword: string) => void;
   /** 검색 기획이 정해지기 전에는 입력을 막음. */
   isDisabled?: boolean;
+  /** 입력 글자 수 제한. 서버가 받는 검색어 길이에 맞춤. */
+  maxLength?: number;
   className?: string;
 }
 
@@ -20,6 +22,7 @@ export function ListSearch({
   keyword,
   onSubmitKeyword,
   isDisabled,
+  maxLength,
   className,
 }: ListSearchProps) {
   const { t } = useTranslation();
@@ -43,6 +46,7 @@ export function ListSearch({
         aria-label={t("list.search.label")}
         placeholder={t("list.search.placeholder")}
         disabled={isDisabled}
+        maxLength={maxLength}
         value={draft}
         onChange={(event) => setDraft(event.target.value)}
       />

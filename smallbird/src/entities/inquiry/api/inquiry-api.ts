@@ -363,7 +363,8 @@ export function getAttachmentDownloadUrl(
   return `${ENV.apiServerUrl}/v3/help/file/download/${kind}/${attachmentIdx}`;
 }
 
-export type BuyerInquiryStatusFilter = "all" | "waiting" | "done";
+export type BuyerInquiryStatusFilter =
+  "all" | "waiting" | "consulting" | "done";
 export interface BuyerInquiryFilters {
   sourceType: "ALL" | "PURCHASER_QUESTION" | "PRODUCT_QNA";
   campaignIdx?: number;
@@ -386,6 +387,7 @@ export function toBuyerSearchType(keyword: string) {
 const BUYER_STATUS_PARAM = {
   all: "ALL",
   waiting: "WAITING",
+  consulting: "IN_PROGRESS",
   done: "ANSWERED",
 } as const;
 

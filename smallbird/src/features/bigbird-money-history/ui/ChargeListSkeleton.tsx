@@ -7,10 +7,10 @@ import { Skeleton } from "@/shared/ui/skeleton";
 import { LIST_PAGE_SIZE } from "../model/constants";
 
 const CARD_SKELETON_COUNT = 3;
-const CARD_ROW_COUNT = 4;
+const CARD_ROW_COUNT = 6;
 
 interface ChargeListSkeletonProps {
-  /** PC·TAB은 표, MO는 카드. */
+  /** PC는 표, TAB·MO는 카드. */
   isTable: boolean;
 }
 
@@ -20,7 +20,16 @@ export function ChargeListSkeleton({ isTable }: ChargeListSkeletonProps) {
     return (
       <SkeletonGroup>
         <TableSkeleton
-          columnClassNames={["w-32", "w-20", "w-20", "w-16", "w-8", "w-8"]}
+          columnClassNames={[
+            "w-10",
+            "w-32",
+            "w-24",
+            "w-20",
+            "w-28",
+            "w-16",
+            "w-8",
+            "w-8",
+          ]}
           rowCount={LIST_PAGE_SIZE}
         />
       </SkeletonGroup>
@@ -28,12 +37,12 @@ export function ChargeListSkeleton({ isTable }: ChargeListSkeletonProps) {
   }
 
   return (
-    <SkeletonGroup className="flex flex-col gap-5">
+    <SkeletonGroup className="grid grid-cols-1 gap-5 tablet:grid-cols-2 tablet:gap-3">
       {Array.from({ length: CARD_SKELETON_COUNT }, (_, card) => (
         <div key={card} className="flex flex-col gap-2">
           <div className="flex justify-end gap-2">
-            <Skeleton className="h-9 w-20" />
             <Skeleton className="h-9 w-28" />
+            <Skeleton className="h-9 w-20" />
           </div>
           <div className="overflow-hidden rounded-lg border">
             {Array.from({ length: CARD_ROW_COUNT }, (_, row) => (

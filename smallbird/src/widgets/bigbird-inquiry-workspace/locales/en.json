@@ -63,5 +63,25 @@
   "productName": "Product",
   "period": "Period",
   "progressStatus": "Status",
-  "shopCode": "Shop code"
+  "shopCode": "Shop code",
+  "otherTag": "Other",
+  "withdrawal": {
+    "title": "Bigbird Money withdrawal",
+    "status": {
+      "requested": "Requested",
+      "approved": "Approved",
+      "rejected": "Rejected"
+    },
+    "notice": {
+      "approved": "Request approved.",
+      "rejected": "Request rejected."
+    },
+    "amount": "Amount",
+    "won": "{{amount}} KRW",
+    "applicant": "Applicant",
+    "applicantValue": "{{name}} (@{{id}})",
+    "account": "Bank account",
+    "requestedAt": "Requested at",
+    "rejectReason": "Reason"
+  }
 }

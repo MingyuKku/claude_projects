@@ -5,9 +5,10 @@ export type MoneyTab = (typeof MONEY_TABS)[number];
 export const CHARGE_VIEWS = ["balance", "history"] as const;
 export type ChargeView = (typeof CHARGE_VIEWS)[number];
 
-/** 하위 화면. `charge`·`charge-detail`은 충전 내역 탭, `usage-detail`은 사용 내역 탭에서만 열림. */
+/** 하위 화면. `charge`·`withdraw`는 두 탭 모두, `charge-detail`은 충전 내역 탭, `usage-detail`은 사용 내역 탭에서만 열림. */
 export const MONEY_PANELS = [
   "charge",
+  "withdraw",
   "charge-detail",
   "usage-detail",
 ] as const;

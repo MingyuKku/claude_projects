@@ -287,14 +287,16 @@ describe("고객센터 진입", () => {
       );
       mockThreads([withAuto]);
       await renderRoute("/customer-center/bigbird/1");
+      // 목록 카드의 "기타문의" 태그(Figma 26/10/29)와 섞이지 않게 대화 영역에서만 찾음.
+      const conversation = await screen.findByRole("region", {
+        name: "문의 대화",
+      });
+      expect(await within(conversation).findByText("본문")).toBeInTheDocument();
       expect(
-        await within(
-          await screen.findByRole("region", { name: "문의 대화" }),
-        ).findByText("본문"),
-      ).toBeInTheDocument();
-      expect(screen.queryByText("기타문의")).not.toBeInTheDocument();
+        within(conversation).queryByText("기타문의"),
+      ).not.toBeInTheDocument();
       expect(
-        screen.queryByText(/문의하실 내용을 남겨주세요/),
+        within(conversation).queryByText(/문의하실 내용을 남겨주세요/),
       ).not.toBeInTheDocument();
     });
 

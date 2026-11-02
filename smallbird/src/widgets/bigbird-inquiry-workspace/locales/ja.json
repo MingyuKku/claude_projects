@@ -63,5 +63,25 @@
   "productName": "商品名",
   "period": "進行期間",
   "progressStatus": "進行状況",
-  "shopCode": "ショップコード"
+  "shopCode": "ショップコード",
+  "otherTag": "その他",
+  "withdrawal": {
+    "title": "ビッグバードマネー出金申請",
+    "status": {
+      "requested": "承認申請",
+      "approved": "承認済み",
+      "rejected": "却下"
+    },
+    "notice": {
+      "approved": "申請が承認されました。",
+      "rejected": "申請が却下されました。"
+    },
+    "amount": "出金申請額",
+    "won": "{{amount}}ウォン",
+    "applicant": "申請者",
+    "applicantValue": "{{name}} (@{{id}})",
+    "account": "振込口座",
+    "requestedAt": "申請日時",
+    "rejectReason": "却下理由"
+  }
 }

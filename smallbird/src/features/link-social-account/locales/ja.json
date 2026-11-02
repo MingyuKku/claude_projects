@@ -3,7 +3,6 @@
   "provider": {
     "kakao": "カカオ",
     "naver": "ネイバー",
-    "facebook": "フェイスブック",
     "google": "グーグル",
     "apple": "アップル"
   },

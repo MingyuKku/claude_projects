@@ -12,8 +12,9 @@ import type { ComponentProps } from "react";
 
 // Figma Chat List Base / Card(5198:100096 광고주 문의, 5198:113027 구매자 문의).
 // Focus=True는 선택된 대화(bg-accent), Hover는 bg-accent/50 + 삭제 버튼, Highlighted는 검색어 강조.
+// MO는 Figma 변수 모드가 p-5=16·leading-7=26이라 카드가 좌우·아래 16, 제목 줄 26(11315:49659 카드 94).
 const itemVariants = cva(
-  "group relative flex w-full flex-col items-start px-5 pt-4 pb-5",
+  "group relative flex w-full flex-col items-start p-4 tablet:px-5 tablet:pb-5",
   {
     variants: {
       isSelected: {
@@ -46,8 +47,10 @@ interface ChatListItemBaseProps extends Omit<ComponentProps<"li">, "title"> {
   date: string;
   time?: string;
   preview?: string;
-  /** 제목 앞 회색 접두(Figma 3.0.6 광고주 문의 카드의 "기타 문의"). user 형태에서는 쓰지 않음. */
+  /** 제목 앞 회색 접두(Figma 3.0.6 광고주 문의 카드의 "기타 문의", 구매자 문의 카드의 브랜드명). user 형태에서는 쓰지 않음. */
   titlePrefix?: string;
+  /** 제목 아래 보조 줄(Figma 26/10/29 구매자 문의 카드의 "@작성자"). user 형태에서는 쓰지 않음. */
+  caption?: string;
   /** 검색어. 제목·이름·미리보기에서 일치 구간을 강조함. */
   highlight?: string;
   hasAlert?: boolean;
@@ -92,9 +95,15 @@ function HighlightedText({
   );
 }
 
-function AlertDot({ label }: { label?: string }) {
+function AlertDot({
+  label,
+  className,
+}: {
+  label?: string;
+  className?: string;
+}) {
   return (
-    <span className="mt-1 size-2 shrink-0 rounded-full bg-blue-500">
+    <span className={cn("size-2 shrink-0 rounded-full bg-blue-500", className)}>
       {label && <span className="sr-only">{label}</span>}
     </span>
   );
@@ -108,6 +117,7 @@ export function ChatListItem({
   user,
   preview,
   titlePrefix,
+  caption,
   highlight,
   hasAlert = false,
   alertLabel,
@@ -119,8 +129,11 @@ export function ChatListItem({
   ...props
 }: ChatListItemProps) {
   const hasUser = Boolean(user);
+  // 제목 값이 아직 없는 카드(빅버드 기타 문의)는 배지 문구로 이름을 대신함.
   const accessibleName =
-    user?.name ?? [titlePrefix, title].filter(Boolean).join(" ");
+    user?.name ??
+    ([titlePrefix, title, caption].filter(Boolean).join(" ") ||
+      badges.map((badge) => badge.label).join(" "));
 
   return (
     <li
@@ -177,7 +190,7 @@ export function ChatListItem({
               <p className="-my-0.5 min-w-0 flex-1 truncate py-0.5 text-base leading-none font-semibold text-card-foreground">
                 <HighlightedText text={user.name} keyword={highlight} />
               </p>
-              {hasAlert && <AlertDot label={alertLabel} />}
+              {hasAlert && <AlertDot label={alertLabel} className="mt-1" />}
             </div>
             {preview && (
               <p className="truncate text-sm leading-5 text-card-foreground">
@@ -187,16 +200,27 @@ export function ChatListItem({
           </div>
         </div>
       ) : (
-        <div className="pointer-events-none flex w-full items-center gap-2.5 pl-2">
-          {titlePrefix && (
-            <p className="shrink-0 text-base leading-7 font-semibold text-muted-foreground">
-              {titlePrefix}
+        // Figma Description: 접두·제목 Title Row가 각각 pl-2(8px)라 사이도 8px. 보조 줄(Caption)은 2px 아래 pl-2.
+        <div className="pointer-events-none flex w-full flex-col gap-0.5">
+          <div className="flex w-full items-center">
+            {/* 시안에 접두 최대 폭이 없어, 긴 브랜드명이 제목을 다 밀어내지 않게 절반으로 제한함(임시). */}
+            {titlePrefix && (
+              <p className="max-w-1/2 shrink-0 truncate pl-2 text-base leading-6.5 font-semibold text-muted-foreground tablet:leading-7">
+                <HighlightedText text={titlePrefix} keyword={highlight} />
+              </p>
+            )}
+            <div className="flex min-w-0 flex-1 items-center gap-2 pl-2">
+              <p className="min-w-0 flex-1 truncate text-base leading-6.5 font-semibold text-card-foreground tablet:leading-7">
+                {title && <HighlightedText text={title} keyword={highlight} />}
+              </p>
+              {hasAlert && <AlertDot label={alertLabel} />}
+            </div>
+          </div>
+          {caption && (
+            <p className="truncate pl-2 text-sm leading-none text-card-foreground">
+              <HighlightedText text={caption} keyword={highlight} />
             </p>
           )}
-          <p className="min-w-0 flex-1 truncate text-base leading-7 font-semibold text-card-foreground">
-            {title && <HighlightedText text={title} keyword={highlight} />}
-          </p>
-          {hasAlert && <AlertDot label={alertLabel} />}
         </div>
       )}
     </li>

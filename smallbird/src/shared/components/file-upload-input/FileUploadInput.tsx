@@ -10,6 +10,8 @@ import type { ChangeEvent } from "react";
 interface FileUploadInputProps {
   /** 입력 칸에 보일 이름. 고른 파일명이나 등록 상태 문구. */
   fileName: string;
+  /** 고른 파일이 없을 때 입력 칸에 흐리게 보일 안내. */
+  placeholder?: string;
   buttonLabel: string;
   /** 같은 화면에 업로드 버튼이 여럿일 때 구분하는 이름(예: "사업자 등록증 업로드"). */
   buttonAriaLabel?: string;
@@ -24,6 +26,7 @@ interface FileUploadInputProps {
 
 export function FileUploadInput({
   fileName,
+  placeholder,
   buttonLabel,
   buttonAriaLabel,
   accept,
@@ -42,7 +45,13 @@ export function FileUploadInput({
 
   return (
     <div className="flex items-center gap-2">
-      <Input {...controlProps} readOnly disabled={disabled} value={fileName} />
+      <Input
+        {...controlProps}
+        readOnly
+        disabled={disabled}
+        placeholder={placeholder}
+        value={fileName}
+      />
       <Button
         type="button"
         variant="outline"

@@ -12,6 +12,7 @@
   },
   "paymentMethod": {
     "card": "Credit card",
+    "cardDebit": "Debit card",
     "cardInstallment": "Credit card (installments)"
   },
   "plan": {

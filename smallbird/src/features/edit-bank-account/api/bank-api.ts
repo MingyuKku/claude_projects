@@ -1,7 +1,7 @@
 import { serverApiV3 } from "@/shared/api";
 
 import { transformBankAccountToViewModel } from "../lib/transform-bank-account";
-import { bankAccountResponseSchema, bankListSchema } from "../model/schema";
+import { bankAccountResponseSchema } from "../model/schema";
 
 export interface BankAccountBody {
   bankIdx: number;
@@ -15,11 +15,6 @@ export async function fetchBankAccount() {
   return transformBankAccountToViewModel(
     bankAccountResponseSchema.parse(response),
   );
-}
-
-export async function fetchBankList() {
-  const response = await serverApiV3.get("/mypage/account/bank/list");
-  return bankListSchema.parse(response).bankList;
 }
 
 /**

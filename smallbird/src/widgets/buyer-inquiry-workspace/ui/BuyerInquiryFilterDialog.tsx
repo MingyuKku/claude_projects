@@ -129,7 +129,8 @@ export function BuyerInquiryFilterDialog({
             { value: "all", label: t("filter.all") },
             ...(campaigns ?? []).map((campaign) => ({
               value: campaign.campaignIdx.toString(),
-              label: campaign.name,
+              // 상품명·브랜드명이 비어 있는 캠페인(stage 데이터 누락)은 캠페인 코드로 대신 보임.
+              label: campaign.name || campaign.campaignCode,
               keywords: [campaign.campaignCode],
             })),
           ]}

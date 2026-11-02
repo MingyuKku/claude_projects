@@ -1,59 +1,67 @@
-import { useEffect } from "react";
-
-import { EmptyState } from "@/shared/components/empty-state";
 import {
   FilterToolbar,
   hasActiveFilter,
   ListEmptyState,
-  ListPagination,
   resolveEmptyKind,
 } from "@/shared/components/list-filter";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery } from "@/shared/lib";
-import { Button } from "@/shared/ui/button";
 
-import { useChargeHistory } from "../api/use-charge-history";
-import { useChargeFilterFields } from "../lib/use-charge-filter-fields";
-import { useListParams } from "../lib/use-list-params";
-import { TABLET_QUERY } from "../model/constants";
+import {
+  useChargeHistory,
+  useChargeScrollList,
+  useReloadChargeHistory,
+} from "../api/use-charge-history";
+import { useChargeAutoRefresh } from "../lib/use-charge-auto-refresh";
+import { useChargeListParams } from "../lib/use-charge-list-params";
+import {
+  LIST_PAGE_SIZE_OPTIONS,
+  DESKTOP_QUERY,
+  TABLET_QUERY,
+} from "../model/constants";
 import { ChargeCardList } from "./ChargeCardList";
 import { ChargeListSkeleton } from "./ChargeListSkeleton";
 import { ChargeTable } from "./ChargeTable";
+import { HistoryPagedList } from "./HistoryPagedList";
+import { HistoryScrollList } from "./HistoryScrollList";
 
 interface ChargeHistoryProps {
   /** 거래 상세를 열어 둔 충전 내역(쿼리 `id`). 그 행을 활성 처리함. */
   activeId: string | null;
+  /** 오른쪽 패널(충전·출금·거래 상세)이 열려 있음. 열려 있으면 은행·계좌 번호 열을 숨김. */
+  isPanelOpen: boolean;
   onClickDetail: (id: string) => void;
 }
 
-// 충전 상세 내역. PC·TAB은 표 + 인라인 툴바(충전 일자·입금 상태·새로고침), MO는 카드 + 필터 모달. 검색창은 없음(스펙 §3).
-// 쪽은 URL 쿼리가 소유하고 쪽 나눔은 서버가 함. 필터는 서버 지원 전까지 비활성이라 목록 요청에는 쪽만 보냄.
-export function ChargeHistory({ activeId, onClickDetail }: ChargeHistoryProps) {
+// 충전/출금 내역. PC는 표, TAB은 2열 카드 + 쪽 이동, MO는 1열 카드 + 스크롤로 이어 읽기(맨 위로 버튼). 툴바는 PC·TAB 인라인, MO "필터" 모달. 검색창은 없음(스펙 §3).
+// 필터(구분·충전 일자·입금 상태)와 "N개 보기"(10·20·50)는 주소 쿼리가 소유하고 서버에 함께 보냄.
+export function ChargeHistory({
+  activeId,
+  isPanelOpen,
+  onClickDetail,
+}: ChargeHistoryProps) {
   const { t } = useTranslation("features/bigbird-money-history");
-  const { t: tCommon } = useTranslation();
   const isTabletUp = useMediaQuery(TABLET_QUERY);
-  const fields = useChargeFilterFields();
-  const params = useListParams(fields);
-  const { list, isLoading, isError, mutate } = useChargeHistory(params.page);
+  const isDesktop = useMediaQuery(DESKTOP_QUERY);
+  const { fields, params, baseQuery } = useChargeListParams();
+  const reload = useReloadChargeHistory();
+  // 쪽 나눔 목록(PC·TAB)과 이어 읽는 목록(MO)은 폭에 따라 한쪽만 읽음.
+  const paged = useChargeHistory(
+    isTabletUp ? { ...baseQuery, page: params.page } : null,
+  );
+  const scroll = useChargeScrollList(baseQuery, !isTabletUp);
+  useChargeAutoRefresh(
+    isTabletUp ? (paged.list?.records ?? []) : scroll.records,
+  );
 
-  const { clampPage } = params;
-  const totalPages = list?.totalPages ?? 0;
-  // 주소를 직접 고쳐 범위를 벗어난 쪽은 마지막 쪽으로 당김.
-  const isPageOutOfRange =
-    list !== undefined && totalPages > 0 && params.page > totalPages;
-  useEffect(() => {
-    if (isPageOutOfRange) clampPage(totalPages);
-  }, [isPageOutOfRange, totalPages, clampPage]);
-
-  const records = list?.records ?? [];
-  const emptyContent =
-    list?.totalCount === 0 ? (
-      <ListEmptyState
-        kind={resolveEmptyKind("", hasActiveFilter(params.filters))}
-        keyword=""
-        noneTitle={t("charge.empty.none")}
-      />
-    ) : undefined;
+  const emptyContent = (
+    <ListEmptyState
+      kind={resolveEmptyKind("", hasActiveFilter(params.filters))}
+      keyword=""
+      noneTitle={t("charge.empty.none")}
+    />
+  );
+  const skeleton = <ChargeListSkeleton isTable={isDesktop} />;
 
   return (
     <section className="flex flex-col gap-4" aria-labelledby="charge-title">
@@ -67,49 +75,66 @@ export function ChargeHistory({ activeId, onClickDetail }: ChargeHistoryProps) {
         onApplyFromDialog={params.applyFiltersAndClosePanel}
         onRefresh={() => {
           params.reset();
-          void mutate();
+          void reload();
+        }}
+        isNarrowSelect
+        shouldFillFields={isPanelOpen}
+        pageSize={{
+          value: params.pageSize,
+          options: LIST_PAGE_SIZE_OPTIONS,
+          onChange: params.setPageSize,
         }}
       />
 
-      {isLoading ? (
-        <ChargeListSkeleton isTable={isTabletUp} />
-      ) : isError || !list ? (
-        <EmptyState
-          type="alarm"
-          title={tCommon("error.unexpected")}
-          className="py-20"
-          action={
-            <Button variant="outline" onClick={() => void mutate()}>
-              {tCommon("action.retry")}
-            </Button>
-          }
-        />
-      ) : (
-        // 표(또는 카드)와 쪽 이동은 12px 간격으로 한 묶음(시안).
-        <div className="flex flex-col gap-3">
-          {isTabletUp ? (
+      {isTabletUp ? (
+        <HistoryPagedList
+          list={paged.list}
+          isLoading={paged.isLoading}
+          isError={paged.isError}
+          onRetry={() => void paged.mutate()}
+          page={params.page}
+          onChangePage={params.setPage}
+          onClampPage={params.clampPage}
+          buildPageHref={params.buildPageHref}
+          skeleton={skeleton}
+          emptyContent={emptyContent}
+          isTable={isDesktop}
+          renderTable={(records, empty) => (
             <ChargeTable
               records={records}
               activeId={activeId}
+              isPanelOpen={isPanelOpen}
               onClickDetail={(record) => onClickDetail(record.id)}
-              emptyContent={emptyContent}
+              emptyContent={empty}
             />
-          ) : (
-            (emptyContent ?? (
-              <ChargeCardList
-                records={records}
-                onClickDetail={(record) => onClickDetail(record.id)}
-              />
-            ))
           )}
-          <ListPagination
-            page={list.page}
-            totalPages={totalPages}
-            totalCount={list.totalCount}
-            buildHref={params.buildPageHref}
-            onChangePage={params.setPage}
-          />
-        </div>
+          renderCards={(records) => (
+            <ChargeCardList
+              records={records}
+              onClickDetail={(record) => onClickDetail(record.id)}
+            />
+          )}
+        />
+      ) : (
+        <HistoryScrollList
+          records={scroll.records}
+          totalCount={scroll.totalCount}
+          hasMore={scroll.hasMore}
+          isLoading={scroll.isLoading}
+          isLoadingMore={scroll.isLoadingMore}
+          isError={scroll.isError}
+          isLoadMoreError={scroll.isLoadMoreError}
+          onLoadMore={scroll.loadMore}
+          onRetry={() => void scroll.reload()}
+          skeleton={skeleton}
+          emptyContent={emptyContent}
+          renderCards={(records) => (
+            <ChargeCardList
+              records={records}
+              onClickDetail={(record) => onClickDetail(record.id)}
+            />
+          )}
+        />
       )}
     </section>
   );

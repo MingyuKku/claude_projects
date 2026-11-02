@@ -6,36 +6,50 @@
       "label": "Usage history"
     },
     "column": {
+      "type": "Type",
+      "date": "Date",
       "campaignName": "Campaign",
-      "usedAt": "Date",
       "usage": "Usage",
       "amount": "Amount",
-      "campaignCode": "Campaign code",
+      "remaining": "Balance",
       "detail": "Details"
-    },
-    "card": {
-      "usedAt": "Date",
-      "campaignName": "Campaign",
-      "campaignType": "Campaign type",
-      "campaignCode": "Campaign code",
-      "usage": "Usage",
-      "amount": "Amount",
-      "remaining": "Balance after"
     },
     "action": {
       "detail": "View details"
     },
     "detail": {
-      "title": "Details",
-      "usedAt": "Date",
+      "title": "Usage details",
+      "type": "Type",
+      "date": {
+        "use": "Date",
+        "refund": "Refund date",
+        "charge": "Charge date",
+        "withdraw": "Withdraw date"
+      },
       "campaignName": "Campaign",
       "campaignType": "Campaign type",
       "campaignCode": "Campaign code",
       "usage": "Usage",
-      "amount": "Amount",
+      "contractTarget": "Contract target",
+      "amount": {
+        "use": "Amount",
+        "refund": "Amount",
+        "charge": "Charge amount",
+        "withdraw": "Withdraw amount"
+      },
       "remaining": "Balance after"
     },
     "filter": {
+      "type": {
+        "label": "Type",
+        "placeholder": "Select a type.",
+        "option": {
+          "use": "Used",
+          "refund": "Refund",
+          "charge": "Charge",
+          "withdraw": "Withdraw"
+        }
+      },
       "date": {
         "label": "Date",
         "placeholder": "Select dates."
@@ -50,27 +64,40 @@
       }
     },
     "empty": {
-      "none": "No Bigbird Money usage yet."
+      "none": "No usage yet."
+    },
+    "type": {
+      "use": "Used",
+      "refund": "Refund",
+      "charge": "Charge",
+      "withdraw": "Withdraw"
+    },
+    "campaignType": {
+      "recruit": "Recruitment",
+      "pick": "PICK"
+    },
+    "usageDetail": {
+      "contractPick": "Influencer contract fee (PICK)",
+      "contractRecruit": "Influencer contract fee (Recruitment)",
+      "aiManuscriptConfirm": "Add-on (AI Draft Review)",
+      "aiPostingGuide": "Add-on (AI Posting Guide)"
     }
   },
   "charge": {
-    "title": "Charge history",
+    "title": "Transaction history",
     "list": {
-      "label": "Charge history"
+      "label": "Transaction history"
     },
     "column": {
-      "requestedAt": "Date",
-      "amount": "Requested amount",
-      "method": "Method",
+      "type": "Type",
+      "date": "Date",
+      "amount": "Amount",
+      "bank": "Bank",
+      "account": "Account no.",
+      "holder": "Depositor",
       "status": "Status",
       "receipt": "Receipt",
       "detail": "Details"
-    },
-    "card": {
-      "requestedAt": "Date",
-      "amount": "Requested amount",
-      "method": "Method",
-      "status": "Status"
     },
     "action": {
       "detail": "View details",
@@ -82,17 +109,35 @@
     },
     "detail": {
       "title": "Transaction details",
-      "approvedAt": "Approved",
+      "type": "Type",
       "requestedAt": "Requested",
-      "amount": "Requested amount",
+      "amount": "Charge amount",
       "method": "Method",
       "bank": "Bank",
-      "account": "Virtual account no.",
+      "account": "Account no.",
+      "holder": "Depositor",
       "depositedAt": "Deposited",
       "status": "Deposit status",
-      "receipt": "Get receipt"
+      "receipt": "Get receipt",
+      "withdraw": {
+        "requestedAt": "Requested",
+        "amount": "Withdrawal amount",
+        "method": "Method",
+        "methodValue": "To entered account",
+        "holder": "Account holder",
+        "completedAt": "Withdrawn",
+        "status": "Withdrawal status"
+      }
     },
     "filter": {
+      "type": {
+        "label": "Type",
+        "placeholder": "Select a type.",
+        "option": {
+          "charge": "Charge",
+          "withdraw": "Withdraw"
+        }
+      },
       "date": {
         "label": "Date",
         "placeholder": "Select dates."
@@ -101,14 +146,15 @@
         "label": "Status",
         "placeholder": "Select a status.",
         "option": {
-          "paid": "Paid",
+          "paid": "Deposited",
+          "withdrawn": "Withdrawn",
           "pending": "Pending",
-          "canceled": "Canceled"
+          "canceled": "Unpaid, canceled"
         }
       }
     },
     "empty": {
-      "none": "No Bigbird Money charges yet."
+      "none": "No charges or withdrawals yet."
     },
     "notice": {
       "title": "Notice",
@@ -116,6 +162,10 @@
       "validity": "The virtual account is valid until midnight in 2 days.",
       "instant": "Bigbird Money is credited once the deposit is confirmed.",
       "delay": "The balance may take up to 5 minutes to update after the deposit."
+    },
+    "type": {
+      "charge": "Charge",
+      "withdraw": "Withdraw"
     }
   }
 }

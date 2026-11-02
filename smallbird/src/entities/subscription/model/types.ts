@@ -1,9 +1,4 @@
-import type {
-  PaymentMethod,
-  PaymentStatus,
-  SubscriptionProductType,
-  UsageMetric,
-} from "./codes";
+import type { CardKind, SubscriptionProductType, UsageMetric } from "./codes";
 
 /** 구독 탭의 상품 카드 한 장. 가격은 정책이 없어 더미(스펙 §1·§7 P-1). */
 export interface SubscriptionPlan {
@@ -34,6 +29,8 @@ export interface Subscription {
   amount: number;
   /** 서버 결제 수단 코드. 표시는 `usePaymentMethodLabel`이 하고, 모르는 값은 서버 값을 그대로 보임. */
   paymentMethod: string;
+  /** 가장 최근 결제에 쓴 카드의 종류. 모르거나 없으면 null. */
+  cardKind: CardKind | null;
   isCancelScheduled: boolean;
 }
 
@@ -83,6 +80,8 @@ export interface BillingCard {
   /** 마스킹된 카드번호(`1234-56**-****-***7`). 결제사가 끝 4자리를 주지 않아 서버 값을 그대로 표시. */
   maskedNumber: string;
   isDefault: boolean;
+  /** 카드 종류. 모르거나 없으면 null. 지금 화면은 쓰지 않음(카드 목록 시안에 표기 없음). */
+  cardKind: CardKind | null;
 }
 
 /** 구독 결제 내역 한 건. */
@@ -93,8 +92,12 @@ export interface PaymentRecord {
   /** 결제 내역 이름(서버가 만드는 상품명, 그대로 표시). */
   name: string;
   amount: number;
-  method: PaymentMethod;
-  status: PaymentStatus;
+  /** 서버 결제 수단 값. 코드(`PAYMENT_METHODS`)가 아니면 그대로 표시함. */
+  method: string;
+  /** 결제에 쓴 카드의 종류. 모르거나 없으면 null. */
+  cardKind: CardKind | null;
+  /** 서버 결제 상태 값. 코드(`PAYMENT_STATUSES`)가 아니면 그대로 표시함. */
+  status: string;
   /** 거래명세서 주소. 결제 완료 건에만 있음. */
   receiptUrl: string | null;
 }

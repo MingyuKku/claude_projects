@@ -32,7 +32,10 @@ export function SubscribedProductCards({
           { key: "amount", value: formatWon(subscription.amount) },
           {
             key: "method",
-            value: paymentMethodLabel(subscription.paymentMethod),
+            value: paymentMethodLabel(
+              subscription.paymentMethod,
+              subscription.cardKind,
+            ),
           },
         ] as const;
 

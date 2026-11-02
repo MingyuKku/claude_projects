@@ -24,6 +24,7 @@ import { FileItem, FileThumbnail } from "@/shared/components/file-list";
 import { SearchInput } from "@/shared/components/search-input";
 import { Button } from "@/shared/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/shared/ui/tabs";
+import { WithdrawalRequestCard } from "@/widgets/bigbird-inquiry-workspace";
 
 import { PreviewMatrix, previewStateProps } from "../PreviewMatrix";
 import { Section } from "../Section";
@@ -71,13 +72,48 @@ const ADVERTISER_ITEMS = [
   { id: 6, status: "답변 대기", title: "여름 신상 스킨케어 체험단 문의" },
   { id: 7, status: "답변 대기", title: "여름 신상 스킨케어 체험단 문의" },
 ] as const;
+// Figma 26/10/29 구매자 문의 목록(11315:50439) 카드 순서 그대로
 const BUYER_ITEMS = [
-  { id: 1, status: "상담 중", hasAlert: true },
-  { id: 2, status: "답변 대기", hasAlert: false },
-  { id: 3, status: "상담 중", hasAlert: true },
-  { id: 4, status: "답변 완료", hasAlert: false },
-  { id: 5, status: "상담 중", hasAlert: false },
-  { id: 6, status: "상담 중", hasAlert: false },
+  {
+    id: 1,
+    badge: { label: "답변 대기", variant: "blue" },
+    source: "구매자 문의",
+    writer: "@김하루",
+    hasAlert: false,
+    isSelected: true,
+  },
+  {
+    id: 2,
+    badge: { label: "실시간 상담 중", variant: "green" },
+    source: "구매자 문의",
+    writer: "@박하루",
+    hasAlert: true,
+    isSelected: false,
+  },
+  {
+    id: 3,
+    badge: { label: "답변 완료", variant: "gray" },
+    source: "구매자 문의",
+    writer: "@InfluencerNickname",
+    hasAlert: false,
+    isSelected: false,
+  },
+  {
+    id: 4,
+    badge: { label: "답변 대기", variant: "blue" },
+    source: "상품 Q&A",
+    writer: "@InfluencerNickname",
+    hasAlert: false,
+    isSelected: false,
+  },
+  {
+    id: 5,
+    badge: { label: "답변 완료", variant: "gray" },
+    source: "상품 Q&A",
+    writer: "@InfluencerNickname",
+    hasAlert: false,
+    isSelected: false,
+  },
 ] as const;
 const MESSAGE_SIZES = ["lg", "md", "sm"] as const;
 const TOOLBAR_ACTIONS = [
@@ -167,17 +203,19 @@ function ChatListPanels() {
         title="문의 목록"
         search={<SearchBar />}
         tabs={
-          <ChatTabs labels={["전체", "답변 대기", "재문의", "답변 완료"]} />
+          <ChatTabs labels={["전체", "답변 대기", "상담 중", "답변 완료"]} />
         }
       >
         {BUYER_ITEMS.map((item) => (
           <ChatListItem
             key={item.id}
-            badges={BUYER_BADGES[item.status]}
-            date="0월 0일"
+            badges={[item.badge, { label: item.source, variant: "outline" }]}
+            date="00년 0월 0일"
             time="00:00"
-            user={{ name: "김하루" }}
-            preview={PREVIEW_TEXT}
+            titlePrefix="브랜드명"
+            title="캠페인명 문의"
+            caption={item.writer}
+            isSelected={item.isSelected}
             hasAlert={item.hasAlert}
             alertLabel="새 메시지"
           />
@@ -459,6 +497,34 @@ function SuggestionCardSample({
   );
 }
 
+const WITHDRAWAL_STATUSES = ["requested", "approved", "rejected"] as const;
+
+// 빅버드 머니 출금 요청 카드(11430:200465·200466·200467). 넓은 화면은 380 상한, MO는 대화 폭(360 - 좌우 20) 전체.
+function WithdrawalCardSamples() {
+  return (
+    <PreviewMatrix
+      rows={["wide", "mo"] as const}
+      columns={WITHDRAWAL_STATUSES}
+      rowLabel={(row) => (row === "wide" ? "PC·TAB" : "MO 320")}
+      renderCell={(row, status) => (
+        <div className={row === "wide" ? "w-119" : "w-80"}>
+          <WithdrawalRequestCard
+            status={status}
+            amount={999999}
+            applicantName="김하루"
+            applicantId="harukim"
+            bankName="우리은행"
+            accountNumber="1234-1234-1234"
+            accountHolder="김하루"
+            requestedAt={new Date(2026, 8, 8, 0, 0)}
+            rejectReason="통장 사본과 신청자 명의가 일치하지 않아 거절되었습니다."
+          />
+        </div>
+      )}
+    />
+  );
+}
+
 export function ChatSection() {
   return (
     <>
@@ -560,6 +626,10 @@ export function ChatSection() {
             )
           }
         />
+      </Section>
+
+      <Section title="빅버드 머니 출금 요청 카드 (11430:200414)">
+        <WithdrawalCardSamples />
       </Section>
 
       <Section title="Button / Clip Board (6766:45668)">

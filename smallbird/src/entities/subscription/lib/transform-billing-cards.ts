@@ -1,3 +1,5 @@
+import { toCardKind } from "../model/codes";
+
 import type { BillingCardListResponse } from "../model/schema";
 import type { BillingCard } from "../model/types";
 
@@ -10,5 +12,6 @@ export function transformBillingCards(
     issuer: card.issuer,
     maskedNumber: card.maskedNumber,
     isDefault: card.isDefault,
+    cardKind: toCardKind(card.cardKind),
   }));
 }

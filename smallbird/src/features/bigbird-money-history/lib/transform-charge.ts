@@ -2,19 +2,16 @@ import { parseServerDate } from "@/entities/account";
 import { toChargeStatus } from "@/entities/bigbird-money";
 import { toReceiptUrl } from "@/shared/lib/receipt";
 
-import { LIST_PAGE_SIZE } from "../model/constants";
-
 import type { ChargeList } from "../model/charge-schema";
-import type { ChargeListViewModel } from "../model/charge-types";
+import type { ChargeListViewModel, ChargeType } from "../model/charge-types";
 
 const EMPTY_TEXT = "-";
-/** 입금 전에는 입금 완료일이 이 값으로 옴. */
-const NO_DATE = "N/A";
 
-function dateText(value: string | null | undefined) {
-  const text = value?.trim();
-  return text && text !== NO_DATE ? text : EMPTY_TEXT;
-}
+// 객체 리터럴이면 프로토타입 이름도 조회되므로 Map으로 둠.
+const CHARGE_TYPE_BY_SERVER_VALUE = new Map<string, ChargeType>([
+  ["CHARGE", "charge"],
+  ["WITHDRAWAL", "withdraw"],
+]);
 
 function textOrDash(value: string | null | undefined) {
   return value?.trim() ? value : EMPTY_TEXT;
@@ -22,31 +19,31 @@ function textOrDash(value: string | null | undefined) {
 
 export function transformChargeList(list: ChargeList): ChargeListViewModel {
   return {
-    records: list.list.map((item, index) => {
-      const statusText = item.depositState?.trim() ?? "";
-      const status = toChargeStatus(statusText);
-      const depositedAtText = dateText(item.depositDate);
+    records: list.list.map((item) => {
+      const type = CHARGE_TYPE_BY_SERVER_VALUE.get(item.type) ?? null;
+      const status = toChargeStatus(item.status);
       return {
-        id: String(index),
+        id: `${type ?? item.type.toLowerCase()}-${item.id}`,
+        serverId: item.id,
+        type,
+        typeText: textOrDash(item.type),
         requestedAt: parseServerDate(item.requestDate),
-        requestedAtText: dateText(item.requestDate),
-        amount: item.requestAmount ?? null,
+        requestedAtText: textOrDash(item.requestDate),
+        amount: item.amount ?? null,
         payMethod: item.payMethod?.trim() ?? "",
         status,
-        statusText: statusText || EMPTY_TEXT,
+        statusText: textOrDash(item.status),
         bankName: textOrDash(item.bankName),
         accountNumber: textOrDash(item.accountNumber),
-        depositedAt:
-          depositedAtText === EMPTY_TEXT
-            ? null
-            : parseServerDate(item.depositDate),
-        depositedAtText,
-        // 거래명세서는 결제 완료 건만 켬(스펙 §3).
+        holderName: textOrDash(item.holderName),
+        completedAt: parseServerDate(item.completedDate),
+        completedAtText: textOrDash(item.completedDate),
+        // 거래명세서는 입금 완료 건만 켬(스펙 §3). 대기 중 건도 주소가 오지만 가상계좌 발급 영수증이라 쓰지 않음.
         receiptUrl: status === "paid" ? toReceiptUrl(item.receiptUrl) : null,
       };
     }),
     totalCount: list.count,
     page: list.currentPage,
-    totalPages: Math.ceil(list.count / LIST_PAGE_SIZE),
+    totalPages: Math.ceil(list.count / Math.max(list.entrySize, 1)),
   };
 }

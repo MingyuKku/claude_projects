@@ -1,41 +1,55 @@
 {
   "won": "{{amount}}원",
   "usage": {
-    "title": "사용 상세 내역",
+    "title": "상세 내역",
     "list": {
       "label": "사용 상세 내역"
     },
     "column": {
+      "type": "구분",
+      "date": "일자",
       "campaignName": "캠페인 명",
-      "usedAt": "사용 일자",
-      "usage": "사용 내역",
-      "amount": "사용 금액",
-      "campaignCode": "캠페인 코드",
+      "usage": "내역",
+      "amount": "금액",
+      "remaining": "잔액",
       "detail": "상세 보기"
-    },
-    "card": {
-      "usedAt": "사용 일자",
-      "campaignName": "캠페인 명",
-      "campaignType": "캠페인 유형",
-      "campaignCode": "캠페인 코드",
-      "usage": "사용 내역",
-      "amount": "사용 금액",
-      "remaining": "사용 후 잔액"
     },
     "action": {
       "detail": "상세 보기"
     },
     "detail": {
-      "title": "상세 보기",
-      "usedAt": "사용 일자",
+      "title": "사용 내역 상세 보기",
+      "type": "구분",
+      "date": {
+        "use": "사용 일자",
+        "refund": "환급 일자",
+        "charge": "충전 일자",
+        "withdraw": "출금 일자"
+      },
       "campaignName": "캠페인 명",
       "campaignType": "캠페인 유형",
       "campaignCode": "캠페인 코드",
       "usage": "사용 내역",
-      "amount": "사용 금액",
+      "contractTarget": "계약 대상",
+      "amount": {
+        "use": "사용 금액",
+        "refund": "사용 금액",
+        "charge": "충전 금액",
+        "withdraw": "출금 금액"
+      },
       "remaining": "사용 후 잔액"
     },
     "filter": {
+      "type": {
+        "label": "구분",
+        "placeholder": "사용 유형을 선택하세요.",
+        "option": {
+          "use": "사용",
+          "refund": "환급",
+          "charge": "충전",
+          "withdraw": "출금"
+        }
+      },
       "date": {
         "label": "사용 일자",
         "placeholder": "날짜를 선택하세요."
@@ -50,27 +64,40 @@
       }
     },
     "empty": {
-      "none": "빅버드 머니 사용 내역이 없습니다."
+      "none": "사용 내역이 없습니다."
+    },
+    "type": {
+      "use": "사용",
+      "refund": "환급",
+      "charge": "충전",
+      "withdraw": "출금"
+    },
+    "campaignType": {
+      "recruit": "모집형",
+      "pick": "PICK형"
+    },
+    "usageDetail": {
+      "contractPick": "인플루언서 계약비용(PICK형)",
+      "contractRecruit": "인플루언서 계약비용(모집형)",
+      "aiManuscriptConfirm": "부가 서비스(AI 원고컨펌)",
+      "aiPostingGuide": "부가 서비스(AI 포스팅가이드)"
     }
   },
   "charge": {
-    "title": "충전 상세 내역",
+    "title": "상세 내역",
     "list": {
-      "label": "충전 상세 내역"
+      "label": "충전/출금 상세 내역"
     },
     "column": {
-      "requestedAt": "충전 일자",
-      "amount": "충전 요청 금액",
-      "method": "결제 수단",
+      "type": "구분",
+      "date": "일자",
+      "amount": "금액",
+      "bank": "은행",
+      "account": "계좌 번호",
+      "holder": "입금자 명",
       "status": "입금 상태",
       "receipt": "거래명세서",
       "detail": "상세 보기"
-    },
-    "card": {
-      "requestedAt": "충전 일자",
-      "amount": "충전 요청 금액",
-      "method": "결제 수단",
-      "status": "입금 상태"
     },
     "action": {
       "detail": "상세 보기",
@@ -82,17 +109,35 @@
     },
     "detail": {
       "title": "거래 상세 보기",
-      "approvedAt": "승인 일자",
+      "type": "충전 구분",
       "requestedAt": "입금 요청 일자",
-      "amount": "충전 요청 금액",
+      "amount": "충전 금액",
       "method": "결제 수단",
       "bank": "은행 명",
-      "account": "가상 계좌 번호",
+      "account": "계좌 번호",
+      "holder": "입금자 명",
       "depositedAt": "입금 완료 일",
       "status": "입금 여부",
-      "receipt": "거래명세서 받기"
+      "receipt": "거래명세서 받기",
+      "withdraw": {
+        "requestedAt": "출금 요청 일자",
+        "amount": "출금 금액",
+        "method": "처리 방식",
+        "methodValue": "입력된 계좌로 출금",
+        "holder": "예금주 명",
+        "completedAt": "출금 완료 일",
+        "status": "출금 여부"
+      }
     },
     "filter": {
+      "type": {
+        "label": "구분",
+        "placeholder": "충전 유형을 선택하세요.",
+        "option": {
+          "charge": "충전",
+          "withdraw": "출금"
+        }
+      },
       "date": {
         "label": "충전 일자",
         "placeholder": "날짜를 선택하세요."
@@ -101,14 +146,15 @@
         "label": "입금 상태",
         "placeholder": "입금 상태를 선택하세요.",
         "option": {
-          "paid": "결제 완료",
+          "paid": "입금 완료",
+          "withdrawn": "출금 완료",
           "pending": "대기 중",
-          "canceled": "결제 취소"
+          "canceled": "미입금 취소"
         }
       }
     },
     "empty": {
-      "none": "빅버드 머니 충전 내역이 없습니다."
+      "none": "충전/출금 내역이 없습니다."
     },
     "notice": {
       "title": "안내",
@@ -116,6 +162,10 @@
       "validity": "무통장 입금 가상계좌의 유효기간은 2일 뒤 자정까지 입니다.",
       "instant": "빅버드 머니는 입금 확인 시 바로 충전됩니다.",
       "delay": "입금완료 후 보유 금액 확인까지는 최대 5분 소요될 수 있습니다."
+    },
+    "type": {
+      "charge": "충전",
+      "withdraw": "출금"
     }
   }
 }

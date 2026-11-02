@@ -64,7 +64,7 @@ describe("transformMasterToViewModel", () => {
     });
     expect(socialLinks.naver).toEqual({ isLinked: false, email: null });
     // 응답에 키가 아예 없는 SNS도 연동 안 됨으로 본다.
-    expect(socialLinks.facebook.isLinked).toBe(false);
+    expect(socialLinks.apple.isLinked).toBe(false);
   });
 
   it("서류는 인덱스가 아니라 등록 여부와 파일명으로 바꾼다", () => {

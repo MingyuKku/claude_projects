@@ -1,4 +1,4 @@
-import { ArrowLeft, CircleAlert, X } from "lucide-react";
+import { ChevronLeft, CircleAlert, X } from "lucide-react";
 import { useId, useState } from "react";
 import { toast } from "sonner";
 
@@ -7,6 +7,7 @@ import { SubHeader } from "@/shared/components/app-header";
 import { PriceField } from "@/shared/components/text-field";
 import { formatNumber, useTranslation } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
+import { ScrollArea } from "@/shared/ui/scroll-area";
 
 import { useRequestCharge } from "../api/use-request-charge";
 import {
@@ -76,7 +77,7 @@ export function ChargePanel({
                 aria-label={tCommon("action.back")}
                 onClick={onClose}
               >
-                <ArrowLeft />
+                <ChevronLeft />
               </Button>
             )}
             {t("title")}
@@ -95,66 +96,70 @@ export function ChargePanel({
           </Button>
         }
       />
-      <div className="flex flex-1 flex-col gap-6 overflow-y-auto p-4 tablet:gap-8 tablet:px-5 tablet:pt-4 tablet:pb-3">
-        <BalanceCard amount={balance?.amount} />
+      <ScrollArea className="min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:block!">
+        <div className="flex flex-col gap-6 p-4 tablet:gap-8 tablet:px-5 tablet:pt-4 tablet:pb-3">
+          <BalanceCard amount={balance?.amount} />
 
-        <div className="flex flex-col gap-5">
-          <div className="flex flex-col gap-3">
-            <div className="flex flex-col gap-2">
-              <PriceField
-                label={t("field.label")}
-                unit={t("field.unit")}
-                placeholder={t("field.placeholder")}
-                autoComplete="off"
-                value={amount === null ? "" : formatNumber(amount)}
-                aria-invalid={error ? true : undefined}
-                aria-describedby={error ? errorId : undefined}
-                onChange={(event) => setAmount(parseAmount(event.target.value))}
-              />
-              {error && (
-                <p
-                  id={errorId}
-                  role="alert"
-                  className="text-sm leading-5 text-destructive"
-                >
-                  {t(`error.${error}`, {
-                    amount: formatNumber(
-                      error === "min" ? MIN_CHARGE_AMOUNT : MAX_CHARGE_AMOUNT,
-                    ),
-                  })}
-                </p>
-              )}
-            </div>
-            <div className="grid grid-cols-4 gap-2">
-              {QUICK_AMOUNTS.map((quick) => (
-                <Button
-                  key={quick}
-                  type="button"
-                  variant="outline"
-                  size="sm"
-                  className="min-w-0"
-                  onClick={() =>
-                    setAmount((current) => addAmount(current, quick))
+          <div className="flex flex-col gap-5">
+            <div className="flex flex-col gap-3">
+              <div className="flex flex-col gap-2">
+                <PriceField
+                  label={t("field.label")}
+                  unit={t("field.unit")}
+                  placeholder={t("field.placeholder")}
+                  autoComplete="off"
+                  value={amount === null ? "" : formatNumber(amount)}
+                  aria-invalid={error ? true : undefined}
+                  aria-describedby={error ? errorId : undefined}
+                  onChange={(event) =>
+                    setAmount(parseAmount(event.target.value))
                   }
-                >
-                  {t(`quick.${quick}`)}
-                </Button>
-              ))}
+                />
+                {error && (
+                  <p
+                    id={errorId}
+                    role="alert"
+                    className="text-sm leading-5 text-destructive"
+                  >
+                    {t(`error.${error}`, {
+                      amount: formatNumber(
+                        error === "min" ? MIN_CHARGE_AMOUNT : MAX_CHARGE_AMOUNT,
+                      ),
+                    })}
+                  </p>
+                )}
+              </div>
+              <div className="grid grid-cols-4 gap-2">
+                {QUICK_AMOUNTS.map((quick) => (
+                  <Button
+                    key={quick}
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    className="min-w-0"
+                    onClick={() =>
+                      setAmount((current) => addAmount(current, quick))
+                    }
+                  >
+                    {t(`quick.${quick}`)}
+                  </Button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <ul className="flex flex-col gap-2 border-t pt-5 text-sm leading-5 text-muted-foreground">
-            <li className="flex items-start gap-1.5">
-              <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
-              {t("notice.min", { amount: formatNumber(MIN_CHARGE_AMOUNT) })}
-            </li>
-            <li className="flex items-start gap-1.5">
-              <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
-              {t("notice.max", { amount: formatNumber(MAX_CHARGE_AMOUNT) })}
-            </li>
-          </ul>
+            <ul className="flex flex-col gap-2 border-t pt-5 text-sm leading-5 text-muted-foreground">
+              <li className="flex items-start gap-1.5">
+                <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
+                {t("notice.min", { amount: formatNumber(MIN_CHARGE_AMOUNT) })}
+              </li>
+              <li className="flex items-start gap-1.5">
+                <CircleAlert aria-hidden className="mt-0.5 size-4 shrink-0" />
+                {t("notice.max", { amount: formatNumber(MAX_CHARGE_AMOUNT) })}
+              </li>
+            </ul>
+          </div>
         </div>
-      </div>
+      </ScrollArea>
       <div className="p-4 tablet:p-5">
         <Button type="submit" className="w-full" disabled={!canCharge}>
           {t("submit", { amount: formatNumber(amount ?? 0) })}

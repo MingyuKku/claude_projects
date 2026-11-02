@@ -26,6 +26,17 @@ export type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
 export const PAYMENT_METHODS = ["card", "cardInstallment"] as const;
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 
+/** 결제 카드 종류. 서버 `cardKind`(`credit` 신용·`debit` 체크). 기프트카드·알 수 없음은 서버가 null로 줌. */
+export const CARD_KINDS = ["credit", "debit"] as const;
+export type CardKind = (typeof CARD_KINDS)[number];
+
+/** 서버 값을 카드 종류 코드로 바꿈. 없거나 모르는 값은 null(종류를 가리지 않고 보임). */
+export function toCardKind(
+  serverValue: string | null | undefined,
+): CardKind | null {
+  return CARD_KINDS.find((kind) => kind === serverValue) ?? null;
+}
+
 /** 이용 현황 지표. 매칭 성사 수는 PICK형만. */
 export const USAGE_METRICS = [
   "campaignCount",

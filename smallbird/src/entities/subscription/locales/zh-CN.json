@@ -12,6 +12,7 @@
   },
   "paymentMethod": {
     "card": "信用卡",
+    "cardDebit": "借记卡",
     "cardInstallment": "信用卡(分期)"
   },
   "plan": {

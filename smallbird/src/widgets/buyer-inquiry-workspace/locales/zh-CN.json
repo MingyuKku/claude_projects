@@ -2,9 +2,10 @@
   "listTitle": "咨询列表",
   "all": "全部",
   "waiting": "待回复",
+  "consulting": "咨询中",
   "done": "已回复",
   "status": {
-    "consulting": "咨询中",
+    "consulting": "实时咨询中",
     "waiting": "待回复",
     "done": "已回复"
   },

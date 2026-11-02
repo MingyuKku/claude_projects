@@ -1,3 +1,4 @@
+import { toCardKind } from "../model/codes";
 import { isSubscriptionProductType } from "../model/schema";
 
 import type { SubscriptionListResponse } from "../model/schema";
@@ -18,6 +19,7 @@ export function transformSubscriptions(
             endsAt: item.endsAt,
             amount: item.amount,
             paymentMethod: item.paymentMethod,
+            cardKind: toCardKind(item.cardKind),
             isCancelScheduled: item.isCancelScheduled,
           },
         ]

@@ -12,6 +12,7 @@
   },
   "paymentMethod": {
     "card": "クレジットカード",
+    "cardDebit": "デビットカード",
     "cardInstallment": "クレジットカード(分割)"
   },
   "plan": {

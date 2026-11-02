@@ -12,6 +12,7 @@ import {
   fetchQnaDetail,
   fetchBuyerInquiryPage,
   fetchBuyerProduct,
+  fetchInquiryCampaigns,
   fetchInquiryUser,
   sendInquiryMessage,
   uploadInquiryAttachment,
@@ -519,5 +520,37 @@ describe("fetchBuyerProduct", () => {
     expect(serverApiV3.get).toHaveBeenCalledWith(
       "/help/c-purchaser-questionInfo/20261001-0001",
     );
+  });
+});
+
+describe("fetchInquiryCampaigns", () => {
+  it("상품명이 null인 캠페인이 섞여도 목록 전체를 받고 상품명은 빈 문자열로 둔다", async () => {
+    const campaign = {
+      campaignIdx: 10,
+      campaignCode: "P-1",
+      brandName: "빅버드",
+      productName: "스킨케어 캠페인",
+      mainImageUrl: null,
+      progressStartDate: null,
+      progressEndDate: null,
+    };
+    vi.mocked(serverApiV3.get).mockResolvedValueOnce({
+      result: true,
+      list: [
+        campaign,
+        // stage 실측(2026-11-02): 상품명 null이면 브랜드명도 빈 값.
+        { ...campaign, campaignIdx: 1057, brandName: "", productName: null },
+      ],
+    });
+
+    const campaigns = await fetchInquiryCampaigns();
+
+    expect(
+      campaigns.map((item) => [item.campaignIdx, item.productName]),
+    ).toEqual([
+      [10, "스킨케어 캠페인"],
+      [1057, ""],
+    ]);
+    expect(campaigns[1]?.name).toBe("");
   });
 });

@@ -2,7 +2,7 @@ import useSWR, { useSWRConfig } from "swr";
 
 import { fetchBigbirdMoneyBalance } from "./biz-money-api";
 
-export const BIGBIRD_MONEY_BALANCE_KEY = ["mypage", "biz-money", "balance"];
+export const BIGBIRD_MONEY_BALANCE_KEY = ["mypage", "bigbird-money", "balance"];
 
 /**
  * 보유 빅버드 머니. 헤더와 빅버드 머니 화면이 같은 키를 읽어 한 번만 요청하고, 충전 뒤에는 두 곳이 같이 갱신됨.

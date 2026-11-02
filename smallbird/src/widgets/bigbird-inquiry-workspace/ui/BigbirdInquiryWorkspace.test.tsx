@@ -100,3 +100,38 @@ describe("BigbirdInquiryWorkspace 무한 스크롤", () => {
     expect(screen.getAllByRole("listitem").length).toBeGreaterThan(0);
   });
 });
+
+describe("BigbirdInquiryWorkspace 목록 카드", () => {
+  const base: BigbirdInquiryViewModel = {
+    threadIdx: 1,
+    sequence: 1,
+    campaignIdx: null,
+    isRealtime: false,
+    isFinished: false,
+    status: "waiting",
+    realtimePhase: null,
+    createdAt: new Date("2026-10-29T09:00:00"),
+    messages: [],
+  };
+
+  it("기타 문의 카드에만 기타문의 태그를 붙인다", () => {
+    render(
+      <MemoryRouter>
+        <BigbirdInquiryWorkspace
+          threadUserIdx={undefined}
+          inquiries={[base, { ...base, threadIdx: 2, campaignIdx: 10 }]}
+          isLoading={false}
+          isError={false}
+          onClickRefresh={() => {}}
+          isPanelOpen={false}
+          panelLabel="대화"
+        >
+          <p>패널 내용</p>
+        </BigbirdInquiryWorkspace>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getAllByText("기타문의")).toHaveLength(1);
+    expect(screen.getByText("캠페인 문의")).toBeInTheDocument();
+  });
+});

@@ -2,9 +2,10 @@
   "listTitle": "문의 목록",
   "all": "전체",
   "waiting": "답변 대기",
+  "consulting": "상담 중",
   "done": "답변 완료",
   "status": {
-    "consulting": "상담 중",
+    "consulting": "실시간 상담 중",
     "waiting": "답변 대기",
     "done": "답변 완료"
   },
