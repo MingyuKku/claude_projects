@@ -53,12 +53,16 @@ describe("일반 문의 입력창", () => {
     const { router, onSent } = renderComposer();
     await user.type(screen.getByRole("textbox"), "추가 문의입니다{Enter}");
     await waitFor(() => expect(onSent).toHaveBeenCalledOnce());
-    expect(serverApiV3.post).toHaveBeenCalledWith("/help/thread/message", {
-      threadIdx: 101,
-      body: "추가 문의입니다",
-      attachmentIdx: null,
-      isAuto: false,
-    });
+    expect(serverApiV3.post).toHaveBeenCalledWith(
+      "/help/thread/message",
+      {
+        threadIdx: 101,
+        body: "추가 문의입니다",
+        attachmentIdx: null,
+        isAuto: false,
+      },
+      { headers: { "X-Device-Id": expect.any(String) } },
+    );
     expect(screen.getByRole("textbox")).toHaveValue("");
     expect(router.state.location.pathname).toBe("/customer-center/bigbird/101");
   });
@@ -122,6 +126,7 @@ describe("일반 문의 입력창", () => {
       2,
       "/help/thread/message",
       expect.objectContaining({ threadIdx: 303, body: "다시 문의" }),
+      { headers: { "X-Device-Id": expect.any(String) } },
     );
   });
 

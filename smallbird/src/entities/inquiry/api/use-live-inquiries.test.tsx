@@ -45,9 +45,14 @@ function realtime(
   };
 }
 
+// 상담 문서와 계정 문서 구독이 같은 스냅숏을 받음. 연결은 계정 문서의 msgResponseDate(요청 뒤 시각)로 판단함.
 function snapshotOf(isConnect: boolean, finishTime: string | null = null) {
   return {
     exists: () => true,
+    get: (field: string) =>
+      field === "msgResponseDate" && isConnect
+        ? "2026-10-19 10:00:10"
+        : undefined,
     data: () => ({
       sequence: 7,
       threadIdx: 101,
@@ -75,7 +80,15 @@ describe("useLiveInquiries", () => {
         ]),
       { wrapper },
     );
-    await waitFor(() => expect(mocks.onSnapshot).toHaveBeenCalledOnce());
+    // 상담 문서 1건 + 연결 판단용 내 계정 문서
+    await waitFor(() => expect(mocks.onSnapshot).toHaveBeenCalledTimes(2));
+    expect(mocks.doc).toHaveBeenCalledWith(
+      expect.anything(),
+      "helpdesk",
+      "0.0.2",
+      "threadUserIdx",
+      "5971",
+    );
     expect(mocks.doc).toHaveBeenCalledWith(
       expect.anything(),
       "helpdesk",

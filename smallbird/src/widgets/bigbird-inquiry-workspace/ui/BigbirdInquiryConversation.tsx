@@ -11,6 +11,8 @@ import {
   useBigbirdInquiryDetail,
   useCampaignTimeline,
   useInquiryCampaigns,
+  isMatchFailureShown,
+  useConsultationDocument,
   useRealtimeConsultationMessages,
 } from "@/entities/inquiry";
 import { EditableChatMessage } from "@/features/edit-inquiry-message";
@@ -145,7 +147,17 @@ export function BigbirdInquiryConversation({
     const timer = setTimeout(() => setIsFailedCardHidden(true), FAILED_CARD_MS);
     return () => clearTimeout(timer);
   }, [isFailed]);
-  const isFailedCardVisible = isFailed && !isFailedCardHidden;
+  // 3분 매칭 실패로 서버가 일반 문의로 돌린 스레드: 상담 문서의 endReason으로 앎.
+  const { consultation: endedConsultation } = useConsultationDocument(
+    threadUserIdx,
+    inquiry.isRealtime ? undefined : inquiry.sequence,
+    inquiry.threadIdx,
+  );
+  // endReason은 종료·전환 때마다 덮어써지고 새 요청 뒤에도 남을 수 있어(마켓 실측 2026-11-04) 요청 시각이 비었을 때만 인정하고,
+  // 실패 뒤에 상담원이 일반 메시지를 보내면 걷음. 규칙은 isMatchFailureShown.
+  const isMatchFailed = isMatchFailureShown(endedConsultation);
+  const isFailedCardVisible =
+    (isFailed && !isFailedCardHidden) || isMatchFailed;
   // 대화 위에 고정되는 안내 카드(완료·요청 중·요청 실패). 첫 메시지가 가리지 않게 높이만큼 띄움.
   const hasTopCard =
     inquiry.isFinished || phase === "requesting" || isFailedCardVisible;
@@ -169,6 +181,7 @@ export function BigbirdInquiryConversation({
           status="loading"
           title={t("realtime.requesting.title")}
           description={t("realtime.requesting.description")}
+          // 피그마(11315:50259 등)는 "최대 5분"이지만 백엔드 매칭 실패(스케줄러)가 3분이라 3분으로 맞춤(사용자 결정 2026-11-03).
           caption={t("realtime.requesting.caption")}
           className={className}
         />
@@ -181,6 +194,7 @@ export function BigbirdInquiryConversation({
           status="error"
           title={t("realtime.failed.title")}
           description={t("realtime.failed.description")}
+          caption={t("realtime.failed.caption")}
           className={className}
         />
       );
@@ -201,6 +215,10 @@ export function BigbirdInquiryConversation({
   function renderMessage(message: InquiryMessageViewModel) {
     const side = message.isMine ? "me" : "other";
     const name = message.isMine ? myName : t("bigbirdManager");
+    // 서버의 상담 종료 안내는 말풍선이 아니라 가운데 구분선(마켓·인플루언서 시안과 같음).
+    if (message.kind === "notice") {
+      return <ChatDivider className="self-center">{message.body}</ChatDivider>;
+    }
     if (message.isDeleted) {
       return (
         <ChatDivider className="self-center">{t("deletedMessage")}</ChatDivider>
@@ -361,7 +379,11 @@ export function BigbirdInquiryConversation({
         ) : hasNoMessages && inquiry.isRealtime && realtime.isError ? (
           <EmptyState
             type="no-message"
-            title={t("realtimeLoadError")}
+            title={t(
+              realtime.isOtherDevice
+                ? "realtime.otherDevice"
+                : "realtimeLoadError",
+            )}
             className="flex-1"
           />
         ) : // 요청 중·연결 중·요청 실패에서 보일 메시지(캠페인 카드 포함)가 없으면 빈 영역으로 둠(시안 9298:260487 등). 안내는 종료된 이력에만 보임.

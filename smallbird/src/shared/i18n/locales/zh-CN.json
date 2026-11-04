@@ -63,8 +63,8 @@
         "description": "视频最大50MB。"
       },
       "fileSize": {
-        "title": "文档超出大小",
-        "description": "文档最大30MB。"
+        "title": "附件超出大小",
+        "description": "每个文件最大可附加30MB。"
       },
       "imageCount": {
         "title": "图片数量超限",

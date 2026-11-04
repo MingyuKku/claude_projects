@@ -42,6 +42,7 @@ export type ShellNavSubItem = Omit<SidebarNavSubItemData, "id" | "label"> & {
     | "commerceSettlement"
     | "bigbird"
     | "buyer"
+    | "influencer"
     | "subscribe"
     | "money"
     | "account";
@@ -92,6 +93,7 @@ export const SHELL_NAV_ITEMS: ShellNavItem[] = [
     subItems: [
       { id: "bigbird", href: ROUTES.customerCenterBigbird },
       { id: "buyer", href: ROUTES.customerCenterBuyer },
+      { id: "influencer", href: ROUTES.customerCenterInfluencer },
     ],
   },
 ];

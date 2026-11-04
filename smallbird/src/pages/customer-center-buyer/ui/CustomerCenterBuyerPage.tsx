@@ -15,14 +15,26 @@ import { useMediaQuery } from "@/shared/lib/useMediaQuery";
 import {
   BuyerInquiryPanels,
   BuyerInquiryWorkspace,
+  INQUIRY_MENU,
+  OPENED_BY_USER_STATE,
   toBuyerInquiryFilters,
   toBuyerStatusFilter,
 } from "@/widgets/buyer-inquiry-workspace";
 
 import type { RealtimeAlarm } from "@/entities/inquiry";
 import type { SessionViewModel } from "@/entities/session";
+import type { InquiryMenu } from "@/widgets/buyer-inquiry-workspace";
 
 export function CustomerCenterBuyerPage() {
+  return <InquiryMenuPage menu="buyer" />;
+}
+
+/** 인플루언서 문의(REQ-34-0001): 구매자 문의와 같은 화면에 인플루언서 문의·캠페인 Q&A를 보여 줌. */
+export function CustomerCenterInfluencerPage() {
+  return <InquiryMenuPage menu="influencer" />;
+}
+
+function InquiryMenuPage({ menu }: { menu: InquiryMenu }) {
   const { t } = useTranslation("pages/customer-center-buyer");
   const { inquiryKey } = useParams();
   const session = useOutletContext<SessionViewModel>();
@@ -40,9 +52,11 @@ export function CustomerCenterBuyerPage() {
     mutate,
   } = useBuyerInquiries(
     toBuyerStatusFilter(searchParams.get("status")),
-    toBuyerInquiryFilters(searchParams),
+    toBuyerInquiryFilters(searchParams, menu),
+    INQUIRY_MENU[menu].sources,
     handleRealtimeAlarm,
   );
+  const isInfluencer = menu === "influencer";
   // 문의를 고르지 않고 들어오면 지금 탭(서버가 걸러 준 목록)의 첫 문의를 보여 줌(빅버드 문의와 같음).
   const selectedInquiry =
     inquiryKey === undefined
@@ -75,14 +89,16 @@ export function CustomerCenterBuyerPage() {
                 inquiryKey: target.key,
               })
             : ROUTES.customerCenterBuyer,
+          { state: OPENED_BY_USER_STATE },
         ),
     });
   }
 
   return (
     <>
-      <title>{t("title")}</title>
+      <title>{t(isInfluencer ? "influencerTitle" : "title")}</title>
       <BuyerInquiryWorkspace
+        menu={menu}
         inquiries={inquiries}
         isLoading={isLoading}
         isError={isError}
@@ -99,14 +115,14 @@ export function CustomerCenterBuyerPage() {
           <BuyerInquiryPanels
             inquiry={openedInquiry}
             threadUserIdx={session.threadUserIdx}
-            identifier={session.identifier}
+            onChangeStatus={() => void mutate()}
           />
         ) : (
           !isLoading && (
+            // Figma 빈 상태(TAB 11315:50562 등)와 같은 문구·아이콘. 개발 초기 "준비 중" 임시 문구를 대신함(2026-11-03).
             <EmptyState
-              type="folder"
-              title={t("preparingTitle")}
-              description={t("preparingDescription")}
+              type="no-message"
+              title={t("empty")}
               className="min-h-full tablet:rounded-lg tablet:border tablet:border-border"
             />
           )

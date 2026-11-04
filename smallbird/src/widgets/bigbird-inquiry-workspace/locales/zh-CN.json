@@ -1,6 +1,5 @@
 {
   "listTitle": "咨询列表",
-  "refresh": "刷新",
   "newInquiry": "新建咨询",
   "all": "全部",
   "waiting": "待回复",
@@ -42,14 +41,16 @@
     },
     "failed": {
       "title": "无法实时咨询",
-      "description": "目前客服暂时无法应答。请留下咨询，我们会为您回复。"
+      "description": "目前咨询较多，暂时难以提供实时咨询。",
+      "caption": "将转为普通咨询，并按顺序为您回复。"
     },
     "end": "结束咨询",
     "composer": "实时咨询消息",
     "composerPlaceholder": "请输入咨询内容。（最多3,000字）",
     "attach": "附件",
     "send": "发送",
-    "request": "实时咨询"
+    "request": "实时咨询",
+    "otherDevice": "其他客服正在处理该咨询，请在咨询结束后再使用。"
   },
   "composer": {
     "placeholder": "请输入咨询内容。（最多3,000字）",

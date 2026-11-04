@@ -86,24 +86,41 @@ describe("parseServerDate", () => {
 });
 
 describe("transformSubSelfToViewModel", () => {
-  it("Sub 본인 정보를 읽고, 응답에 없는 가입일·본인인증은 비운다", () => {
-    const profile = transformSubSelfToViewModel(
-      subSelfAccountSchema.parse({
-        accountIdx: 101,
+  const subSelf = {
+    accountIdx: 101,
+    identifier: "sub01",
+    name: "김서브",
+    email: "sub01@bigbird.local",
+    phone: "01011112222",
+    profileImageUrl: "https://cdn.bigbird.local/sub01.png",
+    created: "2026-10-28 14:05",
+  };
+
+  it("Sub 본인 정보·이미지·생성일을 읽고, 본인인증은 비운다", () => {
+    expect(
+      transformSubSelfToViewModel(subSelfAccountSchema.parse(subSelf)),
+    ).toEqual({
+      profile: {
         identifier: "sub01",
         name: "김서브",
-        email: "sub01@bigbird.local",
         phone: "01011112222",
-        profileImageUrl: null,
+        email: "sub01@bigbird.local",
+        joinedAt: new Date(2026, 9, 28, 14, 5),
+        certIdx: null,
+      },
+      profileImageUrl: "https://cdn.bigbird.local/sub01.png",
+    });
+  });
+
+  it("이미지·생성일이 없으면 null이다", () => {
+    const { profile, profileImageUrl } = transformSubSelfToViewModel(
+      subSelfAccountSchema.parse({
+        ...subSelf,
+        profileImageUrl: "",
+        created: null,
       }),
     );
-    expect(profile).toEqual({
-      identifier: "sub01",
-      name: "김서브",
-      phone: "01011112222",
-      email: "sub01@bigbird.local",
-      joinedAt: null,
-      certIdx: null,
-    });
+    expect(profileImageUrl).toBeNull();
+    expect(profile.joinedAt).toBeNull();
   });
 });

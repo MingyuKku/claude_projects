@@ -56,7 +56,11 @@ describe("getFirestoreDb", () => {
     const getFirestoreDb = await loadGetFirestoreDb();
     await Promise.all([getFirestoreDb(), getFirestoreDb()]);
 
-    expect(post).toHaveBeenCalledExactlyOnceWith("/help/firebase-token");
+    expect(post).toHaveBeenCalledExactlyOnceWith(
+      "/help/firebase-token",
+      undefined,
+      { headers: { "X-Device-Id": expect.any(String) } },
+    );
     expect(signInWithCustomToken).toHaveBeenCalledExactlyOnceWith(
       { type: "auth" },
       "custom-token",

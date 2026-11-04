@@ -133,7 +133,7 @@ describe("MyPageSubscribePage 결제 화면", () => {
   });
 
   it("period가 없으면 월간이다", async () => {
-    setup("/mypage/subscribe?panel=checkout&plan=recruit");
+    setup("/mypage/subscribe?panel=checkout&plan=pick");
     expect(
       await screen.findByText("결제 즉시 1개월 이용 시작"),
     ).toBeInTheDocument();
@@ -144,6 +144,15 @@ describe("MyPageSubscribePage 결제 화면", () => {
     expect(
       await screen.findByRole("button", { name: "구독 중" }),
     ).toBeDisabled();
+  });
+
+  it("구독 중인 상품의 결제 화면 주소로 들어오면 결제 화면 대신 구독 탭을 보인다", async () => {
+    setup("/mypage/subscribe?panel=checkout&plan=recruit");
+    expect(
+      await screen.findByRole("button", { name: "구독 중" }),
+    ).toBeDisabled();
+    expect(screen.queryByText("결제 즉시 1개월 이용 시작")).toBeNull();
+    expect(screen.queryByRole("button", { name: "결제" })).toBeNull();
   });
 
   it("구독 목록을 읽지 못하면 오류 안내를 보이고 다시 시도하면 불러온다", async () => {
@@ -212,6 +221,17 @@ describe("MyPageSubscribePage 카드 없음", () => {
 
     await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull());
     expect(screen.getByTestId("search")).toBeEmptyDOMElement();
+  });
+
+  it("구독 중인 상품의 결제 화면 주소면 결제할 일이 없어 카드 등록 안내도 띄우지 않는다", async () => {
+    setup("/mypage/subscribe?panel=checkout&plan=recruit");
+    await screen.findByRole("button", { name: "구독 중" });
+    await waitFor(() =>
+      expect(serverApiV3.get).toHaveBeenCalledWith(
+        "/mypage/subscription/billing-cards",
+      ),
+    );
+    expect(screen.queryByRole("alertdialog")).toBeNull();
   });
 
   it("안내에서 카드를 등록하고 돌아오면 구독하려던 결제 화면을 다시 연다", async () => {

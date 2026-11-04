@@ -1,0 +1,17 @@
+# stage 서버에서 실행한다. CI deploy:stage job 이 ~/service/docker-compose.yml 로 올리고 IMAGE 를 넘긴다.
+services:
+  client-fe:
+    image: ${IMAGE:?IMAGE 가 필요합니다}
+    container_name: stage-bigbird-client-fe
+    # 서버 4000 번은 ALB 대상 포트(biglink stage 복제 구성), 컨테이너 nginx 는 80 번으로 받는다.
+    ports:
+      - "4000:80"
+    restart: always
+    environment:
+      - TZ=Asia/Seoul
+    healthcheck:
+      test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/ || exit 1"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s

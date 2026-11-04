@@ -2,6 +2,7 @@ import { RefreshCcw, Settings2, X } from "lucide-react";
 import { useId, useState } from "react";
 
 import {
+  INQUIRY_SOURCE_TYPE,
   useBuyerInfluencerOptions,
   useInquiryCampaigns,
 } from "@/entities/inquiry";
@@ -20,10 +21,14 @@ import {
 } from "@/shared/ui/dialog";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 
+import { INQUIRY_MENU } from "../model/menu";
+
+import type { InquiryMenu } from "../model/menu";
 import type { BuyerInquiryFilters } from "@/entities/inquiry";
 import type { ReactNode } from "react";
 
 interface BuyerInquiryFilterDialogProps {
+  menu: InquiryMenu;
   value: BuyerInquiryFilters;
   threadUserIdx?: number;
   onApply: (filters: BuyerInquiryFilters) => void;
@@ -34,9 +39,8 @@ function toRangeKey({ startDate, endDate }: BuyerInquiryFilters) {
   return startDate && endDate ? `${startDate}~${endDate}` : "";
 }
 
-const SOURCE_TYPES = ["ALL", "PURCHASER_QUESTION", "PRODUCT_QNA"] as const;
-
 export function BuyerInquiryFilterDialog({
+  menu,
   value,
   threadUserIdx,
   onApply,
@@ -46,16 +50,15 @@ export function BuyerInquiryFilterDialog({
   const isTabletUp = useMediaQuery("(min-width: 768px)");
   const [open, setOpen] = useState(false);
   const titleId = useId();
+  // Figma 인플루언서 필터(10819:41465): 전체 · 인플루언서 문의 · 캠페인 Q&A.
+  const sourceTypes = [
+    "ALL",
+    ...INQUIRY_MENU[menu].sources.map((source) => INQUIRY_SOURCE_TYPE[source]),
+  ] as const;
   const dateLabelId = useId();
   const [draft, setDraft] = useState<BuyerInquiryFilters>(value);
   const { campaigns } = useInquiryCampaigns(threadUserIdx);
   const { options } = useBuyerInfluencerOptions(draft.campaignIdx);
-  // 조건이 걸려 있으면 필터 버튼을 활성 색으로 보여 줌(Figma "필터 버튼 활성화 시").
-  const isActive =
-    value.sourceType !== "ALL" ||
-    value.campaignIdx !== undefined ||
-    value.influencerThreadUserIdx !== undefined ||
-    value.startDate !== undefined;
   const hasChanges =
     draft.sourceType !== value.sourceType ||
     draft.campaignIdx !== value.campaignIdx ||
@@ -73,10 +76,11 @@ export function BuyerInquiryFilterDialog({
   }
 
   const trigger = (
+    // Figma 26/10/29: 필터 버튼은 늘 파랑 글자, 설정창이 열리면 파랑 테두리("필터 버튼 활성화 시"). 적용된 조건은 칩이 보여 줌.
     <Button
-      variant={isActive ? "outline" : "outline-foreground"}
+      variant="outline"
       size="default"
-      className="min-w-20 gap-1.5"
+      className="min-w-20 gap-1.5 data-[state=open]:border-primary"
     >
       <Settings2 className="size-4" />
       {t("filter.action")}
@@ -91,9 +95,9 @@ export function BuyerInquiryFilterDialog({
           <legend className="mb-2 text-sm font-medium">
             {t("filter.source")}
           </legend>
-          {/* 토글 간격 8·최소 폭 94, 선택은 흰 2px을 띄운 primary 링(Figma Toggle focus ring) */}
+          {/* 토글 간격 8, 3개(인플루언서 메뉴)도 한 줄에 들어가도록 최소 폭 없이 균등 분배, 선택은 흰 2px을 띄운 primary 링(Figma Toggle focus ring) */}
           <div className="flex gap-2">
-            {SOURCE_TYPES.map((sourceType) => (
+            {sourceTypes.map((sourceType) => (
               <Button
                 key={sourceType}
                 type="button"
@@ -101,7 +105,7 @@ export function BuyerInquiryFilterDialog({
                 size="sm"
                 aria-pressed={draft.sourceType === sourceType}
                 className={cn(
-                  "min-w-23.5 flex-1 border-input",
+                  "min-w-0 flex-1 border-input px-1",
                   draft.sourceType === sourceType &&
                     "ring-2 ring-primary ring-offset-2",
                 )}

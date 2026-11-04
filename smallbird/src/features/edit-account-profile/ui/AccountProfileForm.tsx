@@ -22,6 +22,7 @@ import { PhoneVerifyRow } from "./PhoneVerifyRow";
 import { ProfileImageField } from "./ProfileImageField";
 import { ProfilePasswordFields } from "./ProfilePasswordFields";
 
+import type { ProfileImageSource } from "../api/use-profile-image";
 import type { AccountRole } from "../lib/save-account-profile";
 import type { AccountProfileViewModel } from "@/entities/account";
 import type { ChangeEvent, FormEvent } from "react";
@@ -30,6 +31,7 @@ interface AccountProfileFormProps {
   /** Master와 Sub ID는 저장 API 경로가 다름. 기본은 Master. */
   accountType?: AccountRole;
   profile: AccountProfileViewModel;
+  imageSource: ProfileImageSource;
   /** 회원 탈퇴 버튼을 보일 때만 넘김(Master). */
   onClickWithdraw?: () => void;
   /** 서버에 하나라도 반영된 뒤 호출. 화면이 정보를 다시 읽음. */
@@ -43,6 +45,7 @@ interface AccountProfileFormProps {
 export function AccountProfileForm({
   accountType = "master",
   profile,
+  imageSource,
   onClickWithdraw,
   onSaved,
   onFinishEdit,
@@ -50,7 +53,7 @@ export function AccountProfileForm({
 }: AccountProfileFormProps) {
   const { t } = useTranslation("features/edit-account-profile");
   const { t: tCommon } = useTranslation();
-  const image = useProfileImagePicker(accountType);
+  const image = useProfileImagePicker(imageSource);
 
   const [values, setValues] = useState({
     password: "",
@@ -112,7 +115,7 @@ export function AccountProfileForm({
     if (completed.includes("password")) {
       setValues((prev) => ({ ...prev, password: "", passwordCheck: "" }));
     }
-    if (completed.includes("image")) image.markSaved();
+    if (completed.includes("image")) image.discardPicked();
     if (completed.length > 0) {
       void image.refresh();
       onSaved();

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { ENV } from "@/shared/config";
 
 import { serverApiV3 } from "./clients";
+import { deviceHeaders } from "./device-id";
 
 import type { FirebaseApp } from "firebase/app";
 import type { Auth } from "firebase/auth";
@@ -34,6 +35,20 @@ export async function getFirestoreDb(): Promise<Firestore> {
   signInPromise ??= signIn(app);
   await signInPromise;
   return db;
+}
+
+/**
+ * 이 기기의 Firebase 토큰·채팅방 잠금을 서버에서 풀어 달라고 요청함(로그아웃 직전, 가이드 2026-11-03 5번).
+ * 실패해도 로그아웃은 이어서 해야 하므로 오류를 던지지 않고 로그만 남김.
+ */
+export async function revokeFirebaseToken(): Promise<void> {
+  try {
+    await serverApiV3.post("/help/firebase-token/revoke", undefined, {
+      headers: deviceHeaders(),
+    });
+  } catch (error) {
+    console.error("Firebase 토큰 해제 실패", error);
+  }
 }
 
 /** 로그아웃·계정 전환 때 Firebase 로그인도 끊음. Firestore를 쓴 적 없으면 아무것도 하지 않음. */
@@ -87,7 +102,9 @@ async function signIn(app: FirebaseApp): Promise<void> {
     );
     const auth = await authPromise;
     const { token } = firebaseTokenSchema.parse(
-      await serverApiV3.post("/help/firebase-token"),
+      await serverApiV3.post("/help/firebase-token", undefined, {
+        headers: deviceHeaders(),
+      }),
     );
     if (generation !== signInGeneration) return;
     await signInWithCustomToken(auth, token);

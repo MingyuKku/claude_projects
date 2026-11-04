@@ -55,6 +55,7 @@ describe("BuyerInquiryFilterDialog", () => {
     render(
       <SWRConfig value={{ provider: () => new Map() }}>
         <BuyerInquiryFilterDialog
+          menu="buyer"
           value={{ sourceType: "ALL" }}
           threadUserIdx={5971}
           onApply={() => {}}

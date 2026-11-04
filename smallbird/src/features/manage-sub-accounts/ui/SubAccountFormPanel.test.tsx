@@ -68,6 +68,7 @@ beforeEach(() => {
   vi.mocked(toast).mockReset();
   vi.mocked(toast.error).mockReset();
   vi.mocked(serverApiV3.post).mockReset();
+  vi.mocked(serverApiV3.patch).mockReset();
   // 기본: 중복확인은 사용 가능(false), 생성은 성공.
   vi.mocked(serverApiV3.post).mockImplementation((path: string) =>
     Promise.resolve(
@@ -273,14 +274,14 @@ describe("SubAccountFormPanel 수정", () => {
   function setupEdit() {
     const onClose = vi.fn();
     const onSaved = vi.fn();
-    render(
+    const { container } = render(
       <SubAccountFormPanel
         account={account}
         onClose={onClose}
         onSaved={onSaved}
       />,
     );
-    return { onClose, onSaved, user: userEvent.setup() };
+    return { onClose, onSaved, container, user: userEvent.setup() };
   }
 
   it("제목과 버튼이 수정으로 바뀌고 현재 값을 채운다(비밀번호는 빈 칸)", () => {
@@ -321,6 +322,24 @@ describe("SubAccountFormPanel 수정", () => {
     expect(JSON.parse(await request.text())).toEqual({ name: "이담당" });
     expect(toast).toHaveBeenCalledWith("Sub ID 정보가 수정되었습니다.");
     expect(serverApiV3.post).not.toHaveBeenCalled();
+  });
+
+  it("프로필 이미지만 바꿔도 수정할 수 있고 이미지를 PATCH에 함께 보낸다", async () => {
+    vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:preview");
+    vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
+    vi.mocked(serverApiV3.patch).mockResolvedValue({ result: true });
+    const { user, onSaved, container } = setupEdit();
+    const image = new File(["image"], "face.png", { type: "image/png" });
+    await user.upload(container.querySelector("input[type=file]")!, image);
+    await user.click(screen.getByRole("button", { name: "수정하기" }));
+    await waitFor(() => expect(onSaved).toHaveBeenCalled());
+    const [, form] = vi.mocked(serverApiV3.patch).mock.calls[0] as [
+      string,
+      FormData,
+    ];
+    const request = form.get("request") as Blob;
+    expect(JSON.parse(await request.text())).toEqual({});
+    expect(form.get("profileImage")).toBe(image);
   });
 
   it("수정 중 아이디가 이미 쓰이면 중복으로 안내하고 닫지 않는다", async () => {

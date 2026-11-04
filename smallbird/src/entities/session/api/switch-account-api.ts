@@ -1,7 +1,7 @@
 import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
 
-import { serverApi, signOutFirebase } from "@/shared/api";
+import { revokeFirebaseToken, serverApi, signOutFirebase } from "@/shared/api";
 
 import { transformSwitchAccountsToViewModel } from "../lib/transform-switch-accounts";
 import {
@@ -40,6 +40,8 @@ async function switchAccount(
   _key: readonly string[],
   { arg }: { arg: SwitchAccountRequest },
 ) {
+  // 전환 전 계정 세션으로 이 기기의 채팅방 잠금을 먼저 풂(로그아웃과 같음, 가이드 2026-11-03 5번). 실패해도 전환은 이어 감.
+  await revokeFirebaseToken();
   // 구 앱은 name도 전송하지만 현재 OpenAPI 요청에는 userIdx만 정의되어 있다.
   const response = await serverApi.post(
     "/super/change",

@@ -1,7 +1,7 @@
 import { tryit } from "radash";
 
 import { campaignCardSchema } from "../model/schema";
-import { REALTIME_CLOSED_MESSAGE } from "./consultation-write";
+import { REALTIME_END_NOTICES } from "./consultation-write";
 
 import type {
   BigbirdInquiryListItem,
@@ -72,6 +72,9 @@ function toProductName(brandName: string, productName: string) {
 
 // 문서는 image 경로로 올라가 서버가 fileType을 image로 줄 수 있어 파일 이름으로 먼저 가림.
 const DOCUMENT_EXTENSION = /\.(pdf|txt|docx?|xlsx?|pptx?)$/i;
+// 인플루언서 문의는 타임라인의 fileType이 비어 오므로(stage 2026-11-03) 파일 이름 확장자로도 가림.
+const IMAGE_EXTENSION = /\.(jpe?g|png|gif|bmp|webp)$/i;
+const VIDEO_EXTENSION = /\.(mp4|avi|mov|wmv|flv|mpe?g)$/i;
 
 function toKind(
   message: Pick<
@@ -83,12 +86,17 @@ function toKind(
   campaign: CampaignCard | null,
 ): InquiryMessageKind {
   if (campaign) return "campaignCard";
-  // 상담 종료 안내는 자동 메시지지만 대화에 보여 줌(사용자 결정 2026-10-29). 나머지 자동 안내는 숨김.
-  if (message.auto && message.body !== REALTIME_CLOSED_MESSAGE) return "system";
+  // 상담 종료 안내는 자동 메시지지만 대화에 구분선으로 보여 줌(사용자 결정 2026-10-29·11-04). 나머지 자동 안내는 숨김.
+  if (message.auto)
+    return REALTIME_END_NOTICES.includes(message.body.trim())
+      ? "notice"
+      : "system";
   if (message.attachmentIdx === null) return "text";
   if (DOCUMENT_EXTENSION.test(message.fileName ?? "")) return "file";
   if (message.fileType?.startsWith("image")) return "image";
   if (message.fileType?.startsWith("video")) return "video";
+  if (IMAGE_EXTENSION.test(message.fileName ?? "")) return "image";
+  if (VIDEO_EXTENSION.test(message.fileName ?? "")) return "video";
   return "file";
 }
 
@@ -99,12 +107,14 @@ function toKind(
 export function transformInquiryMessageToViewModel(
   message: InquiryMessage,
   fallback: { id: number; createdAt: Date } = { id: -1, createdAt: new Date() },
+  /** 서버의 `isUserMessage` 대신 쓸 발신 판단. 인플루언서 문의처럼 서버 값이 Swagger와 반대인 대화에 씀. */
+  isFromMe: (message: InquiryMessage) => boolean = (m) => m.isUserMessage,
 ): InquiryMessageViewModel {
   const campaign = parseCampaignCard(message);
   return {
     id: message.messageIdx ?? fallback.id,
     // 캠페인 카드는 v2 호환으로 광고주가 보낸 auto 메시지(isUserMessage: false)로 저장됨. 내가 보낸 카드로 그림.
-    isMine: message.isUserMessage || campaign !== null,
+    isMine: isFromMe(message) || campaign !== null,
     kind: toKind(message, campaign),
     body: toPlainBody(message.body),
     createdAt: message.writeTime
@@ -130,14 +140,16 @@ export function transformInquiryMessageToViewModel(
 /** 메시지 목록을 뷰모델로 바꿈. 시각이 null인 메시지는 앞 메시지(없으면 뒤 메시지) 시각을 이어 씀. */
 export function transformInquiryMessagesToViewModels(
   messages: InquiryMessage[],
+  isFromMe?: (message: InquiryMessage) => boolean,
 ): InquiryMessageViewModel[] {
   const firstTime = messages.find((message) => message.writeTime)?.writeTime;
   let previousAt = firstTime ? toDate(firstTime) : new Date();
   return messages.map((message, index) => {
-    const viewModel = transformInquiryMessageToViewModel(message, {
-      id: -(index + 1),
-      createdAt: previousAt,
-    });
+    const viewModel = transformInquiryMessageToViewModel(
+      message,
+      { id: -(index + 1), createdAt: previousAt },
+      isFromMe,
+    );
     previousAt = viewModel.createdAt;
     return viewModel;
   });
@@ -372,10 +384,20 @@ const BUYER_STATUS = {
   BuyerInquiryViewModel["status"]
 >;
 
+const BUYER_SOURCE = {
+  PURCHASER_QUESTION: "purchaser",
+  PRODUCT_QNA: "qna",
+  INFLUENCER_QUESTION: "influencer",
+  CAMPAIGN_QNA: "campaignQna",
+} as const satisfies Record<
+  BuyerInquiry["sourceType"],
+  BuyerInquiryViewModel["source"]
+>;
+
 export function transformBuyerInquiryToViewModel(
   inquiry: BuyerInquiry,
 ): BuyerInquiryViewModel {
-  const source = inquiry.sourceType === "PRODUCT_QNA" ? "qna" : "purchaser";
+  const source = BUYER_SOURCE[inquiry.sourceType];
   return {
     key: `${source}-${inquiry.inquiryIdx}`,
     inquiryIdx: inquiry.inquiryIdx,
@@ -388,6 +410,7 @@ export function transformBuyerInquiryToViewModel(
     writeTime: toListDate(inquiry.writeTime),
     threadUserIdx: inquiry.threadUserIdx,
     userIdx: inquiry.userIdx,
+    sequence: inquiry.sequence ?? null,
     preview: toPlainBody(inquiry.body ?? ""),
     lastActivityAt: toListDate(inquiry.writeTime),
     hasUnread: inquiry.hasUnread,

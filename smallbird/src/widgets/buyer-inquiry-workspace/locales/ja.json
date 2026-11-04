@@ -11,7 +11,9 @@
   },
   "source": {
     "purchaser": "購入者問い合わせ",
-    "qna": "商品Q&A"
+    "qna": "商品Q&A",
+    "influencer": "インフルエンサー問い合わせ",
+    "campaignQna": "キャンペーンQ&A"
   },
   "empty": "お問い合わせはありません。",
   "loadError": "お問い合わせ一覧を読み込めませんでした。",
@@ -47,7 +49,9 @@
     "sourceType": {
       "ALL": "すべて",
       "PURCHASER_QUESTION": "購入者問い合わせ",
-      "PRODUCT_QNA": "商品Q&A"
+      "PRODUCT_QNA": "商品Q&A",
+      "INFLUENCER_QUESTION": "インフルエンサー問い合わせ",
+      "CAMPAIGN_QNA": "キャンペーンQ&A"
     }
   },
   "searchEmpty": "'{{keyword}}'の検索結果はありません。",
@@ -76,7 +80,6 @@
     "cancel": "キャンセル",
     "failed": "処理できませんでした。もう一度お試しください。",
     "exists": "すでに返信があります。",
-    "read": "購入者が読んだ返信は編集・削除できません。",
     "deleteTitle": "返信を削除しますか?",
     "deleteDescription": "削除した返信は元に戻せません。"
   },
@@ -86,6 +89,7 @@
   },
   "realtime": {
     "end": "相談終了",
-    "endFailed": "相談を終了できませんでした。もう一度お試しください。"
+    "endFailed": "相談を終了できませんでした。もう一度お試しください。",
+    "otherDevice": "他の担当者がこのお問い合わせを対応中です。相談終了後に再度ご利用ください。"
   }
 }

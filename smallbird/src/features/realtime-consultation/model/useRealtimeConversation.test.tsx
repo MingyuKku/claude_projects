@@ -7,38 +7,30 @@ import type { BigbirdInquiryViewModel } from "@/entities/inquiry";
 const mocks = vi.hoisted(() => ({
   acquire: vi.fn(),
   release: vi.fn(),
-  append: vi.fn(),
-  cancel: vi.fn(),
-  close: vi.fn(),
+  send: vi.fn(),
   closeRest: vi.fn(),
-  expire: vi.fn(),
-  retry: vi.fn(),
   upload: vi.fn(),
   toastError: vi.fn(),
-  ids: 0,
+  toastSuccess: vi.fn(),
 }));
 
 vi.mock("@/entities/inquiry", () => ({
-  abortConsultationClose: vi.fn(),
   acquireConsultationLock: mocks.acquire,
-  appendConsultationMessage: mocks.append,
-  buildRequestAlarm: () => ({}),
-  cancelRealtimeRequest: mocks.cancel,
   closeBigbirdInquiry: mocks.closeRest,
-  closeConsultation: mocks.close,
+  isOtherDeviceError: (error: { status?: number }) => error?.status === 409,
   getAttachmentKind: (file: { name: string }) =>
     /\.(png|jpg)$/i.test(file.name) ? "image" : null,
   LOCK_REFRESH_MS: 15_000,
-  markRealtimeRequestExpired: mocks.expire,
-  newMessageId: () => `id-${++mocks.ids}`,
   REALTIME_IDLE_LIMIT_MS: 10 * 60_000,
   REALTIME_IDLE_WARNING_MS: 5 * 60_000,
   releaseConsultationLock: mocks.release,
-  retryRealtimeRequest: mocks.retry,
+  sendInquiryMessage: mocks.send,
   TAB_ID: "tab-1",
   uploadInquiryAttachment: mocks.upload,
 }));
-vi.mock("sonner", () => ({ toast: { error: mocks.toastError } }));
+vi.mock("sonner", () => ({
+  toast: { error: mocks.toastError, success: mocks.toastSuccess },
+}));
 
 const session = {
   userIdx: 42,
@@ -83,14 +75,10 @@ function setup(
 describe("useRealtimeConversation", () => {
   beforeEach(() => {
     vi.clearAllMocks();
-    mocks.ids = 0;
     mocks.acquire.mockResolvedValue({ ok: true, skipped: false });
     mocks.release.mockResolvedValue({ ok: true, skipped: false });
-    mocks.append.mockResolvedValue({ ok: true, skipped: false });
-    mocks.cancel.mockResolvedValue({ ok: true, skipped: false });
-    mocks.close.mockResolvedValue({ ok: true, skipped: false });
-    mocks.expire.mockResolvedValue({ ok: true, skipped: false });
-    mocks.retry.mockResolvedValue({ ok: true, skipped: false });
+    mocks.send.mockResolvedValue(101);
+    mocks.closeRest.mockResolvedValue(undefined);
     mocks.upload.mockResolvedValue({
       url: "https://cdn/a.png",
       attachmentIdx: 9,
@@ -99,7 +87,7 @@ describe("useRealtimeConversation", () => {
     });
   });
 
-  it("쓰기를 끄면 Firestore를 건드리지 않는다", () => {
+  it("쓰기를 끄면 락을 잡지 않는다", () => {
     const { result } = setup(inquiry(), false);
     expect(result.current.lock).toBe("inactive");
     expect(mocks.acquire).not.toHaveBeenCalled();
@@ -173,26 +161,6 @@ describe("useRealtimeConversation", () => {
     expect(mocks.release).toHaveBeenCalledOnce();
   });
 
-  it("요청 실패 후 만료 기록이 실패하면 잠시 뒤 다시 시도한다", async () => {
-    vi.useFakeTimers();
-    try {
-      mocks.expire
-        .mockRejectedValueOnce(new Error("network"))
-        .mockResolvedValue({ ok: true, skipped: false });
-      setup(inquiry({ realtimePhase: "failed", connectDeadlineAt: 1000 }));
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(0);
-      });
-      expect(mocks.expire).toHaveBeenCalledTimes(1);
-      await act(async () => {
-        await vi.advanceTimersByTimeAsync(15_000);
-      });
-      expect(mocks.expire).toHaveBeenCalledTimes(2);
-    } finally {
-      vi.useRealTimers();
-    }
-  });
-
   it("광고주 차례가 5분이면 안내하고, 10분이면 상담을 끝내고 종료를 알린다", async () => {
     vi.useFakeTimers();
     try {
@@ -208,13 +176,13 @@ describe("useRealtimeConversation", () => {
         await vi.advanceTimersByTimeAsync(5 * 60_000);
       });
       expect(result.current.idleAlert).toBe("advertiserWarning");
-      expect(mocks.close).not.toHaveBeenCalled();
+      expect(mocks.closeRest).not.toHaveBeenCalled();
       act(() => result.current.dismissIdleAlert());
       await act(async () => {
         await vi.advanceTimersByTimeAsync(5 * 60_000);
       });
       expect(result.current.idleAlert).toBe("advertiserClosed");
-      expect(mocks.close).toHaveBeenCalledOnce();
+      expect(mocks.closeRest).toHaveBeenCalledOnce();
     } finally {
       vi.useRealTimers();
     }
@@ -235,12 +203,12 @@ describe("useRealtimeConversation", () => {
         await vi.advanceTimersByTimeAsync(5 * 60_000);
       });
       expect(result.current.idleAlert).toBe("operatorDelay");
-      expect(mocks.close).not.toHaveBeenCalled();
+      expect(mocks.closeRest).not.toHaveBeenCalled();
       await act(async () => {
         await vi.advanceTimersByTimeAsync(5 * 60_000);
       });
       expect(result.current.idleAlert).toBe("operatorUnavailable");
-      expect(mocks.close).toHaveBeenCalledOnce();
+      expect(mocks.closeRest).toHaveBeenCalledOnce();
     } finally {
       vi.useRealTimers();
     }
@@ -264,7 +232,7 @@ describe("useRealtimeConversation", () => {
         await vi.advanceTimersByTimeAsync(0);
       });
       expect(result.current.idleAlert).toBeNull();
-      expect(mocks.close).toHaveBeenCalledOnce();
+      expect(mocks.closeRest).toHaveBeenCalledOnce();
     } finally {
       vi.useRealTimers();
     }
@@ -305,28 +273,44 @@ describe("useRealtimeConversation", () => {
     expect(result.current.canSend).toBe(false);
   });
 
-  it("전송이 오류로 끝난 뒤 같은 글을 다시 보내면 같은 messageId를 쓴다", async () => {
-    const { result } = setup();
-    mocks.append.mockRejectedValueOnce(new Error("network"));
-    await act(async () => {
-      expect(await result.current.send("안녕하세요")).toBe(false);
-    });
-    await act(async () => {
-      expect(await result.current.send("안녕하세요")).toBe(true);
-    });
-    const ids = mocks.append.mock.calls.map(
-      ([, input]) => input.message.messageId,
+  it("요청 중이던 상담이 연결되는 순간 연결 토스트를 한 번 띄운다", () => {
+    let value = inquiry({ realtimePhase: "requesting" });
+    const { rerender } = renderHook(() =>
+      useRealtimeConversation({
+        inquiry: value,
+        session,
+        enabled: true,
+        onChanged: vi.fn(),
+      }),
     );
-    expect(ids[0]).toBe(ids[1]);
-    // 성공했으니 다음 글은 새 식별자.
-    await act(async () => {
-      await result.current.send("안녕하세요");
-    });
-    expect(mocks.append.mock.calls[2]?.[1].message.messageId).not.toBe(ids[0]);
+    expect(mocks.toastSuccess).not.toHaveBeenCalled();
+    value = inquiry({ realtimePhase: "connected" });
+    rerender();
+    rerender();
+    expect(mocks.toastSuccess).toHaveBeenCalledExactlyOnceWith(
+      "실시간 문의가 연결되었습니다.",
+    );
   });
 
-  it("거절되면 입력을 지키기 위해 false를 돌려주고 안내를 띄운다", async () => {
-    mocks.append.mockResolvedValue({ ok: false, reason: "closing" });
+  it("이미 연결된 상담을 열 때는 연결 토스트를 띄우지 않는다", () => {
+    setup(inquiry({ realtimePhase: "connected" }));
+    expect(mocks.toastSuccess).not.toHaveBeenCalled();
+  });
+
+  it("텍스트는 REST 메시지 API로 그 스레드에 보낸다", async () => {
+    const { result } = setup();
+    await act(async () => {
+      expect(await result.current.send(" 안녕하세요 ")).toBe(true);
+    });
+    expect(mocks.send).toHaveBeenCalledWith({
+      threadIdx: 101,
+      body: "안녕하세요",
+    });
+  });
+
+  it("전송이 실패하면 입력을 지키기 위해 false를 돌려주고 안내를 띄운다", async () => {
+    mocks.send.mockRejectedValue(new Error("network"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
     const { result } = setup();
     await act(async () => {
       expect(await result.current.send("x")).toBe(false);
@@ -334,19 +318,18 @@ describe("useRealtimeConversation", () => {
     expect(mocks.toastError).toHaveBeenCalledOnce();
   });
 
-  it("종료는 REST 종료를 closeConsultation에 넘기고 끝나면 목록을 갱신한다", async () => {
+  it("종료는 REST 종료만 부르고 끝나면 목록을 갱신한다", async () => {
     const { result, onChanged } = setup();
     await act(async () => {
       expect(await result.current.end()).toBe(true);
     });
-    const [, options] = mocks.close.mock.calls[0] ?? [];
-    await options.closeRest();
     expect(mocks.closeRest).toHaveBeenCalledWith(101);
     expect(onChanged).toHaveBeenCalledOnce();
   });
 
   it("종료 중 오류가 나면 안내하고 목록은 건드리지 않는다", async () => {
-    mocks.close.mockRejectedValue(new Error("rest"));
+    mocks.closeRest.mockRejectedValue(new Error("rest"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
     const { result, onChanged } = setup();
     await act(async () => {
       expect(await result.current.end()).toBe(false);
@@ -355,52 +338,44 @@ describe("useRealtimeConversation", () => {
     expect(onChanged).not.toHaveBeenCalled();
   });
 
-  it("요청 실패 상태에서 락을 가진 탭이 만료를 한 번만 기록한다", async () => {
-    const { result, rerender } = setup(
-      inquiry({ realtimePhase: "failed", connectDeadlineAt: 1000 }),
-    );
+  it("파일을 올려 첨부 메시지로 보내고, 실패해 다시 보내면 이미 올린 파일은 다시 올리지 않는다", async () => {
+    const { result } = setup();
     await waitFor(() => expect(result.current.lock).toBe("held"));
-    await waitFor(() => expect(mocks.expire).toHaveBeenCalledOnce());
-    rerender();
-    expect(mocks.expire).toHaveBeenCalledOnce();
+    const files = [new File(["1"], "a.png")];
+    mocks.send.mockRejectedValueOnce(new Error("network"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    await expect(result.current.sendFiles(files)).resolves.toBe(false);
+    await expect(result.current.sendFiles(files)).resolves.toBe(true);
+    expect(mocks.upload).toHaveBeenCalledOnce();
+    expect(mocks.send).toHaveBeenLastCalledWith({
+      threadIdx: 101,
+      body: "https://cdn/a.png",
+      attachmentIdx: 9,
+    });
   });
 
-  it("파일을 모두 올린 뒤 한 번의 저장으로 보내고, 실패해 다시 보내면 업로드와 messageId를 재사용한다", async () => {
+  it("여러 파일 중간에 실패해 다시 보내면 이미 보낸 첨부는 건너뛰고 남은 것만 보낸다", async () => {
     const { result } = setup();
     await waitFor(() => expect(result.current.lock).toBe("held"));
     const files = [new File(["1"], "a.png"), new File(["2"], "b.png")];
     mocks.upload
-      .mockResolvedValueOnce({
-        url: "https://cdn/a.png",
-        attachmentIdx: 9,
-        fileName: "a.png",
-        fileSize: 1,
-      })
-      .mockResolvedValueOnce({
-        url: "https://cdn/b.png",
-        attachmentIdx: 10,
-        fileName: "b.png",
-        fileSize: 1,
-      });
-    mocks.append.mockRejectedValueOnce(new Error("network"));
+      .mockResolvedValueOnce({ url: "https://cdn/a.png", attachmentIdx: 1 })
+      .mockResolvedValueOnce({ url: "https://cdn/b.png", attachmentIdx: 2 });
+    mocks.send.mockClear();
+    mocks.send
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce(new Error("network"));
+    vi.spyOn(console, "error").mockImplementation(() => {});
     await expect(result.current.sendFiles(files)).resolves.toBe(false);
     await expect(result.current.sendFiles(files)).resolves.toBe(true);
-    expect(mocks.upload).toHaveBeenCalledTimes(2);
-    expect(mocks.append).toHaveBeenCalledTimes(2);
-    const first = mocks.append.mock.calls[0]![1].message;
-    const second = mocks.append.mock.calls[1]![1].message;
-    expect(second).toHaveLength(2);
-    expect(second[0]).toMatchObject({
-      auto: false,
-      attachmentIdx: 9,
-      body: "https://cdn/a.png",
-      fileName: "a.png",
-      fileType: "image",
-      isUserMessage: true,
-    });
-    expect(second.map((m: { messageId: string }) => m.messageId)).toEqual(
-      first.map((m: { messageId: string }) => m.messageId),
+    const bodies = mocks.send.mock.calls.map(
+      ([arg]) => (arg as { body: string }).body,
     );
+    expect(bodies).toEqual([
+      "https://cdn/a.png",
+      "https://cdn/b.png",
+      "https://cdn/b.png",
+    ]);
   });
 
   it("업로드가 실패하면 저장하지 않고, 허용하지 않는 형식은 요청하지 않는다", async () => {
@@ -410,7 +385,7 @@ describe("useRealtimeConversation", () => {
     await expect(
       result.current.sendFiles([new File(["x"], "a.png")]),
     ).resolves.toBe(false);
-    expect(mocks.append).not.toHaveBeenCalled();
+    expect(mocks.send).not.toHaveBeenCalled();
     await expect(
       result.current.sendFiles([new File(["x"], "a.gif")]),
     ).resolves.toBe(false);

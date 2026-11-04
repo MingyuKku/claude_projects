@@ -78,10 +78,12 @@ export function EditableChatMessage({
       onChanged();
     } catch (error) {
       console.error("메시지 수정·삭제 실패", error);
-      const isRead = isApiError(error) && error.status === 409;
-      toast.error(isRead ? t("alreadyRead") : t("failed"));
-      // 읽힌 메시지는 서버 상태와 화면이 어긋난 것이라 최신 상태를 다시 받습니다.
-      if (isRead) onChanged();
+      // 읽힌 메시지(409)는 서버 상태와 화면이 어긋난 것이라 안내 없이 대화를 다시 받아 수정·삭제 버튼이 사라지게 합니다.
+      if (isApiError(error) && error.status === 409) {
+        onChanged();
+        return;
+      }
+      toast.error(t("failed"));
     } finally {
       setIsBusy(false);
     }

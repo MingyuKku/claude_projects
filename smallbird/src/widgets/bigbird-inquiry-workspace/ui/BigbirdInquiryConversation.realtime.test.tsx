@@ -6,7 +6,10 @@ import { BigbirdInquiryConversation } from "./BigbirdInquiryConversation";
 
 import type { BigbirdInquiryViewModel } from "@/entities/inquiry";
 
-const state = vi.hoisted(() => ({ onlyCard: false }));
+const state = vi.hoisted(() => ({
+  onlyCard: false,
+  endReason: null as string | null,
+}));
 
 const card = JSON.stringify({
   mainImageUrl: null,
@@ -30,6 +33,7 @@ vi.mock("firebase/firestore", () => ({
         threadIdx: 101,
         isConnect: true,
         finishTime: null,
+        endReason: state.endReason,
         messages: state.onlyCard
           ? [
               {
@@ -127,6 +131,7 @@ it("요청 중에도 캠페인 카드를 보여 주고 빈 상담 안내는 띄�
   expect(screen.getByText("다이노키키")).toBeInTheDocument();
   expect(screen.queryByText("상담 메시지가 없습니다.")).not.toBeInTheDocument();
   state.onlyCard = false;
+  state.endReason = null;
 });
 
 it("연결 실패 카드에 요구명세서 문구를 보여 준다", async () => {
@@ -144,9 +149,36 @@ it("연결 실패 카드에 요구명세서 문구를 보여 준다", async () =
   await waitFor(() =>
     expect(screen.queryByLabelText("불러오는 중…")).not.toBeInTheDocument(),
   );
+  expect(screen.getByText("실시간 상담 불가")).toBeInTheDocument();
+  expect(
+    screen.getByText("현재 문의가 많아 실시간 상담 응대가 어렵습니다."),
+  ).toBeInTheDocument();
   expect(
     screen.getByText(
-      "현재, 상담원 응대가 어려운 상황입니다. 문의를 남겨주시면 답변드리도록 하겠습니다.",
+      "일반 문의로 전환되며, 남겨주신 문의는 순차적으로 답변드리겠습니다.",
     ),
   ).toBeInTheDocument();
+});
+
+it("서버가 일반 문의로 돌린 3분 매칭 실패(endReason)도 같은 카드를 계속 보여 준다", async () => {
+  state.endReason = "MATCH_TIMEOUT";
+  // 상담원 메시지 없이 서버 자동 메시지(캠페인 카드)만 있는 문서
+  state.onlyCard = true;
+  render(
+    <SWRConfig value={{ provider: () => new Map() }}>
+      <MemoryRouter>
+        <BigbirdInquiryConversation
+          inquiry={{
+            ...inquiry,
+            isRealtime: false,
+            realtimePhase: null,
+            status: "waiting",
+          }}
+          myName="김빅링크"
+          threadUserIdx={5971}
+        />
+      </MemoryRouter>
+    </SWRConfig>,
+  );
+  expect(await screen.findByText("실시간 상담 불가")).toBeInTheDocument();
 });

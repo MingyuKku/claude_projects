@@ -118,16 +118,26 @@ export function toEditFormValues(account: {
   };
 }
 
+export interface EditFormState {
+  values: CreateFormValues;
+  initial: CreateFormValues;
+  errors: CreateFormErrors;
+  idStatus: IdCheckStatus;
+  /** 새 프로필 이미지를 골랐는지. 이미지는 수정 요청에 파일로 따로 실리므로 입력값과 별개로 변경 여부에 셈. */
+  hasPickedImage: boolean;
+}
+
 /**
  * 담당자명·아이디·이메일이 차 있고 오류가 없고, 비밀번호는 바꿀 때만(입력했다면 확인 칸과 같아야 함) 저장할 수 있음.
- * 아이디를 바꿨다면 중복확인을 통과해야 함. 값이 하나도 안 바뀌었으면 저장할 것이 없어 막음.
+ * 아이디를 바꿨다면 중복확인을 통과해야 함. 입력값도 이미지도 안 바뀌었으면 저장할 것이 없어 막음.
  */
-export function canEditSubAccount(
-  values: CreateFormValues,
-  initial: CreateFormValues,
-  errors: CreateFormErrors,
-  idStatus: IdCheckStatus,
-) {
+export function canEditSubAccount({
+  values,
+  initial,
+  errors,
+  idStatus,
+  hasPickedImage,
+}: EditFormState) {
   const hasError = Object.values(errors).some((error) => error !== null);
   const isRequiredFilled = [values.name, values.identifier, values.email].every(
     (value) => value.trim() !== "",
@@ -139,7 +149,8 @@ export function canEditSubAccount(
     values.name.trim() !== initial.name ||
     isIdChanged ||
     values.email.trim() !== initial.email ||
-    values.password !== "";
+    values.password !== "" ||
+    hasPickedImage;
   return (
     isRequiredFilled &&
     !hasError &&

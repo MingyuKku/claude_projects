@@ -15,7 +15,7 @@ import { useMediaQuery } from "@/shared/lib/useMediaQuery";
 
 import { formatDividerDate, formatMessageTime } from "../lib/format";
 import { IS_BUYER_WRITE_ENABLED } from "../model/constants";
-import { useAcceptRealtimeOnOpen } from "../model/useAcceptRealtimeOnOpen";
+import { isQnaSource } from "../model/menu";
 import { QnaConversation } from "./QnaConversation";
 
 import type { BuyerInquiryViewModel } from "@/entities/inquiry";
@@ -24,33 +24,32 @@ const TABLET_ONLY_QUERY = "(min-width: 768px) and (max-width: 1439.98px)";
 
 interface BuyerConversationProps {
   inquiry: BuyerInquiryViewModel;
-  /** 실시간 상담 수락 메시지에 남길 광고주 계정 id(세션 값). */
-  identifier?: string;
+  /** 다른 기기가 이 실시간 상담을 쥐고 있어 읽기가 막힘(채팅방 잠금). */
+  isOtherDevice?: boolean;
 }
 
-/** 대화 영역의 메시지 부분. 구매자 문의는 구매자↔광고주 스레드, 상품 Q&A는 질문과 답변. */
+/** 대화 영역의 메시지 부분. 구매자·인플루언서 문의는 상대↔광고주 스레드, 상품·캠페인 Q&A는 질문과 답변. */
 export function BuyerConversation({
   inquiry,
-  identifier,
+  isOtherDevice = false,
 }: BuyerConversationProps) {
-  return inquiry.source === "qna" ? (
+  return isQnaSource(inquiry.source) ? (
     <QnaConversation inquiry={inquiry} />
   ) : (
-    <PurchaserConversation inquiry={inquiry} identifier={identifier} />
+    <PurchaserConversation inquiry={inquiry} isOtherDevice={isOtherDevice} />
   );
 }
 
 function PurchaserConversation({
   inquiry,
-  identifier,
+  isOtherDevice = false,
 }: BuyerConversationProps) {
   const { t } = useTranslation("widgets/buyer-inquiry-workspace");
   const { t: tCommon } = useTranslation();
   // Figma 구매자 대화 말풍선: TAB(6791:59549)은 작은 형태(아바타 32·최대 200), MO·PC는 최대 340입니다.
   const isTablet = useMediaQuery(TABLET_ONLY_QUERY);
-  const { messages, realtimeThread, isLoading, isError, mutate } =
+  const { messages, isLoading, isError, mutate } =
     usePurchaserConversation(inquiry);
-  useAcceptRealtimeOnOpen(inquiry, realtimeThread, identifier ?? null);
   const writerName = inquiry.writerName ?? t("unknownWriter");
   const avatarSrc = useInquiryUserImage(inquiry.threadUserIdx);
   const endRef = useRef<HTMLDivElement>(null);
@@ -70,11 +69,11 @@ function PurchaserConversation({
       />
     );
   }
-  if (isError) {
+  if (isError || isOtherDevice) {
     return (
       <EmptyState
         type="no-message"
-        title={t("conversationError")}
+        title={t(isOtherDevice ? "realtime.otherDevice" : "conversationError")}
         className="flex-1"
       />
     );
@@ -127,10 +126,15 @@ function PurchaserConversation({
                 <ConversationFiles
                   row={row}
                   name={name}
+                  size={isTablet ? "sm" : "md"}
                   time={
                     row.text ? formatMessageTime(row.text.createdAt) : undefined
                   }
                 />
+              ) : row.message.kind === "notice" ? (
+                <ChatDivider className="self-center">
+                  {row.message.body}
+                </ChatDivider>
               ) : (
                 <Fragment>
                   <EditableChatMessage

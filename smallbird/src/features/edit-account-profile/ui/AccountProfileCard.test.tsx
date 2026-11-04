@@ -30,17 +30,28 @@ const profile: AccountProfileViewModel = {
   certIdx: 87,
 };
 
-function setup(accountType?: "master" | "sub") {
+const SUB_IMAGE_URL = "https://cdn.bigbird.local/sub01.png";
+
+/** 기본은 Master. Sub ID는 본인 정보에 담겨 온 이미지를 넘김. */
+function setup(sub?: { profileImageUrl: string | null }) {
   const onClickWithdraw = vi.fn();
   render(
     <MemoryRouter initialEntries={["/mypage/account?tab=master"]}>
       <SWRConfig value={{ provider: () => new Map() }}>
-        <AccountProfileCard
-          accountType={accountType}
-          profile={profile}
-          onClickWithdraw={accountType === "sub" ? undefined : onClickWithdraw}
-          onSaved={vi.fn()}
-        />
+        {sub ? (
+          <AccountProfileCard
+            accountType="sub"
+            profile={profile}
+            profileImageUrl={sub.profileImageUrl}
+            onSaved={vi.fn()}
+          />
+        ) : (
+          <AccountProfileCard
+            profile={profile}
+            onClickWithdraw={onClickWithdraw}
+            onSaved={vi.fn()}
+          />
+        )}
       </SWRConfig>
     </MemoryRouter>,
   );
@@ -76,6 +87,13 @@ describe("AccountProfileCard", () => {
     expect(screen.getByText("old@bigbird.com")).toBeInTheDocument();
     expect(screen.queryByLabelText("비밀번호 변경")).toBeNull();
     expect(screen.getByRole("button", { name: "회원 탈퇴" })).toBeVisible();
+  });
+
+  it("Master 이미지는 GET /profile로 읽는다", async () => {
+    setup();
+    await waitFor(() =>
+      expect(serverApiV3.get).toHaveBeenCalledWith("/mypage/account/profile"),
+    );
   });
 
   it("회원 탈퇴 버튼은 부모에게 알린다", async () => {
@@ -146,8 +164,17 @@ describe("AccountProfileCard", () => {
   });
 
   describe("Sub ID", () => {
+    it("보기·수정 모두 회사(Master) 기준인 GET /profile을 부르지 않는다", async () => {
+      const { user } = setup({ profileImageUrl: SUB_IMAGE_URL });
+      await user.click(screen.getByRole("button", { name: "수정" }));
+      expect(await screen.findByLabelText("비밀번호 변경")).toBeInTheDocument();
+      expect(serverApiV3.get).not.toHaveBeenCalledWith(
+        "/mypage/account/profile",
+      );
+    });
+
     it("시안의 라벨로 읽기 전용 행을 보이고 휴대폰 번호·회원 탈퇴는 없다", () => {
-      setup("sub");
+      setup({ profileImageUrl: null });
       for (const label of [
         "담당자 명",
         "아이디 명",
@@ -162,7 +189,7 @@ describe("AccountProfileCard", () => {
     });
 
     it("수정은 비밀번호 확인 없이 바로 입력 모드가 되고 휴대폰 인증 행은 없다", async () => {
-      const { user } = setup("sub");
+      const { user } = setup({ profileImageUrl: null });
       await user.click(screen.getByRole("button", { name: "수정" }));
       expect(screen.queryByRole("dialog")).toBeNull();
       expect(serverApiV3.post).not.toHaveBeenCalled();

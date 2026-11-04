@@ -8,6 +8,7 @@ import { ApiError, serverApi, serverApiV3 } from "@/shared/api";
 
 import { AccountProfileForm } from "./AccountProfileForm";
 
+import type { ProfileImageSource } from "../api/use-profile-image";
 import type { AccountProfileViewModel } from "@/entities/account";
 import type * as SharedApi from "@/shared/api";
 
@@ -33,21 +34,35 @@ const profile: AccountProfileViewModel = {
 const NEW_PASSWORD = "Wq!9a2k7xZ";
 
 function setup(
-  props: {
+  {
+    subProfileImageUrl,
+    ...props
+  }: {
     onClickWithdraw?: () => void;
     accountType?: "master" | "sub";
+    /** Sub ID 본인 정보에 담겨 온 이미지. */
+    subProfileImageUrl?: string | null;
   } = {},
   initialEntry = "/mypage/account?tab=master",
 ) {
   const onSaved = vi.fn();
-  render(
+  const imageSource: ProfileImageSource =
+    props.accountType === "sub"
+      ? { accountType: "sub", url: subProfileImageUrl ?? null }
+      : { accountType: "master" };
+  const { container } = render(
     <MemoryRouter initialEntries={[initialEntry]}>
       <SWRConfig value={{ provider: () => new Map() }}>
-        <AccountProfileForm profile={profile} onSaved={onSaved} {...props} />
+        <AccountProfileForm
+          profile={profile}
+          imageSource={imageSource}
+          onSaved={onSaved}
+          {...props}
+        />
       </SWRConfig>
     </MemoryRouter>,
   );
-  return { onSaved, user: userEvent.setup() };
+  return { onSaved, container, user: userEvent.setup() };
 }
 
 const CERT_TOKEN = {
@@ -90,6 +105,8 @@ beforeEach(() => {
     .mockReset()
     .mockResolvedValue({ profileUrl: null });
   vi.mocked(serverApiV3.put).mockReset().mockResolvedValue({ result: true });
+  vi.mocked(serverApiV3.post).mockReset();
+  vi.mocked(serverApiV3.patch).mockReset();
 });
 
 describe("AccountProfileForm", () => {
@@ -277,7 +294,7 @@ describe("AccountProfileForm", () => {
   });
 
   describe("Sub ID", () => {
-    it("Sub 경로로 이메일·비밀번호를 저장하고 현재 이미지는 GET /profile로 읽는다", async () => {
+    it("Sub 경로로 이메일·비밀번호를 저장하고 회사(Master) 기준인 GET /profile은 부르지 않는다", async () => {
       const { user, onSaved } = setup({ accountType: "sub" });
       const email = screen.getByLabelText("이메일 주소");
       await user.clear(email);
@@ -294,7 +311,39 @@ describe("AccountProfileForm", () => {
       expect(serverApiV3.put).toHaveBeenCalledWith("/mypage/account/sub/pw", {
         pw: NEW_PASSWORD,
       });
-      expect(serverApiV3.get).toHaveBeenCalledWith("/mypage/account/profile");
+      expect(serverApiV3.get).not.toHaveBeenCalledWith(
+        "/mypage/account/profile",
+      );
     });
+
+    it.each([
+      {
+        subProfileImageUrl: "https://cdn.bigbird.local/sub01.png",
+        method: "patch",
+      },
+      { subProfileImageUrl: null, method: "post" },
+    ] as const)(
+      "본인 이미지 유무로 등록·수정을 가른다(이미지 $subProfileImageUrl → $method)",
+      async ({ subProfileImageUrl, method }) => {
+        vi.spyOn(URL, "createObjectURL").mockReturnValue("blob:preview");
+        vi.spyOn(URL, "revokeObjectURL").mockImplementation(() => {});
+        vi.mocked(serverApiV3[method]).mockResolvedValue({ result: true });
+        const { user, onSaved, container } = setup({
+          accountType: "sub",
+          subProfileImageUrl,
+        });
+        await user.upload(
+          container.querySelector<HTMLInputElement>("input[type=file]")!,
+          new File(["image"], "face.png", { type: "image/png" }),
+        );
+        await user.click(screen.getByRole("button", { name: "저장" }));
+
+        await waitFor(() => expect(onSaved).toHaveBeenCalled());
+        expect(serverApiV3[method]).toHaveBeenCalledWith(
+          "/mypage/account/sub/profile",
+          expect.any(FormData),
+        );
+      },
+    );
   });
 });

@@ -4,6 +4,7 @@ import {
   ApiError,
   serverApi,
   serverApiV3,
+  revokeFirebaseToken,
   signOutFirebase,
 } from "@/shared/api";
 import { ENV } from "@/shared/config";
@@ -61,6 +62,8 @@ export function useFormLogin() {
 
 /** 기존 로그아웃은 JSON 대신 쿠키 만료와 302를 반환하므로 외부 Location을 따라가지 않는다. */
 export async function logout(): Promise<void> {
+  // 세션이 살아 있을 때 이 기기의 채팅방 잠금을 먼저 풂. 실패해도 로그아웃은 이어 감.
+  await revokeFirebaseToken();
   const response = await fetch(`${ENV.apiServerUrl}/logout`, {
     method: "GET",
     credentials: "include",

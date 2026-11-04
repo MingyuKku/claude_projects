@@ -1,10 +1,12 @@
 import { useSearchParams } from "react-router";
 
 import {
+  getSubscribedTypes,
   IS_SUBSCRIPTION_MOCK_ENABLED,
   isBillingPeriod,
   isActiveProductType,
   useBillingCards,
+  useSubscriptions,
 } from "@/entities/subscription";
 import { SubscriptionPlanList } from "@/features/browse-subscription-plans";
 import {
@@ -73,6 +75,10 @@ export function MyPageSubscribePage() {
   const { data: cards } = useBillingCards({
     enabled: IS_SUBSCRIPTION_MOCK_ENABLED,
   });
+  // 결제 화면 주소로 바로 들어왔을 때 이미 구독 중인 상품인지 확인함(구독 탭·결제내역과 같은 키라 한 번만 요청함).
+  const { data: subscriptions } = useSubscriptions({
+    enabled: IS_SUBSCRIPTION_MOCK_ENABLED,
+  });
 
   // 구독 API가 공개되기 전 빌드(stage·prod)에서는 목을 쓰지 않고 준비 중으로 둠(account.md §1). API가 공개되면 지움.
   if (!IS_SUBSCRIPTION_MOCK_ENABLED) {
@@ -98,10 +104,19 @@ export function MyPageSubscribePage() {
   // 결제 화면은 구독 탭에서 상품이 정해졌을 때만 열림(주소를 직접 고쳐 다른 탭·잘못된 상품을 넣어도 무시).
   const isCheckoutRequested =
     panel === "checkout" && tab === "plans" && checkoutType !== null;
+  // 구독 중인 상품은 구독 탭의 버튼이 비활성이라 결제 화면에 갈 수 없고, 주소로 바로 들어와도 열지 않고 구독 탭("구독 중" 카드)을 보임.
+  // 구독 목록을 읽기 전에는 알 수 없어 결제 화면이 먼저 열림. 서버도 결제를 `ALREADY_SUBSCRIBED`로 거절함.
+  // 결제할 일이 없으므로 카드 확인보다 먼저 봄(카드가 0장이어도 카드 등록 안내를 띄우지 않음).
+  const isAlreadySubscribed =
+    isCheckoutRequested &&
+    subscriptions !== undefined &&
+    getSubscribedTypes(subscriptions).has(checkoutType);
   // 등록된 카드가 없으면 결제 화면 대신 구독 탭에서 카드 등록 안내를 띄움(스펙 §3 카드 없음). 주소로 바로 들어와도 같음.
   // 카드를 읽기 전에는 알 수 없어 결제 화면이 먼저 열리고, 읽은 뒤 0장이면 구독 탭으로 돌아와 안내함.
-  const isCardRequired = isCheckoutRequested && cards?.length === 0;
-  const isCheckout = isCheckoutRequested && !isCardRequired;
+  const isCardRequired =
+    isCheckoutRequested && !isAlreadySubscribed && cards?.length === 0;
+  const isCheckout =
+    isCheckoutRequested && !isAlreadySubscribed && !isCardRequired;
   // TAB의 결제내역 필터 화면은 탭 줄까지 덮는 본문 전체 화면(탭 숨김은 의도, 스펙 §3).
   const isTabletFilter = tab === "payments" && filterScreen.isOpen;
 

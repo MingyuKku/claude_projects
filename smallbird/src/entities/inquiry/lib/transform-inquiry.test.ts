@@ -188,6 +188,25 @@ describe("transformInquiryThreadToViewModel", () => {
             fileType: "image",
             fileName: "보고서.xlsx",
           }),
+          // 인플루언서 문의는 fileType이 비어 와서 파일 이름 확장자로 사진·동영상을 가림
+          message({
+            messageIdx: 9,
+            attachmentIdx: 9,
+            fileType: null,
+            fileName: "PNG.png",
+          }),
+          message({
+            messageIdx: 10,
+            attachmentIdx: 9,
+            fileType: null,
+            fileName: "영상.MOV",
+          }),
+          message({
+            messageIdx: 11,
+            attachmentIdx: 9,
+            fileType: null,
+            fileName: "자료.zip",
+          }),
         ],
       }),
     );
@@ -199,6 +218,9 @@ describe("transformInquiryThreadToViewModel", () => {
       "image",
       "video",
       "file",
+      "file",
+      "image",
+      "video",
       "file",
     ]);
     expect(messages[0]?.campaign?.productName).toBe("샘플 상품");
@@ -648,24 +670,33 @@ describe("transformInquiryMessagesToViewModels", () => {
 });
 
 describe("자동 메시지 분류", () => {
-  it("상담 종료 안내는 대화에 보이고 다른 자동 안내는 시스템 메시지로 숨긴다", () => {
-    const [closed, greeting] = transformInquiryMessagesToViewModels([
-      message({
-        messageIdx: 1,
-        auto: true,
-        isUserMessage: false,
-        body: "실시간 상담이 종료되었습니다.",
-      }),
-      message({
-        messageIdx: 2,
-        auto: true,
-        isUserMessage: false,
-        body: "상담원과 연결되었습니다.",
-      }),
-    ]);
+  it("상담 종료 안내(세 문구)는 구분선(notice)으로 보이고 다른 자동 안내는 시스템 메시지로 숨긴다", () => {
+    const bodies = [
+      "실시간 상담이 종료되었습니다.",
+      "상담이 종료되었습니다.",
+      "추가 문의가 없으셔서 실시간 상담이 자동종료되었습니다.",
+      "상담원과 연결되었습니다.",
+      "실시간 상담을 요청했습니다.",
+    ];
+    const kinds = transformInquiryMessagesToViewModels(
+      bodies.map((body, index) =>
+        message({
+          messageIdx: index + 1,
+          auto: true,
+          isUserMessage: false,
+          body,
+        }),
+      ),
+    ).map((view) => view.kind);
 
-    expect(closed?.kind).toBe("text");
-    expect(greeting?.kind).toBe("system");
+    expect(kinds).toEqual(["notice", "notice", "notice", "system", "system"]);
+  });
+
+  it("사람이 쓴 같은 문구는 안내가 아니라 일반 메시지로 둔다", () => {
+    const [view] = transformInquiryMessagesToViewModels([
+      message({ messageIdx: 1, body: "상담이 종료되었습니다." }),
+    ]);
+    expect(view?.kind).toBe("text");
   });
 });
 

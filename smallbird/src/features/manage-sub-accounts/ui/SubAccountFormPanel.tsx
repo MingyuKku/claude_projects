@@ -74,7 +74,13 @@ export function SubAccountFormPanel({
   const canSubmit =
     !isSubmitting &&
     (isEdit
-      ? canEditSubAccount(values, initialValues, errors, idCheck.status)
+      ? canEditSubAccount({
+          values,
+          initial: initialValues,
+          errors,
+          idStatus: idCheck.status,
+          hasPickedImage: pickedImage !== null,
+        })
       : canCreateSubAccount(values, errors, idCheck.status));
   const isIdValidFormat =
     values.identifier !== "" && errors.identifier === null;

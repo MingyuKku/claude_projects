@@ -137,7 +137,9 @@ export function CustomerCenterBigbirdPage() {
       toast.error(t("requestFailed"));
       return;
     }
-    const requested = await requestRealtime(campaign);
+    const requested = await requestRealtime(campaign, {
+      threadIdx: selected.threadIdx,
+    });
     if (requested.status !== "requested") {
       toast.error(t("requestFailed"));
       return;

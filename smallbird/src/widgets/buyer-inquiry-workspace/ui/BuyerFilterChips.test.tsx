@@ -64,6 +64,7 @@ function renderWorkspace(search: string) {
         path: ROUTES.customerCenterBuyerThread,
         element: (
           <BuyerInquiryWorkspace
+            menu="buyer"
             inquiries={[]}
             isLoading={false}
             isError={false}
@@ -109,9 +110,6 @@ describe("구매자 목록 적용된 필터 칩", () => {
   it("조건이 없으면 칩이 없다", () => {
     renderWorkspace("");
     expect(screen.queryByText(/조건 해제/)).not.toBeInTheDocument();
-    expect(screen.getByRole("button", { name: "필터" })).not.toHaveClass(
-      "text-primary",
-    );
   });
 
   it("이름을 아직 모르면 번호로 대신하고, 인플루언서 칩의 ×는 그 조건만 푼다", async () => {

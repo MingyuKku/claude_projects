@@ -64,6 +64,7 @@ export {
 export { PaymentStatusBadge } from "./ui/PaymentStatusBadge";
 export { SubscriptionPlanCard } from "./ui/SubscriptionPlanCard";
 export { submitIssuanceForm } from "./lib/submit-issuance-form";
+export { getSubscribedTypes } from "./lib/subscribed-types";
 export {
   readApiErrorPgMessage,
   readApiErrorReason,

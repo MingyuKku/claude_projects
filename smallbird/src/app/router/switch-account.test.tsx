@@ -24,7 +24,7 @@ vi.hoisted(() => {
 vi.mock("@/shared/api", async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   serverApi: { get: vi.fn(), post: vi.fn() },
-  serverApiV3: { get: vi.fn() },
+  serverApiV3: { get: vi.fn(), post: vi.fn() },
 }));
 
 vi.mock("@/shared/lib", async (importOriginal) => ({
@@ -121,9 +121,12 @@ describe("관리자 계정 전환", () => {
         name: "sample-master 계정으로 변경",
       }),
     );
-    expect(serverApi.post).toHaveBeenCalledWith("/super/change", {
-      userIdx: 42,
-    });
+    // 전환 전에 기기 잠금을 먼저 풀어 /super/change는 그 뒤에 나감.
+    await waitFor(() =>
+      expect(serverApi.post).toHaveBeenCalledWith("/super/change", {
+        userIdx: 42,
+      }),
+    );
     expect(
       screen.getByRole("button", { name: "bigbird 계정으로 변경" }),
     ).toBeDisabled();

@@ -7,6 +7,5 @@
   "cancel": "Cancel",
   "deleteTitle": "Delete this message?",
   "deleteDescription": "A deleted message can't be restored.",
-  "alreadyRead": "Read messages can't be edited or deleted.",
   "failed": "Request failed. Please try again."
 }

@@ -10,7 +10,7 @@ import { NavigationContext } from "../model/navigation-context";
 import type { MenuPermissions } from "@/entities/session";
 import type { ComponentProps } from "react";
 
-// 구독은 역할, 인플루언서 검색·빅버드 머니·구매자 문의는 세션의 메뉴 권한(`GET /v3/sec`)에 따라 아래에서 따로 판단함.
+// 구독은 역할, 인플루언서 검색·빅버드 머니·구매자 문의·인플루언서 문의는 세션의 메뉴 권한(`GET /v3/sec`)에 따라 아래에서 따로 판단함.
 const ENABLED_HREFS = new Set<string>([
   ROUTES.main,
   ROUTES.switchAccount,
@@ -22,10 +22,12 @@ const PERMISSION_BY_HREF: Record<string, keyof MenuPermissions> = {
   [ROUTES.influencerSearch]: "influencerMatching",
   [ROUTES.mypageMoney]: "bigbirdMoney",
   [ROUTES.customerCenterBuyer]: "purchaserQuestion",
+  [ROUTES.customerCenterInfluencer]: "influencerQuestion",
 };
 const LOGIN_REQUIRED_HREFS = new Set<string>([
   ROUTES.customerCenterBigbird,
   ROUTES.customerCenterBuyer,
+  ROUTES.customerCenterInfluencer,
   ROUTES.mypageAccount,
   ROUTES.mypageSubscribe,
   ROUTES.mypageMoney,

@@ -124,14 +124,16 @@ export function NewBigbirdInquiryForm({
               }
               scrollBarStyle={{ top: CAMPAIGN_TABLE_HEADER_HEIGHT }}
             >
+              {/* Figma 새 문의 캠페인 표(11315:50062): 행 48, 머리글 배경 muted(#F1F5F9). */}
               <Table
                 className="table-fixed"
+                size="xs"
                 headerTone="gray"
                 containerClassName="overflow-visible rounded-none border-0"
                 aria-label={t("campaignListLabel")}
               >
                 {/* sticky 머리글은 border-collapse에서 테두리가 따라오지 않아 그림자로 아래 선을 그림. */}
-                <TableHeader className="sticky top-0 z-10 [&_th]:shadow-[inset_0_-1px_0_var(--color-border)] [&_tr]:border-b-0">
+                <TableHeader className="sticky top-0 z-10 [--table-header-bg:var(--color-muted)] [&_th]:shadow-[inset_0_-1px_0_var(--color-border)] [&_tr]:border-b-0">
                   <TableRow>
                     <TableHead className="w-12">
                       <span className="sr-only">{t("select")}</span>
@@ -223,7 +225,7 @@ export function NewBigbirdInquiryForm({
 function CampaignStatusRow({ children }: { children: ReactNode }) {
   return (
     <TableRow>
-      <TableCell colSpan={3} className="h-14 text-center text-muted-foreground">
+      <TableCell colSpan={3} className="h-12 text-center text-muted-foreground">
         {children}
       </TableCell>
     </TableRow>

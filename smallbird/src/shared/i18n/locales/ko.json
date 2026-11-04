@@ -63,8 +63,8 @@
         "description": "동영상 파일은 최대 50MB까지 첨부할 수 있습니다."
       },
       "fileSize": {
-        "title": "문서 첨부파일 용량 초과",
-        "description": "문서 파일은 최대 30MB까지 첨부할 수 있습니다."
+        "title": "첨부파일 용량 초과",
+        "description": "파일당 최대 30MB까지 첨부할 수 있습니다."
       },
       "imageCount": {
         "title": "이미지 최대 업로드 개수 초과",

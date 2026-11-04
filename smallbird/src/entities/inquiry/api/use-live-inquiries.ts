@@ -4,7 +4,10 @@ import {
   applyRealtimeConsultation,
   getConnectDeadline,
 } from "../lib/realtime-phase";
-import { useRealtimeConsultationStates } from "./realtime-consultation-api";
+import {
+  useAccountResponseAt,
+  useRealtimeConsultationStates,
+} from "./realtime-consultation-api";
 
 import type { BigbirdInquiryViewModel } from "../model/schema";
 
@@ -27,6 +30,11 @@ export function useLiveInquiries(
     threadUserIdx ?? 0,
     threadUserIdx === undefined ? [] : targets,
   );
+  // 연결 판단은 내 계정 문서의 `msgResponseDate`로 함(realtime-phase.ts).
+  const responseAt = useAccountResponseAt(
+    threadUserIdx ?? 0,
+    threadUserIdx !== undefined && targets.length > 0,
+  );
   const [now, setNow] = useState(() => Date.now());
 
   const live = useMemo(
@@ -36,9 +44,10 @@ export function useLiveInquiries(
           inquiry,
           consultations[inquiry.threadIdx],
           now,
+          responseAt,
         ),
       ),
-    [inquiries, consultations, now],
+    [inquiries, consultations, now, responseAt],
   );
 
   // 연결 대기 중인 상담의 마감 시각에 한 번 깨움. 지나면 그 상담은 실패가 되어 다음 마감으로 넘어감.

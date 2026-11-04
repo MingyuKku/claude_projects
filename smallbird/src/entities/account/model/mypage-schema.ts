@@ -60,14 +60,17 @@ export const accountMasterSchema = z.object({
 });
 export type AccountMaster = z.infer<typeof accountMasterSchema>;
 
-/** `GET /v3/mypage/account/sub/self`. SUB 전용(MASTER·ADMIN은 403). 가입일은 응답에 없음(docs/mypage-api.md §4-8). */
+/** `GET /v3/mypage/account/sub/self`. SUB 전용(MASTER·ADMIN은 403). */
 export const subSelfAccountSchema = z.object({
   accountIdx: z.number(),
   identifier: z.string(),
   name: z.string(),
   email: z.string(),
   phone: z.string(),
+  // Sub 본인 이미지. `GET /profile`은 회사(Master) 기준이라 Sub 이미지는 여기서만 읽음(2026-11-03 백엔드 확인).
   profileImageUrl: z.string().nullish(),
+  // Sub 계정 생성일시(`yyyy-MM-dd HH:mm`, Master `user.created`와 같은 형식). 2026-11-03 Stage 추가.
+  created: z.string().nullish(),
 });
 export type SubSelfAccount = z.infer<typeof subSelfAccountSchema>;
 
@@ -105,6 +108,13 @@ export interface AccountProfileViewModel {
   joinedAt: Date | null;
   /** 현재 연결된 본인인증 인덱스. 휴대폰을 바꾸지 않을 때 `PUT /modify`에 다시 보냄. */
   certIdx: number | null;
+}
+
+/** Sub ID 본인 정보. Master와 달리 프로필 이미지가 본인 정보 응답에 함께 옴. */
+export interface SubSelfAccountViewModel {
+  profile: AccountProfileViewModel;
+  /** 등록한 적이 없으면 null. */
+  profileImageUrl: string | null;
 }
 
 /** 회사정보 폼의 초기값. 서류는 인덱스가 아니라 등록 여부와 파일명만 UI가 봄. */

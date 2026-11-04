@@ -41,13 +41,20 @@ export function useSubscriptionPlans() {
 
 export const SUBSCRIPTIONS_KEY = ["mypage", "subscription", "subscriptions"];
 
+interface UseSubscriptionsOptions {
+  /** false면 조회하지 않음. 구독 API를 아직 열지 않은 빌드에서 안 쓰는 요청이 나가지 않게 함. */
+  enabled?: boolean;
+}
+
 /**
- * 구독 중인 상품들(해지 예정 포함). 구독 탭·결제내역·이용요약이 같은 키를 읽어 한 번만 요청함.
+ * 구독 중인 상품들(해지 예정 포함). 구독 탭·결제 화면 진입 확인·결제내역·이용요약이 같은 키를 읽어 한 번만 요청함.
  * 해지·결제 뒤에는 `mutate()`로 다시 읽음.
  */
-export function useSubscriptions() {
+export function useSubscriptions({
+  enabled = true,
+}: UseSubscriptionsOptions = {}) {
   const { data, error, isLoading, mutate } = useSWR(
-    SUBSCRIPTIONS_KEY,
+    enabled ? SUBSCRIPTIONS_KEY : null,
     fetchSubscriptions,
   );
   return { data, isLoading, isError: Boolean(error), mutate };

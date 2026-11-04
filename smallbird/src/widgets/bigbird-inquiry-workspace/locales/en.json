@@ -1,6 +1,5 @@
 {
   "listTitle": "Inquiry list",
-  "refresh": "Refresh",
   "newInquiry": "New inquiry",
   "all": "All",
   "waiting": "Waiting",
@@ -42,14 +41,16 @@
     },
     "failed": {
       "title": "Live chat unavailable",
-      "description": "Our agents can't respond right now. Leave a message and we'll get back to you."
+      "description": "Live chat is hard to provide right now due to high inquiry volume.",
+      "caption": "Your inquiry switches to a general inquiry and will be answered in order."
     },
     "end": "End chat",
     "composer": "Live chat message",
     "composerPlaceholder": "Enter your inquiry. (Up to 3,000 characters)",
     "attach": "Attach",
     "send": "Send",
-    "request": "Live chat"
+    "request": "Live chat",
+    "otherDevice": "Another agent is handling this inquiry. Please try again after it ends."
   },
   "composer": {
     "placeholder": "Enter your inquiry. (Up to 3,000 characters)",

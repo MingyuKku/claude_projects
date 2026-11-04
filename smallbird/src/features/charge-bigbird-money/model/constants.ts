@@ -30,9 +30,3 @@ export const INICIS_FORM_ID = "SendPayForm_bigbird";
  */
 export const PAYMENT_RETURN_PARAM = "isPaid";
 export const PAYMENT_RETURN_SUCCESS = "true";
-/** 같이 붙어 오지만 쓰지 않아 주소에서 지우는 쿼리. */
-export const PAYMENT_RETURN_EXTRA_PARAMS = [
-  "gopaymethod",
-  "goodName",
-  "code",
-] as const;

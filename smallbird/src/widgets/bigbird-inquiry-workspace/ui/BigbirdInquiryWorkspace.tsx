@@ -140,8 +140,6 @@ export function BigbirdInquiryWorkspace({
     <div className="flex h-full min-h-0 min-w-0 gap-5">
       <ChatListPanel
         title={t("listTitle")}
-        refreshLabel={t("refresh")}
-        onClickRefresh={onClickRefresh}
         action={
           <Button asChild size="sm">
             <Link to={ROUTES.customerCenterBigbirdNew}>

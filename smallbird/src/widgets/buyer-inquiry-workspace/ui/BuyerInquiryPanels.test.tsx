@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router";
@@ -7,6 +7,7 @@ import { SWRConfig } from "swr";
 import { serverApiV3 } from "@/shared/api";
 import { ROUTES } from "@/shared/config";
 
+import { OPENED_BY_USER_STATE } from "../model/realtime-inquiry-idx";
 import { BuyerInquiryPanels } from "./BuyerInquiryPanels";
 
 import type { BuyerInquiryViewModel } from "@/entities/inquiry";
@@ -43,6 +44,7 @@ const inquiry: BuyerInquiryViewModel = {
   writeTime: new Date("2026-10-01T10:00"),
   threadUserIdx: 77,
   userIdx: null,
+  sequence: null,
   preview: "마지막 메시지",
   lastActivityAt: new Date("2026-10-01T10:00"),
   hasUnread: false,
@@ -60,7 +62,8 @@ const message = (
   messageIdx,
   threadIdx: 1,
   body,
-  userIdx: 1,
+  userIdx: isUserMessage ? 1 : 77,
+  sequence: null,
   attachmentIdx: null,
   writeTime,
   readTime: null,
@@ -99,44 +102,47 @@ beforeEach(() => {
   flags.isWriteEnabled = true;
   vi.mocked(serverApiV3.get).mockReset();
   vi.mocked(serverApiV3.get).mockImplementation(async (path: string) => {
-    if (path === "/help/thread")
+    if (path === "/help/inquiry/purchaser-campaign-timeline")
       return {
         result: true,
         data: [
-          {
-            threadIdx: 1,
-            sequence: 1,
-            viewing: null,
-            toUserIdx: 1,
-            fmUserIdx: 77,
-            campaignIdx: 10,
-            finishTime: null,
-            created: "2026-10-01T10:00:00",
-            boardType: true,
-            status: "ANSWERED",
-            messages: [
-              message(2, "오늘 발송합니다.", true, "2026-10-01T11:00:00"),
-              message(1, "배송이 언제 되나요?", false, "2026-10-01T10:00:00"),
-            ],
-          },
+          message(1, "배송이 언제 되나요?", false, "2026-10-01T10:00:00"),
+          message(2, "오늘 발송합니다.", true, "2026-10-01T11:00:00"),
         ],
       };
     return detail;
   });
 });
 
-function renderPanels(threadUserIdx?: number) {
+function renderPanels(
+  threadUserIdx?: number,
+  target: BuyerInquiryViewModel = inquiry,
+  onChangeStatus?: () => void,
+  state?: unknown,
+) {
   const router = createMemoryRouter(
     [
       {
         path: ROUTES.customerCenterBuyerThread,
         element: (
-          <BuyerInquiryPanels inquiry={inquiry} threadUserIdx={threadUserIdx} />
+          <BuyerInquiryPanels
+            inquiry={target}
+            threadUserIdx={threadUserIdx}
+            onChangeStatus={onChangeStatus}
+          />
         ),
       },
       { path: ROUTES.customerCenterBuyer, element: <p>문의 목록 화면</p> },
     ],
-    { initialEntries: ["/customer-center/buyer/purchaser-501?status=done"] },
+    {
+      initialEntries: [
+        {
+          pathname: "/customer-center/buyer/purchaser-501",
+          search: "?status=done",
+          state,
+        },
+      ],
+    },
   );
   render(
     <SWRConfig value={{ provider: () => new Map() }}>
@@ -146,6 +152,66 @@ function renderPanels(threadUserIdx?: number) {
   return router;
 }
 
+function renderPanelsForAccept(target: BuyerInquiryViewModel, state?: unknown) {
+  const router = renderPanels(77, target, undefined, state);
+  return { router, unmount: () => cleanup() };
+}
+
+describe("인플루언서 문의 상담 종료", () => {
+  const influencer: BuyerInquiryViewModel = {
+    ...inquiry,
+    key: "influencer-2092",
+    inquiryIdx: 2092,
+    source: "influencer",
+    status: "consulting",
+  };
+
+  it("실시간 상담 중이면 상담 종료로 그 스레드를 끝내고 목록을 다시 받게 한다", async () => {
+    vi.mocked(serverApiV3.put).mockResolvedValue({ result: true });
+    const onChangeStatus = vi.fn();
+    renderPanels(77, influencer, onChangeStatus);
+    await userEvent.click(
+      await screen.findByRole("button", { name: "상담 종료" }),
+    );
+    await waitFor(() =>
+      expect(serverApiV3.put).toHaveBeenCalledWith(
+        "/help/thread/2092",
+        undefined,
+        { headers: { "X-Device-Id": expect.any(String) } },
+      ),
+    );
+    await waitFor(() => expect(onChangeStatus).toHaveBeenCalled());
+  });
+
+  it("자동 선택으로 열린 실시간 문의는 수락하지 않고, 사용자가 직접 연 문의만 수락한다", async () => {
+    vi.mocked(serverApiV3.put).mockResolvedValue({ result: true });
+    const { unmount } = renderPanelsForAccept({
+      ...influencer,
+      inquiryIdx: 3001,
+    });
+    await screen.findByText("김하루");
+    expect(serverApiV3.put).not.toHaveBeenCalled();
+    unmount();
+    renderPanelsForAccept(
+      { ...influencer, inquiryIdx: 3002 },
+      OPENED_BY_USER_STATE,
+    );
+    await waitFor(() =>
+      expect(serverApiV3.put).toHaveBeenCalledWith(
+        "/help/inquiry/3002/realtime/accept",
+        undefined,
+        { headers: { "X-Device-Id": expect.any(String) } },
+      ),
+    );
+  });
+
+  it("실시간 상담 중이 아니면 버튼이 없다", async () => {
+    renderPanels(77, { ...influencer, status: "done" });
+    await screen.findByText("김하루");
+    expect(screen.queryByRole("button", { name: "상담 종료" })).toBeNull();
+  });
+});
+
 describe("구매자 문의 오른쪽 패널", () => {
   it("구매자↔광고주 대화를 시간순으로 보여 주고 type=client로 조회한다", async () => {
     renderPanels();
@@ -153,9 +219,12 @@ describe("구매자 문의 오른쪽 패널", () => {
     expect(screen.getByText("오늘 발송합니다.")).toBeInTheDocument();
     // 내 말풍선 위에는 보낸 광고주 계정 id가 보입니다.
     expect(screen.getByText("mgkang")).toBeInTheDocument();
-    expect(serverApiV3.get).toHaveBeenCalledWith("/help/thread", {
-      params: { threadUserIdx: 77, type: "client", campaignIdx: 10 },
-    });
+    expect(serverApiV3.get).toHaveBeenCalledWith(
+      "/help/inquiry/purchaser-campaign-timeline",
+      {
+        params: { campaignIdx: 10, purchaserThreadUserIdx: 77 },
+      },
+    );
     const texts = screen
       .getAllByText(/배송이 언제 되나요\?|오늘 발송합니다\./)
       .map((element) => element.textContent);
@@ -170,29 +239,15 @@ describe("구매자 문의 오른쪽 패널", () => {
       productName: "냉장고",
     });
     vi.mocked(serverApiV3.get).mockImplementation(async (path: string) => {
-      if (path !== "/help/thread") return detail;
+      if (path !== "/help/inquiry/purchaser-campaign-timeline") return detail;
       return {
         result: true,
         data: [
           {
-            threadIdx: 1,
-            sequence: 1,
-            viewing: null,
-            toUserIdx: 1,
-            fmUserIdx: 77,
-            campaignIdx: 10,
-            finishTime: null,
-            created: "2026-10-01T10:00:00",
-            boardType: true,
-            status: "WAITING",
-            messages: [
-              {
-                ...message(1, campaignJson, false, "2026-10-01T10:00:00"),
-                auto: true,
-              },
-              message(2, "배송이 언제 되나요?", false, "2026-10-01T10:01:00"),
-            ],
+            ...message(1, campaignJson, false, "2026-10-01T10:00:00"),
+            auto: true,
           },
+          message(2, "배송이 언제 되나요?", false, "2026-10-01T10:01:00"),
         ],
       };
     });
@@ -203,28 +258,14 @@ describe("구매자 문의 오른쪽 패널", () => {
 
   it("삭제된 메시지는 삭제 표시 없이 대화에서 뺀다", async () => {
     vi.mocked(serverApiV3.get).mockImplementation(async (path: string) => {
-      if (path !== "/help/thread") return detail;
+      if (path !== "/help/inquiry/purchaser-campaign-timeline") return detail;
       return {
         result: true,
         data: [
+          message(1, "배송이 언제 되나요?", false, "2026-10-01T10:00:00"),
           {
-            threadIdx: 1,
-            sequence: 1,
-            viewing: null,
-            toUserIdx: 1,
-            fmUserIdx: 77,
-            campaignIdx: 10,
-            finishTime: null,
-            created: "2026-10-01T10:00:00",
-            boardType: true,
-            status: "WAITING",
-            messages: [
-              message(1, "배송이 언제 되나요?", false, "2026-10-01T10:00:00"),
-              {
-                ...message(2, "지운 답변", true, "2026-10-01T10:01:00"),
-                deleteTime: "2026-10-01T10:02:00",
-              },
-            ],
+            ...message(2, "지운 답변", true, "2026-10-01T10:01:00"),
+            deleteTime: "2026-10-01T10:02:00",
           },
         ],
       };
@@ -271,7 +312,8 @@ describe("구매자 문의 오른쪽 패널", () => {
 
   it("대화 조회가 실패하면 안내를 보여 준다", async () => {
     vi.mocked(serverApiV3.get).mockImplementation(async (path: string) => {
-      if (path === "/help/thread") throw new Error("500");
+      if (path === "/help/inquiry/purchaser-campaign-timeline")
+        throw new Error("500");
       return detail;
     });
     renderPanels();

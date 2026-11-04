@@ -43,6 +43,7 @@ const inquiry: BuyerInquiryViewModel = {
   writeTime: new Date("2026-10-01T10:00"),
   threadUserIdx: 77,
   userIdx: null,
+  sequence: null,
   preview: "문의",
   lastActivityAt: new Date("2026-10-01T10:00"),
   hasUnread: false,
@@ -51,28 +52,14 @@ const inquiry: BuyerInquiryViewModel = {
   shopName: null,
 };
 
-const thread = (threadIdx: number, created: string) => ({
-  threadIdx,
-  sequence: 1,
-  viewing: null,
-  toUserIdx: 1,
-  fmUserIdx: 77,
-  campaignIdx: 10,
-  finishTime: null,
-  created,
-  boardType: true,
-  status: "WAITING",
-  messages: [],
-});
-
-function mockThreads(data: ReturnType<typeof thread>[]) {
-  vi.mocked(serverApiV3.get).mockResolvedValue({ result: true, data });
+function mockTimeline() {
+  vi.mocked(serverApiV3.get).mockResolvedValue({ result: true, data: [] });
 }
 
-function renderComposer() {
+function renderComposer(value: BuyerInquiryViewModel = inquiry) {
   render(
     <SWRConfig value={{ provider: () => new Map() }}>
-      <BuyerReplyComposer inquiry={inquiry} />
+      <BuyerReplyComposer inquiry={value} />
     </SWRConfig>,
   );
 }
@@ -86,34 +73,35 @@ beforeEach(() => {
 });
 
 describe("구매자 문의 답장 입력창", () => {
-  it("가장 최근 스레드에 텍스트를 보낸다", async () => {
+  it("목록 행의 문의 번호로 텍스트를 보낸다", async () => {
     const user = userEvent.setup();
-    mockThreads([
-      thread(1, "2026-10-01T09:00:00"),
-      thread(2, "2026-10-02T09:00:00"),
-    ]);
+    mockTimeline();
     vi.mocked(serverApiV3.post).mockResolvedValue({
       result: true,
-      threadIdx: 2,
+      threadIdx: 501,
     });
     renderComposer();
     await waitFor(() => expect(screen.getByRole("textbox")).toBeEnabled());
     await user.type(screen.getByRole("textbox"), "내일 출발합니다.");
     await user.click(screen.getByRole("button", { name: "전송" }));
     await waitFor(() =>
-      expect(serverApiV3.post).toHaveBeenCalledWith("/help/thread/message", {
-        threadIdx: 2,
-        body: "내일 출발합니다.",
-        attachmentIdx: null,
-        isAuto: false,
-      }),
+      expect(serverApiV3.post).toHaveBeenCalledWith(
+        "/help/thread/message",
+        {
+          threadIdx: 501,
+          body: "내일 출발합니다.",
+          attachmentIdx: null,
+          isAuto: false,
+        },
+        { headers: { "X-Device-Id": expect.any(String) } },
+      ),
     );
     await waitFor(() => expect(screen.getByRole("textbox")).toHaveValue(""));
   });
 
   it("종료된 스레드라 서버가 새 스레드를 만들면 첨부를 그 스레드로 보낸다", async () => {
     const user = userEvent.setup();
-    mockThreads([thread(2, "2026-10-02T09:00:00")]);
+    mockTimeline();
     vi.mocked(serverApiV3.post).mockImplementation(async (path: string) =>
       path === "/help/thread/message"
         ? { result: true, threadIdx: 3 }
@@ -149,15 +137,15 @@ describe("구매자 문의 답장 입력창", () => {
   });
 
   it("대화 내역(스레드)이 없으면 보낼 곳이 없어 입력이 막힌다", async () => {
-    mockThreads([]);
-    renderComposer();
+    mockTimeline();
+    renderComposer({ ...inquiry, source: "influencer", campaignIdx: null });
     await waitFor(() => expect(screen.getByRole("textbox")).toBeDisabled());
     expect(screen.getByRole("button", { name: "전송" })).toBeDisabled();
   });
 
   it("전송이 실패하면 입력을 지우지 않고 안내한다", async () => {
     const user = userEvent.setup();
-    mockThreads([thread(2, "2026-10-02T09:00:00")]);
+    mockTimeline();
     vi.mocked(serverApiV3.post).mockRejectedValue(new Error("500"));
     renderComposer();
     await waitFor(() => expect(screen.getByRole("textbox")).toBeEnabled());
@@ -173,7 +161,7 @@ describe("구매자 문의 답장 입력창", () => {
 
   it("쓰기를 꺼 두면 입력창은 보이지만 비활성이라 보낼 수 없다", async () => {
     flags.isWriteEnabled = false;
-    mockThreads([thread(1, "2026-10-01T09:00:00")]);
+    mockTimeline();
     renderComposer();
     // 대화(스레드)를 받은 뒤에도 입력은 막혀 있어야 함.
     await waitFor(() => expect(serverApiV3.get).toHaveBeenCalled());

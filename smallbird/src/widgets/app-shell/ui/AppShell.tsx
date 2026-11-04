@@ -34,6 +34,7 @@ import type { ReactNode } from "react";
 const CUSTOMER_CENTER_PATH_PREFIXES: string[] = [
   ROUTES.customerCenterBigbird,
   ROUTES.customerCenterBuyer,
+  ROUTES.customerCenterInfluencer,
 ];
 // 고객센터는 모바일에서 본문이 가장자리까지 차고, 태블릿 이상에서는 위쪽 여백 없이 좌우·아래만 둠.
 const CUSTOMER_CENTER_MAIN_CLASS =

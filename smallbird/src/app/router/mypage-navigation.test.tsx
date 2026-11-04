@@ -95,6 +95,7 @@ beforeEach(() => {
         email: "sub01@bigbird.com",
         phone: "01012345678",
         profileImageUrl: null,
+        created: "2026-10-28 14:05",
       });
     return Promise.resolve({ profileUrl: null });
   });
@@ -176,8 +177,16 @@ describe("마이페이지 · 계정 설정 셸", () => {
     expect(screen.queryByText("휴대폰 번호")).toBeNull();
     expect(screen.queryByText("간편 로그인 연동")).toBeNull();
     expect(screen.queryByRole("button", { name: "회원 탈퇴" })).toBeNull();
+    expect(screen.getByText("2026. 10. 28.")).toBeInTheDocument();
     expect(serverApiV3.get).toHaveBeenCalledWith("/mypage/account/sub/self");
     expect(serverApiV3.get).not.toHaveBeenCalledWith("/mypage/account/master");
+    // 프로필 이미지는 /sub/self로 받음. /profile은 회사(Master) 기준이라 Master 이미지가 옴.
+    expect(serverApiV3.get).not.toHaveBeenCalledWith("/mypage/account/profile");
+    // Sub ID 목록은 MASTER·ADMIN 전용(Sub는 403)이라 부르지 않음.
+    expect(serverApiV3.get).not.toHaveBeenCalledWith(
+      "/mypage/account/sub",
+      expect.anything(),
+    );
   });
 
   describe("빌드(stage·prod)에서도 실제 API 탭은 그대로 보인다", () => {
@@ -920,6 +929,16 @@ describe("마이페이지 · 빅버드 머니", () => {
     mockViewport({ tablet: true, desktop: false });
     const router = await renderRoute(
       `${ROUTES.mypageMoney}?isPaid=true&gopaymethod=VCard&goodName=%3F%3F`,
+    );
+
+    expect(await screen.findByText("충전 요청 완료")).toBeInTheDocument();
+    await waitFor(() => expect(router.state.location.search).toBe(""));
+  });
+
+  it("결제 서버가 더 붙인 쿼리(가상계좌 정보 등)도 이름과 상관없이 모두 지운다", async () => {
+    mockViewport({ tablet: true, desktop: false });
+    const router = await renderRoute(
+      `${ROUTES.mypageMoney}?isPaid=true&gopaymethod=VBank&accountNumber=1234567890&holderName=%ED%99%8D&dueDate=20261106`,
     );
 
     expect(await screen.findByText("충전 요청 완료")).toBeInTheDocument();

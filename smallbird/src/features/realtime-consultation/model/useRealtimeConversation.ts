@@ -4,16 +4,14 @@ import { toast } from "sonner";
 
 import {
   acquireConsultationLock,
-  appendConsultationMessage,
   closeBigbirdInquiry,
-  closeConsultation,
   getAttachmentKind,
+  isOtherDeviceError,
   LOCK_REFRESH_MS,
-  markRealtimeRequestExpired,
-  newMessageId,
   REALTIME_IDLE_LIMIT_MS,
   REALTIME_IDLE_WARNING_MS,
   releaseConsultationLock,
+  sendInquiryMessage,
   TAB_ID,
   uploadInquiryAttachment,
 } from "@/entities/inquiry";
@@ -47,21 +45,10 @@ interface Options {
   onChanged: () => void;
 }
 
-const REASON_KEY = {
-  finished: "closed",
-  closing: "closing",
-  canceled: "closed",
-  expired: "closed",
-  "not-connected": "notConnected",
-  "lock-lost": "lockLost",
-  connected: "alreadyConnected",
-  mismatch: "failed",
-  missing: "failed",
-} as const;
-
 /**
- * 실시간 상담 화면의 쓰기 동작: 응대 락(획득·갱신·해제), 전송, 종료, 만료 기록,
- * 연결 후 무응답 안내·자동 종료. 실제 쓰기 규칙은 entities/inquiry의 트랜잭션 함수가 지킴.
+ * 실시간 상담 화면의 쓰기 동작: 응대 락(획득·갱신·해제), 전송, 종료, 연결 후 무응답 안내·자동 종료.
+ * 전송·종료는 REST만 부르고 상담 문서는 서버가 씀(백엔드 흐름도 프론트팀 가이드 2026-11-03). 요청 만료(3분)는
+ * 백엔드 스케줄러가 처리함. 응대 락만 계정 문서에 직접 씀.
  */
 export function useRealtimeConversation({
   inquiry,
@@ -76,16 +63,11 @@ export function useRealtimeConversation({
     state: "held" | "blocked" | "error";
   } | null>(null);
   const [isBusy, setIsBusy] = useState(false);
-  const pendingMessage = useRef<{ text: string; id: string } | null>(null);
-  // 업로드와 저장 중 어느 쪽이 실패했는지에 따라 다시 보낼 때 업로드·메시지 식별자를 재사용함.
-  const pendingFiles = useRef(
-    new WeakMap<
-      File,
-      {
-        uploaded: Awaited<ReturnType<typeof uploadInquiryAttachment>>;
-        id: string;
-      }
-    >(),
+  // 다시 보낼 때 이미 올린 파일은 다시 올리지 않음.
+  // 이미 보낸 파일. 여러 파일 중간에 실패해 다시 보낼 때 앞서 보낸 첨부를 또 보내지 않음.
+  const sentFiles = useRef(new WeakSet<File>());
+  const uploadedFiles = useRef(
+    new WeakMap<File, Awaited<ReturnType<typeof uploadInquiryAttachment>>>(),
   );
 
   const sequence = inquiry?.sequence;
@@ -95,7 +77,6 @@ export function useRealtimeConversation({
     enabled && Boolean(inquiry?.isRealtime) && !inquiry?.isFinished;
   const owner = `${session.userIdx}_${session.accountIdx}`;
   const { threadUserIdx } = session;
-  const target = sequence === undefined ? null : { threadUserIdx, sequence };
   const lockKey = `${threadUserIdx}:${sequence}:${owner}`;
   const lock: LockState = !isLive
     ? "inactive"
@@ -155,47 +136,17 @@ export function useRealtimeConversation({
     if (lock === "error") toast.error(t("lockCheckFailed"));
   }, [lock, t]);
 
-  // 요청 실패(마감 경과)한 v3 요청에 만료를 기록함. 운영 앱이 뒤늦게 연결하지 못하게 함.
-  const expiredKey = useRef<string | null>(null);
-  // 만료 기록이 실패하면 잠시 뒤 같은 마감값으로 다시 시도함.
-  const [expireAttempt, setExpireAttempt] = useState(0);
-  const connectDeadlineAt = inquiry?.connectDeadlineAt;
-  useEffect(() => {
-    if (!isLive || sequence === undefined) return;
-    if (phase !== "failed" || lock !== "held") return;
-    const key = `${sequence}:${connectDeadlineAt}`;
-    if (expiredKey.current === key) return;
-    expiredKey.current = key;
-    void tryit(markRealtimeRequestExpired)({ threadUserIdx, sequence }).then(
-      ([error]) => {
-        if (!error) return;
-        console.error("요청 만료 기록 실패", error);
-        setTimeout(() => {
-          expiredKey.current = null;
-          setExpireAttempt((count) => count + 1);
-        }, LOCK_REFRESH_MS);
-      },
-    );
-  }, [
-    isLive,
-    phase,
-    lock,
-    sequence,
-    threadUserIdx,
-    connectDeadlineAt,
-    expireAttempt,
-  ]);
-
   async function end(): Promise<boolean> {
-    if (!target || threadIdx === undefined || isBusy) return false;
+    if (threadIdx === undefined || isBusy) return false;
     setIsBusy(true);
     try {
-      const [error, result] = await tryit(closeConsultation)(target, {
-        closeRest: () => closeBigbirdInquiry(threadIdx),
-      });
-      if (error || !result.ok) {
-        if (error) console.error("실시간 상담 종료 실패", error);
-        toast.error(t("endFailed"));
+      // 서버가 DB 종료와 상담 문서 finishTime을 함께 씀.
+      const [error] = await tryit(closeBigbirdInquiry)(threadIdx);
+      if (error) {
+        console.error("실시간 상담 종료 실패", error);
+        toast.error(
+          t(isOtherDeviceError(error) ? "lock.description" : "endFailed"),
+        );
         return false;
       }
       onChanged();
@@ -204,6 +155,23 @@ export function useRealtimeConversation({
       setIsBusy(false);
     }
   }
+
+  // 요청 중이던 상담이 연결되는 순간 한 번 알림(피그마 토스트 PC 11315:50266·TAB 11315:49908·MO 11315:51098). 연결은
+  // 상담 문서 acceptedAt으로 판단함(realtime-phase.ts). 이미 연결된 상담을 열 때는 알리지 않음.
+  const previousPhase = useRef<{ sequence: number; phase: string } | null>(
+    null,
+  );
+  useEffect(() => {
+    if (sequence === undefined || phase === null) return;
+    const previous = previousPhase.current;
+    previousPhase.current = { sequence, phase };
+    if (
+      previous?.sequence === sequence &&
+      previous.phase === "requesting" &&
+      phase === "connected"
+    )
+      toast.success(t("connected"));
+  }, [sequence, phase, t]);
 
   // 연결 뒤 마지막 메시지부터 5분이면 안내, 10분이면 광고주 차례는 자동 종료·운영 차례는 지연 안내(REQ-23-0021).
   // 새 메시지가 오면 시작 시각이 바뀌어 다시 셈. 락을 가진 탭만 셈.
@@ -254,56 +222,30 @@ export function useRealtimeConversation({
 
   async function send(text: string): Promise<boolean> {
     const body = text.trim();
-    if (!target || threadIdx === undefined || !body) return false;
-    // 응답이 유실돼 같은 글을 다시 보내면 같은 식별자로 보내 중복 저장을 막음.
-    const pending =
-      pendingMessage.current?.text === body
-        ? pendingMessage.current
-        : { text: body, id: newMessageId() };
-    pendingMessage.current = pending;
-    const [error, result] = await tryit(appendConsultationMessage)(
-      { ...target, threadIdx },
-      {
-        requireConnected: false,
-        lock: { owner, tabId: TAB_ID },
-        message: {
-          auto: false,
-          attachmentIdx: null,
-          identifier: session.identifier,
-          isUserMessage: true,
-          body,
-          fileName: null,
-          messageId: pending.id,
-        },
-      },
-    );
+    if (threadIdx === undefined || !body) return false;
+    const [error] = await tryit(sendInquiryMessage)({ threadIdx, body });
     if (error) {
       console.error("실시간 상담 메시지 전송 실패", error);
-      toast.error(t("sendFailed"));
+      toast.error(
+        t(isOtherDeviceError(error) ? "lock.description" : "sendFailed"),
+      );
       return false;
     }
-    if (!result.ok) {
-      toast.error(t(REASON_KEY[result.reason]));
-      pendingMessage.current = null;
-      return false;
-    }
-    pendingMessage.current = null;
     return true;
   }
 
   /**
-   * 파일을 모두 올린 뒤 첨부 메시지를 한 번에 저장해 대화에 한꺼번에 나타나게 함. 실패하면 false이고, 같은
-   * 파일들로 다시 부르면 이미 올린 것은 다시 올리지 않고 같은 messageId로 이어서 보냄.
+   * 파일을 하나씩 올리고 첨부 메시지로 보냄. 실패하면 false이고, 같은 파일들로 다시 부르면 이미 올린 것은
+   * 다시 올리지 않고 이미 보낸 것은 건너뜀.
    */
   async function sendFiles(files: readonly File[]): Promise<boolean> {
-    if (!target || threadIdx === undefined || files.length === 0) return false;
-    const messages = [];
+    if (threadIdx === undefined || files.length === 0) return false;
     for (const file of files) {
-      const kind = getAttachmentKind(file);
-      if (!kind) return false;
-      let pending = pendingFiles.current.get(file);
-      if (!pending) {
-        const [uploadError, uploaded] = await tryit(uploadInquiryAttachment)(
+      if (sentFiles.current.has(file)) continue;
+      if (!getAttachmentKind(file)) return false;
+      let uploaded = uploadedFiles.current.get(file);
+      if (!uploaded) {
+        const [uploadError, result] = await tryit(uploadInquiryAttachment)(
           file,
         );
         if (uploadError) {
@@ -311,40 +253,24 @@ export function useRealtimeConversation({
           toast.error(t("sendFailed"));
           return false;
         }
-        pending = { uploaded, id: newMessageId() };
-        pendingFiles.current.set(file, pending);
+        uploaded = result;
+        uploadedFiles.current.set(file, uploaded);
       }
-      messages.push({
-        auto: false,
-        attachmentIdx: pending.uploaded.attachmentIdx,
-        identifier: session.identifier,
-        isUserMessage: true,
-        body: pending.uploaded.url,
-        // 운영 앱이 video를 `이름.확장자`로 쪼개 읽으므로 확장자가 있는 이름을 둠.
-        fileName: pending.uploaded.fileName || file.name,
-        fileType: kind,
-        messageId: pending.id,
+      const [error] = await tryit(sendInquiryMessage)({
+        threadIdx,
+        body: uploaded.url,
+        attachmentIdx: uploaded.attachmentIdx,
       });
+      if (error) {
+        console.error("실시간 상담 첨부 전송 실패", error);
+        toast.error(
+          t(isOtherDeviceError(error) ? "lock.description" : "sendFailed"),
+        );
+        return false;
+      }
+      uploadedFiles.current.delete(file);
+      sentFiles.current.add(file);
     }
-    const [error, result] = await tryit(appendConsultationMessage)(
-      { ...target, threadIdx },
-      {
-        requireConnected: false,
-        lock: { owner, tabId: TAB_ID },
-        message: messages,
-      },
-    );
-    if (error) {
-      console.error("실시간 상담 첨부 전송 실패", error);
-      toast.error(t("sendFailed"));
-      return false;
-    }
-    if (!result.ok) {
-      toast.error(t(REASON_KEY[result.reason]));
-      for (const file of files) pendingFiles.current.delete(file);
-      return false;
-    }
-    for (const file of files) pendingFiles.current.delete(file);
     return true;
   }
 

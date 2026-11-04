@@ -62,9 +62,7 @@ describe("AttachmentTextField", () => {
     const big = new File(["x"], "big.pdf");
     Object.defineProperty(big, "size", { value: 30 * 1024 * 1024 + 1 });
     await user.upload(fileInput(), big);
-    expect(
-      await screen.findByText("문서 첨부파일 용량 초과"),
-    ).toBeInTheDocument();
+    expect(await screen.findByText("첨부파일 용량 초과")).toBeInTheDocument();
     expect(screen.queryByText("big.pdf")).not.toBeInTheDocument();
   });
 

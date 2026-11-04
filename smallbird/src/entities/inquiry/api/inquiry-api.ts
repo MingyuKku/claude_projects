@@ -1,12 +1,11 @@
-import { useCallback, useMemo } from "react";
+import { useCallback, useEffect, useMemo } from "react";
 import useSWR, { useSWRConfig } from "swr";
 import useSWRInfinite from "swr/infinite";
 
-import { ApiError, isApiError, serverApiV3 } from "@/shared/api";
+import { ApiError, deviceHeaders, isApiError, serverApiV3 } from "@/shared/api";
 import { ENV } from "@/shared/config";
 
 import { getAttachmentKind } from "../lib/attachment-rules";
-import { mergeRealtimeMessages } from "../lib/merge-realtime-messages";
 import {
   transformBuyerInquiryDetailToViewModel,
   transformBuyerInquiryToViewModel,
@@ -17,7 +16,6 @@ import {
   transformInquiryMessagesToViewModels,
   transformBigbirdInquiryDetailMessages,
   transformBigbirdInquiryListItemToViewModel,
-  transformInquiryThreadToViewModel,
 } from "../lib/transform-inquiry";
 import {
   bigbirdInquiryDetailSchema,
@@ -25,11 +23,11 @@ import {
   buyerInquiryDetailSchema,
   campaignTimelineSchema,
   buyerInquiryListSchema,
+  INQUIRY_SOURCE_TYPE,
   buyerInfluencerOptionsSchema,
   createInquiryThreadResultSchema,
   inquiryCampaignDetailSchema,
   inquiryCampaignListSchema,
-  inquiryThreadListSchema,
   inquiryUserSchema,
   purchaserQuestionInfoSchema,
   qnaDetailListSchema,
@@ -42,13 +40,14 @@ import {
   useBuyerAccountChanges,
   useInquirySummaryChanges,
 } from "./helpdesk-changes";
-import { useRealtimeConsultationMessages } from "./realtime-consultation-api";
 import { useCoalescedRefresh } from "./use-coalesced-refresh";
 import { useLiveInquiries } from "./use-live-inquiries";
 
 import type {
   BigbirdInquiryViewModel,
+  BuyerInquirySource,
   BuyerInquiryViewModel,
+  InquirySourceType,
   InquiryThread,
   RealtimeAlarm,
 } from "../model/schema";
@@ -330,29 +329,41 @@ export async function sendInquiryMessage({
   isAuto = false,
   attachmentIdx = null,
 }: SendInquiryMessageArgs) {
-  const response = await serverApiV3.post("/help/thread/message", {
-    threadIdx,
-    body,
-    attachmentIdx,
-    isAuto,
-  });
+  // 기기 헤더: 매칭된 실시간 채팅방은 매칭 당시 기기만 쓸 수 있음(다른 기기는 409, 가이드 2026-11-03 5번).
+  const response = await serverApiV3.post(
+    "/help/thread/message",
+    { threadIdx, body, attachmentIdx, isAuto },
+    { headers: deviceHeaders() },
+  );
   return ensureSucceeded(sendInquiryMessageResultSchema.parse(response))
     .threadIdx;
 }
 
 /**
- * 구매자 실시간 상담 종료(`PUT /v3/help/inquiry/{inquiryIdx}/realtime/finish`). 서버가 DB 종료와 Firestore
- * 상담 문서 종료를 함께 하므로 광고주는 Firestore에 직접 쓰지 않음.
+ * 구매자·인플루언서 실시간 요청 수락(`PUT /v3/help/inquiry/{inquiryIdx}/realtime/accept`). 서버가 계정 문서의
+ * `msgResponseDate`를 써서 연결로 보이고 3분 매칭 실패를 막음(백엔드 흐름도 프론트팀 가이드 2026-11-03).
  */
-export async function finishPurchaserRealtime(inquiryIdx: number) {
+export async function acceptInquiryRealtime(inquiryIdx: number) {
   const response = await serverApiV3.put(
-    `/help/inquiry/${inquiryIdx}/realtime/finish`,
+    `/help/inquiry/${inquiryIdx}/realtime/accept`,
+    undefined,
+    { headers: deviceHeaders() },
   );
   ensureSucceeded(simpleResultSchema.parse(response));
 }
 
+/**
+ * 문의 스레드 종료(`PUT /v3/help/thread/{threadIdx}`). 빅버드·구매자·인플루언서 문의 공용이며 서버가 DB와 상담 문서의
+ * `finishTime`을 함께 씀(백엔드 흐름도 프론트팀 가이드 2026-11-03).
+ */
 export async function closeBigbirdInquiry(threadIdx: number) {
-  const response = await serverApiV3.put(`/help/thread/${threadIdx}`);
+  const response = await serverApiV3.put(
+    `/help/thread/${threadIdx}`,
+    undefined,
+    {
+      headers: deviceHeaders(),
+    },
+  );
   ensureSucceeded(simpleResultSchema.parse(response));
 }
 
@@ -383,7 +394,7 @@ export function getAttachmentDownloadUrl(
 export type BuyerInquiryStatusFilter =
   "all" | "waiting" | "consulting" | "done";
 export interface BuyerInquiryFilters {
-  sourceType: "ALL" | "PURCHASER_QUESTION" | "PRODUCT_QNA";
+  sourceType: "ALL" | InquirySourceType;
   campaignIdx?: number;
   influencerThreadUserIdx?: number;
   /** 검색어(이름 또는 주문번호). 비어 있으면 검색하지 않음. */
@@ -397,8 +408,14 @@ export interface BuyerInquiryFilters {
  * 검색 입력은 하나라서 서버의 검색 기준(`searchType`)을 검색어로 정함. 숫자와 하이픈만 있으면 주문번호, 그 밖에는
  * 이름(2026-10-21 가정: 주문번호 형식은 코드로 확인하지 못했고, 이름에 숫자만 있는 경우는 없다고 봄).
  */
-export function toBuyerSearchType(keyword: string) {
-  return /^[0-9-]+$/.test(keyword) ? "orderNumber" : "name";
+export function toBuyerSearchType(
+  keyword: string,
+  sources: readonly BuyerInquirySource[] = ["purchaser", "qna"],
+) {
+  // 주문번호는 구매자 문의만 있음(인플루언서 문의·캠페인 Q&A는 항상 null, Swagger).
+  return sources.includes("purchaser") && /^[0-9-]+$/.test(keyword)
+    ? "orderNumber"
+    : "name";
 }
 
 const BUYER_STATUS_PARAM = {
@@ -411,12 +428,19 @@ const BUYER_STATUS_PARAM = {
 /** 한 번에 받는 문의 수. 목록 끝까지 스크롤하면 다음 쪽을 받음. */
 export const BUYER_INQUIRY_PAGE_SIZE = 20;
 
+/**
+ * 문의 목록 한 쪽. 인플루언서 문의 메뉴(`sources`에 influencer)는 전용 목록 `GET /v3/help/influencer-inquiry`
+ * (인플루언서 문의·캠페인 Q&A만, 요청·응답은 통합 목록과 같음)를 쓰고, 그 밖에는 `GET /v3/help/inquiry`.
+ */
 export async function fetchBuyerInquiryPage(
   status: BuyerInquiryStatusFilter,
   page: number,
   filters: BuyerInquiryFilters = { sourceType: "ALL" },
+  sources?: readonly BuyerInquirySource[],
 ) {
-  const response = await serverApiV3.get("/help/inquiry", {
+  const isInfluencerMenu = sources?.includes("influencer") ?? false;
+  const url = isInfluencerMenu ? "/help/influencer-inquiry" : "/help/inquiry";
+  const response = await serverApiV3.get(url, {
     params: {
       status: BUYER_STATUS_PARAM[status],
       sourceType: filters.sourceType,
@@ -428,7 +452,7 @@ export async function fetchBuyerInquiryPage(
         : { influencerThreadUserIdx: filters.influencerThreadUserIdx }),
       ...(filters.keyword
         ? {
-            searchType: toBuyerSearchType(filters.keyword),
+            searchType: toBuyerSearchType(filters.keyword, sources),
             keyword: filters.keyword,
           }
         : {}),
@@ -442,18 +466,28 @@ export async function fetchBuyerInquiryPage(
   const { list, pagingInfo } = ensureSucceeded(
     buyerInquiryListSchema.parse(response),
   );
+  // ponytail: 통합 목록의 `ALL`은 두 메뉴 권한을 다 가진 계정에 인플루언서 행도 섞어 주므로 받은 뒤 이 메뉴 출처만 남김.
+  // 구매자 메뉴 전용 목록이 생기면 지움.
+  const inquiries = list.map(transformBuyerInquiryToViewModel);
   return {
-    inquiries: list.map(transformBuyerInquiryToViewModel),
+    inquiries:
+      sources && !isInfluencerMenu
+        ? inquiries.filter((inquiry) => sources.includes(inquiry.source))
+        : inquiries,
     page: pagingInfo.page,
     totalPage: pagingInfo.totalPage,
     totalCount: pagingInfo.totalCount,
   };
 }
 
-/** 구매자 문의 + 상품 Q&A 통합 목록. 탭(상태)이 바뀌면 처음 쪽부터 다시 받음. */
+/**
+ * 구매자 문의·인플루언서 문의 메뉴의 통합 목록. 탭(상태)이 바뀌면 처음 쪽부터 다시 받음.
+ * `sources`는 이 메뉴가 보여 줄 출처. `sourceType=ALL`이면 서버가 다른 메뉴 유형도 섞어 주므로 걸러 냄.
+ */
 export function useBuyerInquiries(
   status: BuyerInquiryStatusFilter,
-  filters: BuyerInquiryFilters = { sourceType: "ALL" },
+  filters: BuyerInquiryFilters,
+  sources: readonly BuyerInquirySource[],
   /** 목록의 구매자가 실시간 상담을 새로 요청했을 때(크롬 알림용). */
   onRealtimeAlarm?: (threadUserIdx: number, alarm: RealtimeAlarm) => void,
 ) {
@@ -464,6 +498,7 @@ export function useBuyerInquiries(
           ? null
           : [
               "buyer-inquiries",
+              sources.join(),
               status,
               filters.sourceType,
               filters.campaignIdx,
@@ -475,6 +510,7 @@ export function useBuyerInquiries(
             ],
       ([
         ,
+        ,
         filter,
         sourceType,
         campaignIdx,
@@ -485,6 +521,7 @@ export function useBuyerInquiries(
         page,
       ]: readonly [
         string,
+        string,
         BuyerInquiryStatusFilter,
         BuyerInquiryFilters["sourceType"],
         number | undefined,
@@ -494,14 +531,19 @@ export function useBuyerInquiries(
         string | undefined,
         number,
       ]) =>
-        fetchBuyerInquiryPage(filter, page, {
-          sourceType,
-          campaignIdx,
-          influencerThreadUserIdx,
-          keyword,
-          startDate,
-          endDate,
-        }),
+        fetchBuyerInquiryPage(
+          filter,
+          page,
+          {
+            sourceType,
+            campaignIdx,
+            influencerThreadUserIdx,
+            keyword,
+            startDate,
+            endDate,
+          },
+          sources,
+        ),
       { revalidateFirstPage: true },
     );
   const last = data?.[data.length - 1];
@@ -528,6 +570,11 @@ export function useBuyerInquiries(
     refresh,
     onRealtimeAlarm,
   );
+  // 구매자 메뉴에서 받은 쪽이 인플루언서 행뿐이면 보이는 행이 없어 목록 끝 감지가 일어나지 않으므로, 보일 행이 나오거나 끝날 때까지 이어 받음.
+  const isLastPageHidden = last !== undefined && last.inquiries.length === 0;
+  useEffect(() => {
+    if (hasMore && isLastPageHidden && !isValidating) void setSize(size + 1);
+  }, [hasMore, isLastPageHidden, isValidating, setSize, size]);
   return {
     inquiries,
     isLoading,
@@ -539,10 +586,10 @@ export function useBuyerInquiries(
   };
 }
 
-/** 구매자 문의·상품 Q&A 상세 패널(`GET /v3/help/inquiry/{inquiryIdx}`). `sourceType`은 목록 행의 값 그대로. */
+/** 문의 상세 패널(`GET /v3/help/inquiry/{inquiryIdx}`). `sourceType`은 목록 행의 값 그대로. */
 export async function fetchBuyerInquiryDetail(
   inquiryIdx: number,
-  sourceType: "PURCHASER_QUESTION" | "PRODUCT_QNA",
+  sourceType: InquirySourceType,
 ) {
   const response = await serverApiV3.get(`/help/inquiry/${inquiryIdx}`, {
     params: { sourceType },
@@ -600,97 +647,104 @@ export function useBuyerInquiryDetail(inquiry: BuyerInquiryViewModel) {
     () =>
       fetchBuyerInquiryDetail(
         inquiry.inquiryIdx,
-        inquiry.source === "qna" ? "PRODUCT_QNA" : "PURCHASER_QUESTION",
+        INQUIRY_SOURCE_TYPE[inquiry.source],
       ),
   );
   return { detail: data, isLoading, isError: Boolean(error), mutate };
 }
 
+const EMPTY_CONVERSATION = {
+  messages: [],
+  latestThreadIdx: null,
+  sequence: null,
+  isRealtime: false,
+};
+
 /**
- * 구매자 문의 대화(`GET /v3/help/thread?type=client`: 구매자↔광고주). 스레드 여럿의 메시지를 시간순으로 이어 붙임.
- * 명세상 404는 대화 내역이 없는 경우라 빈 목록으로 봄.
+ * 구매자·인플루언서 문의 대화: 캠페인 통합 타임라인(`GET /v3/help/inquiry/{purchaser|influencer}-campaign-timeline`).
+ * 캠페인에 걸린 스레드 전부와 실시간 구간을 서버가 시간순으로 합쳐 줌. `GET /v3/help/thread`는 실시간 구간이 빠져 쓰지
+ * 않음(Swagger 2026-11-04). 404는 빈 대화로 봄.
  */
-export async function fetchPurchaserConversation(
-  threadUserIdx: number,
-  campaignIdx: number | null,
+async function fetchTimelineConversation(
+  path: string,
+  params: Record<string, number>,
+  counterpartThreadUserIdx: number,
 ) {
   try {
-    const response = await serverApiV3.get("/help/thread", {
-      params: {
-        threadUserIdx,
-        type: "client",
-        ...(campaignIdx === null ? {} : { campaignIdx }),
-      },
-    });
-    const { data } = ensureSucceeded(inquiryThreadListSchema.parse(response));
-    const threads = data.map(transformInquiryThreadToViewModel);
-    const realtime = threads.find(
-      (thread) => thread.isRealtime && !thread.isFinished,
-    );
+    const response = await serverApiV3.get(path, { params });
+    const timeline = ensureSucceeded(campaignTimelineSchema.parse(response));
     return {
-      /** 진행 중인 실시간 상담 스레드. 메시지는 Firestore 상담 문서가 원본. */
-      realtimeThread: realtime
-        ? { threadIdx: realtime.threadIdx, sequence: realtime.sequence }
-        : null,
-      // 상담 기록 패널이 스레드(과거 상담)별로 보여 줌. 오래된 것부터.
-      threads: [...threads].sort(
-        (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
+      // 서버가 상대(구매자·인플루언서) 메시지를 isUserMessage true로 줌(stage 2026-11-03 인플루언서 실측, Swagger는 광고주가
+      // true). 값이 고쳐져도 맞도록 보낸 사람(userIdx)이 상대가 아니면 내 메시지로 봄. 실시간 구간은 userIdx가 없어 서버 값을 씀.
+      // ponytail: 실시간 구간의 방향은 stage 실데이터로 확인 전.
+      messages: transformInquiryMessagesToViewModels(
+        timeline.data,
+        (message) =>
+          message.userIdx === null
+            ? message.isUserMessage
+            : message.userIdx !== counterpartThreadUserIdx,
       ),
-      messages: threads
-        .flatMap((thread) => thread.messages)
-        .sort((a, b) => a.createdAt.getTime() - b.createdAt.getTime()),
-      // 답장을 보낼 스레드: 가장 최근에 만들어진 스레드(종료됐으면 서버가 새 스레드를 만들어 보냄).
-      latestThreadIdx:
-        [...threads].sort(
-          (a, b) => b.createdAt.getTime() - a.createdAt.getTime(),
-        )[0]?.threadIdx ?? null,
+      // 마지막 메시지의 스레드(종료됐으면 서버가 같은 스레드를 다시 열거나 새 스레드를 만들어 보냄).
+      latestThreadIdx: timeline.data.at(-1)?.threadIdx ?? null,
+      /** 가장 마지막 스레드의 상담 문서 ID. */
+      sequence: timeline.sequence ?? null,
+      /** 마지막 스레드가 실시간 상담 중인지. */
+      isRealtime: timeline.isBoardType === false && !timeline.finishTime,
     };
   } catch (error) {
-    if (isApiError(error) && error.status === 404)
-      return {
-        realtimeThread: null,
-        threads: [],
-        messages: [],
-        latestThreadIdx: null,
-      };
+    if (isApiError(error) && error.status === 404) return EMPTY_CONVERSATION;
     throw error;
   }
 }
 
+export function fetchPurchaserConversation(
+  campaignIdx: number,
+  purchaserThreadUserIdx: number,
+) {
+  return fetchTimelineConversation(
+    "/help/inquiry/purchaser-campaign-timeline",
+    { campaignIdx, purchaserThreadUserIdx },
+    purchaserThreadUserIdx,
+  );
+}
+
+export function fetchInfluencerConversation(
+  campaignIdx: number,
+  influencerThreadUserIdx: number,
+) {
+  return fetchTimelineConversation(
+    "/help/inquiry/influencer-campaign-timeline",
+    { campaignIdx, influencerThreadUserIdx },
+    influencerThreadUserIdx,
+  );
+}
+
+/** 구매자·인플루언서 문의 대화. 둘 다 항상 캠페인이 있음(Swagger). */
 export function usePurchaserConversation(inquiry: BuyerInquiryViewModel) {
-  const { threadUserIdx, campaignIdx } = inquiry;
+  const { threadUserIdx, campaignIdx, source } = inquiry;
   const { data, isLoading, error, mutate } = useSWR(
-    threadUserIdx === null
+    threadUserIdx === null || campaignIdx === null
       ? null
-      : ["purchaser-messages", threadUserIdx, campaignIdx],
-    () => fetchPurchaserConversation(threadUserIdx!, campaignIdx),
+      : [`${source}-messages`, threadUserIdx, campaignIdx],
+    () =>
+      source === "influencer"
+        ? fetchInfluencerConversation(campaignIdx!, threadUserIdx!)
+        : fetchPurchaserConversation(campaignIdx!, threadUserIdx!),
     // 열어 둔 사이에 온 메시지는 탭으로 돌아올 때 다시 받아 보여 줌(앱 전체 기본은 꺼져 있음).
     { revalidateOnFocus: true },
   );
-  const realtimeThread = data?.realtimeThread ?? null;
-  // 진행 중인 실시간 상담은 구매자 계정의 Firestore 상담 문서가 원본(REST 메시지는 늦거나 빔).
-  const realtime = useRealtimeConsultationMessages(
-    threadUserIdx ?? 0,
-    threadUserIdx === null ? undefined : realtimeThread?.sequence,
-    realtimeThread?.threadIdx ?? 0,
-  );
-  const messages = useMemo(() => {
-    if (!data || !realtimeThread || !realtime.messages) return data?.messages;
-    return mergeRealtimeMessages(
-      data.threads,
-      realtimeThread.threadIdx,
-      realtime.messages,
-    );
-  }, [data, realtimeThread, realtime.messages]);
   return {
-    messages,
-    /** 같은 구매자와의 과거 상담(스레드)들. 상담 기록 패널에 씀. */
-    threads: data?.threads,
-    /** 답장을 보낼 스레드. 대화 내역이 없으면 null이라 보낼 수 없음. */
-    threadIdx: data?.latestThreadIdx ?? null,
-    realtimeThread,
-    isLoading: isLoading || realtime.isLoading,
-    isError: Boolean(error) || realtime.isError,
+    messages: data?.messages,
+    /**
+     * 답장을 보낼 스레드. 구매자 문의는 목록 행 번호(= 가장 최근 스레드 번호)로 보냄. 끝난 스레드면 서버가 같은 스레드를
+     * 다시 열고(캠페인 문의) 실시간 중이면 그 스레드에 이어 쌓임. 대화 내역이 없으면 null이라 보낼 수 없음.
+     */
+    threadIdx:
+      source === "purchaser"
+        ? inquiry.inquiryIdx
+        : (data?.latestThreadIdx ?? null),
+    isLoading,
+    isError: Boolean(error),
     mutate,
   };
 }

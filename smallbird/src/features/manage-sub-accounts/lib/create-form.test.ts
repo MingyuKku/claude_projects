@@ -121,10 +121,26 @@ describe("canEditSubAccount", () => {
   const check = (
     values: CreateFormValues,
     status: "idle" | "available" = "idle",
-  ) => canEditSubAccount(values, initial, validateCreateForm(values), status);
+    hasPickedImage = false,
+  ) =>
+    canEditSubAccount({
+      values,
+      initial,
+      errors: validateCreateForm(values),
+      idStatus: status,
+      hasPickedImage,
+    });
 
   it("아무것도 바꾸지 않았으면 저장할 수 없다", () => {
     expect(check(initial)).toBe(false);
+  });
+
+  it("프로필 이미지만 새로 골라도 저장할 수 있다", () => {
+    expect(check(initial, "idle", true)).toBe(true);
+  });
+
+  it("이미지를 골랐어도 입력 오류가 있으면 저장할 수 없다", () => {
+    expect(check({ ...initial, email: "wrong" }, "idle", true)).toBe(false);
   });
 
   it("담당자명이나 이메일만 바꿔도 저장할 수 있다(비밀번호·아이디 확인 불필요)", () => {

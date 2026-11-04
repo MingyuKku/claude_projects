@@ -19,14 +19,14 @@ export function formatListDate(value: Date) {
   });
 }
 
-/** 대화 날짜 구분 (예: 26. 9. 8. (화)) */
+/**
+ * 대화 날짜 구분 (예: 26.9.8 (화)). Figma 표기를 모든 언어에 같은 모양으로 쓰고 요일만 현재 언어로 씀
+ * (사용자 결정 2026-11-03, 10/22 Intl 표기 유지 결정을 대체).
+ */
 export function formatDividerDate(value: Date) {
-  return formatDate(value, {
-    year: "2-digit",
-    month: "numeric",
-    day: "numeric",
-    weekday: "short",
-  });
+  const year = String(value.getFullYear() % 100).padStart(2, "0");
+  const weekday = formatDate(value, { weekday: "short" });
+  return `${year}.${value.getMonth() + 1}.${value.getDate()} (${weekday})`;
 }
 
 export function formatMessageTime(value: Date) {

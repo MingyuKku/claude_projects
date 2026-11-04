@@ -23,6 +23,7 @@ vi.mock("@/shared/lib/useMediaQuery", () => ({
     mocks.width >= Number(/\d+/.exec(query)?.[0]),
 }));
 vi.mock("@/widgets/buyer-inquiry-workspace", () => ({
+  INQUIRY_MENU: { buyer: { sources: ["purchaser", "qna"] } },
   toBuyerStatusFilter: () => "all",
   toBuyerInquiryFilters: () => ({ sourceType: "ALL" }),
   BuyerInquiryWorkspace: ({

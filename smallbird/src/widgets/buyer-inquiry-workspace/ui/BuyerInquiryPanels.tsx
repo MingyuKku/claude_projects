@@ -1,15 +1,16 @@
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { tryit } from "radash";
 import { useState } from "react";
-import { useNavigate, useSearchParams } from "react-router";
+import { useLocation, useNavigate, useSearchParams } from "react-router";
 import { toast } from "sonner";
 
 import {
-  finishPurchaserRealtime,
+  closeBigbirdInquiry,
+  useConsultationSync,
+  isOtherDeviceError,
   useInquiryUserImage,
   usePurchaserConversation,
 } from "@/entities/inquiry";
-import { ROUTES } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
 import { Avatar, AvatarImage, AvatarPlaceholder } from "@/shared/ui/avatar";
@@ -18,6 +19,12 @@ import { Button } from "@/shared/ui/button";
 import { ScrollArea } from "@/shared/ui/scroll-area";
 
 import { STATUS_BADGE_VARIANT } from "../lib/format";
+import { INQUIRY_MENU, isQnaSource, toInquiryMenu } from "../model/menu";
+import {
+  getRealtimeInquiryIdx,
+  isOpenedByUser,
+} from "../model/realtime-inquiry-idx";
+import { useAcceptRealtimeOnOpen } from "../model/useAcceptRealtimeOnOpen";
 import { BuyerConversation } from "./BuyerConversation";
 import { BuyerInquiryDetailPanel } from "./BuyerInquiryDetailPanel";
 import { BuyerReplyComposer } from "./BuyerReplyComposer";
@@ -33,23 +40,35 @@ interface BuyerInquiryPanelsProps {
   inquiry: BuyerInquiryViewModel;
   /** 상세 패널이 캠페인 이미지·이름을 광고주의 캠페인 목록에서 찾을 때 씀(세션 값). */
   threadUserIdx?: number;
-  /** 실시간 상담 메시지에 남길 광고주 계정 id(세션 값). */
-  identifier?: string;
+  /** 상담 종료처럼 목록의 상태가 바뀐 뒤 목록을 다시 받을 때 부름. */
+  onChangeStatus?: () => void;
 }
 
-/** 구매자 문의 대화(구매자 문의 스레드·상품 Q&A)와 상세 정보 패널. */
+/** 문의 대화(구매자·인플루언서 문의 스레드, 상품·캠페인 Q&A)와 상세 정보 패널. */
 export function BuyerInquiryPanels({
   inquiry,
   threadUserIdx,
-  identifier,
+  onChangeStatus,
 }: BuyerInquiryPanelsProps) {
   const { t } = useTranslation("widgets/buyer-inquiry-workspace");
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
   const panel = searchParams.get("panel");
   const writerName = inquiry.writerName ?? t("unknownWriter");
-  // 구매자 문의만 문의자 번호가 있음(상품 Q&A는 null이라 기본 아바타).
+  // 스레드 문의만 문의자 번호가 있음(Q&A는 null이라 기본 아바타).
   const avatarSrc = useInquiryUserImage(inquiry.threadUserIdx);
+  const realtimeInquiryIdx = getRealtimeInquiryIdx(inquiry);
+  // 상담 중이면 상담 문서를 구독해 새 메시지·연결·종료를 받고, 이미 연결된 상담은 다시 수락하지 않음.
+  const { connection, isOtherDevice } = useConsultationSync(
+    inquiry,
+    onChangeStatus,
+  );
+  // 자동 선택으로 열린 첫 행은 수락하지 않고, 사용자가 직접 연 문의만 수락함.
+  const { state } = useLocation();
+  useAcceptRealtimeOnOpen(
+    isOpenedByUser(state) ? realtimeInquiryIdx : null,
+    connection,
+  );
 
   function setPanel(value: "detail" | null) {
     setSearchParams((params) => {
@@ -63,7 +82,7 @@ export function BuyerInquiryPanels({
     const params = new URLSearchParams(searchParams);
     params.delete("panel");
     void navigate({
-      pathname: ROUTES.customerCenterBuyer,
+      pathname: INQUIRY_MENU[toInquiryMenu(inquiry.source)].listRoute,
       search: params.toString(),
     });
   }
@@ -100,8 +119,12 @@ export function BuyerInquiryPanels({
           <strong className="-my-0.5 min-w-0 flex-1 truncate py-0.5 text-base leading-none font-semibold">
             {writerName}
           </strong>
-          {inquiry.source === "purchaser" && (
-            <RealtimeFinishButton inquiry={inquiry} />
+          {realtimeInquiryIdx !== null && (
+            <RealtimeFinishButton
+              inquiry={inquiry}
+              inquiryIdx={realtimeInquiryIdx}
+              onFinished={onChangeStatus}
+            />
           )}
         </div>
         <Button
@@ -118,17 +141,13 @@ export function BuyerInquiryPanels({
         className={cn("min-h-0 flex-1 bg-muted", SCROLL_VIEWPORT_FIX)}
       >
         <div className="flex min-h-full flex-col p-4 tablet:p-5">
-          <BuyerConversation inquiry={inquiry} identifier={identifier} />
+          <BuyerConversation inquiry={inquiry} isOtherDevice={isOtherDevice} />
         </div>
       </ScrollArea>
-      {/* 상품 Q&A는 답변 입력이 대화 안에 있습니다. */}
+      {/* Q&A는 답변 입력이 대화 안에 있습니다. */}
       {/* key로 문의마다 입력 중인 글·첨부를 분리함. 없으면 A에 쓰던 내용이 B로 오발송될 수 있음. */}
-      {inquiry.source === "purchaser" && (
-        <BuyerReplyComposer
-          key={inquiry.key}
-          inquiry={inquiry}
-          identifier={identifier}
-        />
+      {!isQnaSource(inquiry.source) && (
+        <BuyerReplyComposer key={inquiry.key} inquiry={inquiry} />
       )}
     </section>
   );
@@ -178,31 +197,40 @@ export function BuyerInquiryPanels({
 }
 
 /**
- * 진행 중인 구매자 실시간 상담의 종료 버튼. 광고주는 시작 없이 수락·종료만 함(2026-11-02 사용자 결정).
- * 시간 초과 종료는 백엔드 스케줄러가 하므로 프론트 타이머는 없음.
+ * 진행 중인 구매자·인플루언서 실시간 상담의 종료 버튼(`PUT /v3/help/thread/{threadIdx}`, 가이드 2026-11-03).
+ * 문의 번호가 스레드 번호와 같음. 시간 초과 종료는 백엔드 스케줄러가 하므로 프론트 타이머는 없음.
  */
-function RealtimeFinishButton({ inquiry }: { inquiry: BuyerInquiryViewModel }) {
+function RealtimeFinishButton({
+  inquiry,
+  inquiryIdx,
+  onFinished,
+}: {
+  inquiry: BuyerInquiryViewModel;
+  /** 진행 중인 실시간 상담의 문의 번호(getRealtimeInquiryIdx). */
+  inquiryIdx: number;
+  onFinished?: () => void;
+}) {
   const { t } = useTranslation("widgets/buyer-inquiry-workspace");
-  const { realtimeThread, mutate } = usePurchaserConversation(inquiry);
+  const { mutate } = usePurchaserConversation(inquiry);
   const [isFinishing, setIsFinishing] = useState(false);
 
-  if (!realtimeThread) return null;
-
   async function handleClickFinish() {
-    if (!realtimeThread) return;
     setIsFinishing(true);
-    // 같은 구매자·캠페인의 대화는 한 화면에 합쳐 보여서 열어 둔 문의가 진행 중인 상담이 아닐 수 있음.
-    // 구매자 문의는 문의 번호가 스레드 번호와 같아(stage 확인 2026-11-02) 진행 중인 스레드 번호로 종료함.
-    const [error] = await tryit(finishPurchaserRealtime)(
-      realtimeThread.threadIdx,
-    );
+    const [error] = await tryit(closeBigbirdInquiry)(inquiryIdx);
     setIsFinishing(false);
     if (error) {
       console.error("구매자 실시간 상담 종료 실패", error);
-      toast.error(t("realtime.endFailed"));
+      toast.error(
+        t(
+          isOtherDeviceError(error)
+            ? "realtime.otherDevice"
+            : "realtime.endFailed",
+        ),
+      );
       return;
     }
     void mutate();
+    onFinished?.();
   }
 
   return (

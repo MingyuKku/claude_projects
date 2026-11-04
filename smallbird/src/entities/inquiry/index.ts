@@ -7,7 +7,7 @@ export {
   editInquiryMessage,
   editQnaReply,
   getAttachmentDownloadUrl,
-  finishPurchaserRealtime,
+  acceptInquiryRealtime,
   sendInquiryMessage,
   uploadInquiryAttachment,
   useBigbirdInquiries,
@@ -49,30 +49,31 @@ export { InquiryUploadStatus } from "./ui/InquiryUploadStatus";
 export { groupAttachments } from "./lib/group-attachments";
 export type { ConversationRow } from "./lib/group-attachments";
 export {
-  abortConsultationClose,
-  acceptRealtimeRequest,
   acquireConsultationLock,
-  appendConsultationMessage,
-  cancelRealtimeRequest,
-  closeConsultation,
-  createRealtimeRequest,
-  finishConsultationClose,
-  markRealtimeRequestExpired,
-  newMessageId,
   releaseConsultationLock,
-  retryRealtimeRequest,
   TAB_ID,
+  updateHelpdeskAccount,
 } from "./api/realtime-consultation-write";
-export { createRealtimeThread } from "./api/realtime-request-api";
+export type { HelpdeskAccountFields } from "./api/realtime-consultation-write";
+export { useConsultationSync } from "./api/use-consultation-sync";
+export type { ConsultationConnection } from "./api/use-consultation-sync";
+export {
+  createRealtimeThread,
+  startThreadRealtime,
+} from "./api/realtime-request-api";
 export {
   buildRequestAlarm,
   formatWriteTime,
   LOCK_REFRESH_MS,
   LOCK_TTL_MS,
 } from "./lib/consultation-write";
-export { useRealtimeConsultationMessages } from "./api/realtime-consultation-api";
+export {
+  useConsultationDocument,
+  useRealtimeConsultationMessages,
+} from "./api/realtime-consultation-api";
 export {
   applyRealtimeConsultation,
+  isMatchFailureShown,
   getConnectDeadline,
   getIdleTurn,
   REALTIME_IDLE_LIMIT_MS,
@@ -89,6 +90,7 @@ export {
 } from "./lib/transform-inquiry";
 export {
   campaignCardSchema,
+  INQUIRY_SOURCE_TYPE,
   createInquiryThreadResultSchema,
   inquiryCampaignListSchema,
   inquiryThreadListSchema,
@@ -101,6 +103,7 @@ export type {
   BigbirdInquiryViewModel,
   BuyerInquirySource,
   BuyerInquiryStatus,
+  InquirySourceType,
   BuyerInquiryDetailViewModel,
   BuyerInquiryViewModel,
   BuyerProductViewModel,
@@ -112,3 +115,4 @@ export type {
   InquiryMessageKind,
   InquiryMessageViewModel,
 } from "./model/schema";
+export { isOtherDeviceError } from "./lib/other-device";

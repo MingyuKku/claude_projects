@@ -1,9 +1,9 @@
 import type {
   AccountMaster,
   CompanyInfoViewModel,
-  AccountProfileViewModel,
   MasterAccountViewModel,
   SubSelfAccount,
+  SubSelfAccountViewModel,
 } from "../model/mypage-schema";
 
 /** 서버 날짜 형식은 `yyyy-MM-dd HH:mm`(시간대 표기 없음). 로컬 시각으로 읽음. */
@@ -49,16 +49,19 @@ export function transformMasterToViewModel(
   };
 }
 
-/** Sub ID 본인 정보. 응답에 가입일이 없어 비워 두고, Sub는 본인인증을 쓰지 않아 `certIdx`가 없음. */
+/** Sub ID 본인 정보. Sub는 본인인증을 쓰지 않아 `certIdx`가 없음. */
 export function transformSubSelfToViewModel(
   account: SubSelfAccount,
-): AccountProfileViewModel {
+): SubSelfAccountViewModel {
   return {
-    identifier: account.identifier,
-    name: account.name,
-    phone: account.phone,
-    email: account.email,
-    joinedAt: null,
-    certIdx: null,
+    profile: {
+      identifier: account.identifier,
+      name: account.name,
+      phone: account.phone,
+      email: account.email,
+      joinedAt: parseServerDate(account.created),
+      certIdx: null,
+    },
+    profileImageUrl: account.profileImageUrl || null,
   };
 }

@@ -11,6 +11,7 @@ const ALL_PERMISSIONS: MenuPermissions = {
   commerce: true,
   bigbirdMoney: true,
   purchaserQuestion: true,
+  influencerQuestion: true,
 };
 
 function toMenuPermissions(session: Session): MenuPermissions {
@@ -22,6 +23,7 @@ function toMenuPermissions(session: Session): MenuPermissions {
     commerce: session.isCommerceAccess ?? false,
     bigbirdMoney: session.isBigbirdMoneyAccess ?? false,
     purchaserQuestion: session.isPurchaserQuestionAccess ?? false,
+    influencerQuestion: session.isInfluencerQuestionAccess ?? false,
   };
 }
 

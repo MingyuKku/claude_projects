@@ -119,7 +119,7 @@ describe("EditableChatMessage", () => {
     expect(onChanged).toHaveBeenCalledOnce();
   });
 
-  it("이미 읽혀 409면 안내하고 최신 상태를 다시 받는다", async () => {
+  it("이미 읽혀 409면 안내 없이 최신 상태를 다시 받는다", async () => {
     const user = userEvent.setup();
     vi.mocked(serverApiV3.put).mockRejectedValue(new ApiError(409, {}));
     const onChanged = renderMessage();
@@ -127,9 +127,7 @@ describe("EditableChatMessage", () => {
     await user.click(screen.getByRole("button", { name: "수정" }));
     await user.type(screen.getByRole("textbox"), "!");
     await user.click(screen.getByRole("button", { name: "완료" }));
-    expect(toast.error).toHaveBeenCalledWith(
-      "상대가 읽은 메시지는 수정·삭제할 수 없습니다.",
-    );
+    expect(toast.error).not.toHaveBeenCalled();
     expect(onChanged).toHaveBeenCalledOnce();
   });
 

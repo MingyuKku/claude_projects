@@ -44,6 +44,7 @@ function inquiry(
     writeTime: new Date("2026-10-01T10:00"),
     threadUserIdx: 77,
     userIdx: null,
+    sequence: null,
     preview: "배송이 언제 되나요?",
     lastActivityAt: new Date("2026-10-01T10:00"),
     hasUnread: false,
@@ -61,9 +62,13 @@ function renderWorkspace(
   const router = createMemoryRouter(
     [
       {
-        path: ROUTES.customerCenterBuyerThread,
+        path:
+          props.menu === "influencer"
+            ? ROUTES.customerCenterInfluencerThread
+            : ROUTES.customerCenterBuyerThread,
         element: (
           <BuyerInquiryWorkspace
+            menu="buyer"
             inquiries={[inquiry()]}
             isLoading={false}
             isError={false}
@@ -150,6 +155,37 @@ describe("구매자 문의 목록", () => {
     expect(router.state.location.search).toBe("?status=waiting");
   });
 
+  it("인플루언서 문의 메뉴는 인플루언서 경로로 이동하고 필터 유형이 인플루언서 문의·캠페인 Q&A다", async () => {
+    const user = userEvent.setup();
+    const router = renderWorkspace(
+      {
+        menu: "influencer",
+        inquiries: [
+          inquiry({
+            key: "influencer-601",
+            inquiryIdx: 601,
+            source: "influencer",
+            orderNumber: null,
+          }),
+        ],
+      },
+      ROUTES.customerCenterInfluencer,
+    );
+    expect(screen.getByText("인플루언서 문의")).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: /@김하루/ }));
+    expect(router.state.location.pathname).toBe(
+      "/customer-center/influencer/influencer-601",
+    );
+    await user.click(screen.getByRole("button", { name: "필터" }));
+    const dialog = screen.getByRole("dialog");
+    expect(
+      within(dialog).getByRole("button", { name: "캠페인 Q&A" }),
+    ).toBeInTheDocument();
+    expect(
+      within(dialog).queryByRole("button", { name: "상품 Q&A" }),
+    ).not.toBeInTheDocument();
+  });
+
   it("탭을 누르면 URL의 status만 바꾼다(전체는 지운다)", async () => {
     const user = userEvent.setup();
     const router = renderWorkspace();
@@ -223,7 +259,7 @@ describe("구매자 문의 목록", () => {
       `${ROUTES.customerCenterBuyer}?q=${encodeURIComponent("없는이름")}`,
     );
     expect(
-      screen.getByText("'없는이름'에 대한 결과가 없습니다."),
+      screen.getByText("‘없는이름’에 대한 결과가 없습니다."),
     ).toBeInTheDocument();
   });
 });

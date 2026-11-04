@@ -6,6 +6,13 @@ describe("parseAmount", () => {
     expect(parseAmount("1a2b3")).toBe(123);
   });
 
+  it("소수점 뒤는 버리고 정수부만 읽는다", () => {
+    expect(parseAmount("100000.5")).toBe(100000);
+    expect(parseAmount("100,000.99")).toBe(100000);
+    expect(parseAmount("1.000.000")).toBe(1);
+    expect(parseAmount(".5")).toBeNull();
+  });
+
   it("비었거나 0이면 입력 없음이다", () => {
     expect(parseAmount("")).toBeNull();
     expect(parseAmount("0")).toBeNull();

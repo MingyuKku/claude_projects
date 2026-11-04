@@ -1,6 +1,10 @@
 import { useState } from "react";
 
-import { isBillingPeriod, SubscriptionPlanCard } from "@/entities/subscription";
+import {
+  getSubscribedTypes,
+  isBillingPeriod,
+  SubscriptionPlanCard,
+} from "@/entities/subscription";
 import { ToggleTab } from "@/shared/components/toggle-tab";
 import { useTranslation } from "@/shared/i18n";
 
@@ -34,7 +38,7 @@ export function SubscriptionPlanList({
     ReadonlySet<SubscriptionProductType>
   >(new Set());
   const cardListRef = useEqualCollapsedHeight<HTMLDivElement>();
-  const subscribedTypes = new Set(subscriptions.map((item) => item.type));
+  const subscribedTypes = getSubscribedTypes(subscriptions);
 
   function toggleDetail(type: SubscriptionProductType) {
     setExpanded((prev) => {

@@ -1,4 +1,9 @@
-import { ApiError, serverApi, serverApiV3 } from "@/shared/api";
+import {
+  ApiError,
+  revokeFirebaseToken,
+  serverApi,
+  serverApiV3,
+} from "@/shared/api";
 
 import { fetchSession, formLogin, logout } from "./session-api";
 
@@ -8,6 +13,7 @@ vi.mock("@/shared/api", async (importOriginal) => {
     ...actual,
     serverApi: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn() },
     serverApiV3: { get: vi.fn() },
+    revokeFirebaseToken: vi.fn(async () => {}),
   };
 });
 
@@ -76,6 +82,8 @@ describe("logout", () => {
       vi.fn().mockResolvedValue({ type: "opaqueredirect" }),
     );
     await expect(logout()).resolves.toBeUndefined();
+    // 세션이 살아 있을 때 이 기기의 채팅방 잠금부터 풂(가이드 2026-11-03 5번)
+    expect(revokeFirebaseToken).toHaveBeenCalledOnce();
   });
 
   it.each([200, 401, 500])(

@@ -2,6 +2,8 @@ import useSWRSubscription from "swr/subscription";
 
 import { getFirestoreDb } from "@/shared/api";
 
+import { isOtherDeviceError } from "../lib/other-device";
+import { parseWriteTime } from "../lib/realtime-phase";
 import { transformRealtimeConsultationMessages } from "../lib/transform-inquiry";
 import { realtimeConsultationSchema } from "../model/schema";
 
@@ -9,6 +11,15 @@ import type {
   InquiryMessageViewModel,
   RealtimeConsultation,
 } from "../model/schema";
+
+// 같은 화면에서 상담 문서·계정 문서 구독이 동시에 시작돼 SDK 모듈을 한 번만 불러옴.
+const importFirestore = () => import("firebase/firestore");
+let firestoreModule: ReturnType<typeof importFirestore> | undefined;
+
+function loadFirestore() {
+  firestoreModule ??= importFirestore();
+  return Promise.all([getFirestoreDb(), firestoreModule]);
+}
 
 interface ConsultationTarget {
   sequence: number;
@@ -26,10 +37,7 @@ async function watchConsultation(
   onData: (consultation: RealtimeConsultation) => void,
   onError: (error: Error) => void,
 ): Promise<() => void> {
-  const [db, { doc, onSnapshot }] = await Promise.all([
-    getFirestoreDb(),
-    import("firebase/firestore"),
-  ]);
+  const [db, { doc, onSnapshot }] = await loadFirestore();
   let isClosed = false;
   const unsubscribe = onSnapshot(
     doc(
@@ -122,6 +130,64 @@ export function useRealtimeConsultationMessages(
     messages: data,
     isLoading: sequence !== undefined && data === undefined && !error,
     isError: Boolean(error),
+    /** 다른 기기가 이 채팅방을 쥐고 있어 읽기가 막힘(채팅방 잠금). */
+    isOtherDevice: isOtherDeviceError(error),
+  };
+}
+
+type DocumentKey = readonly [
+  "realtime-consultation-document",
+  number,
+  number,
+  number,
+];
+
+/**
+ * 상담 문서 하나를 있는 그대로 구독함(구매자·인플루언서 문의의 연결 판단·변경 신호용). `sequence`가 없으면 구독하지 않음.
+ * 문서를 읽지 못하면(없음·권한) `isError`이고, 다른 기기가 방을 쥐어 권한이 막힌 경우는 `isOtherDevice`.
+ */
+export function useConsultationDocument(
+  threadUserIdx: number,
+  sequence: number | undefined,
+  threadIdx: number,
+) {
+  const key: DocumentKey | null =
+    sequence === undefined
+      ? null
+      : ["realtime-consultation-document", threadUserIdx, sequence, threadIdx];
+  const { data, error } = useSWRSubscription<
+    RealtimeConsultation,
+    Error,
+    DocumentKey | null
+  >(key, ([, userIdx, selectedSequence, selectedThreadIdx], { next }) => {
+    let isDisposed = false;
+    let unsubscribe: (() => void) | undefined;
+    void watchConsultation(
+      userIdx,
+      { sequence: selectedSequence, threadIdx: selectedThreadIdx },
+      (consultation) => next(null, consultation),
+      (cause) => {
+        console.error("상담 문서 구독 오류", selectedSequence, cause);
+        next(cause);
+      },
+    )
+      .then((stop) => {
+        if (isDisposed) stop();
+        else unsubscribe = stop;
+      })
+      .catch((cause: unknown) => {
+        if (!isDisposed) next(toError(cause));
+      });
+    return () => {
+      isDisposed = true;
+      unsubscribe?.();
+    };
+  });
+  return {
+    consultation: data,
+    isLoading: sequence !== undefined && data === undefined && !error,
+    isError: Boolean(error),
+    isOtherDevice: isOtherDeviceError(error),
   };
 }
 
@@ -180,4 +246,42 @@ export function useRealtimeConsultationStates(
     };
   });
   return data ?? {};
+}
+
+type AccountKey = readonly ["helpdesk-account-response", number];
+
+/**
+ * 요청자 계정 문서(`helpdesk/0.0.2/threadUserIdx/{내}`)의 `msgResponseDate`를 ms로 구독함. 실시간 연결 판단용이라
+ * 진행 중인 실시간 상담이 있을 때만 구독함. 값이 없거나 읽지 못하면 null.
+ */
+export function useAccountResponseAt(threadUserIdx: number, enabled: boolean) {
+  const key: AccountKey | null = enabled
+    ? ["helpdesk-account-response", threadUserIdx]
+    : null;
+  const { data } = useSWRSubscription<number | null, Error, AccountKey | null>(
+    key,
+    ([, userIdx], { next }) => {
+      let isDisposed = false;
+      let unsubscribe: (() => void) | undefined;
+      const handleError = (cause: unknown) => {
+        if (!isDisposed) console.error("계정 문서 구독 실패", userIdx, cause);
+      };
+      void loadFirestore()
+        .then(([db, { doc, onSnapshot }]) => {
+          if (isDisposed) return;
+          unsubscribe = onSnapshot(
+            doc(db, "helpdesk", "0.0.2", "threadUserIdx", String(userIdx)),
+            (snapshot) =>
+              next(null, parseWriteTime(snapshot.get("msgResponseDate"))),
+            handleError,
+          );
+        })
+        .catch(handleError);
+      return () => {
+        isDisposed = true;
+        unsubscribe?.();
+      };
+    },
+  );
+  return data ?? null;
 }

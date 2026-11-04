@@ -8,9 +8,16 @@ export type AmountError = "min" | "max";
 
 const MAX_INPUT_VALUE = 10 ** MAX_INPUT_DIGITS - 1;
 
-/** 입력 문자열에서 숫자만 남겨 금액으로 읽음. 비었거나 0이면 null(입력 없음). 자릿수는 상한까지만 받음. */
+/**
+ * 지원 언어 모두 소수점이 "."라 그 앞의 정수부만 금액으로 읽음.
+ * 숫자만 남기면 소수부가 정수부에 이어 붙어 금액이 커지기 때문(QA-21-0242).
+ */
+const DECIMAL_SEPARATOR = ".";
+
+/** 입력 문자열의 정수부에서 숫자만 남겨 금액으로 읽음(원은 1원 단위라 소수부는 버림). 비었거나 0이면 null(입력 없음). 자릿수는 상한까지만 받음. */
 export function parseAmount(raw: string): number | null {
-  const digits = raw.replace(/\D/g, "").slice(0, MAX_INPUT_DIGITS);
+  const [integerPart = ""] = raw.split(DECIMAL_SEPARATOR);
+  const digits = integerPart.replace(/\D/g, "").slice(0, MAX_INPUT_DIGITS);
   const amount = Number(digits);
   return amount > 0 ? amount : null;
 }

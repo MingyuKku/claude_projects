@@ -2,8 +2,8 @@
 // 있도록 환경 변수는 이 객체로만 읽음. 값은 공개됨. Vite가 VITE_* 변수를
 // 번들에 그대로 넣으므로 비밀 값은 넣지 않음.
 export const ENV = {
-  // API 기준 값은 절대 URL이 아니라 경로 접두사. 백엔드 CORS 허용 목록에
-  // 이 앱의 출처가 없어서 개발 프록시와 운영 리버스 프록시가 대신 전달함.
+  // API 기준 값. 배포 환경은 백엔드 절대 주소(백엔드가 배포 도메인을 CORS 허용),
+  // 로컬 개발은 경로 접두사를 넣고 개발 서버 프록시가 전달함.
   apiServerUrl: import.meta.env.VITE_API_SERVER_URL,
   apiMemberUrl: import.meta.env.VITE_API_MEMBER_URL,
   apiSocialUrl: import.meta.env.VITE_API_SOCIAL_URL,

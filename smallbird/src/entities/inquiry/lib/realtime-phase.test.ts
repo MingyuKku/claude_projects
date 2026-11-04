@@ -2,6 +2,8 @@ import {
   applyRealtimeConsultation,
   getConnectDeadline,
   getRealtimePhase,
+  isConsultationConnected,
+  isMatchFailureShown,
   REALTIME_CONNECT_TIMEOUT_MS,
 } from "./realtime-phase";
 
@@ -99,7 +101,48 @@ describe("applyRealtimeConsultation", () => {
         consultation({ isConnect: true }),
         start,
       ),
+    ).toMatchObject({ realtimePhase: "requesting", status: "waiting" });
+    // 연결은 isConnect가 아니라 요청 뒤 계정 문서의 msgResponseDate로 판단함
+    expect(
+      applyRealtimeConsultation(inquiry(), consultation(), start, start + 10),
     ).toMatchObject({ realtimePhase: "connected", status: "consulting" });
+    // 요청 전의 응답 시각(지난 상담 값)은 연결로 보지 않음
+    expect(
+      applyRealtimeConsultation(inquiry(), consultation(), start, start - 10),
+    ).toMatchObject({ realtimePhase: "requesting" });
+    // 상담 문서의 acceptedAt이 요청 시각 이후면 연결(계정 문서 값보다 먼저 봄)
+    expect(
+      applyRealtimeConsultation(
+        inquiry(),
+        consultation({
+          matchRequestedAt: "2026-10-19 10:00:00",
+          acceptedAt: "2026-10-19 10:00:05",
+        }),
+        start + 10_000,
+        null,
+      ),
+    ).toMatchObject({ realtimePhase: "connected" });
+    // 재요청으로 요청 시각이 새로 찍히면 예전 acceptedAt은 미연결. 계정 문서 값이 더 늦어도 acceptedAt이 우선
+    expect(
+      applyRealtimeConsultation(
+        inquiry(),
+        consultation({
+          matchRequestedAt: "2026-10-19 10:01:00",
+          acceptedAt: "2026-10-19 10:00:05",
+        }),
+        start + 70_000,
+        start + 65_000,
+      ),
+    ).toMatchObject({ realtimePhase: "requesting" });
+    // 서버가 쓴 요청 시각(matchRequestedAt)이 기준
+    expect(
+      applyRealtimeConsultation(
+        inquiry(),
+        consultation({ matchRequestedAt: "2026-10-19 10:01:00" }),
+        start + 70_000,
+        start + 30_000,
+      ),
+    ).toMatchObject({ realtimePhase: "requesting" });
     expect(
       applyRealtimeConsultation(
         inquiry(),
@@ -188,11 +231,27 @@ describe("applyRealtimeConsultation: 재시도·취소·무응답", () => {
     });
   });
 
+  it("이전 사이클의 취소·만료·수락 값이 남은 재요청은 요청 중으로 본다", () => {
+    const reused = applyRealtimeConsultation(
+      inquiry(),
+      consultation({
+        matchRequestedAt: "2026-10-19 10:00:30",
+        canceledAt: "2026-10-19 09:50:00",
+        expiredAt: "2026-10-19 09:55:00",
+        acceptedAt: "2026-10-19 09:52:00",
+        endReason: "MATCH_TIMEOUT",
+      }),
+      start + 31_000,
+    );
+    expect(reused.realtimePhase).toBe("requesting");
+  });
+
   it("연결 뒤에는 마지막 메시지로 누구의 답을 기다리는지 정한다", () => {
     const connected = applyRealtimeConsultation(
       inquiry(),
       consultation({ isConnect: true, seqResponseDate: "2026-10-19 10:00:30" }),
       start + 1000,
+      start + 500,
     );
     expect(connected.idleTurn).toEqual({
       waitingFor: "advertiser",
@@ -229,6 +288,7 @@ describe("applyRealtimeConsultation: 재시도·취소·무응답", () => {
         ],
       }),
       start + 1000,
+      start + 500,
     );
     expect(advertiserSpoke.idleTurn).toEqual({
       waitingFor: "operator",
@@ -248,3 +308,128 @@ function formatForTest(time: number) {
   const pad = (n: number) => String(n).padStart(2, "0");
   return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
 }
+
+describe("isConsultationConnected", () => {
+  const requestedAt = "2026-11-04 10:00:00";
+  const acceptedAt = "2026-11-04 10:01:00";
+
+  it("수락 시각이 요청 시각과 같거나 늦으면 연결됨", () => {
+    expect(
+      isConsultationConnected({ acceptedAt, matchRequestedAt: requestedAt }),
+    ).toBe(true);
+    expect(
+      isConsultationConnected({
+        acceptedAt: requestedAt,
+        matchRequestedAt: requestedAt,
+      }),
+    ).toBe(true);
+  });
+
+  it("수락 시각이 요청 시각보다 이르면 연결 아님", () => {
+    expect(
+      isConsultationConnected({
+        acceptedAt: "2026-11-04 09:00:00",
+        matchRequestedAt: requestedAt,
+      }),
+    ).toBe(false);
+  });
+
+  it("수락이 없으면 연결 아님", () => {
+    expect(isConsultationConnected({ matchRequestedAt: requestedAt })).toBe(
+      false,
+    );
+  });
+
+  it("서버가 일반 문의로 돌린 문서(요청 시각 비고 수락 시각 남음)는 연결 아님", () => {
+    expect(
+      isConsultationConnected({ acceptedAt, matchRequestedAt: null }),
+    ).toBe(false);
+  });
+
+  it("같은 문서로 재요청해 다시 수락되면 이전 endReason이 남아도 연결됨", () => {
+    const document = {
+      acceptedAt: "2026-11-04 10:11:00",
+      matchRequestedAt: "2026-11-04 10:10:00",
+      endReason: "MATCH_TIMEOUT",
+    };
+    expect(isConsultationConnected(document)).toBe(true);
+  });
+});
+
+describe("isMatchFailureShown", () => {
+  const message = (
+    overrides: Partial<RealtimeConsultation["messages"][number]>,
+  ): RealtimeConsultation["messages"][number] => ({
+    auto: false,
+    attachmentIdx: null,
+    identifier: null,
+    isUserMessage: false,
+    body: "내용",
+    created: "2026-11-04 10:05:00",
+    ...overrides,
+  });
+  const failed = consultation({
+    endReason: "MATCH_TIMEOUT",
+    matchRequestedAt: null,
+    waitDeadline: "2026-11-04 10:03:00",
+    messages: [
+      message({ auto: true, body: "안내", created: "2026-11-04 10:03:01" }),
+    ],
+  });
+
+  it("MATCH_TIMEOUT이고 요청 시각이 비면 보인다", () => {
+    expect(isMatchFailureShown(failed)).toBe(true);
+  });
+
+  it("새 요청(요청 시각 있음)이거나 다른 종료 사유면 보이지 않는다", () => {
+    expect(
+      isMatchFailureShown({
+        ...failed,
+        matchRequestedAt: "2026-11-04 10:10:00",
+      }),
+    ).toBe(false);
+    expect(
+      isMatchFailureShown({ ...failed, endReason: "INACTIVITY_TIMEOUT" }),
+    ).toBe(false);
+    expect(isMatchFailureShown(undefined)).toBe(false);
+  });
+
+  it("실패 시각 뒤에 상담원이 보낸 일반 메시지가 오면 걷는다", () => {
+    expect(
+      isMatchFailureShown({
+        ...failed,
+        messages: [
+          ...failed.messages,
+          message({ created: "2026-11-04 10:05:00" }),
+        ],
+      }),
+    ).toBe(false);
+  });
+
+  it("서버 자동 안내·광고주 메시지·실패 전 메시지는 답변으로 치지 않는다", () => {
+    expect(
+      isMatchFailureShown({
+        ...failed,
+        messages: [
+          message({ auto: true, created: "2026-11-04 10:06:00" }),
+          message({ isUserMessage: true, created: "2026-11-04 10:06:00" }),
+          message({ created: "2026-11-04 10:02:00" }),
+        ],
+      }),
+    ).toBe(true);
+  });
+
+  it("마감 시각이 없으면 마지막 자동 안내 시각을 기준으로 한다", () => {
+    const withoutDeadline = { ...failed, waitDeadline: null };
+    expect(isMatchFailureShown(withoutDeadline)).toBe(true);
+    expect(
+      isMatchFailureShown({
+        ...withoutDeadline,
+        messages: [
+          ...withoutDeadline.messages,
+          message({ created: "2026-11-04 10:05:00" }),
+        ],
+      }),
+    ).toBe(false);
+  });
+});

@@ -17,6 +17,9 @@ export const ROUTES = {
   customerCenterBuyer: "/customer-center/buyer",
   // 구매자 문의도 목록과 대화가 한 화면. `inquiryKey`는 출처를 담은 임시 키.
   customerCenterBuyerThread: "/customer-center/buyer/:inquiryKey?",
+  // 인플루언서 문의는 구매자 문의와 같은 화면(인플루언서 문의·캠페인 Q&A).
+  customerCenterInfluencer: "/customer-center/influencer",
+  customerCenterInfluencerThread: "/customer-center/influencer/:inquiryKey?",
   mypageSubscribe: "/mypage/subscribe",
   mypageMoney: "/mypage/money",
   mypageAccount: "/mypage/account",

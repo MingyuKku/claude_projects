@@ -324,7 +324,7 @@ describe("고객센터 진입", () => {
     const dialog = screen.getByRole("dialog", { name: "전체 메뉴" });
     await user.click(within(dialog).getByRole("link", { name: "구매자 문의" }));
     expect(
-      await screen.findByText("구매자 문의 화면을 준비 중입니다."),
+      await screen.findByText("문의사항이 존재하지 않습니다."),
     ).toBeInTheDocument();
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
@@ -357,7 +357,7 @@ describe("고객센터 진입", () => {
       expect(router.state.location.pathname).toBe(ROUTES.main),
     );
     expect(
-      screen.queryByText("구매자 문의 화면을 준비 중입니다."),
+      screen.queryByText("문의사항이 존재하지 않습니다."),
     ).not.toBeInTheDocument();
   });
 
@@ -369,7 +369,7 @@ describe("고객센터 진입", () => {
     });
     await renderRoute(ROUTES.customerCenterBuyer);
     expect(
-      await screen.findByText("구매자 문의 화면을 준비 중입니다."),
+      await screen.findByText("문의사항이 존재하지 않습니다."),
     ).toBeInTheDocument();
   });
 

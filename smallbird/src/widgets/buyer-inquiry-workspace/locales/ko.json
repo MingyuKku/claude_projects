@@ -11,7 +11,9 @@
   },
   "source": {
     "purchaser": "구매자 문의",
-    "qna": "상품 Q&A"
+    "qna": "상품 Q&A",
+    "influencer": "인플루언서 문의",
+    "campaignQna": "캠페인 Q&A"
   },
   "empty": "문의사항이 존재하지 않습니다.",
   "loadError": "문의 목록을 불러오지 못했습니다.",
@@ -47,10 +49,12 @@
     "sourceType": {
       "ALL": "전체",
       "PURCHASER_QUESTION": "구매자 문의",
-      "PRODUCT_QNA": "상품 Q&A"
+      "PRODUCT_QNA": "상품 Q&A",
+      "INFLUENCER_QUESTION": "인플루언서 문의",
+      "CAMPAIGN_QNA": "캠페인 Q&A"
     }
   },
-  "searchEmpty": "'{{keyword}}'에 대한 결과가 없습니다.",
+  "searchEmpty": "‘{{keyword}}’에 대한 결과가 없습니다.",
   "searchPlaceholder": "원하는 조건을 입력해 보세요.",
   "orderDate": "주문일",
   "paymentAmount": "결제 금액",
@@ -76,7 +80,6 @@
     "cancel": "취소",
     "failed": "처리하지 못했습니다. 다시 시도해 주세요.",
     "exists": "이미 답변이 등록된 문의입니다.",
-    "read": "구매자가 읽은 답변은 수정·삭제할 수 없습니다.",
     "deleteTitle": "답변을 삭제할까요?",
     "deleteDescription": "삭제한 답변은 복구할 수 없습니다."
   },
@@ -86,6 +89,7 @@
   },
   "realtime": {
     "end": "상담 종료",
-    "endFailed": "상담을 종료하지 못했습니다. 다시 시도해 주세요."
+    "endFailed": "상담을 종료하지 못했습니다. 다시 시도해 주세요.",
+    "otherDevice": "현재 다른 상담원이 해당 문의를 처리 중이므로 상담이 종료된 후 다시 이용해 주세요."
   }
 }

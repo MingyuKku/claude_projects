@@ -23,6 +23,7 @@ const ALL_TRUE = {
   commerce: true,
   bigbirdMoney: true,
   purchaserQuestion: true,
+  influencerQuestion: true,
 };
 
 describe("transformSessionToViewModel", () => {
@@ -73,12 +74,14 @@ describe("transformSessionToViewModel", () => {
       commerce: false,
       bigbirdMoney: true,
       purchaserQuestion: false,
+      influencerQuestion: false,
     });
   });
 
   it("denies a SUB permission the server did not send", () => {
     const vm = transformSessionToViewModel({ ...base, authority: "SUB" });
     expect(Object.values(vm.permissions)).toEqual([
+      false,
       false,
       false,
       false,

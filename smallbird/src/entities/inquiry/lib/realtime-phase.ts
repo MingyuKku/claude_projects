@@ -28,6 +28,53 @@ export function parseWriteTime(value: unknown) {
   return Number.isNaN(time) ? null : time;
 }
 
+/**
+ * 상담 문서만으로 본 연결 여부: 요청 시각(`matchRequestedAt`)이 있고 `acceptedAt`이 그와 같거나 늦으면 연결됨.
+ * 서버가 끝내거나 일반 문의로 돌리면 `matchRequestedAt`이 비고 `acceptedAt`·`endReason`은 남으며, 같은 문서를 재요청에
+ * 다시 쓰므로(마켓 실측 2026-11-04) 요청 시각이 없으면 연결 아님. 요청 시각이 없는 옛 문서는 수락을 한 번 더 보냄
+ * (탭 기록으로 중복 방지). 둘 다 같은 형식의 문자열로 정규화돼 있어 사전순 비교가 시각순과 같음.
+ */
+export function isConsultationConnected(
+  consultation: Pick<RealtimeConsultation, "acceptedAt" | "matchRequestedAt">,
+): boolean {
+  const { acceptedAt, matchRequestedAt } = consultation;
+  return Boolean(
+    acceptedAt && matchRequestedAt && acceptedAt >= matchRequestedAt,
+  );
+}
+
+/**
+ * 3분 매칭 실패 안내 박스를 보일지. 서버가 일반 문의로 돌린 문서(`endReason` MATCH_TIMEOUT, `matchRequestedAt` 빔)이고, 실패
+ * 시각 뒤에 운영 상담원이 보낸 일반 메시지(auto·광고주 메시지 아님)가 아직 없을 때. 실패 시각은 `waitDeadline`, 없으면 서버
+ * 자동 안내(auto) 중 마지막 메시지의 시각. 둘 다 없으면 시각을 알 수 없어 박스를 유지함. 상담 문서 메시지에는 삭제 표시가 없어
+ * 삭제 여부는 보지 못함.
+ */
+export function isMatchFailureShown(
+  consultation:
+    | Pick<
+        RealtimeConsultation,
+        "endReason" | "matchRequestedAt" | "waitDeadline" | "messages"
+      >
+    | undefined,
+): boolean {
+  if (
+    !consultation ||
+    consultation.endReason !== "MATCH_TIMEOUT" ||
+    consultation.matchRequestedAt
+  )
+    return false;
+  const failedAt =
+    consultation.waitDeadline ??
+    consultation.messages.filter((message) => message.auto).at(-1)?.created;
+  if (!failedAt) return true;
+  return !consultation.messages.some(
+    (message) =>
+      !message.auto &&
+      message.isUserMessage === false &&
+      message.created > failedAt,
+  );
+}
+
 const PHASE_STATUS: Record<RealtimePhase, BigbirdInquiryStatus> = {
   requesting: "waiting",
   connected: "consulting",
@@ -45,8 +92,7 @@ interface PhaseInput {
 }
 
 /**
- * 종료 여부(`finishTime`)가 먼저. `isConnect`는 종료 때 v2 광고주는 true, 운영 앱은 false를 쓰므로
- * 종료된 상담의 상태를 판정하는 데 쓰지 않음.
+ * 종료 여부(`finishTime`)가 먼저. `isConnect`는 연결 여부(호출하는 쪽이 `msgResponseDate`로 계산한 값).
  *
  * ponytail: 요청 실패는 서버·Firestore에 저장되지 않아 "요청 시각 + 3분이 지나도 연결되지 않음"으로 계산함.
  * 재시도할 때 새 요청 시각을 담을 필드가 정해지면 `requestedAt`을 그 값으로 바꿈.
@@ -116,22 +162,38 @@ export function applyRealtimeConsultation(
   inquiry: BigbirdInquiryViewModel,
   consultation: RealtimeConsultation | undefined,
   now: number,
+  /** 요청자 계정 문서(`threadUserIdx/{내}`)의 `msgResponseDate`(ms). 없으면 null. */
+  responseAt: number | null = null,
 ): BigbirdInquiryViewModel {
   if (!inquiry.isRealtime) return inquiry;
   if (!consultation && !inquiry.isFinished) return inquiry;
-  // 재시도하면 `waitDeadline`이 새로 써지므로 REST의 생성 시각보다 우선함.
+  // 서버가 쓰는 요청 시각(`matchRequestedAt`)이 먼저, 없으면 대기 마감 - 3분, 그것도 없으면 REST의 생성 시각.
+  const matchRequestedAt = parseWriteTime(consultation?.matchRequestedAt);
   const deadline = parseWriteTime(consultation?.waitDeadline);
   const requestedAt =
-    deadline === null
-      ? inquiry.createdAt
-      : new Date(deadline - REALTIME_CONNECT_TIMEOUT_MS);
+    matchRequestedAt !== null
+      ? new Date(matchRequestedAt)
+      : deadline === null
+        ? inquiry.createdAt
+        : new Date(deadline - REALTIME_CONNECT_TIMEOUT_MS);
   const isFinished = inquiry.isFinished || consultation?.finishTime != null;
-  const isConnect = consultation?.isConnect ?? false;
-  // 취소·만료가 기록된 요청은 마감 시각 전에도 실패.
+  // 연결 = 같은 상담 문서의 `acceptedAt` ≥ 요청 시각(백엔드 흐름도 프론트팀 가이드 3번, 2026-11-03). `isConnect`는 서버가
+  // 요청 직후부터 true라 쓰지 않음.
+  // ponytail: `acceptedAt`이 없는 문서(stage 반영 전·예전 문서)는 요청 이후 계정 문서 `msgResponseDate`가 생기거나 바뀐
+  // 것으로 근사함. 계정 문서는 사용자당 하나라 동시에 열린 다른 상담의 수락과 섞일 수 있음. 반영이 끝나면 이 분기를 지움.
+  const acceptedAt = parseWriteTime(consultation?.acceptedAt);
+  const connectedAt = acceptedAt ?? responseAt;
+  const isConnect =
+    connectedAt !== null && connectedAt >= requestedAt.getTime();
+  // 취소·만료가 기록된 요청은 마감 시각 전에도 실패. 같은 문서를 재요청에 다시 쓰고 이전 사이클 값이 남으므로(마켓 실측
+  // 2026-11-04) 이번 요청 시각 이후에 기록된 것만 인정함.
+  const endedAt = [consultation?.canceledAt, consultation?.expiredAt].map(
+    parseWriteTime,
+  );
   const isDead =
     !isFinished &&
     !isConnect &&
-    Boolean(consultation?.canceledAt || consultation?.expiredAt);
+    endedAt.some((time) => time !== null && time >= requestedAt.getTime());
   const phase = isDead
     ? "failed"
     : getRealtimePhase({ isFinished, isConnect, requestedAt, now });

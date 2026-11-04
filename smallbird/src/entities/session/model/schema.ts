@@ -23,7 +23,7 @@ export const sessionSchema = z.object({
   phone: z.string().optional(),
   // SUB 계정일 때만 오는 본인 이름. 연락처는 `phone`.
   name: z.string().nullish(),
-  // 메뉴 권한 6개(LNB 노출용). MASTER·ADMIN은 모두 true, SUB는 마스터가 정한 값이고 호출할 때마다 새로 읽음.
+  // 메뉴 권한 7개(LNB 노출용). MASTER·ADMIN은 모두 true, SUB는 마스터가 정한 값이고 호출할 때마다 새로 읽음.
   // 진입이 거부된 경로는 403이라 오지 않으므로 없으면 false로 읽음.
   isCampaignAccess: z.boolean().optional(),
   isInfluencerMatchingAccess: z.boolean().optional(),
@@ -31,6 +31,8 @@ export const sessionSchema = z.object({
   isCommerceAccess: z.boolean().optional(),
   isBigbirdMoneyAccess: z.boolean().optional(),
   isPurchaserQuestionAccess: z.boolean().optional(),
+  // 구매자 문의와 별도 권한(2026-10-30). Swagger상 DB 컬럼이 아직 없어 SUB는 항상 false로 옴.
+  isInfluencerQuestionAccess: z.boolean().optional(),
 });
 export type Session = z.infer<typeof sessionSchema>;
 
@@ -42,6 +44,7 @@ export interface MenuPermissions {
   commerce: boolean;
   bigbirdMoney: boolean;
   purchaserQuestion: boolean;
+  influencerQuestion: boolean;
 }
 
 export interface SessionViewModel {

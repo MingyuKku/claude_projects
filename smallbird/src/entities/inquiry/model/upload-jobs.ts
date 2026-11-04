@@ -29,12 +29,13 @@ interface UploadJobsState {
 // 같은 문의에서 업로드가 겹쳐 돌지 않게 함.
 const running = new Set<number>();
 
-// 대화 캐시를 다시 받음(키: ["bigbird-inquiry-detail", …], ["purchaser-messages", …], ["campaign-timeline", campaignIdx]).
+// 대화 캐시를 다시 받음(키: ["bigbird-inquiry-detail", …], ["purchaser-messages" | "influencer-messages", …], ["campaign-timeline", campaignIdx]).
 // 캠페인 문의 대화는 타임라인을 먼저 보여 주므로 함께 갱신함. 빅버드 목록은 useSWRInfinite라 필터 mutate가 닿지 않고,
 // 새 스레드는 summary 변경 구독이 목록을 다시 받음.
 const CONVERSATION_KEYS = [
   "bigbird-inquiry-detail",
   "purchaser-messages",
+  "influencer-messages",
   "campaign-timeline",
 ];
 // 상세(bigbird-inquiry-detail)는 받으면 운영 답장이 읽음 처리되므로 탭이 가려져 있으면 받지 않음(탭 복귀 때 받음).

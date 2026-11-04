@@ -86,10 +86,19 @@ export const bigbirdInquiryDetailSchema = z.object({
   data: z.object({ messages: z.array(inquiryMessageSchema).nullable() }),
 });
 
-/** `GET /v3/help/thread/campaign-timeline`. 캠페인에 걸린 모든 스레드의 메시지를 시간순으로 합친 목록. */
+/**
+ * 캠페인 통합 타임라인(`GET /v3/help/thread/campaign-timeline`·`/inquiry/influencer-campaign-timeline`·
+ * `/inquiry/purchaser-campaign-timeline`). 캠페인에 걸린 모든 스레드의 메시지를 실시간 구간까지 시간순으로 합친 목록.
+ * 최상위 값은 가장 마지막 스레드의 것이고 스레드가 없으면 null(Swagger 2026-11-04). 구버전 서버는 없어도 읽음.
+ */
 export const campaignTimelineSchema = z.object({
   result: z.boolean(),
   data: z.array(inquiryMessageSchema),
+  finishTime: z.string().nullish(),
+  /** false면 실시간 상담 중. */
+  isBoardType: z.boolean().nullish(),
+  /** Firestore 상담 문서 ID(`sequence`). */
+  sequence: z.number().nullish(),
 });
 
 export const inquiryThreadListSchema = z.object({
@@ -200,7 +209,13 @@ export const realtimeConsultationSchema = z.object({
   origin: z.enum(["v2", "v3"]).nullish(),
   // 서버(2026-11-02 stage 배포)는 Timestamp로, v2·마켓·프론트는 문자열로 씀. 둘 다 문자열로 통일해 읽음.
   waitDeadline: z.preprocess(normalizeFirestoreTime, z.string().nullish()),
+  // 서버가 실시간 요청 때 쓰는 요청 시각(Timestamp). 연결 판단의 기준.
+  matchRequestedAt: z.preprocess(normalizeFirestoreTime, z.string().nullish()),
+  // 수락(버튼·첫 답장) 때 서버가 쓰는 시각(Timestamp, 2026-11-03 백엔드 답변). 연결 판단의 기준.
+  acceptedAt: z.preprocess(normalizeFirestoreTime, z.string().nullish()),
   canceledAt: z.preprocess(normalizeFirestoreTime, z.string().nullish()),
+  // 서버가 상담을 끝낼 때 쓰는 사유(MATCH_TIMEOUT·INACTIVITY_TIMEOUT·REQUESTER_FINISHED·RESPONDER_FINISHED). 새 값이 와도 읽도록 문자열.
+  endReason: z.string().nullish(),
   expiredAt: z.preprocess(normalizeFirestoreTime, z.string().nullish()),
   closingAt: z.preprocess(normalizeFirestoreTime, z.string().nullish()),
   messages: z.array(
@@ -232,7 +247,7 @@ export type BigbirdInquiryStatus = "waiting" | "consulting" | "done" | "failed";
 export type RealtimePhase = "requesting" | "connected" | "failed" | "finished";
 
 export type InquiryMessageKind =
-  "text" | "campaignCard" | "image" | "video" | "file" | "system";
+  "text" | "campaignCard" | "image" | "video" | "file" | "system" | "notice";
 
 export interface InquiryAttachment {
   attachmentIdx: number;
@@ -305,10 +320,29 @@ export interface InquiryCampaignViewModel {
   period: string | null;
 }
 
-/** `GET /v3/help/inquiry` 항목: 구매자 문의와 상품 Q&A 통합 목록. 시각은 "2026-10-01 10:00" 형식. */
+/** 화면·URL의 출처 값과 서버 `sourceType`. 구매자 문의 메뉴는 앞의 둘, 인플루언서 문의 메뉴는 뒤의 둘. */
+export const INQUIRY_SOURCE_TYPE = {
+  purchaser: "PURCHASER_QUESTION",
+  qna: "PRODUCT_QNA",
+  influencer: "INFLUENCER_QUESTION",
+  campaignQna: "CAMPAIGN_QNA",
+} as const;
+export type BuyerInquirySource = keyof typeof INQUIRY_SOURCE_TYPE;
+export type InquirySourceType =
+  (typeof INQUIRY_SOURCE_TYPE)[BuyerInquirySource];
+
+/**
+ * `GET /v3/help/inquiry` 항목: 구매자 문의·상품 Q&A·인플루언서 문의·캠페인 Q&A 통합 목록. 시각은 "2026-10-01 10:00" 형식.
+ * `sourceType=ALL`이면 메뉴 권한에 따라 네 유형이 섞여 옴(Swagger 2026-11-02).
+ */
 export const buyerInquirySchema = z.object({
   inquiryIdx: z.number(),
-  sourceType: z.enum(["PURCHASER_QUESTION", "PRODUCT_QNA"]),
+  sourceType: z.enum([
+    "PURCHASER_QUESTION",
+    "PRODUCT_QNA",
+    "INFLUENCER_QUESTION",
+    "CAMPAIGN_QNA",
+  ]),
   /** IN_PROGRESS는 구매자가 실시간 상담으로 바꾼 문의(2026-10-30 명세 추가). */
   status: z.enum(["WAITING", "ANSWERED", "IN_PROGRESS"]),
   campaignIdx: z.number().nullable(),
@@ -322,6 +356,8 @@ export const buyerInquirySchema = z.object({
   /** 상품 Q&A 상세 조회 키(`POST /v3/help/qna`의 userIdx). 구매자 문의면 null. */
   userIdx: z.number().nullable(),
   hasUnread: z.boolean().default(false),
+  /** 상담 Firestore 문서 ID. 구매자·인플루언서 문의만 값이 있음(Swagger 2026-11-04, stage 반영 전엔 없음). */
+  sequence: z.number().nullish(),
   /** 카드 문구(REQ-24-0001)용. 백엔드 요청 중이라 아직 오지 않음. */
   brandName: z.string().nullish(),
   campaignName: z.string().nullish(),
@@ -471,7 +507,6 @@ export const replyResultSchema = z.object({
   status: z.string(),
 });
 
-export type BuyerInquirySource = "purchaser" | "qna";
 export type BuyerInquiryStatus = "waiting" | "consulting" | "done";
 
 export interface BuyerInquiryViewModel {
@@ -485,10 +520,12 @@ export interface BuyerInquiryViewModel {
   writerName: string | null;
   body: string | null;
   writeTime: Date | null;
-  /** 구매자 문의 대화 조회 키. 상품 Q&A면 null. */
+  /** 구매자·인플루언서 문의 대화 조회 키. Q&A면 null. */
   threadUserIdx: number | null;
-  /** 상품 Q&A 상세 조회 키. 구매자 문의면 null. */
+  /** 상품·캠페인 Q&A 상세 조회 키. 구매자·인플루언서 문의면 null. */
   userIdx: number | null;
+  /** 상담 Firestore 문서 ID(`helpdesk/0.0.2/threadUserIdx/{threadUserIdx}/sequence/{sequence}`). 없으면 null. */
+  sequence: number | null;
   /** 목록 미리보기: 가장 최근 메시지 본문. */
   preview: string;
   /** 마지막 활동 시각. 메시지가 없는 스레드는 null. */

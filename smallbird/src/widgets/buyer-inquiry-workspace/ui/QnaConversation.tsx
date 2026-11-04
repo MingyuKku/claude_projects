@@ -129,13 +129,11 @@ function QnaReply({
       onChanged();
     } catch (error) {
       console.error("Q&A 답변 처리 실패", error);
-      toast.error(
-        isApiError(error) && error.status === 409
-          ? t(`reply.${conflictKey}`)
-          : t("reply.failed"),
-      );
-      // 409는 서버 상태와 어긋났다는 뜻이라 최신 상태를 다시 받음.
-      if (isApiError(error) && error.status === 409) onChanged();
+      const isConflict = isApiError(error) && error.status === 409;
+      // 이미 읽힌 답변(수정·삭제 409)은 안내 없이 최신 상태를 다시 받아 버튼이 사라지게 함. 등록 409(이미 답변 있음)는 안내함.
+      if (isConflict) onChanged();
+      if (!isConflict || conflictKey === "exists")
+        toast.error(isConflict ? t("reply.exists") : t("reply.failed"));
     } finally {
       setIsBusy(false);
     }

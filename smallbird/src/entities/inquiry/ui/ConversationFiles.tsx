@@ -18,13 +18,20 @@ interface ConversationFilesProps {
   name: string;
   /** 앞의 텍스트 말풍선 옆에 보이는 시각. */
   time?: string;
+  /** 말풍선 크기. TAB은 작은 형태(아바타 32·이름 한 줄)를 씀(Figma 11315:50501). 기본 md. */
+  size?: "sm" | "md";
 }
 
 /**
  * 대화의 첨부 묶음: 말풍선(있으면) 아래 이미지·동영상 80px 썸네일 격자 + 누르면 열리는 뷰어, 그 아래 문서 카드
  * (Figma 11315:49676, 190px 카드에 이름·용량·다운로드). 보낸 쪽 끝에 붙음. 빅버드 문의와 구매자 문의 대화가 같이 씀.
  */
-export function ConversationFiles({ row, name, time }: ConversationFilesProps) {
+export function ConversationFiles({
+  row,
+  name,
+  time,
+  size,
+}: ConversationFilesProps) {
   const { t: tCommon } = useTranslation();
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
   // 문서는 뷰어 대상이 아니라 누르면 바로 내려받음. 뷰어는 이미지·동영상만 넘김.
@@ -55,6 +62,7 @@ export function ConversationFiles({ row, name, time }: ConversationFilesProps) {
     <>
       <ChatMessage
         name={name}
+        size={size}
         side={row.isMine ? "me" : "other"}
         message={row.text?.body}
         time={time}

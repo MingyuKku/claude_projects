@@ -6,25 +6,29 @@ import { useInquiryCampaigns } from "@/entities/inquiry";
 import { ChatListItem, ChatListPanel } from "@/shared/components/chat-list";
 import { EmptyState } from "@/shared/components/empty-state";
 import { SearchInput } from "@/shared/components/search-input";
-import { ROUTES } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 
 import {
+  BUYER_STATUS_FILTERS,
   STATUS_FILTERS,
   toBuyerInquiryFilters,
   toBuyerStatusFilter,
+  toSourceParam,
 } from "../lib/filters";
 import {
   formatListDate,
   getBuyerCardText,
   STATUS_BADGE_VARIANT,
 } from "../lib/format";
+import { INQUIRY_MENU } from "../model/menu";
+import { OPENED_BY_USER_STATE } from "../model/realtime-inquiry-idx";
 import { BuyerFilterChips } from "./BuyerFilterChips";
 import { BuyerInquiryFilterDialog } from "./BuyerInquiryFilterDialog";
 
+import type { InquiryMenu } from "../model/menu";
 import type {
   BuyerInquiryFilters,
   BuyerInquiryViewModel,
@@ -32,6 +36,7 @@ import type {
 import type { FormEvent, ReactNode } from "react";
 
 interface BuyerInquiryWorkspaceProps {
+  menu: InquiryMenu;
   /** 서버가 준 순서(최신순) 그대로의 문의 목록. */
   inquiries: BuyerInquiryViewModel[] | undefined;
   isLoading: boolean;
@@ -52,6 +57,7 @@ interface BuyerInquiryWorkspaceProps {
 // Figma 구매자 문의 PC(5202:105720): 목록 + 채팅 + 상세 정보, 간격 20.
 // TAB·MO는 한 번에 한 화면만 보임(목록 ↔ 채팅).
 export function BuyerInquiryWorkspace({
+  menu,
   inquiries,
   isLoading,
   isError,
@@ -71,7 +77,9 @@ export function BuyerInquiryWorkspace({
   // 목록 필터는 URL에 둠. 대화로 갔다가 뒤로 와도 유지됨.
   const [searchParams, setSearchParams] = useSearchParams();
   const statusFilter = toBuyerStatusFilter(searchParams.get("status"));
-  const filters = toBuyerInquiryFilters(searchParams);
+  const statusFilters =
+    menu === "buyer" ? BUYER_STATUS_FILTERS : STATUS_FILTERS;
+  const filters = toBuyerInquiryFilters(searchParams, menu);
   const sentinelRef = useRef<HTMLLIElement>(null);
   const { campaigns } = useInquiryCampaigns(threadUserIdx);
 
@@ -140,12 +148,9 @@ export function BuyerInquiryWorkspace({
 
   function handleApplyFilters(value: BuyerInquiryFilters) {
     setSearchParams((params) => {
-      if (value.sourceType === "ALL") params.delete("source");
-      else
-        params.set(
-          "source",
-          value.sourceType === "PURCHASER_QUESTION" ? "purchaser" : "qna",
-        );
+      const source = toSourceParam(value.sourceType);
+      if (source) params.set("source", source);
+      else params.delete("source");
       if (value.campaignIdx === undefined) params.delete("campaignIdx");
       else params.set("campaignIdx", String(value.campaignIdx));
       if (value.influencerThreadUserIdx === undefined)
@@ -225,6 +230,7 @@ export function BuyerInquiryWorkspace({
               />
             </form>
             <BuyerInquiryFilterDialog
+              menu={menu}
               value={filters}
               threadUserIdx={threadUserIdx}
               onApply={handleApplyFilters}
@@ -244,7 +250,7 @@ export function BuyerInquiryWorkspace({
         tabs={
           <Tabs value={statusFilter} onValueChange={handleChangeStatus}>
             <TabsList className="w-full">
-              {STATUS_FILTERS.map((filter) => (
+              {statusFilters.map((filter) => (
                 <TabsTrigger key={filter} value={filter}>
                   {t(filter)}
                 </TabsTrigger>
@@ -284,12 +290,15 @@ export function BuyerInquiryWorkspace({
             highlight={filters.keyword}
             isSelected={inquiry.key === selectedKey}
             onClickItem={() =>
-              void navigate({
-                pathname: generatePath(ROUTES.customerCenterBuyerThread, {
-                  inquiryKey: inquiry.key,
-                }),
-                search: searchParams.toString(),
-              })
+              void navigate(
+                {
+                  pathname: generatePath(INQUIRY_MENU[menu].threadRoute, {
+                    inquiryKey: inquiry.key,
+                  }),
+                  search: searchParams.toString(),
+                },
+                { state: OPENED_BY_USER_STATE },
+              )
             }
           />
         ))}

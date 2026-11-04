@@ -8,6 +8,7 @@ import { useProfileImage } from "../api/use-profile-image";
 import { formatJoinedAt } from "../lib/format-joined-at";
 import { PASSWORD_MASK } from "../model/constants";
 
+import type { ProfileImageSource } from "../api/use-profile-image";
 import type { AccountRole } from "../lib/save-account-profile";
 import type { AccountProfileViewModel } from "@/entities/account";
 
@@ -15,6 +16,7 @@ interface AccountProfileViewProps {
   /** Sub ID는 시안의 라벨·행 구성이 다름(휴대폰 번호 행 없음). 기본은 Master. */
   accountType?: AccountRole;
   profile: AccountProfileViewModel;
+  imageSource: ProfileImageSource;
   onClickEdit: () => void;
   /** 회원 탈퇴 버튼을 보일 때만 넘김(Master). */
   onClickWithdraw?: () => void;
@@ -24,12 +26,13 @@ interface AccountProfileViewProps {
 export function AccountProfileView({
   accountType = "master",
   profile,
+  imageSource,
   onClickEdit,
   onClickWithdraw,
 }: AccountProfileViewProps) {
   const { t } = useTranslation("features/edit-account-profile");
   const { t: tCommon } = useTranslation();
-  const { profileUrl } = useProfileImage();
+  const { profileUrl } = useProfileImage(imageSource);
   const isMaster = accountType === "master";
 
   return (

@@ -135,6 +135,16 @@
     "Microsoft YaHei", -apple-system, system-ui, sans-serif;
 }
 
+/*
+ * Figma 디자인 시스템은 Tailwind v3 팔레트 값을 씀. v4 기본값(OKLCH)과 눈에 띄게 다른 색만 시안 값으로 맞춤
+ * (디자인 QA 2026-11-03 사용자 결정: 배지·날짜 구분선·빈 상태 글자색).
+ */
+@theme {
+  --color-blue-600: #2563eb;
+  --color-emerald-600: #059669;
+  --color-slate-400: #94a3b8;
+}
+
 @theme inline {
   --font-sans: var(--font-family-base);
 

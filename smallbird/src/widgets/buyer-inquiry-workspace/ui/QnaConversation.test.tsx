@@ -42,6 +42,7 @@ const inquiry: BuyerInquiryViewModel = {
   writeTime: new Date("2026-10-01T10:00"),
   threadUserIdx: null,
   userIdx: 9,
+  sequence: null,
   preview: "질문",
   lastActivityAt: new Date("2026-10-01T10:00"),
   hasUnread: false,
@@ -141,7 +142,7 @@ describe("상품 Q&A 대화", () => {
     );
   });
 
-  it("삭제는 확인 후에 보내고, 이미 읽힌 답변(409)이면 이유를 알린다", async () => {
+  it("삭제는 확인 후에 보내고, 이미 읽힌 답변(409)이면 안내 없이 목록을 다시 받는다", async () => {
     const user = userEvent.setup();
     vi.mocked(serverApiV3.post).mockResolvedValue(qna(unread));
     vi.mocked(serverApiV3.delete).mockRejectedValue(new ApiError(409, null));
@@ -157,11 +158,11 @@ describe("상품 Q&A 대화", () => {
     await waitFor(() =>
       expect(serverApiV3.delete).toHaveBeenCalledWith("/help/reply/5"),
     );
+    // 안내 팝업 없이 대화를 다시 받음(같은 문의 상세를 한 번 더 요청).
     await waitFor(() =>
-      expect(toast.error).toHaveBeenCalledWith(
-        "구매자가 읽은 답변은 수정·삭제할 수 없습니다.",
-      ),
+      expect(vi.mocked(serverApiV3.post).mock.calls.length).toBeGreaterThan(1),
     );
+    expect(toast.error).not.toHaveBeenCalled();
   });
 
   it("구매자가 읽은 답변에는 수정·삭제 버튼이 없다", async () => {

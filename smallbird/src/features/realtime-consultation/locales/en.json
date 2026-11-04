@@ -2,9 +2,10 @@
   "composer": "Live chat message",
   "composerPlaceholder": "Enter your message. (up to 3,000 characters)",
   "send": "Send",
+  "connected": "Live chat connected.",
   "lock": {
     "title": "A chat is already in progress.",
-    "description": "You're already chatting with the Bigbird team on another screen. Please try again after that chat ends.",
+    "description": "Another agent is handling this inquiry. Please try again after it ends.",
     "cancel": "Cancel",
     "confirm": "OK"
   },
@@ -31,11 +32,11 @@
     },
     "operatorDelay": {
       "title": "Connecting to live chat",
-      "description": "Our agent is helping another customer, so replies are delayed. Please wait a moment"
+      "description": "The agent is handling other chats, so replies are delayed. Please wait a moment."
     },
     "operatorUnavailable": {
       "title": "Live chat delayed",
-      "description": "Our agents can't chat live right now. Leave a message and we'll reply soon."
+      "description": "No agent is available right now. Leave a message and we will reply soon."
     },
     "cancel": "Cancel",
     "confirm": "OK"

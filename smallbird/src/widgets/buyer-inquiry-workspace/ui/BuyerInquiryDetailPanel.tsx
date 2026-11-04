@@ -14,6 +14,8 @@ import { formatNumber, useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
 import { Avatar, AvatarImage, AvatarPlaceholder } from "@/shared/ui/avatar";
 
+import { toInquiryMenu } from "../model/menu";
+
 import type { BuyerInquiryViewModel } from "@/entities/inquiry";
 import type { ReactNode } from "react";
 
@@ -39,6 +41,9 @@ export function BuyerInquiryDetailPanel({
   const campaign = campaigns?.find(
     (item) => item.campaignIdx === inquiry.campaignIdx,
   );
+  // Figma 인플루언서 문의 상세(PC 10819:40984·TAB 10819:40998)는 주문/상품 정보·공구샵 코드·공구 진행 인플루언서가 없음.
+  // MO 시안(10819:40238)에는 남아 있으나 PC·TAB 기준으로 둠(디자인 확인 필요).
+  const isBuyerMenu = toInquiryMenu(inquiry.source) === "buyer";
 
   if (isLoading) {
     return (
@@ -72,7 +77,8 @@ export function BuyerInquiryDetailPanel({
   const campaignName = campaign?.name || detail.name;
   const period =
     detail.progressStartDate && detail.progressEndDate
-      ? `${detail.progressStartDate}~${detail.progressEndDate}`
+      ? // Figma 표기 YYYY.MM.DD~YYYY.MM.DD(서버는 yyyy-MM-dd)
+        `${detail.progressStartDate.replaceAll("-", ".")}~${detail.progressEndDate.replaceAll("-", ".")}`
       : null;
 
   return (
@@ -101,7 +107,7 @@ export function BuyerInquiryDetailPanel({
           )}
         </div>
       </div>
-      {detail.orderNumber && (
+      {isBuyerMenu && detail.orderNumber && (
         <Section title={t("orderInfo")}>
           <div className="flex items-start gap-2 tablet:gap-3">
             {/* Figma: 썸네일이 남는 폭을 채우는 정사각형이고 글은 140px 고정, 위쪽 정렬. */}
@@ -145,8 +151,9 @@ export function BuyerInquiryDetailPanel({
       {(detail.campaignCode || detail.campaignType || period) && (
         <Section
           title={t("campaignInfo")}
-          // Figma Container(6756:41103)는 높이 289 고정이고 배너가 남는 높이를 채웁니다(PC 81·MO 97).
-          contentClassName="h-72.25 gap-2 tablet:gap-3"
+          // 구매자 문의: Figma Container(6756:41103)는 높이 289 고정이고 배너가 남는 높이를 채움(PC 81·MO 97).
+          // 인플루언서 문의는 공구샵 코드·바로가기가 없어 배너가 72 고정(Figma 11315:50442 상세 패널).
+          contentClassName={cn("gap-2 tablet:gap-3", isBuyerMenu && "h-72.25")}
         >
           {/* 캠페인을 목록에서 못 찾거나 이미지가 없어도 배너 자리는 남깁니다. */}
           {campaignImageUrl ? (
@@ -154,12 +161,18 @@ export function BuyerInquiryDetailPanel({
               src={campaignImageUrl}
               alt={campaignName ?? ""}
               loading="lazy"
-              className="min-h-0 w-full flex-1 rounded-sm object-cover"
+              className={cn(
+                "min-h-0 w-full rounded-sm object-cover",
+                isBuyerMenu ? "flex-1" : "h-18",
+              )}
             />
           ) : (
             <div
               aria-hidden
-              className="min-h-0 w-full flex-1 rounded-sm bg-muted"
+              className={cn(
+                "min-h-0 w-full rounded-sm bg-muted",
+                isBuyerMenu ? "flex-1" : "h-18",
+              )}
             />
           )}
           {/* Figma Wrap(6756:41105): 캠페인명과 정보 줄·복사 버튼은 6px 간격입니다. */}
@@ -178,14 +191,15 @@ export function BuyerInquiryDetailPanel({
                 {...copyProps}
               />
             )}
-            {detail.shopCode && (
+            {isBuyerMenu && detail.shopCode && (
               <ClipboardButton
                 label={t("shopCode")}
                 value={detail.shopCode}
                 {...copyProps}
               />
             )}
-            {detail.influencerAccountLink && (
+            {/* TODO(backend): 인플루언서 닉네임 필드가 내려오면 [브랜드명][캠페인명][인플루언서 닉네임] 문의 표기와 닉네임만 남기는 상세로 교체 (요구명세서 24 I4·I26, 백엔드 요청 문서 5절 등록) */}
+            {isBuyerMenu && detail.influencerAccountLink && (
               // Figma Info(6766:47012): 간격 없이 양끝 정렬, 라벨은 한 줄이고 계정명이 길면 버튼 쪽을 말줄임합니다.
               <div className="flex items-center justify-between">
                 <span className="shrink-0 text-xs leading-4 font-medium whitespace-nowrap text-muted-foreground">

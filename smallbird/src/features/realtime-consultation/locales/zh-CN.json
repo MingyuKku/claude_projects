@@ -2,9 +2,10 @@
   "composer": "实时咨询消息",
   "composerPlaceholder": "请输入咨询内容。(最多3,000字)",
   "send": "发送",
+  "connected": "实时咨询已连接。",
   "lock": {
     "title": "咨询正在进行中。",
-    "description": "您正在其他页面与Bigbird运营团队咨询。请在当前咨询结束后再使用。",
+    "description": "其他客服正在处理该咨询，请在咨询结束后再使用。",
     "cancel": "取消",
     "confirm": "确认"
   },
@@ -31,11 +32,11 @@
     },
     "operatorDelay": {
       "title": "正在连接实时咨询",
-      "description": "客服正在处理其他咨询，回复有所延迟。请稍候"
+      "description": "客服正在同时处理其他咨询，回复有所延迟。请稍候"
     },
     "operatorUnavailable": {
       "title": "实时咨询延迟",
-      "description": "目前客服暂时无法实时应答。请留下咨询，我们会尽快回复。"
+      "description": "当前客服无法接待。请留言，我们会尽快回复。"
     },
     "cancel": "取消",
     "confirm": "确认"

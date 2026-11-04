@@ -124,6 +124,12 @@ export const routes: RouteObject[] = [
             (await import("@/pages/customer-center-buyer"))
               .CustomerCenterBuyerPage,
         ),
+        page(
+          ROUTES.customerCenterInfluencerThread,
+          async () =>
+            (await import("@/pages/customer-center-buyer"))
+              .CustomerCenterInfluencerPage,
+        ),
       ]),
 
       // 마이페이지. 셸은 MypageLayout이 맡음.

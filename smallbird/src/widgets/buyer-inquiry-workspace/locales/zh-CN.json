@@ -11,7 +11,9 @@
   },
   "source": {
     "purchaser": "买家咨询",
-    "qna": "商品问答"
+    "qna": "商品问答",
+    "influencer": "网红咨询",
+    "campaignQna": "活动问答"
   },
   "empty": "暂无咨询。",
   "loadError": "无法加载咨询列表。",
@@ -47,7 +49,9 @@
     "sourceType": {
       "ALL": "全部",
       "PURCHASER_QUESTION": "买家咨询",
-      "PRODUCT_QNA": "商品问答"
+      "PRODUCT_QNA": "商品问答",
+      "INFLUENCER_QUESTION": "网红咨询",
+      "CAMPAIGN_QNA": "活动问答"
     }
   },
   "searchEmpty": "没有'{{keyword}}'的搜索结果。",
@@ -76,7 +80,6 @@
     "cancel": "取消",
     "failed": "处理失败，请重试。",
     "exists": "该咨询已有回复。",
-    "read": "买家已读的回复无法编辑或删除。",
     "deleteTitle": "删除该回复？",
     "deleteDescription": "删除后无法恢复。"
   },
@@ -86,6 +89,7 @@
   },
   "realtime": {
     "end": "结束咨询",
-    "endFailed": "结束咨询失败,请重试。"
+    "endFailed": "结束咨询失败,请重试。",
+    "otherDevice": "其他客服正在处理该咨询，请在咨询结束后再使用。"
   }
 }

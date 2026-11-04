@@ -1,4 +1,8 @@
-import { getBuyerCardText } from "./format";
+import { renderHook } from "@testing-library/react";
+
+import { useTranslation } from "@/shared/i18n";
+
+import { getBuyerCardText, formatDividerDate } from "./format";
 
 import type {
   BuyerInquiryViewModel,
@@ -20,6 +24,7 @@ function inquiry(
     writeTime: null,
     threadUserIdx: 77,
     userIdx: null,
+    sequence: null,
     preview: "주문했는데 배송 시작이 늦어지는 것 같습니다",
     lastActivityAt: null,
     hasUnread: false,
@@ -72,4 +77,29 @@ describe("getBuyerCardText", () => {
       getBuyerCardText(inquiry({ campaignIdx: 99, preview: "짧은 문의" }), []),
     ).toEqual({ kind: "preview", text: "짧은 문의" });
   });
+});
+
+// i18next는 shared/i18n 밖에서 직접 임포트할 수 없어 useTranslation의 i18n으로 언어를 바꿈.
+function changeLanguage(language: string) {
+  const { result } = renderHook(() => useTranslation());
+  return result.current.i18n.changeLanguage(language);
+}
+
+describe("formatDividerDate", () => {
+  afterEach(async () => {
+    await changeLanguage("ko");
+  });
+
+  it.each([
+    ["ko", "26.9.8 (화)"],
+    ["en", "26.9.8 (Tue)"],
+    ["ja", "26.9.8 (火)"],
+    ["zh-CN", "26.9.8 (周二)"],
+  ])(
+    "%s에서 Figma 표기(26.9.8 (요일))로 쓰고 요일만 번역한다",
+    async (language, expected) => {
+      await changeLanguage(language);
+      expect(formatDividerDate(new Date(2026, 8, 8))).toBe(expected);
+    },
+  );
 });

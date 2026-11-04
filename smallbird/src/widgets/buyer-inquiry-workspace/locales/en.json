@@ -11,7 +11,9 @@
   },
   "source": {
     "purchaser": "Buyer Q&A",
-    "qna": "Product Q&A"
+    "qna": "Product Q&A",
+    "influencer": "Influencer Q&A",
+    "campaignQna": "Campaign Q&A"
   },
   "empty": "No inquiries yet.",
   "loadError": "Couldn't load inquiries.",
@@ -47,7 +49,9 @@
     "sourceType": {
       "ALL": "All",
       "PURCHASER_QUESTION": "Buyer Q&A",
-      "PRODUCT_QNA": "Product Q&A"
+      "PRODUCT_QNA": "Product Q&A",
+      "INFLUENCER_QUESTION": "Influencer Q&A",
+      "CAMPAIGN_QNA": "Campaign Q&A"
     }
   },
   "searchEmpty": "No results for '{{keyword}}'.",
@@ -76,7 +80,6 @@
     "cancel": "Cancel",
     "failed": "Something went wrong. Please try again.",
     "exists": "This inquiry already has a reply.",
-    "read": "Replies the buyer has read can't be edited or deleted.",
     "deleteTitle": "Delete this reply?",
     "deleteDescription": "A deleted reply can't be restored."
   },
@@ -86,6 +89,7 @@
   },
   "realtime": {
     "end": "End chat",
-    "endFailed": "Couldn't end the chat. Please try again."
+    "endFailed": "Couldn't end the chat. Please try again.",
+    "otherDevice": "Another agent is handling this inquiry. Please try again after it ends."
   }
 }

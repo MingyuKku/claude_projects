@@ -63,8 +63,8 @@
         "description": "Videos can be up to 50MB."
       },
       "fileSize": {
-        "title": "Document too large",
-        "description": "Documents can be up to 30MB."
+        "title": "File too large",
+        "description": "Each file can be up to 30MB."
       },
       "imageCount": {
         "title": "Too many images",

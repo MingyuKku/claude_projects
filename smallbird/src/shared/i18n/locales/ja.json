@@ -63,8 +63,8 @@
         "description": "動画は最大50MBまでです。"
       },
       "fileSize": {
-        "title": "文書の容量超過",
-        "description": "文書は最大30MBまでです。"
+        "title": "添付ファイル容量超過",
+        "description": "1ファイルあたり最大30MBまで添付できます。"
       },
       "imageCount": {
         "title": "画像の数超過",

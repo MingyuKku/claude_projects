@@ -3,11 +3,9 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import {
-  acceptRealtimeRequest,
-  appendConsultationMessage,
   AttachmentTextField,
   InquiryUploadStatus,
-  newMessageId,
+  isOtherDeviceError,
   sendInquiryMessage,
   startInquiryUploads,
   useInquiryAttachments,
@@ -27,15 +25,11 @@ import type { BuyerInquiryViewModel } from "@/entities/inquiry";
  */
 export function BuyerReplyComposer({
   inquiry,
-  identifier,
 }: {
   inquiry: BuyerInquiryViewModel;
-  /** 실시간 상담 메시지에 남길 광고주 계정 id(세션 값). */
-  identifier?: string;
 }) {
   const { t } = useTranslation("widgets/buyer-inquiry-workspace");
-  const { threadIdx, realtimeThread, mutate } =
-    usePurchaserConversation(inquiry);
+  const { threadIdx, mutate } = usePurchaserConversation(inquiry);
   const [text, setText] = useState("");
   const [isSending, setIsSending] = useState(false);
   const attachments = useInquiryAttachments();
@@ -49,52 +43,23 @@ export function BuyerReplyComposer({
     setIsSending(true);
     try {
       // 종료된 스레드에 보내면 서버가 새 스레드를 만들어 그 번호를 돌려줌. 첨부도 그 스레드로 보냄.
+      // 실시간 상담 중에도 같은 API로 보내고 Firestore 반영은 서버가 함(백엔드 흐름도 프론트팀 가이드 2026-11-03).
       let target = threadIdx;
       const body = text.trim();
-      if (body && realtimeThread && inquiry.threadUserIdx !== null) {
-        // 실시간 상담: 수락은 대화를 열 때 함(useAcceptRealtimeOnOpen). 열 때 수락이 빠졌으면(문서가 늦게 생김 등)
-        // 연결 전 거절(not-connected)이 오므로 여기서 한 번 수락하고 다시 보냄. 수락도 거절되면(종료·만료) 실패.
-        const target = {
-          threadUserIdx: inquiry.threadUserIdx,
-          ...realtimeThread,
-        };
-        const message = {
-          auto: false,
-          attachmentIdx: null,
-          identifier: identifier ?? null,
-          isUserMessage: false,
-          body,
-          fileName: null,
-          messageId: newMessageId(),
-        };
-        const send = () =>
-          appendConsultationMessage(target, {
-            requireConnected: true,
-            message,
-          });
-        const [error, result] = await tryit(async () => {
-          const first = await send();
-          if (first.ok || first.reason !== "not-connected") return first;
-          const accepted = await acceptRealtimeRequest(
-            target,
-            identifier ?? null,
-          );
-          return accepted.ok ? send() : accepted;
-        })();
-        if (error || !result.ok) {
-          console.error("구매자 실시간 상담 전송 실패", error ?? result);
-          toast.error(t("reply.failed"));
-          return;
-        }
-        setText("");
-      } else if (body) {
+      if (body) {
         const [error, savedThreadIdx] = await tryit(sendInquiryMessage)({
-          threadIdx,
+          threadIdx: target,
           body,
         });
         if (error) {
           console.error("구매자 문의 답장 전송 실패", error);
-          toast.error(t("reply.failed"));
+          toast.error(
+            t(
+              isOtherDeviceError(error)
+                ? "realtime.otherDevice"
+                : "reply.failed",
+            ),
+          );
           return;
         }
         target = savedThreadIdx;
