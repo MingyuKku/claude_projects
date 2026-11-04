@@ -7,6 +7,7 @@ import { ROUTES } from "@/shared/config";
 import {
   mockSession,
   mockSessionError,
+  mockSessionErrorOnce,
   mockV3GetError,
   mockV3Get,
   renderRoute,
@@ -79,9 +80,11 @@ describe("고객센터 진입", () => {
       expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
       expect(serverApiV3.get).not.toHaveBeenCalledWith("/sec", {
         headers: { "X-Path": ROUTES.customerCenterBigbird },
+        signal: expect.any(AbortSignal),
       });
       expect(serverApiV3.get).not.toHaveBeenCalledWith("/sec", {
         headers: { "X-Path": ROUTES.customerCenterBuyer },
+        signal: expect.any(AbortSignal),
       });
     },
   );
@@ -117,6 +120,7 @@ describe("고객센터 진입", () => {
     await expectCustomerCenterPage(router, BIGBIRD_PAGE);
     expect(serverApiV3.get).toHaveBeenCalledWith("/sec", {
       headers: { "X-Path": ROUTES.customerCenterBigbird },
+      signal: expect.any(AbortSignal),
     });
     // 세션은 `GET /v3/sec`로만 확인하고 V2 `GET /sec`는 부르지 않음.
     expect(serverApi.get).not.toHaveBeenCalled();
@@ -196,6 +200,8 @@ describe("고객센터 진입", () => {
               threadIdx: item.threadIdx,
               sequence: item.sequence,
               campaignIdx: item.campaignIdx,
+              brandName: null,
+              productName: null,
               status: item.status,
               created: item.created,
               finishTime: item.finishTime,
@@ -342,11 +348,13 @@ describe("고객센터 진입", () => {
     ).not.toHaveAttribute("aria-disabled");
   });
 
-  it("구매자 문의 권한이 없는 SUB가 직접 진입하면 서버가 403으로 막아 로그인으로 돌아간다", async () => {
-    mockSessionError(new ApiError(403, { result: false, reason: "forbidden" }));
+  it("구매자 문의 권한이 없는 SUB가 직접 진입하면 서버가 403으로 막아 홈으로 보낸다", async () => {
+    mockSessionErrorOnce(
+      new ApiError(403, { result: false, reason: "forbidden" }),
+    );
     const router = await renderRoute(ROUTES.customerCenterBuyer);
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(ROUTES.login),
+      expect(router.state.location.pathname).toBe(ROUTES.main),
     );
     expect(
       screen.queryByText("구매자 문의 화면을 준비 중입니다."),
@@ -365,22 +373,44 @@ describe("고객센터 진입", () => {
     ).toBeInTheDocument();
   });
 
-  it.each(["만료된 세션", "서버 접근 거절"])(
-    "%s이면 로컬 로그인으로 돌아간다",
-    async (reason) => {
-      if (reason === "만료된 세션") mockSessionError(new Error("Unauthorized"));
-      else
-        mockSession({
-          ...session,
-          result: false,
-        });
-      const router = await renderRoute(ROUTES.customerCenterBigbird);
-      await waitFor(() =>
-        expect(router.state.location.pathname).toBe(ROUTES.login),
-      );
-      expect(
-        screen.queryByText("문의사항이 존재하지 않습니다."),
-      ).not.toBeInTheDocument();
-    },
-  );
+  it("만료된 세션이면 로컬 로그인으로 돌아간다", async () => {
+    mockSessionError(new ApiError(401, undefined));
+    const router = await renderRoute(ROUTES.customerCenterBigbird);
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(ROUTES.login),
+    );
+    expect(
+      screen.queryByText("문의사항이 존재하지 않습니다."),
+    ).not.toBeInTheDocument();
+  });
+
+  it("서버가 경로를 거절하면(result: false) 로그인이 아니라 홈으로 보낸다", async () => {
+    vi.mocked(serverApiV3.get).mockImplementation(((
+      path: string,
+      options?: { headers?: Record<string, string> },
+    ) =>
+      path === "/sec"
+        ? Promise.resolve({
+            ...session,
+            result: options?.headers?.["X-Path"] === ROUTES.main,
+          })
+        : Promise.reject(new ApiError(404, undefined))) as never);
+    const router = await renderRoute(ROUTES.customerCenterBigbird);
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(ROUTES.main),
+    );
+    expect(
+      screen.queryByText("문의사항이 존재하지 않습니다."),
+    ).not.toBeInTheDocument();
+  });
+
+  it("세션 확인이 서버 오류로 실패하면 로그인으로 보내지 않고 에러 화면을 보여 준다", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    mockSessionError(new ApiError(500, undefined));
+    const router = await renderRoute(ROUTES.customerCenterBigbird);
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "문제가 발생했습니다",
+    );
+    expect(router.state.location.pathname).toBe(ROUTES.customerCenterBigbird);
+  });
 });

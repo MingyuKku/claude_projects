@@ -24,9 +24,7 @@ import type {
   SubscriptionCancelResult,
 } from "../model/types";
 
-/** 결제 서버의 새 카드로 구독 시작(카드 등록 + 첫 결제) API. V3가 프록시하지 않아 프론트가 직접 부름. */
-const NEW_CARD_PATH = "/v3/subscription/billing/subscribe/new-card";
-/** 결제 서버의 등록된 카드로 구독 시작 API. 결제창 없이 기본 카드로 바로 결제함. */
+/** 결제 서버의 등록된 카드로 구독 시작 API. 결제창 없이 기본 카드로 바로 결제함. V3가 프록시하지 않아 프론트가 직접 부름. */
 const SAVED_CARD_PATH = "/v3/subscription/billing/subscribe/saved-card";
 /** 결제 서버의 카드 추가(결제 없이 카드만 등록) API. 결제창 값은 새 카드로 구독 시작과 같은 모양. */
 const CARD_REGISTER_PATH = "/v3/subscription/billing/cards/register";
@@ -82,32 +80,21 @@ export async function fetchSubscriptionPayments(query: PaymentQuery) {
 }
 
 /**
- * 새 카드로 구독 시작(기본 카드가 없을 때). 1) `GET /v3/mypage/subscription/init`으로 토큰(10분 유효)을 받고
- * 2) 결제 서버 `subscribe/new-card`에 상품·주기·`origin`·`redirectUri`를 보내 결제창 값을 받음. 결과를 받는 `returnUrl`은 서버가 정하므로 보내지 않음.
- * 복귀 도메인은 프론트가 `origin`으로 정하고 서버는 검증하지 않음. 금액·주문번호·서명은 서버가 만듦.
- * 실패하면 `{ result: false, reason }` 본문이 담긴 `ApiError`를 던짐.
- */
-export async function requestSubscriptionIssuance(
-  productType: ActiveProductType,
-  billingPeriod: BillingPeriod,
-  paths: IssuancePaths,
-): Promise<IssuanceForm> {
-  return postIssuance(NEW_CARD_PATH, { productType, billingPeriod }, paths);
-}
-
-/**
- * 등록된 카드로 구독 시작(기본 카드가 있을 때). 결제창 없이 서버가 기본 카드로 바로 결제하고 결과를 JSON으로 줌.
+ * 등록된 카드로 구독 시작. 카드가 없으면 구독 화면이 먼저 카드를 등록하게 하므로(스펙 §3 카드 없음) 기본 카드가 있을 때만 부름. 결제창 없이 서버가 기본 카드로 바로 결제하고 결과를 JSON으로 줌.
  * 실패는 400 `{ result: false, reason }`(`NO_BILLING_CARD`·`ALREADY_SUBSCRIBED`·`PAYMENT_FAILED` 등)이고 보조 카드로 재시도하지 않음.
  */
 export async function requestSavedCardSubscription(
   productType: ActiveProductType,
   billingPeriod: BillingPeriod,
+  installmentMonths?: number,
 ) {
   const { token } = await fetchInitToken();
   const response = await payApi.post(SAVED_CARD_PATH, {
     token,
     productType,
     billingPeriod,
+    // 연간 결제의 2~12개월 할부일 때만 보냄. 없으면 일시불(월간에 2 이상을 보내면 서버가 `INVALID_INSTALLMENT`로 거절함).
+    ...(installmentMonths === undefined ? {} : { installmentMonths }),
   });
   return savedCardSubscriptionSchema.parse(response);
 }

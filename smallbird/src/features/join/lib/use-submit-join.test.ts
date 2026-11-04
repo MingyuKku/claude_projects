@@ -28,7 +28,7 @@ const payload: JoinPayload = {
   classification: null,
   companyUrl: null,
 };
-const tokenData = { platform: "kakao", email: "k@b.co", uid: "u1" };
+const tokenData = { platform: "kakao", email: "k@b.co", snsLinkToken: "tok" };
 
 function setup(
   options: { withSns?: boolean; payload?: JoinPayload | null } = {},
@@ -72,7 +72,11 @@ describe("useSubmitJoin", () => {
     post.mockResolvedValue({ result: "success", userIdx: 3 });
     const { result, onJoined, onLinkSocial } = setup({ withSns: true });
     await act(() => result.current.submit());
-    expect(onLinkSocial).toHaveBeenCalledWith("kakao", 3, "k@b.co", "u1");
+    expect(onLinkSocial).toHaveBeenCalledWith({
+      ...tokenData,
+      id: "tester01",
+      password: "Zq7!mkp2",
+    });
     expect(onJoined).toHaveBeenCalledTimes(1);
   });
 

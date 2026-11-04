@@ -30,6 +30,8 @@ const MOCK_SUBSCRIPTIONS: Record<ActiveProductType, Subscription> = {
     paymentMethod: "card",
     cardKind: "credit",
     isCancelScheduled: false,
+    status: "active",
+    nextRetryAt: null,
   },
   pick: {
     id: "sub-pick",
@@ -41,6 +43,8 @@ const MOCK_SUBSCRIPTIONS: Record<ActiveProductType, Subscription> = {
     paymentMethod: "cardInstallment",
     cardKind: "credit",
     isCancelScheduled: true,
+    status: "cancelScheduled",
+    nextRetryAt: null,
   },
 };
 

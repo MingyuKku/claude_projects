@@ -24,6 +24,7 @@
     "subscribe": "Subscribe",
     "subscribed": "Subscribed",
     "comingSoon": "Coming soon",
+    "comingSoonPrice": "Coming soon",
     "comingSoonText": {
       "line1": "Coming soon.",
       "line2": "Stay tuned!"
@@ -31,10 +32,7 @@
     "badge": {
       "brand": "Brand",
       "groupBuy": "Group Buy",
-      "liveCommerce": "Live Commerce",
-      "liveClass": "Live Class",
-      "ota": "OTA",
-      "smallBusiness": "Small Business"
+      "undecided": "TBD"
     },
     "recruit": {
       "features": {

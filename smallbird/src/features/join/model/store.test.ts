@@ -2,7 +2,11 @@ import { createJoinStore } from "./store";
 
 describe("join store", () => {
   it("starts on the info stage, unverified, seeded with the SNS identity", () => {
-    const tokenData = { platform: "naver", email: "a@b.co", uid: "9" };
+    const tokenData = {
+      platform: "naver",
+      email: "a@b.co",
+      snsLinkToken: "tok9",
+    };
     const state = createJoinStore(tokenData).getState();
     expect(state.stage).toBe("info");
     expect(state.account.certIdx).toBeNull();
@@ -55,7 +59,11 @@ describe("join store", () => {
   });
 
   it("resets to the initial state but keeps the SNS identity", () => {
-    const tokenData = { platform: "kakao", email: "a@b.co", uid: "1" };
+    const tokenData = {
+      platform: "kakao",
+      email: "a@b.co",
+      snsLinkToken: "tok1",
+    };
     const store = createJoinStore(tokenData);
     store.getState().patchAccount({ id: "tester01" });
     store.getState().setStage("terms");

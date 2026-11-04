@@ -55,6 +55,12 @@ export const bigbirdInquiryListItemSchema = z.object({
   threadIdx: z.number(),
   sequence: z.number().nullable(),
   campaignIdx: z.number().nullable(),
+  /**
+   * 캠페인 정보. 기타 문의(`campaignIdx` null)면 null. 2026-11-02 stage에 추가돼 아직 배포 안 된 서버에서는
+   * 빠질 수 있어 없어도 받음(없으면 캠페인 목록에서 찾음).
+   */
+  brandName: z.string().nullish(),
+  productName: z.string().nullish(),
   status: z.enum(["WAITING", "IN_PROGRESS", "ANSWERED"]),
   /** 포맷 완료 문자열(`2026-10-20 14:03`). */
   created: z.string(),
@@ -171,6 +177,18 @@ export type CampaignCard = z.infer<typeof campaignCardSchema>;
  * 같은 경로를 쓰고, 일반 문서에는 `sequence`·`threadIdx`·`isConnect`가 없고 `finishTime`이 Timestamp이며 메시지의
  * `isUserMessage`가 null일 수 있음(2026-10-29 dev 확인). 그래서 이 필드들은 없어도 읽을 수 있어야 함.
  */
+/**
+ * 구매자가 실시간 상담을 요청할 때 마켓이 구매자 계정 문서에 쓰는 데스크톱 알림 내용(`alarmData`). 광고주가 수락하면
+ * null이 됨. `title`·`body`의 `/`는 줄바꿈 자리(v2와 같음).
+ */
+export const realtimeAlarmSchema = z.object({
+  title: z.string(),
+  body: z.string().nullish(),
+  icon: z.string().nullish(),
+  campaignIdx: z.number().nullish(),
+});
+export type RealtimeAlarm = z.infer<typeof realtimeAlarmSchema>;
+
 export const realtimeConsultationSchema = z.object({
   sequence: z.number().nullish(),
   threadIdx: z.number().nullish(),
@@ -180,10 +198,11 @@ export const realtimeConsultationSchema = z.object({
   seqResponseDate: z.string().nullish(),
   // 실시간 상담 상태 계약(specs/customer-center/customer-center.md)의 추가 필드. 없는 과거 문서도 읽을 수 있어야 함.
   origin: z.enum(["v2", "v3"]).nullish(),
-  waitDeadline: z.string().nullish(),
-  canceledAt: z.string().nullish(),
-  expiredAt: z.string().nullish(),
-  closingAt: z.string().nullish(),
+  // 서버(2026-11-02 stage 배포)는 Timestamp로, v2·마켓·프론트는 문자열로 씀. 둘 다 문자열로 통일해 읽음.
+  waitDeadline: z.preprocess(normalizeFirestoreTime, z.string().nullish()),
+  canceledAt: z.preprocess(normalizeFirestoreTime, z.string().nullish()),
+  expiredAt: z.preprocess(normalizeFirestoreTime, z.string().nullish()),
+  closingAt: z.preprocess(normalizeFirestoreTime, z.string().nullish()),
   messages: z.array(
     z.object({
       auto: z.boolean(),
@@ -245,6 +264,9 @@ export interface BigbirdInquiryViewModel {
   threadIdx: number;
   sequence: number;
   campaignIdx: number | null;
+  /** 목록 응답의 캠페인 브랜드명·상품명. 기타 문의거나 목록 밖에서 만든 값이면 없음. */
+  brandName?: string | null;
+  productName?: string | null;
   isRealtime: boolean;
   isFinished: boolean;
   status: BigbirdInquiryStatus;
@@ -307,9 +329,18 @@ export const buyerInquirySchema = z.object({
 });
 export type BuyerInquiry = z.infer<typeof buyerInquirySchema>;
 
+const buyerSourceSchema = buyerInquirySchema.pick({ sourceType: true });
+
 export const buyerInquiryListSchema = z.object({
   result: z.boolean(),
-  list: z.array(buyerInquirySchema),
+  // 서버가 인플루언서 문의(INFLUENCER_QUESTION) 등 다른 출처를 섞어 줌(stage 2026-11-02). 구매자 문의 화면은
+  // 마켓 문의만 보이므로(사용자 결정) 모르는 출처는 목록 전체를 실패시키지 않고 건너뜀.
+  list: z
+    .array(z.unknown())
+    .transform((items) =>
+      items.filter((item) => buyerSourceSchema.safeParse(item).success),
+    )
+    .pipe(z.array(buyerInquirySchema)),
   pagingInfo: z.object({
     page: z.number(),
     size: z.number(),

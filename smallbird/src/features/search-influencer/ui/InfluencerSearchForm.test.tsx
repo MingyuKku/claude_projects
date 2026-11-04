@@ -186,6 +186,18 @@ describe("InfluencerSearchForm", () => {
       ).not.toBeInTheDocument();
     });
 
+    it("펼쳐도 커질 공간이 없어도 글이 넘치면 펼치기 아이콘을 보여 준다", async () => {
+      // 입력창 아래 끝이 본문 위 끝과 같아 펼칠 공간이 없는 경우(키보드로 보이는 영역이 낮을 때와 같음).
+      vi.spyOn(
+        HTMLFormElement.prototype,
+        "getBoundingClientRect",
+      ).mockReturnValue({ top: 0, bottom: 0 } as DOMRect);
+      await typeLines(5);
+      expect(
+        screen.getByRole("button", { name: "펼치기" }),
+      ).toBeInTheDocument();
+    });
+
     it("모바일은 8줄을 넘어 입력창 안에서 스크롤이 생길 때만 펼치기 아이콘을 보여 준다", async () => {
       stubMedia(MEDIA_QUERY.mobile);
       const user = await typeLines(8);

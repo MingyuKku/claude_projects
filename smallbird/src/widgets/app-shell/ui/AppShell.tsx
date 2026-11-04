@@ -148,7 +148,6 @@ export function AppShell({
       window.open(CLIENT_GUIDE_URL, "_blank", "noopener,noreferrer"),
   };
   const navigationContextValue = {
-    closeMenu,
     showLoginRequired: () => setIsLoginAlertOpen(true),
     isAuthenticated: session !== null,
     canAccessSubscribe: session !== null && session.authority !== "SUB",

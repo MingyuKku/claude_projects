@@ -26,8 +26,6 @@ export interface FieldLimit {
   maxFieldHeight: number;
   /** maxFieldHeight에서 테두리·패딩·버튼 줄을 뺀 입력 영역의 최대 높이. */
   maxTextareaHeight: number;
-  /** 펼치면 지금보다 커지는지. 커질 공간이 없으면 펼치기 버튼을 숨김(2026-11-02 사용자 결정). */
-  canExpand: boolean;
 }
 
 export type ExpandPhase = "closed" | "open" | "closing";
@@ -35,9 +33,6 @@ export type ExpandPhase = "closed" | "open" | "closing";
 interface UseInlineExpandOptions {
   formRef: RefObject<HTMLFormElement | null>;
 }
-
-// 소수점 높이 차이로 펼치기 버튼이 깜빡이지 않게 이만큼은 같은 높이로 봄.
-const EXPAND_ROOM_TOLERANCE = 1;
 
 function findBoundary(form: HTMLElement) {
   return form.closest<HTMLElement>(`[${EXPAND_BOUNDARY_ATTRIBUTE}]`);
@@ -116,7 +111,6 @@ function measureFieldLimit(
   const limit: FieldLimit = {
     maxFieldHeight,
     maxTextareaHeight: maxFieldHeight - chromeHeight,
-    canExpand: expandedHeight > box.offsetHeight + EXPAND_ROOM_TOLERANCE,
   };
   return { limit, expandedHeight };
 }
@@ -124,8 +118,7 @@ function measureFieldLimit(
 function isSameLimit(a: FieldLimit | undefined, b: FieldLimit) {
   return (
     a?.maxFieldHeight === b.maxFieldHeight &&
-    a.maxTextareaHeight === b.maxTextareaHeight &&
-    a.canExpand === b.canExpand
+    a.maxTextareaHeight === b.maxTextareaHeight
   );
 }
 

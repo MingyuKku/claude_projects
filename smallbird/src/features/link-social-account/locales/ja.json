@@ -10,6 +10,20 @@
   "unlink": {
     "title": "簡単ログイン解除",
     "description": "{{provider}}の簡単ログイン連携を解除しますか？解除すると{{provider}}アカウントでログインできません。",
-    "action": "解除"
+    "action": "解除",
+    "toast": {
+      "done": "{{provider}}の連携を解除しました。",
+      "notLinked": "すでに解除されています。",
+      "failed": "解除できませんでした。もう一度お試しください。"
+    }
+  },
+  "link": {
+    "toast": {
+      "done": "{{provider}}を連携しました。",
+      "alreadyLinked": "別の{{provider}}アカウントが連携済みです。先に解除してください。",
+      "linkedToOther": "他のアカウントに連携済みの{{provider}}アカウントです。",
+      "emailRequired": "メールの提供に同意が必要です。",
+      "failed": "連携できませんでした。もう一度お試しください。"
+    }
   }
 }

@@ -17,7 +17,6 @@
     "credentialRequired": "IDとパスワードを入力",
     "credentialMismatch": "入力されたIDとパスワードが登録情報と一致しません",
     "missingSnsData": "SNS連携情報がありません",
-    "linkFailed": "連携されませんでした。管理者にお問い合わせください",
-    "loginError": "ログイン中にエラーが発生しました"
+    "linkFailed": "連携されませんでした。管理者にお問い合わせください"
   }
 }

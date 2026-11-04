@@ -1,7 +1,7 @@
 import { useLocation } from "react-router";
 
 import { JoinWizard, readSnsTokenData } from "@/features/join";
-import { socialLink } from "@/features/social-login";
+import { linkSnsWithToken } from "@/features/social-login";
 import { useTranslation } from "@/shared/i18n";
 
 export function JoinPage() {
@@ -13,7 +13,12 @@ export function JoinPage() {
   return (
     <>
       <title>{t("title")}</title>
-      <JoinWizard tokenData={tokenData} onLinkSocial={socialLink} />
+      <JoinWizard
+        tokenData={tokenData}
+        onLinkSocial={({ id, password, snsLinkToken }) =>
+          linkSnsWithToken(id, password, snsLinkToken)
+        }
+      />
     </>
   );
 }

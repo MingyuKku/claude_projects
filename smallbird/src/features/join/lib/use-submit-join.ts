@@ -6,11 +6,9 @@ import { joinSubmit } from "../api/join-api";
 import type { JoinResult } from "../model/schema";
 import type { JoinPayload, SnsTokenData } from "../model/types";
 
+/** 방금 만든 계정(`id`·`password`)에 가입 전에 받은 SNS 신원을 연결하는 함수. */
 export type SocialLinker = (
-  platform: string,
-  userIdx: number,
-  email: string,
-  uid: string,
+  link: SnsTokenData & { id: string; password: string },
 ) => Promise<unknown>;
 
 interface UseSubmitJoinParams {
@@ -51,12 +49,11 @@ export function useSubmitJoin({
     }
     if (tokenData && onLinkSocial) {
       // 계정은 이미 만들어졌으므로 SNS 연동이 실패해도 가입은 실패로 보지 않음. 계정 화면에서 나중에 연동할 수 있음.
-      await tryit(onLinkSocial)(
-        tokenData.platform,
-        response.userIdx,
-        tokenData.email,
-        tokenData.uid,
-      );
+      await tryit(onLinkSocial)({
+        ...tokenData,
+        id: payload.id,
+        password: payload.pw,
+      });
     }
     setIsSubmitting(false);
     onJoined();

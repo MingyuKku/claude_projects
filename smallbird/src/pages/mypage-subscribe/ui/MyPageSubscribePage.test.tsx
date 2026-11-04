@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, useLocation } from "react-router";
 import { SWRConfig } from "swr";
@@ -65,14 +65,28 @@ const SUBSCRIPTIONS_RESPONSE = [
   },
 ];
 
-beforeEach(() => {
+const CARDS_RESPONSE = [
+  {
+    id: "32",
+    issuer: "하나카드",
+    maskedNumber: "1234-56**-****-***7",
+    isDefault: true,
+  },
+];
+
+function mockApi(cards: unknown[] = CARDS_RESPONSE) {
   vi.mocked(serverApiV3.get).mockImplementation(async (path) => {
     if (path === "/mypage/subscription/plans") return PLANS_RESPONSE;
     if (path === "/mypage/subscription/subscriptions") {
       return SUBSCRIPTIONS_RESPONSE;
     }
+    if (path === "/mypage/subscription/billing-cards") return cards;
     throw new Error(`unexpected request: ${path}`);
   });
+}
+
+beforeEach(() => {
+  mockApi();
 });
 
 function Location() {
@@ -163,5 +177,79 @@ describe("MyPageSubscribePage 결제 화면", () => {
       await screen.findByRole("button", { name: "구독하기" }),
     ).toBeInTheDocument();
     expect(serverApiV3.get).toHaveBeenCalledWith("/mypage/subscription/plans");
+  });
+});
+
+describe("MyPageSubscribePage 카드 없음", () => {
+  beforeEach(() => {
+    mockApi([]);
+  });
+
+  it("구독하기를 누르면 결제 화면 대신 카드 등록 안내를 띄운다", async () => {
+    const user = setup("/mypage/subscribe");
+    // 카드를 다 읽은 뒤에 눌러야 안내가 뜸.
+    await screen.findByRole("button", { name: "구독 중" });
+    await user.click(screen.getByRole("button", { name: "구독하기" }));
+
+    expect(
+      await screen.findByRole("alertdialog", { name: "결제 카드 등록" }),
+    ).toHaveTextContent(
+      "등록된 카드가 없습니다. 구독 결제를 위해 카드를 먼저 등록해주세요.",
+    );
+    expect(
+      screen.getByRole("button", { name: "결제 카드 등록하기" }),
+    ).toBeEnabled();
+    expect(screen.queryByText("결제 즉시 1개월 이용 시작")).toBeNull();
+  });
+
+  it("취소하면 안내가 닫히고 결제 쿼리가 지워진다", async () => {
+    const user = setup("/mypage/subscribe");
+    await screen.findByRole("button", { name: "구독 중" });
+    await user.click(screen.getByRole("button", { name: "구독하기" }));
+    await screen.findByRole("alertdialog", { name: "결제 카드 등록" });
+
+    await user.click(screen.getByRole("button", { name: "취소" }));
+
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull());
+    expect(screen.getByTestId("search")).toBeEmptyDOMElement();
+  });
+
+  it("안내에서 카드를 등록하고 돌아오면 구독하려던 결제 화면을 다시 연다", async () => {
+    // 카드 등록 전에는 0장, 이니시스에서 돌아와 다시 읽으면 1장.
+    let cards: unknown[] = [];
+    vi.mocked(serverApiV3.get).mockImplementation(async (path) => {
+      if (path === "/mypage/subscription/plans") return PLANS_RESPONSE;
+      if (path === "/mypage/subscription/subscriptions") {
+        return SUBSCRIPTIONS_RESPONSE;
+      }
+      if (path === "/mypage/subscription/billing-cards") return cards;
+      throw new Error(`unexpected request: ${path}`);
+    });
+    // "결제 카드 등록하기"가 이니시스로 떠나기 전에 남긴 값(RegisterCardDialog).
+    sessionStorage.setItem(
+      "billing-card-return-params",
+      JSON.stringify({ panel: "checkout", plan: "pick", period: "yearly" }),
+    );
+    cards = CARDS_RESPONSE;
+    setup("/mypage/subscribe?result=success&cardId=32");
+
+    expect(
+      await screen.findByText("결제 즉시 1년 이용 시작"),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("search")).toHaveTextContent(
+      "panel=checkout&plan=pick&period=yearly",
+    );
+    expect(screen.queryByRole("alertdialog")).toBeNull();
+    expect(sessionStorage.getItem("billing-card-return-params")).toBeNull();
+  });
+
+  it("결제 화면 주소로 바로 들어와도 안내를 띄우고 취소하면 쿼리를 지운다", async () => {
+    const user = setup("/mypage/subscribe?panel=checkout&plan=pick");
+    await screen.findByRole("alertdialog", { name: "결제 카드 등록" });
+
+    await user.click(screen.getByRole("button", { name: "취소" }));
+
+    await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull());
+    expect(screen.getByTestId("search")).toBeEmptyDOMElement();
   });
 });

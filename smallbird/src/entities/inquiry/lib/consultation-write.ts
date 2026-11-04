@@ -47,6 +47,8 @@ export interface AccountDoc {
   clientResponseUserIdx?: string | null;
   clientResponseSequence?: number | null;
   clientResponseTabs?: Record<string, number> | null;
+  /** 요청한 사용자. 수락 때 `newSenderUserIdx`로 씀(운영 앱과 같음). */
+  userIdx?: number | null;
 }
 
 export interface Lock {
@@ -545,6 +547,54 @@ export function planRetryRequest(
       threadBoardType: 0,
       newSenderUserIdx: 1,
       alarmData: input.alarm,
+      msgResponseDate: stamp,
+      updated: stamp,
+    },
+  };
+}
+
+/** 수락 때 남기는 자동 메시지. 운영 v3 `addOperMessage`와 같은 문구(다른 앱이 그대로 표시함). */
+export const ACCEPT_MESSAGE_BODY =
+  "상담원과 연결되었습니다.</br>10분 동안 추가 문의가 없으면 실시간 상담이 자동 종료됩니다.";
+
+/**
+ * 응대하는 쪽(구매자 문의의 광고주)이 실시간 요청을 수락함. 운영 v3 `addOperMessage`와 같은 쓰기.
+ * 취소·만료·종료됐거나 `waitDeadline`이 지났으면 거절하고, 이미 연결됐으면 건너뜀.
+ */
+export function planAcceptRequest(
+  doc: ConsultationDoc | undefined,
+  account: AccountDoc | undefined,
+  input: { identifier: string | null; now: number },
+): Plan {
+  if (!doc) return reject("missing");
+  const closed = getClosedReason(doc);
+  if (closed) return reject(closed);
+  if (doc.isConnect) return { kind: "skip" };
+  // 운영 앱처럼 명시된 마감만 봄. 마감은 백엔드가 요청 때 씀.
+  const deadline = parseWriteTime(doc.waitDeadline);
+  if (deadline !== null && input.now >= deadline) return reject("expired");
+  const stamp = formatWriteTime(input.now);
+  return {
+    kind: "write",
+    consultation: {
+      isConnect: true,
+      seqResponseDate: stamp,
+      messages: [
+        ...(doc.messages ?? []),
+        {
+          auto: true,
+          attachmentIdx: null,
+          identifier: input.identifier,
+          isUserMessage: false,
+          body: ACCEPT_MESSAGE_BODY,
+          created: stamp,
+        },
+      ],
+    },
+    account: {
+      alarmData: null,
+      threadBoardType: 0,
+      newSenderUserIdx: account?.userIdx ?? null,
       msgResponseDate: stamp,
       updated: stamp,
     },

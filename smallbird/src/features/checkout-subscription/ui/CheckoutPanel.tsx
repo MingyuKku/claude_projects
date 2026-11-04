@@ -10,7 +10,15 @@ import { Card, CardHeader, CardTitle } from "@/shared/ui/card";
 import { Checkbox } from "@/shared/ui/checkbox";
 import { Label } from "@/shared/ui/label";
 
+import {
+  canChooseInstallment,
+  LUMP_SUM,
+  toInstallmentMonths,
+} from "../model/installment";
+import { useChangeDefaultCard } from "../model/use-change-default-card";
 import { useStartSubscription } from "../model/use-start-subscription";
+import { ChangeDefaultCardDialog } from "./ChangeDefaultCardDialog";
+import { PaymentMethodSection } from "./PaymentMethodSection";
 
 import type {
   ActiveProductType,
@@ -70,17 +78,18 @@ export function CheckoutPanel({
   onCancel,
 }: CheckoutPanelProps) {
   const { t } = useTranslation("features/checkout-subscription");
-  const { t: tCommon } = useTranslation();
   const productLabel = useProductTypeLabel()(type);
-  // 기본 카드가 있으면 결제창 없이 그 카드로 바로 결제하므로, 카드를 읽기 전에는 결제 방식을 정할 수 없음.
-  // 읽기에 실패하면 기본 카드가 있는지 알 수 없어 새 카드 결제로 넘기지 않고(카드 중복 등록 위험) 안내와 다시 시도를 둠.
+  // 결제는 기본 카드로 바로 하므로 카드를 읽기 전에는 결제할 수 없음. 읽기에 실패하면 안내와 다시 시도를 둠.
+  // 카드가 0장인 경우는 페이지가 이 화면 대신 카드 등록 안내를 보여 주므로 여기서 다루지 않음.
   const {
     data: cards,
     isError: isCardsError,
     mutate: reloadCards,
   } = useBillingCards();
   const defaultCard = cards?.find((card) => card.isDefault);
-  const { start, isStarting } = useStartSubscription(Boolean(defaultCard));
+  const { start, isStarting } = useStartSubscription();
+  const changeCard = useChangeDefaultCard();
+  const [installmentMonths, setInstallmentMonths] = useState(LUMP_SUM);
   const [isAgreed, setIsAgreed] = useState(false);
   const agreeId = useId();
   // 결제 화면에는 월간/연간 구분이 없어 월 요금을 씀.
@@ -90,14 +99,20 @@ export function CheckoutPanel({
     period === "yearly" ? (plan?.yearlyPrice ?? 0) : (plan?.monthlyPrice ?? 0);
   const amount = formatNumber(price);
 
+  // 월간·체크카드면 고른 값이 있어도 일시불로 봄(월간 화면으로 돌아가거나 기본 카드를 바꿔도 값이 어긋나지 않게 렌더 중 계산함).
+  const canInstallment = canChooseInstallment(period, defaultCard);
+  const effectiveInstallmentMonths = canInstallment
+    ? installmentMonths
+    : LUMP_SUM;
+
   function handlePay() {
-    void start(type, period);
+    void start(type, period, toInstallmentMonths(effectiveInstallmentMonths));
   }
 
   return (
     <>
       <div className="grid grid-cols-1 items-start gap-4 tablet:gap-5 desktop:grid-cols-[minmax(0,1fr)_29.75rem]">
-        <div className="flex flex-col gap-4 tablet:gap-6">
+        <div className="flex flex-col gap-4 tablet:gap-5 desktop:gap-6">
           <SectionCard
             title={t("product.title")}
             className="gap-3 tablet:gap-4"
@@ -119,6 +134,17 @@ export function CheckoutPanel({
               />
             </dl>
           </SectionCard>
+          <PaymentMethodSection
+            cards={cards}
+            isError={isCardsError}
+            // 기본 카드를 바꿀지 묻는 동안은 고른 카드가 선택돼 보임(시안).
+            selectedCardId={changeCard.pendingCard?.id ?? defaultCard?.id}
+            onSelectCard={changeCard.selectCard}
+            installmentCardId={canInstallment ? defaultCard?.id : undefined}
+            installmentMonths={effectiveInstallmentMonths}
+            onChangeInstallment={setInstallmentMonths}
+            onRetry={() => void reloadCards()}
+          />
           <SectionCard
             title={t("notice.title")}
             className="gap-3 tablet:gap-4"
@@ -156,32 +182,6 @@ export function CheckoutPanel({
           </CardHeader>
           <dl className={cn("pb-3", CARD_SIDE_CLASS)}>
             <Row label={t("summary.product")} value={productLabel} />
-            {defaultCard && (
-              <Row
-                label={t("summary.card")}
-                value={`${defaultCard.issuer} ${defaultCard.maskedNumber}`}
-              />
-            )}
-            {isCardsError && (
-              <Row
-                label={t("summary.card")}
-                value={
-                  <span className="flex flex-col items-end gap-2">
-                    <span className="text-destructive">
-                      {t("error.cardsLoadFailed")}
-                    </span>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => void reloadCards()}
-                    >
-                      {tCommon("action.retry")}
-                    </Button>
-                  </span>
-                }
-              />
-            )}
             <Row
               label={t("summary.amount")}
               value={t("price.won", { amount })}
@@ -209,6 +209,12 @@ export function CheckoutPanel({
           </div>
         </Card>
       </div>
+      <ChangeDefaultCardDialog
+        open={changeCard.pendingCard !== null}
+        isChanging={changeCard.isChanging}
+        onCancel={changeCard.cancel}
+        onConfirm={() => void changeCard.confirm()}
+      />
     </>
   );
 }

@@ -1,4 +1,4 @@
-import { toCardKind } from "../model/codes";
+import { toCardKind, toSubscriptionStatus } from "../model/codes";
 import { isSubscriptionProductType } from "../model/schema";
 
 import type { SubscriptionListResponse } from "../model/schema";
@@ -21,6 +21,8 @@ export function transformSubscriptions(
             paymentMethod: item.paymentMethod,
             cardKind: toCardKind(item.cardKind),
             isCancelScheduled: item.isCancelScheduled,
+            status: toSubscriptionStatus(item.status, item.isCancelScheduled),
+            nextRetryAt: item.nextRetryAt ?? null,
           },
         ]
       : [],

@@ -41,14 +41,15 @@ export const STATUS_BADGE_VARIANT = {
 } satisfies Record<BigbirdInquiryViewModel["status"], ChatListBadge["variant"]>;
 
 /**
- * 목록·대화 제목. 캠페인 이름은 광고주의 캠페인 목록(`productName`)에서 찾고, 목록 응답에는 메시지가 없어 대화를
- * 받은 뒤에는 문의 생성 때 보낸 캠페인 카드로도 찾음.
+ * 목록·대화 제목. 캠페인 이름은 목록 응답의 상품명(종료 캠페인도 있음)을 먼저 쓰고, 없으면 광고주의 캠페인 목록
+ * (`productName`)에서 찾음. 목록 응답에는 메시지가 없어 대화를 받은 뒤에는 문의 생성 때 보낸 캠페인 카드로도 찾음.
  */
 export function getInquiryTitleKey(
   inquiry: BigbirdInquiryViewModel,
   productName?: string,
 ) {
   const name =
+    inquiry.productName?.trim() ||
     productName?.trim() ||
     inquiry.messages.find((message) => message.campaign)?.campaign?.productName;
   if (name) return { key: "inquiryTitle.campaign", name } as const;

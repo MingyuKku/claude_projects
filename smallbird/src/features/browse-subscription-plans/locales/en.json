@@ -4,12 +4,5 @@
     "monthly": "Monthly",
     "yearly": "Yearly",
     "discount": "{{rate}}% off"
-  },
-  "notice": {
-    "title": "Notice",
-    "items": {
-      "1": "Demo trials are unlimited.",
-      "2": "Subscribe to the plan to register real campaigns."
-    }
   }
 }

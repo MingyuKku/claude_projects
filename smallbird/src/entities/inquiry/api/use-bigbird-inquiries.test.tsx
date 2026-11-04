@@ -23,6 +23,8 @@ const item = (threadIdx: number) => ({
   threadIdx,
   sequence: threadIdx,
   campaignIdx: null,
+  brandName: null,
+  productName: null,
   status: "WAITING",
   created: "2026-10-01 10:00",
   finishTime: null,

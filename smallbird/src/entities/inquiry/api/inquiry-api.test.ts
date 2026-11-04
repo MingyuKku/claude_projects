@@ -36,6 +36,8 @@ const listItem = {
   threadIdx: 101,
   sequence: 7,
   campaignIdx: null,
+  brandName: null,
+  productName: null,
   status: "WAITING",
   created: "2026-10-20 14:03",
   finishTime: null,
@@ -224,6 +226,21 @@ describe("fetchBuyerInquiryPage", () => {
     userIdx: null,
   };
 
+  it("인플루언서 문의 등 모르는 출처가 섞여도 목록을 실패시키지 않고 그 항목만 뺀다", async () => {
+    vi.mocked(serverApiV3.get).mockResolvedValue({
+      result: true,
+      list: [
+        { ...item, inquiryIdx: 1282, sourceType: "INFLUENCER_QUESTION" },
+        item,
+      ],
+      pagingInfo: { page: 1, size: 20, totalCount: 2, totalPage: 1 },
+    });
+    const page = await fetchBuyerInquiryPage("all", 1);
+    expect(page.inquiries.map((inquiry) => inquiry.key)).toEqual([
+      "purchaser-501",
+    ]);
+  });
+
   it("탭을 서버 상태값으로 바꿔 쪽 단위로 조회한다", async () => {
     vi.mocked(serverApiV3.get).mockResolvedValue({
       result: true,
@@ -357,6 +374,7 @@ describe("구매자 문의 상세·대화·Q&A", () => {
   it("구매자 대화는 type=client로 조회하고 404는 빈 대화로 본다", async () => {
     vi.mocked(serverApiV3.get).mockRejectedValue(new ApiError(404, null));
     await expect(fetchPurchaserConversation(77, null)).resolves.toEqual({
+      realtimeThread: null,
       threads: [],
       messages: [],
       latestThreadIdx: null,

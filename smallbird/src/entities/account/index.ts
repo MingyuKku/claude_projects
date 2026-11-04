@@ -27,7 +27,12 @@ export type {
   PasswordErrorCode,
   ValidPasswordErrorCode,
 } from "./model/join-validation";
-export { checkAccountValue, verifyCurrentPassword } from "./api/mypage-api";
+export {
+  checkAccountValue,
+  linkSocial,
+  unlinkSocial,
+  verifyCurrentPassword,
+} from "./api/mypage-api";
 export type {
   DuplicateCheckResult,
   DuplicateCheckType,
@@ -35,6 +40,7 @@ export type {
 export { useBankList } from "./api/use-bank-list";
 export type { BankOption } from "./model/bank-schema";
 export { useMasterAccount } from "./api/use-master-account";
+export { useSocialLinks } from "./api/use-social-links";
 export { useSubSelfAccount } from "./api/use-sub-self-account";
 export {
   DENIED_REASON,
@@ -55,6 +61,11 @@ export {
 } from "./lib/upload-rules";
 export type { UploadRejection } from "./lib/upload-rules";
 export { SOCIAL_PROVIDERS } from "./model/mypage-schema";
+export type {
+  SocialLinkCredential,
+  SocialLinkOutcome,
+  SocialLinkRequest,
+} from "./model/social-link";
 export type {
   AccountProfileViewModel,
   CompanyInfoViewModel,

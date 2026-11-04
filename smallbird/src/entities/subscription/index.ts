@@ -3,9 +3,8 @@ export {
   deleteBillingCard,
   requestCardIssuance,
   requestSavedCardSubscription,
-  requestSubscriptionIssuance,
-  setDefaultBillingCard,
 } from "./api/subscription-api";
+export { useSetDefaultBillingCard } from "./api/use-set-default-billing-card";
 export {
   useBillingCards,
   usePaymentRecords,
@@ -65,4 +64,7 @@ export {
 export { PaymentStatusBadge } from "./ui/PaymentStatusBadge";
 export { SubscriptionPlanCard } from "./ui/SubscriptionPlanCard";
 export { submitIssuanceForm } from "./lib/submit-issuance-form";
-export { readApiErrorReason } from "./lib/read-error-reason";
+export {
+  readApiErrorPgMessage,
+  readApiErrorReason,
+} from "./lib/read-error-reason";

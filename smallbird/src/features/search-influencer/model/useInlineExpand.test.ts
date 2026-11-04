@@ -18,8 +18,6 @@ interface Layout {
   paddingBottom?: number;
   // 셸의 키보드 열림 표식.
   isKeyboardOpen?: boolean;
-  // 접힌 입력창 박스 높이. 없으면 SLOT_HEIGHT.
-  boxHeight?: number;
 }
 
 function rect(box: { top?: number; bottom?: number }) {
@@ -61,10 +59,9 @@ function setup(layout: Layout) {
     get: () => state.scrollportHeight,
   });
   Object.defineProperty(form, "offsetHeight", { value: SLOT_HEIGHT });
-  const boxHeight = layout.boxHeight ?? SLOT_HEIGHT;
-  Object.defineProperty(box, "offsetHeight", { value: boxHeight });
+  Object.defineProperty(box, "offsetHeight", { value: SLOT_HEIGHT });
   Object.defineProperty(textarea, "offsetHeight", {
-    value: boxHeight - CHROME_HEIGHT,
+    value: SLOT_HEIGHT - CHROME_HEIGHT,
   });
 
   const { result, unmount } = renderHook(() =>
@@ -168,7 +165,6 @@ describe("useInlineExpand", () => {
       expect(result.current.limit).toEqual({
         maxFieldHeight: 368,
         maxTextareaHeight: 368 - CHROME_HEIGHT,
-        canExpand: true,
       });
       act(() => result.current.expand());
       expect(result.current.metrics?.overlayHeight).toBe(368);
@@ -188,18 +184,6 @@ describe("useInlineExpand", () => {
       expect(result.current.limit?.maxTextareaHeight).toBe(LINE_HEIGHT);
     });
 
-    it("접힌 입력창이 이미 한도만큼 크면 펼칠 공간이 없다", () => {
-      const { result } = setup({
-        boundaryTop: 0,
-        formBottom: 300,
-        scrollportHeight: 232,
-        isKeyboardOpen: true,
-        boxHeight: 200,
-      });
-      // 232 − 32 = 200 = 접힌 박스 높이.
-      expect(result.current.limit?.canExpand).toBe(false);
-    });
-
     it("키보드 열림 배치로 바뀌면 다시 잰다", async () => {
       const { result, shell } = setup({
         boundaryTop: 0,
@@ -214,18 +198,7 @@ describe("useInlineExpand", () => {
         await Promise.resolve();
       });
       expect(result.current.metrics?.overlayHeight).toBe(368);
-      expect(result.current.limit?.canExpand).toBe(true);
     });
-  });
-
-  it("키보드가 없을 때 펼칠 공간이 없으면 canExpand가 false다", () => {
-    const { result } = setup({
-      boundaryTop: 0,
-      formBottom: 158,
-      scrollportHeight: 700,
-    });
-    // 158 − 16 = 142 = 접힌 박스 높이.
-    expect(result.current.limit?.canExpand).toBe(false);
   });
 
   it("스크롤 영역이 줄면(키보드) 펼친 높이를 다시 잰다", () => {

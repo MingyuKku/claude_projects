@@ -32,15 +32,6 @@ const masterUserSchema = z.object({
   email: z.string().nullish(),
   certification: certificationSchema.nullish(),
   created: z.string().nullish(),
-  // 간편 로그인 연동 상태. 연동하지 않았으면 null.
-  idKakao: z.string().nullish(),
-  idNaver: z.string().nullish(),
-  idGoogle: z.string().nullish(),
-  idApple: z.string().nullish(),
-  emailKakao: z.string().nullish(),
-  emailNaver: z.string().nullish(),
-  emailGoogle: z.string().nullish(),
-  emailApple: z.string().nullish(),
 });
 
 const masterCompanyInformationSchema = z.object({
@@ -90,6 +81,21 @@ export interface SocialLinkViewModel {
   email: string | null;
 }
 
+/**
+ * `GET·POST·DELETE /v3/mypage/account/sns[/{platform}]`의 응답(`AccountSnsListV3Response`).
+ * kakao·naver·google·apple 순서로 항상 4개(2026-11-02 Stage Swagger). 모르는 플랫폼은 트랜스포머가 버림.
+ */
+export const accountSnsListSchema = z.object({
+  items: z.array(
+    z.object({
+      platform: z.string(),
+      linked: z.boolean(),
+      email: z.string().nullish(),
+    }),
+  ),
+});
+export type AccountSnsList = z.infer<typeof accountSnsListSchema>;
+
 export interface AccountProfileViewModel {
   identifier: string;
   /** 담당자명(본인인증 실명). */
@@ -123,5 +129,4 @@ export interface MasterAccountViewModel {
   profile: AccountProfileViewModel;
   /** 회사정보를 아직 등록하지 않았으면 null. `POST`(등록)와 `PUT`(수정)을 가르는 기준. */
   company: CompanyInfoViewModel | null;
-  socialLinks: Record<SocialProvider, SocialLinkViewModel>;
 }

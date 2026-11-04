@@ -9,6 +9,22 @@
       "yearly": "결제 즉시 1년 이용 시작"
     }
   },
+  "method": {
+    "title": "결제 수단",
+    "card": "카드 결제",
+    "required": "필수",
+    "defaultCard": "기본 카드"
+  },
+  "installment": {
+    "label": "{{card}} 할부",
+    "lumpSum": "일시불",
+    "months": "{{months}}개월"
+  },
+  "changeDefault": {
+    "title": "기본 카드 변경",
+    "description": "기본 카드로만 결제 가능합니다. 선택하신 카드를 기본 카드로 변경하시겠습니까?",
+    "action": "기본 카드 변경하기"
+  },
   "notice": {
     "title": "안내사항 확인",
     "agree": "아래 안내사항을 모두 확인하였으며, 정기 결제 및 자동 갱신에 동의합니다.",
@@ -23,7 +39,6 @@
   "summary": {
     "title": "결제 요약",
     "product": "결제 상품",
-    "card": "결제 카드",
     "amount": "결제 금액",
     "pay": "결제",
     "cancel": "취소"
@@ -46,6 +61,9 @@
     "productNotAvailable": "지금은 구독할 수 없는 상품입니다.",
     "cardLimitExceeded": "등록할 수 있는 카드는 최대 2장입니다.",
     "cardRegisterFailed": "카드를 등록하지 못했습니다. 다시 시도해 주세요.",
-    "paymentFailed": "결제에 실패했습니다. 다시 시도해 주세요."
+    "paymentFailed": "결제에 실패했습니다. 다시 시도해 주세요.",
+    "cardNotFound": "이미 삭제되었거나 없는 카드입니다.",
+    "invalidInstallment": "선택한 할부 개월로 결제할 수 없습니다. 다시 선택해 주세요.",
+    "installmentNotAllowedCard": "체크카드는 할부 결제를 할 수 없습니다. 일시불로 결제해 주세요."
   }
 }

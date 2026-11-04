@@ -22,7 +22,8 @@
   },
   "error": {
     "title": "出现问题",
-    "unexpected": "发生意外错误。"
+    "unexpected": "发生意外错误。",
+    "forbidden": "您没有访问此菜单的权限。请向主账号申请权限。"
   },
   "password": {
     "show": "显示{{label}}",

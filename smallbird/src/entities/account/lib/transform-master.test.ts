@@ -19,10 +19,6 @@ const masterResponse = {
       phoneNumber: "01012345678",
     },
     created: "2019-10-18 01:19",
-    idKakao: "kakao-1",
-    emailKakao: "k@example.com",
-    idNaver: null,
-    emailNaver: null,
   },
   companyInformation: {
     companyName: "주식회사 빅버드",
@@ -52,19 +48,6 @@ describe("transformMasterToViewModel", () => {
       certIdx: 87,
     });
     expect(profile.joinedAt?.getFullYear()).toBe(2019);
-  });
-
-  it("연동 ID가 있으면 연동됨, null이면 연동 안 됨으로 본다", () => {
-    const { socialLinks } = transformMasterToViewModel(
-      accountMasterSchema.parse(masterResponse),
-    );
-    expect(socialLinks.kakao).toEqual({
-      isLinked: true,
-      email: "k@example.com",
-    });
-    expect(socialLinks.naver).toEqual({ isLinked: false, email: null });
-    // 응답에 키가 아예 없는 SNS도 연동 안 됨으로 본다.
-    expect(socialLinks.apple.isLinked).toBe(false);
   });
 
   it("서류는 인덱스가 아니라 등록 여부와 파일명으로 바꾼다", () => {

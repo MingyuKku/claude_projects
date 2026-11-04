@@ -50,6 +50,8 @@ const SUBSCRIPTIONS: Subscription[] = [
     paymentMethod: "card",
     cardKind: "credit",
     isCancelScheduled: false,
+    status: "active",
+    nextRetryAt: null,
   },
 ];
 
@@ -77,6 +79,16 @@ describe("SubscriptionPlanList", () => {
     expect(screen.queryByText("월 99,999원")).toBeNull();
   });
 
+  it("연간 결제에서는 할인 전 금액(월 요금 × 12)을 줄 그어 함께 보여 준다", async () => {
+    const { user } = setup();
+    expect(screen.queryByText("연 1,199,988원")).toBeNull();
+
+    await user.click(screen.getByRole("radio", { name: /연간 결제/ }));
+
+    expect(screen.getByText("연 1,199,988원")).toHaveClass("line-through");
+    expect(screen.getByText("연 2,399,988원")).toHaveClass("line-through");
+  });
+
   it("구독 중인 상품은 비활성 '구독 중'이고 다른 상품의 '구독하기'는 눌린다", async () => {
     const { user, onSubscribe } = setup();
     expect(screen.getByRole("button", { name: "구독 중" })).toBeDisabled();
@@ -99,6 +111,8 @@ describe("SubscriptionPlanList", () => {
     expect(buttons).toHaveLength(2);
     for (const button of buttons) expect(button).toBeDisabled();
     expect(screen.getAllByText("추후 제공 예정이에요.")).toHaveLength(2);
+    expect(screen.getAllByText("준비 중")).toHaveLength(2);
+    expect(screen.getAllByText("미정")).toHaveLength(2);
   });
 
   it("상세보기는 카드마다 따로 펼치고 접는다", async () => {

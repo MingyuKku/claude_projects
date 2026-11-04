@@ -37,6 +37,28 @@ export function toCardKind(
   return CARD_KINDS.find((kind) => kind === serverValue) ?? null;
 }
 
+/** 구독 상태. 서버 `status`: `active` 이용 중, `cancelScheduled` 해지 예정(종료일까지 이용), `paymentFailed` 정기결제 실패(이용 중지, 하루 간격 최대 3회 재결제). */
+export const SUBSCRIPTION_STATUSES = [
+  "active",
+  "cancelScheduled",
+  "paymentFailed",
+] as const;
+export type SubscriptionStatus = (typeof SUBSCRIPTION_STATUSES)[number];
+
+/**
+ * 서버 값을 구독 상태 코드로 바꿈. 없거나 모르는 값(서버가 상태를 늘렸거나 예전 응답)은 `isCancelScheduled`로 가려
+ * 화면이 깨지지 않게 함.
+ */
+export function toSubscriptionStatus(
+  serverValue: string | null | undefined,
+  isCancelScheduled: boolean,
+): SubscriptionStatus {
+  return (
+    SUBSCRIPTION_STATUSES.find((status) => status === serverValue) ??
+    (isCancelScheduled ? "cancelScheduled" : "active")
+  );
+}
+
 /** 이용 현황 지표. 매칭 성사 수는 PICK형만. */
 export const USAGE_METRICS = [
   "campaignCount",

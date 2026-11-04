@@ -69,10 +69,17 @@ export function useUsageSeries(
 
 export const BILLING_CARDS_KEY = ["mypage", "subscription", "billing-cards"];
 
+interface UseBillingCardsOptions {
+  /** false면 조회하지 않음. 구독 API를 아직 열지 않은 빌드에서 안 쓰는 요청이 나가지 않게 함. */
+  enabled?: boolean;
+}
+
 /** 정기결제 카드(최대 2장). 삭제·기본 카드 변경은 `mutate`의 낙관적 갱신으로 반영함. */
-export function useBillingCards() {
+export function useBillingCards({
+  enabled = true,
+}: UseBillingCardsOptions = {}) {
   const { data, error, isLoading, mutate } = useSWR(
-    BILLING_CARDS_KEY,
+    enabled ? BILLING_CARDS_KEY : null,
     fetchBillingCards,
   );
   return { data, isLoading, isError: Boolean(error), mutate };

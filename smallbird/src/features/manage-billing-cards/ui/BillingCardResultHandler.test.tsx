@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 import { MemoryRouter, useLocation } from "react-router";
 import { toast } from "sonner";
 
@@ -27,6 +27,7 @@ function setup(search: string) {
 }
 
 beforeEach(() => {
+  sessionStorage.clear();
   revalidate.mockReset();
   vi.mocked(toast.success).mockReset();
 });
@@ -49,6 +50,34 @@ describe("BillingCardResultHandler", () => {
       expect.anything(),
     );
     expect(revalidate).toHaveBeenCalledOnce();
+  });
+
+  it("등록 전에 남긴 돌아올 쿼리가 있으면 새 카드 목록을 받은 뒤 그 화면으로 옮긴다", async () => {
+    sessionStorage.setItem(
+      "billing-card-return-params",
+      JSON.stringify({ panel: "checkout", plan: "pick", period: "yearly" }),
+    );
+    let finishRevalidate: () => void = () => {};
+    revalidate.mockReturnValue(
+      new Promise<void>((resolve) => {
+        finishRevalidate = resolve;
+      }),
+    );
+    setup("?result=success&cardId=32");
+
+    await waitFor(() => expect(revalidate).toHaveBeenCalledOnce());
+    // 새 목록을 받기 전에는 옮기지 않음(0장으로 읽은 목록 때문에 카드 없음 안내가 다시 뜨지 않게).
+    expect(screen.getByTestId("search")).toHaveTextContent(
+      "?result=success&cardId=32",
+    );
+
+    await act(async () => finishRevalidate());
+    await waitFor(() =>
+      expect(screen.getByTestId("search")).toHaveTextContent(
+        "?panel=checkout&plan=pick&period=yearly",
+      ),
+    );
+    expect(sessionStorage.getItem("billing-card-return-params")).toBeNull();
   });
 
   it("구독 결제 성공(subscriptionId)은 처리하지 않는다", () => {

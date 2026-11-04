@@ -9,6 +9,22 @@
       "yearly": "決済後すぐに1年利用開始"
     }
   },
+  "method": {
+    "title": "決済方法",
+    "card": "カード決済",
+    "required": "必須",
+    "defaultCard": "基本カード"
+  },
+  "installment": {
+    "label": "{{card}} 分割回数",
+    "lumpSum": "一括払い",
+    "months": "{{months}}ヶ月"
+  },
+  "changeDefault": {
+    "title": "基本カードの変更",
+    "description": "お支払いは基本カードのみ可能です。選択したカードを基本カードに変更しますか？",
+    "action": "基本カードに変更"
+  },
   "notice": {
     "title": "案内事項の確認",
     "agree": "以下の案内事項をすべて確認し、定期決済と自動更新に同意します。",
@@ -23,7 +39,6 @@
   "summary": {
     "title": "決済概要",
     "product": "決済商品",
-    "card": "決済カード",
     "amount": "決済金額",
     "pay": "決済",
     "cancel": "キャンセル"
@@ -46,6 +61,9 @@
     "productNotAvailable": "現在ご契約いただけないプランです。",
     "cardLimitExceeded": "登録できるカードは最大2枚です。",
     "cardRegisterFailed": "カードを登録できませんでした。もう一度お試しください。",
-    "paymentFailed": "決済に失敗しました。もう一度お試しください。"
+    "paymentFailed": "決済に失敗しました。もう一度お試しください。",
+    "cardNotFound": "すでに削除されたか、存在しないカードです。",
+    "invalidInstallment": "選択した分割回数では決済できません。別の回数を選択してください。",
+    "installmentNotAllowedCard": "デビットカードは分割払いできません。一括払いを選択してください。"
   }
 }

@@ -169,9 +169,11 @@ export function BigbirdInquiryWorkspace({
         )}
       >
         {visible.map((inquiry) => {
+          // 목록 응답의 브랜드명·상품명을 먼저 씀(종료 캠페인도 보임). 없으면 캠페인 목록에서 찾음.
           const campaign = campaigns?.find(
             (item) => item.campaignIdx === inquiry.campaignIdx,
           );
+          const brandName = inquiry.brandName || campaign?.brandName;
           const title = getInquiryTitleKey(inquiry, campaign?.productName);
           const isOther = title.key === "inquiryTitle.other";
           // Figma 26/10/29 카드(11315:49602·49659): 1행은 상태 배지 + 기타 문의일 때만 "기타문의" 태그,
@@ -181,7 +183,7 @@ export function BigbirdInquiryWorkspace({
           return (
             <ChatListItem
               key={inquiry.threadIdx}
-              titlePrefix={isOther ? undefined : campaign?.brandName}
+              titlePrefix={isOther ? undefined : brandName}
               title={
                 isOther
                   ? (otherPreview ?? "")

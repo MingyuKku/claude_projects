@@ -1,10 +1,16 @@
 import { act, fireEvent, render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter, useLocation } from "react-router";
+import {
+  createMemoryRouter,
+  Outlet,
+  RouterProvider,
+  useLocation,
+} from "react-router";
 import { SWRConfig } from "swr";
 
+import { fetchSession } from "@/entities/session";
 import { ApiError, serverApiV3 } from "@/shared/api";
-import { MEDIA_QUERY } from "@/shared/config";
+import { MEDIA_QUERY, ROUTES } from "@/shared/config";
 
 import { HomePage } from "./HomePage";
 
@@ -29,13 +35,29 @@ function LocationProbe() {
   return <div data-testid="location">{useLocation().pathname}</div>;
 }
 
+// 실제 앱에서는 라우터 loader가 세션 확인을 시작해 Outlet context로 넘김(app/router/session-middleware.ts).
 function renderHome() {
+  const sessionPromise = fetchSession(ROUTES.main);
+  sessionPromise.catch(() => undefined);
+  const router = createMemoryRouter([
+    {
+      element: <Outlet context={sessionPromise} />,
+      children: [
+        {
+          path: "*",
+          element: (
+            <>
+              <HomePage />
+              <LocationProbe />
+            </>
+          ),
+        },
+      ],
+    },
+  ]);
   render(
     <SWRConfig value={{ provider: () => new Map(), shouldRetryOnError: false }}>
-      <MemoryRouter>
-        <HomePage />
-        <LocationProbe />
-      </MemoryRouter>
+      <RouterProvider router={router} />
     </SWRConfig>,
   );
 }

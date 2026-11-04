@@ -14,10 +14,10 @@ export const ENV = {
   inicisStdPayUrl: import.meta.env.VITE_INICIS_STDPAY_URL,
   oauthRedirectUrl: import.meta.env.VITE_OAUTH_REDIRECT_URL,
   naverClientId: import.meta.env.VITE_NAVER_CLIENT_ID,
-  kakaoAppKey: import.meta.env.VITE_KAKAO_APP_KEY,
+  // 카카오 REST API 키. 인가 주소에 들어가는 공개 값이고, 클라이언트 시크릿은 백엔드에만 둠.
+  kakaoRestApiKey: import.meta.env.VITE_KAKAO_REST_API_KEY,
   googleClientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
   appleClientId: import.meta.env.VITE_APPLE_CLIENT_ID,
-  appleRedirectUrl: import.meta.env.VITE_APPLE_REDIRECT_URL,
   domain: import.meta.env.VITE_DOMAIN,
   // 헬프데스크 Firebase 프로젝트(실시간 상담). 웹 설정 값은 공개되어도 됨.
   firebaseApiKey: import.meta.env.VITE_FIREBASE_API_KEY,

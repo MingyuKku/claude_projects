@@ -8,6 +8,11 @@
       "failure": "Couldn't register the card. Please try again."
     }
   },
+  "register": {
+    "title": "Register payment card",
+    "description": "No card is registered. Register a card first to pay for your subscription.",
+    "action": "Register card"
+  },
   "menu": {
     "label": "{{issuer}} {{number}} card menu",
     "delete": "Delete card",
@@ -28,7 +33,7 @@
     }
   },
   "error": {
-    "defaultCardInUse": "The default card can't be deleted while a subscription is active. Set another card as the default first.",
+    "defaultCardInUse": "The default card can't be deleted while a subscription is active.",
     "notFound": "This card was already deleted or doesn't exist."
   }
 }

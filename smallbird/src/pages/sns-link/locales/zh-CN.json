@@ -17,7 +17,6 @@
     "credentialRequired": "输入账号和密码",
     "credentialMismatch": "您输入的账号和密码与登记信息不一致",
     "missingSnsData": "没有社交账号关联信息",
-    "linkFailed": "关联失败，请联系管理员",
-    "loginError": "登录时发生错误"
+    "linkFailed": "关联失败，请联系管理员"
   }
 }

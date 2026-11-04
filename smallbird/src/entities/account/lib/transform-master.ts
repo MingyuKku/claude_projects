@@ -1,12 +1,8 @@
-import { SOCIAL_PROVIDERS } from "../model/mypage-schema";
-
 import type {
   AccountMaster,
   CompanyInfoViewModel,
   AccountProfileViewModel,
   MasterAccountViewModel,
-  SocialLinkViewModel,
-  SocialProvider,
   SubSelfAccount,
 } from "../model/mypage-schema";
 
@@ -15,29 +11,6 @@ export function parseServerDate(value: string | null | undefined) {
   if (!value) return null;
   const date = new Date(value.replace(" ", "T"));
   return Number.isNaN(date.getTime()) ? null : date;
-}
-
-function toSocialLinks(user: AccountMaster["user"]) {
-  const ids: Record<SocialProvider, string | null | undefined> = {
-    kakao: user.idKakao,
-    naver: user.idNaver,
-    google: user.idGoogle,
-    apple: user.idApple,
-  };
-  const emails: Record<SocialProvider, string | null | undefined> = {
-    kakao: user.emailKakao,
-    naver: user.emailNaver,
-    google: user.emailGoogle,
-    apple: user.emailApple,
-  };
-  const links = {} as Record<SocialProvider, SocialLinkViewModel>;
-  for (const provider of SOCIAL_PROVIDERS) {
-    links[provider] = {
-      isLinked: Boolean(ids[provider]),
-      email: emails[provider] || null,
-    };
-  }
-  return links;
 }
 
 function toCompanyInfo(
@@ -73,7 +46,6 @@ export function transformMasterToViewModel(
       certIdx: user.certification?.certIdx ?? null,
     },
     company: companyInformation ? toCompanyInfo(companyInformation) : null,
-    socialLinks: toSocialLinks(user),
   };
 }
 

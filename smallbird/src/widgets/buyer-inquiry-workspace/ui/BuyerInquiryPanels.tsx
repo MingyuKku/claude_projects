@@ -1,7 +1,14 @@
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { tryit } from "radash";
+import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router";
+import { toast } from "sonner";
 
-import { useInquiryUserImage } from "@/entities/inquiry";
+import {
+  finishPurchaserRealtime,
+  useInquiryUserImage,
+  usePurchaserConversation,
+} from "@/entities/inquiry";
 import { ROUTES } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
@@ -26,12 +33,15 @@ interface BuyerInquiryPanelsProps {
   inquiry: BuyerInquiryViewModel;
   /** 상세 패널이 캠페인 이미지·이름을 광고주의 캠페인 목록에서 찾을 때 씀(세션 값). */
   threadUserIdx?: number;
+  /** 실시간 상담 메시지에 남길 광고주 계정 id(세션 값). */
+  identifier?: string;
 }
 
 /** 구매자 문의 대화(구매자 문의 스레드·상품 Q&A)와 상세 정보 패널. */
 export function BuyerInquiryPanels({
   inquiry,
   threadUserIdx,
+  identifier,
 }: BuyerInquiryPanelsProps) {
   const { t } = useTranslation("widgets/buyer-inquiry-workspace");
   const navigate = useNavigate();
@@ -90,6 +100,9 @@ export function BuyerInquiryPanels({
           <strong className="-my-0.5 min-w-0 flex-1 truncate py-0.5 text-base leading-none font-semibold">
             {writerName}
           </strong>
+          {inquiry.source === "purchaser" && (
+            <RealtimeFinishButton inquiry={inquiry} />
+          )}
         </div>
         <Button
           variant="outline-foreground"
@@ -105,13 +118,17 @@ export function BuyerInquiryPanels({
         className={cn("min-h-0 flex-1 bg-muted", SCROLL_VIEWPORT_FIX)}
       >
         <div className="flex min-h-full flex-col p-4 tablet:p-5">
-          <BuyerConversation inquiry={inquiry} />
+          <BuyerConversation inquiry={inquiry} identifier={identifier} />
         </div>
       </ScrollArea>
       {/* 상품 Q&A는 답변 입력이 대화 안에 있습니다. */}
       {/* key로 문의마다 입력 중인 글·첨부를 분리함. 없으면 A에 쓰던 내용이 B로 오발송될 수 있음. */}
       {inquiry.source === "purchaser" && (
-        <BuyerReplyComposer key={inquiry.key} inquiry={inquiry} />
+        <BuyerReplyComposer
+          key={inquiry.key}
+          inquiry={inquiry}
+          identifier={identifier}
+        />
       )}
     </section>
   );
@@ -157,5 +174,45 @@ export function BuyerInquiryPanels({
       {conversation}
       {side}
     </div>
+  );
+}
+
+/**
+ * 진행 중인 구매자 실시간 상담의 종료 버튼. 광고주는 시작 없이 수락·종료만 함(2026-11-02 사용자 결정).
+ * 시간 초과 종료는 백엔드 스케줄러가 하므로 프론트 타이머는 없음.
+ */
+function RealtimeFinishButton({ inquiry }: { inquiry: BuyerInquiryViewModel }) {
+  const { t } = useTranslation("widgets/buyer-inquiry-workspace");
+  const { realtimeThread, mutate } = usePurchaserConversation(inquiry);
+  const [isFinishing, setIsFinishing] = useState(false);
+
+  if (!realtimeThread) return null;
+
+  async function handleClickFinish() {
+    if (!realtimeThread) return;
+    setIsFinishing(true);
+    // 같은 구매자·캠페인의 대화는 한 화면에 합쳐 보여서 열어 둔 문의가 진행 중인 상담이 아닐 수 있음.
+    // 구매자 문의는 문의 번호가 스레드 번호와 같아(stage 확인 2026-11-02) 진행 중인 스레드 번호로 종료함.
+    const [error] = await tryit(finishPurchaserRealtime)(
+      realtimeThread.threadIdx,
+    );
+    setIsFinishing(false);
+    if (error) {
+      console.error("구매자 실시간 상담 종료 실패", error);
+      toast.error(t("realtime.endFailed"));
+      return;
+    }
+    void mutate();
+  }
+
+  return (
+    <Button
+      variant="outline-foreground"
+      size="sm"
+      disabled={isFinishing}
+      onClick={() => void handleClickFinish()}
+    >
+      {t("realtime.end")}
+    </Button>
   );
 }

@@ -1,4 +1,3 @@
-import useSWR from "swr";
 import useSWRMutation from "swr/mutation";
 
 import {
@@ -15,62 +14,20 @@ import { formLoginResultSchema, sessionSchema } from "../model/schema";
 
 import type { FormLoginResult, SessionViewModel } from "../model/schema";
 
-// 다른 레이아웃(예: 홈 → 고객센터)으로 넘어갈 때 셸을 바로 그리기 위한 직전 확인 결과.
-// 본문은 새 경로의 확인이 끝난 뒤 그리므로 권한 판단에는 쓰지 않음. 새로고침, 로그인·로그아웃,
-// 세션 확인 실패·거부 때 비워서 다른 사용자의 정보가 셸에 남지 않게 함.
-let lastAllowedSession: SessionViewModel | undefined;
-
-export function getLastAllowedSession() {
-  return lastAllowedSession;
-}
-
-/** 직전 확인 결과를 비움. 로그인·로그아웃에서 쓰고, 테스트는 앞 테스트의 사용자가 다음 테스트의 셸에 남지 않게 비움. */
-export function clearLastAllowedSession() {
-  lastAllowedSession = undefined;
-}
-
-async function fetchSession(pathname: string) {
-  try {
-    const response = await serverApiV3.get("/sec", {
-      headers: { "X-Path": pathname },
-    });
-    const session = transformSessionToViewModel(sessionSchema.parse(response));
-    lastAllowedSession = session.isAllowed ? session : undefined;
-    return session;
-  } catch (error) {
-    lastAllowedSession = undefined;
-    throw error;
-  }
-}
-
 /**
- * `GET /v3/sec`는 마운트할 때마다 요청하고 캐시로 응답하지 않음. 권한은 서버에서
- * 바뀔 수 있어, 오래된 응답은 접근 권한을 잃은 사용자를 화면에 남겨 둠.
- * 서버가 `X-Path`별로 권한을 판단하므로 경로가 키에 들어감.
- *
- * 경로가 바뀌어 다시 확인하는 동안에는 직전 경로의 결과를 유지함(keepPreviousData).
- * 그래야 같은 레이아웃 안에서 이동할 때 셸이 다시 마운트되지 않음. 새 경로의 결과가
- * 거부·오류면 AuthGuard가 그때 로그인으로 보냄.
+ * `GET /v3/sec`로 `X-Path` 경로의 진입 여부와 세션을 물음. 권한은 서버에서 바뀔 수 있어
+ * 데이터 캐시(SWR)에 두지 않고, 라우터가 화면을 옮길 때마다 부름(`app/router`의 세션 middleware).
+ * 로그인 안 됨은 401, 경로 권한 없음은 403으로 거절됨.
  */
-export function useSession(pathname: string) {
-  const { data, error, isLoading, mutate } = useSWR(
-    ["session", pathname],
-    () => fetchSession(pathname),
-    {
-      revalidateOnMount: true,
-      revalidateIfStale: true,
-      dedupingInterval: 0,
-      shouldRetryOnError: false,
-      keepPreviousData: true,
-    },
-  );
-  return {
-    session: data,
-    isLoading,
-    isError: Boolean(error),
-    error,
-    mutate,
-  };
+export async function fetchSession(
+  pathname: string,
+  signal?: AbortSignal,
+): Promise<SessionViewModel> {
+  const response = await serverApiV3.get("/sec", {
+    headers: { "X-Path": pathname },
+    signal,
+  });
+  return transformSessionToViewModel(sessionSchema.parse(response));
 }
 
 /**
@@ -80,7 +37,6 @@ export async function formLogin(
   username: string,
   password: string,
 ): Promise<FormLoginResult> {
-  clearLastAllowedSession();
   await signOutFirebase();
   const body = new FormData();
   body.append("username", username);
@@ -115,7 +71,6 @@ export async function logout(): Promise<void> {
     throw new ApiError(response.status, undefined);
   }
   clearLoginCredential();
-  clearLastAllowedSession();
   await signOutFirebase();
 }
 

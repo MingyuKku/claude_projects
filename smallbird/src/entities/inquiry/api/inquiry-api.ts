@@ -6,6 +6,7 @@ import { ApiError, isApiError, serverApiV3 } from "@/shared/api";
 import { ENV } from "@/shared/config";
 
 import { getAttachmentKind } from "../lib/attachment-rules";
+import { mergeRealtimeMessages } from "../lib/merge-realtime-messages";
 import {
   transformBuyerInquiryDetailToViewModel,
   transformBuyerInquiryToViewModel,
@@ -37,7 +38,11 @@ import {
   simpleResultSchema,
   uploadInquiryAttachmentResultSchema,
 } from "../model/schema";
-import { useInquirySummaryChanges } from "./helpdesk-changes";
+import {
+  useBuyerAccountChanges,
+  useInquirySummaryChanges,
+} from "./helpdesk-changes";
+import { useRealtimeConsultationMessages } from "./realtime-consultation-api";
 import { useCoalescedRefresh } from "./use-coalesced-refresh";
 import { useLiveInquiries } from "./use-live-inquiries";
 
@@ -45,6 +50,7 @@ import type {
   BigbirdInquiryViewModel,
   BuyerInquiryViewModel,
   InquiryThread,
+  RealtimeAlarm,
 } from "../model/schema";
 
 // 첨부 업로드 경로의 {service} 값. v2는 문자열 "undefined"를 보냈고 V3 명세는 허용 값을 적지 않아 백엔드 답변 전 임시값.
@@ -334,6 +340,17 @@ export async function sendInquiryMessage({
     .threadIdx;
 }
 
+/**
+ * 구매자 실시간 상담 종료(`PUT /v3/help/inquiry/{inquiryIdx}/realtime/finish`). 서버가 DB 종료와 Firestore
+ * 상담 문서 종료를 함께 하므로 광고주는 Firestore에 직접 쓰지 않음.
+ */
+export async function finishPurchaserRealtime(inquiryIdx: number) {
+  const response = await serverApiV3.put(
+    `/help/inquiry/${inquiryIdx}/realtime/finish`,
+  );
+  ensureSucceeded(simpleResultSchema.parse(response));
+}
+
 export async function closeBigbirdInquiry(threadIdx: number) {
   const response = await serverApiV3.put(`/help/thread/${threadIdx}`);
   ensureSucceeded(simpleResultSchema.parse(response));
@@ -437,6 +454,8 @@ export async function fetchBuyerInquiryPage(
 export function useBuyerInquiries(
   status: BuyerInquiryStatusFilter,
   filters: BuyerInquiryFilters = { sourceType: "ALL" },
+  /** 목록의 구매자가 실시간 상담을 새로 요청했을 때(크롬 알림용). */
+  onRealtimeAlarm?: (threadUserIdx: number, alarm: RealtimeAlarm) => void,
 ) {
   const { data, error, isLoading, isValidating, size, setSize, mutate } =
     useSWRInfinite(
@@ -487,8 +506,30 @@ export function useBuyerInquiries(
     );
   const last = data?.[data.length - 1];
   const hasMore = last !== undefined && last.page < last.totalPage;
+  const inquiries = useMemo(
+    () => data?.flatMap((page) => page.inquiries),
+    [data],
+  );
+  const { mutate: mutateGlobal } = useSWRConfig();
+  const refreshAll = useCallback(async () => {
+    // 열어 둔 구매자 대화를 먼저 받음. 대화 조회가 새 메시지를 읽음 처리하므로 목록을 같이 받으면
+    // 읽기 전 값(hasUnread true)이 남음(stage 2026-11-02 확인). 실시간 상담은 Firestore 구독이라 따로 바뀜.
+    await mutateGlobal(
+      (key) => Array.isArray(key) && key[0] === "purchaser-messages",
+    );
+    await mutate();
+  }, [mutate, mutateGlobal]);
+  const refresh = useCoalescedRefresh(refreshAll);
+  // 구매자 메시지·상태 변경은 구매자 계정 Firestore 문서에 반영되므로 목록의 구매자들을 구독함.
+  useBuyerAccountChanges(
+    (inquiries ?? []).flatMap((inquiry) =>
+      inquiry.threadUserIdx === null ? [] : [inquiry.threadUserIdx],
+    ),
+    refresh,
+    onRealtimeAlarm,
+  );
   return {
-    inquiries: data?.flatMap((page) => page.inquiries),
+    inquiries,
     isLoading,
     isError: Boolean(error),
     isLoadingMore: isValidating && size > (data?.length ?? 0),
@@ -583,7 +624,14 @@ export async function fetchPurchaserConversation(
     });
     const { data } = ensureSucceeded(inquiryThreadListSchema.parse(response));
     const threads = data.map(transformInquiryThreadToViewModel);
+    const realtime = threads.find(
+      (thread) => thread.isRealtime && !thread.isFinished,
+    );
     return {
+      /** 진행 중인 실시간 상담 스레드. 메시지는 Firestore 상담 문서가 원본. */
+      realtimeThread: realtime
+        ? { threadIdx: realtime.threadIdx, sequence: realtime.sequence }
+        : null,
       // 상담 기록 패널이 스레드(과거 상담)별로 보여 줌. 오래된 것부터.
       threads: [...threads].sort(
         (a, b) => a.createdAt.getTime() - b.createdAt.getTime(),
@@ -599,7 +647,12 @@ export async function fetchPurchaserConversation(
     };
   } catch (error) {
     if (isApiError(error) && error.status === 404)
-      return { threads: [], messages: [], latestThreadIdx: null };
+      return {
+        realtimeThread: null,
+        threads: [],
+        messages: [],
+        latestThreadIdx: null,
+      };
     throw error;
   }
 }
@@ -614,14 +667,30 @@ export function usePurchaserConversation(inquiry: BuyerInquiryViewModel) {
     // 열어 둔 사이에 온 메시지는 탭으로 돌아올 때 다시 받아 보여 줌(앱 전체 기본은 꺼져 있음).
     { revalidateOnFocus: true },
   );
+  const realtimeThread = data?.realtimeThread ?? null;
+  // 진행 중인 실시간 상담은 구매자 계정의 Firestore 상담 문서가 원본(REST 메시지는 늦거나 빔).
+  const realtime = useRealtimeConsultationMessages(
+    threadUserIdx ?? 0,
+    threadUserIdx === null ? undefined : realtimeThread?.sequence,
+    realtimeThread?.threadIdx ?? 0,
+  );
+  const messages = useMemo(() => {
+    if (!data || !realtimeThread || !realtime.messages) return data?.messages;
+    return mergeRealtimeMessages(
+      data.threads,
+      realtimeThread.threadIdx,
+      realtime.messages,
+    );
+  }, [data, realtimeThread, realtime.messages]);
   return {
-    messages: data?.messages,
+    messages,
     /** 같은 구매자와의 과거 상담(스레드)들. 상담 기록 패널에 씀. */
     threads: data?.threads,
     /** 답장을 보낼 스레드. 대화 내역이 없으면 null이라 보낼 수 없음. */
     threadIdx: data?.latestThreadIdx ?? null,
-    isLoading,
-    isError: Boolean(error),
+    realtimeThread,
+    isLoading: isLoading || realtime.isLoading,
+    isError: Boolean(error) || realtime.isError,
     mutate,
   };
 }

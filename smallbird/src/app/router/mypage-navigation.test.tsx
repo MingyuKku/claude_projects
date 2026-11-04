@@ -151,6 +151,7 @@ describe("마이페이지 · 계정 설정 셸", () => {
     expect(screen.getByText("홍길동")).toBeInTheDocument();
     expect(serverApiV3.get).toHaveBeenCalledWith("/sec", {
       headers: { "X-Path": ROUTES.mypageAccount },
+      signal: expect.any(AbortSignal),
     });
   });
 
@@ -279,7 +280,11 @@ describe("마이페이지 · 계정 설정 셸", () => {
         "company",
       ),
     );
-    expect(selectedTabs().map((tab) => tab.textContent)).toEqual(["회사정보"]);
+    await waitFor(() =>
+      expect(selectedTabs().map((tab) => tab.textContent)).toEqual([
+        "회사정보",
+      ]),
+    );
     expect(screen.queryByRole("alertdialog")).toBeNull();
   });
 
@@ -289,9 +294,11 @@ describe("마이페이지 · 계정 설정 셸", () => {
     const alert = await screen.findByRole("alertdialog");
     await user.click(within(alert).getByRole("button", { name: "취소" }));
     await waitFor(() => expect(router.state.location.search).toBe(""));
-    expect(selectedTabs().map((tab) => tab.textContent)).toEqual([
-      "Master ID 관리",
-    ]);
+    await waitFor(() =>
+      expect(selectedTabs().map((tab) => tab.textContent)).toEqual([
+        "Master ID 관리",
+      ]),
+    );
   });
 
   it("MASTER의 ?tab=self는 기본 탭으로 대체한다", async () => {
@@ -399,6 +406,12 @@ describe("마이페이지 · 계정 설정 셸", () => {
       `${ROUTES.mypageAccount}?tab=sub&panel=permission&subId=3&lng=ko`,
     );
     await user.click(await screen.findByRole("tab", { name: "회사정보" }));
+    // 탭 변경도 라우터 이동이라 세션 middleware를 거친 뒤 반영됨.
+    await waitFor(() =>
+      expect(selectedTabs().map((tab) => tab.textContent)).toEqual([
+        "회사정보",
+      ]),
+    );
     const params = new URLSearchParams(router.state.location.search);
     expect(params.get("tab")).toBe("company");
     expect(params.get("lng")).toBe("ko");
@@ -412,9 +425,11 @@ describe("마이페이지 · 계정 설정 셸", () => {
     await waitFor(() =>
       expect(router.state.location.search).toContain("tab=sub"),
     );
-    expect(selectedTabs().map((tab) => tab.textContent)).toEqual([
-      "Sub ID 관리",
-    ]);
+    await waitFor(() =>
+      expect(selectedTabs().map((tab) => tab.textContent)).toEqual([
+        "Sub ID 관리",
+      ]),
+    );
   });
 
   it("기본 탭으로 돌아가면 tab 쿼리를 지운다", async () => {
@@ -569,6 +584,60 @@ describe("마이페이지 · 계정 설정 셸", () => {
     await screen.findByRole("tab", { name: "Sub ID 관리" });
     expect(router.state.location.pathname).toBe(ROUTES.mypageAccount);
     expect(screen.queryByText("준비 중인 기능입니다.")).toBeNull();
+  });
+});
+
+// 화면 진입 확인은 라우트의 세션 middleware가 맡음(app/router/session-middleware.ts).
+describe("마이페이지 · 세션 확인", () => {
+  function sessionCalls() {
+    return vi
+      .mocked(serverApiV3.get)
+      .mock.calls.filter(([path]) => path === "/sec");
+  }
+
+  it("만료 중에 거부된 화면도 로그인 뒤에는 첫 진입에 들어간다", async () => {
+    mockSessionError(new ApiError(401, undefined));
+    const router = await renderRoute(ROUTES.mypageAccount);
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(ROUTES.login),
+    );
+
+    mockSession(session);
+    await act(async () => {
+      await router.navigate(ROUTES.mypageAccount);
+    });
+    expect(
+      await screen.findByRole("tab", { name: "Master ID 관리" }),
+    ).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe(ROUTES.mypageAccount);
+  });
+
+  it("같은 화면 안의 이동(탭 전환)은 세션을 다시 묻지 않는다", async () => {
+    const user = userEvent.setup();
+    await renderRoute(ROUTES.mypageAccount);
+    await user.click(await screen.findByRole("tab", { name: "회사정보" }));
+    await waitFor(() =>
+      expect(selectedTabs().map((tab) => tab.textContent)).toEqual([
+        "회사정보",
+      ]),
+    );
+    expect(sessionCalls()).toHaveLength(1);
+  });
+
+  it("다른 화면으로 옮기면 그 경로로 다시 확인한다", async () => {
+    const router = await renderRoute(ROUTES.mypageAccount);
+    await screen.findByRole("tab", { name: "Master ID 관리" });
+
+    mockSessionError(new ApiError(401, undefined));
+    await act(async () => {
+      await router.navigate(ROUTES.mypageMoney);
+    });
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(ROUTES.login),
+    );
+    expect(sessionCalls().at(-1)?.[1]).toMatchObject({
+      headers: { "X-Path": ROUTES.mypageMoney },
+    });
   });
 });
 

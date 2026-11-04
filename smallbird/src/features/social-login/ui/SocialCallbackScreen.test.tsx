@@ -35,12 +35,12 @@ describe("SocialCallbackScreen", () => {
     renderScreen(() =>
       Promise.resolve({
         status: "needsLink",
-        snsData: { platform: "kakao", uid: "1" },
+        snsData: { platform: "kakao", snsLinkToken: "tok" },
       }),
     );
     expect(
       await screen.findByText(
-        'link {"snsData":{"platform":"kakao","uid":"1"}}',
+        'link {"snsData":{"platform":"kakao","snsLinkToken":"tok"}}',
       ),
     ).toBeInTheDocument();
   });

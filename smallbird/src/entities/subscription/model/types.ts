@@ -1,4 +1,9 @@
-import type { CardKind, SubscriptionProductType, UsageMetric } from "./codes";
+import type {
+  CardKind,
+  SubscriptionProductType,
+  SubscriptionStatus,
+  UsageMetric,
+} from "./codes";
 
 /** 구독 탭의 상품 카드 한 장. 가격은 정책이 없어 더미(스펙 §1·§7 P-1). */
 export interface SubscriptionPlan {
@@ -32,6 +37,10 @@ export interface Subscription {
   /** 가장 최근 결제에 쓴 카드의 종류. 모르거나 없으면 null. */
   cardKind: CardKind | null;
   isCancelScheduled: boolean;
+  /** 구독 상태. `paymentFailed`는 정기결제 실패로 이용이 멈춘 구독(스펙 §7 P-17~P-22, 화면은 시안 후). */
+  status: SubscriptionStatus;
+  /** 다음 재결제 날짜(`YYYY-MM-DD`). 결제 실패(`paymentFailed`)일 때만 있고 그 외 null. */
+  nextRetryAt: string | null;
 }
 
 export interface UsageQuota {

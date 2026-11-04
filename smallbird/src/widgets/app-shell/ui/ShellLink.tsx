@@ -1,5 +1,5 @@
 import { use } from "react";
-import { Link } from "react-router";
+import { Link, useNavigation, useResolvedPath } from "react-router";
 
 import { ROUTES } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
@@ -48,8 +48,8 @@ export function ShellLink({
   ...props
 }: ShellLinkProps) {
   const { t } = useTranslation("widgets/app-shell");
+  const navigation = useNavigation();
   const {
-    closeMenu,
     showLoginRequired,
     canAccessSubscribe,
     permissions,
@@ -66,13 +66,13 @@ export function ShellLink({
   const isEnabledLink =
     ENABLED_HREFS.has(href) || isPermissionAvailable || isSubscribeAvailable;
   const isLoginRequired = LOGIN_REQUIRED_HREFS.has(href) && !isAuthenticated;
+  const to = isLoginRequired ? ROUTES.login : href;
+  // 이 링크의 목적지로 옮기는 중(세션 확인 등). 메뉴가 아이콘 자리에 스피너를 보여 줌(SidebarNavItem).
+  // 쿼리·해시가 붙은 href도 맞도록 경로 부분만 비교함.
+  const targetPathname = useResolvedPath(to).pathname;
+  const isPending = navigation.location?.pathname === targetPathname;
   // 권한·역할로 막힌 메뉴는 "준비 중" 툴팁을 달지 않음.
   const isGatedLink = permissionKey !== undefined || isSubscribe;
-
-  function handleClickLink(event: Parameters<NonNullable<typeof onClick>>[0]) {
-    onClick?.(event);
-    if (!event.defaultPrevented) closeMenu();
-  }
 
   const isLoginAlertLink =
     !isAuthenticated && navId !== undefined && LOGIN_ALERT_NAV_IDS.has(navId);
@@ -116,8 +116,10 @@ export function ShellLink({
     <Link
       {...props}
       className={className}
-      to={isLoginRequired ? ROUTES.login : href}
-      onClick={handleClickLink}
+      to={to}
+      onClick={onClick}
+      data-pending={isPending || undefined}
+      aria-busy={isPending || undefined}
     >
       {children}
     </Link>

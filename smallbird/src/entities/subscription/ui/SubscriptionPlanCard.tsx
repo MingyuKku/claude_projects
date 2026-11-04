@@ -14,21 +14,20 @@ import type {
 } from "../model/codes";
 import type { PlanCardType } from "@/shared/components/cards";
 
-// 준비중 상품의 세부 유형 배지(회색). 활성 상품은 브랜드형(파랑)·공구형(초록).
-const COMING_SOON_BADGES = {
-  live: ["liveCommerce", "liveClass"],
-  applicator: ["ota", "smallBusiness"],
-} as const;
+// 연간 카드의 할인 전 금액(줄 긋기)은 월 요금 × 12로 계산함(스펙 §3, 서버가 따로 주지 않음).
+const MONTHS_PER_YEAR = 12;
 
 const ITEM_IDS = ["1", "2", "3"] as const;
 const STEP_IDS = ["1", "2", "3", "4", "5"] as const;
 
 interface SubscriptionPlanCardProps {
   type: SubscriptionProductType;
-  /** 선택한 결제 주기. 월간이면 "월 ○원", 연간이면 "연 ○원"으로 보임. */
+  /** 선택한 결제 주기. 월간이면 "월 ○원", 연간이면 할인 전 "연 ○원"(줄 긋기)과 결제 총액 "연 ○원"으로 보임. */
   period: BillingPeriod;
-  /** 그 주기의 결제 금액(월 요금 또는 연간 결제 총액). */
-  price: number;
+  /** 월 요금(원). */
+  monthlyPrice: number;
+  /** 연간 결제 총액(원, 할인 반영). */
+  yearlyPrice: number;
   isAvailable: boolean;
   /** 구독 중(해지 예정 포함). */
   isSubscribed: boolean;
@@ -42,7 +41,8 @@ interface SubscriptionPlanCardProps {
 export function SubscriptionPlanCard({
   type,
   period,
-  price,
+  monthlyPrice,
+  yearlyPrice,
   isAvailable,
   isSubscribed,
   isExpanded,
@@ -68,19 +68,13 @@ export function SubscriptionPlanCard({
   );
 
   if (activeType === null || !isAvailable) {
-    const badgeKeys =
-      type === "live" || type === "applicator" ? COMING_SOON_BADGES[type] : [];
     return (
       <PlanCard
         type={cardType}
         className={className}
         title={t(`productType.${type}`)}
-        price={t(`plan.price.${period}`, { price: formatNumber(price) })}
-        badges={badgeKeys.map((key) => (
-          <Badge key={key} variant="gray">
-            {t(`plan.badge.${key}`)}
-          </Badge>
-        ))}
+        price={t("plan.comingSoonPrice")}
+        badges={<Badge variant="gray">{t("plan.badge.undecided")}</Badge>}
         comingSoonText={
           <>
             <span>{t("plan.comingSoonText.line1")}</span>
@@ -92,12 +86,22 @@ export function SubscriptionPlanCard({
     );
   }
 
+  const price = period === "yearly" ? yearlyPrice : monthlyPrice;
+  const originalPrice = monthlyPrice * MONTHS_PER_YEAR;
+  // 할인이 없으면 줄 그은 금액이 결제 금액과 같아 의미가 없음.
+  const hasYearlyDiscount = period === "yearly" && originalPrice > yearlyPrice;
+
   return (
     <PlanCard
       type={cardType}
       className={cn(className, focusClassName)}
       title={t(`productType.${activeType}`)}
       price={t(`plan.price.${period}`, { price: formatNumber(price) })}
+      originalPrice={
+        hasYearlyDiscount
+          ? t("plan.price.yearly", { price: formatNumber(originalPrice) })
+          : undefined
+      }
       badges={
         <>
           <Badge variant="blue">{t("plan.badge.brand")}</Badge>

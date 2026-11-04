@@ -9,6 +9,22 @@
       "yearly": "支付后立即开始使用1年"
     }
   },
+  "method": {
+    "title": "支付方式",
+    "card": "银行卡支付",
+    "required": "必选",
+    "defaultCard": "默认卡"
+  },
+  "installment": {
+    "label": "{{card}} 分期",
+    "lumpSum": "一次性付清",
+    "months": "{{months}}个月"
+  },
+  "changeDefault": {
+    "title": "更换默认卡",
+    "description": "仅可使用默认卡付款。要将所选卡设为默认卡吗？",
+    "action": "设为默认卡"
+  },
   "notice": {
     "title": "确认事项",
     "agree": "我已确认以下全部事项,同意定期支付和自动续订。",
@@ -23,7 +39,6 @@
   "summary": {
     "title": "支付摘要",
     "product": "支付套餐",
-    "card": "支付卡",
     "amount": "支付金额",
     "pay": "支付",
     "cancel": "取消"
@@ -46,6 +61,9 @@
     "productNotAvailable": "该套餐暂时无法订阅。",
     "cardLimitExceeded": "最多可注册2张卡。",
     "cardRegisterFailed": "卡注册失败，请重试。",
-    "paymentFailed": "支付失败，请重试。"
+    "paymentFailed": "支付失败，请重试。",
+    "cardNotFound": "该卡已被删除或不存在。",
+    "invalidInstallment": "所选分期期数无法付款。请选择其他期数。",
+    "installmentNotAllowedCard": "借记卡不支持分期付款。请选择一次性付清。"
   }
 }

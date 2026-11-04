@@ -83,5 +83,9 @@
   "card": {
     "campaignInquiry": "{{label}} お問い合わせ",
     "unread": "未読メッセージ"
+  },
+  "realtime": {
+    "end": "相談終了",
+    "endFailed": "相談を終了できませんでした。もう一度お試しください。"
   }
 }

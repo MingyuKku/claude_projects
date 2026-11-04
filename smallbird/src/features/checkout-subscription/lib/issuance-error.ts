@@ -9,6 +9,8 @@ const ISSUANCE_ERROR_KEYS = {
   CARD_LIMIT_EXCEEDED: "error.cardLimitExceeded",
   CARD_REGISTER_FAILED: "error.cardRegisterFailed",
   PAYMENT_FAILED: "error.paymentFailed",
+  INVALID_INSTALLMENT: "error.invalidInstallment",
+  INSTALLMENT_NOT_ALLOWED_CARD: "error.installmentNotAllowedCard",
 } as const;
 
 export type IssuanceErrorKey =

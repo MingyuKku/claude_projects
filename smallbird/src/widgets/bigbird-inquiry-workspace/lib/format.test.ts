@@ -82,6 +82,15 @@ describe("getInquiryTitleKey", () => {
     ).toEqual({ key: "inquiryTitle.campaign", name: "목록 상품" });
   });
 
+  it("목록 응답의 상품명이 있으면 캠페인 목록보다 먼저 쓴다(대화 헤더도 같은 제목)", () => {
+    expect(
+      getInquiryTitleKey(
+        { ...inquiry([]), campaignIdx: 10, productName: "응답 상품" },
+        "목록 상품",
+      ),
+    ).toEqual({ key: "inquiryTitle.campaign", name: "응답 상품" });
+  });
+
   it("목록에 없으면 대화의 캠페인 카드 상품명을 쓴다", () => {
     expect(getInquiryTitleKey({ ...inquiry([card]), campaignIdx: 10 })).toEqual(
       { key: "inquiryTitle.campaign", name: "카드 상품" },

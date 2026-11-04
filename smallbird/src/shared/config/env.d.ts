@@ -7,10 +7,9 @@ interface ImportMetaEnv {
   readonly VITE_INICIS_STDPAY_URL: string;
   readonly VITE_OAUTH_REDIRECT_URL: string;
   readonly VITE_NAVER_CLIENT_ID: string;
-  readonly VITE_KAKAO_APP_KEY: string;
+  readonly VITE_KAKAO_REST_API_KEY: string;
   readonly VITE_GOOGLE_CLIENT_ID: string;
   readonly VITE_APPLE_CLIENT_ID: string;
-  readonly VITE_APPLE_REDIRECT_URL: string;
   readonly VITE_DOMAIN: string;
   readonly VITE_FIREBASE_API_KEY: string;
   readonly VITE_FIREBASE_AUTH_DOMAIN: string;

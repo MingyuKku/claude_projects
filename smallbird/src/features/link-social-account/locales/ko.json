@@ -10,6 +10,20 @@
   "unlink": {
     "title": "간편 로그인 해제",
     "description": "{{provider}} 간편 로그인 연동을 해제하시겠습니까? 해제하면 {{provider}} 계정으로 로그인할 수 없습니다.",
-    "action": "해제"
+    "action": "해제",
+    "toast": {
+      "done": "{{provider}} 간편 로그인 연동을 해제했습니다.",
+      "notLinked": "이미 연동이 해제된 상태입니다.",
+      "failed": "해제하지 못했습니다. 다시 시도해 주세요."
+    }
+  },
+  "link": {
+    "toast": {
+      "done": "{{provider}} 간편 로그인을 연동했습니다.",
+      "alreadyLinked": "다른 {{provider}} 계정이 이미 연동돼 있습니다. 해제한 뒤 다시 연동해 주세요.",
+      "linkedToOther": "이미 다른 계정에 연동된 {{provider}} 계정입니다.",
+      "emailRequired": "이메일 제공에 동의해야 연동할 수 있습니다.",
+      "failed": "연동하지 못했습니다. 다시 시도해 주세요."
+    }
   }
 }

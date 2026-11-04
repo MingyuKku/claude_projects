@@ -17,7 +17,6 @@
     "credentialRequired": "Enter ID and password",
     "credentialMismatch": "ID and password don't match our records",
     "missingSnsData": "No SNS link info",
-    "linkFailed": "Linking failed. Contact the administrator",
-    "loginError": "Login error occurred"
+    "linkFailed": "Linking failed. Contact the administrator"
   }
 }

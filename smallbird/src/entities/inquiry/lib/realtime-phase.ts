@@ -1,3 +1,5 @@
+import { normalizeFirestoreTime } from "../model/firestore-time";
+
 import type {
   BigbirdInquiryStatus,
   BigbirdInquiryViewModel,
@@ -15,10 +17,14 @@ export const REALTIME_CONNECT_TIMEOUT_MS = 3 * 60 * 1000;
 export const REALTIME_IDLE_WARNING_MS = 5 * 60 * 1000;
 export const REALTIME_IDLE_LIMIT_MS = 10 * 60 * 1000;
 
-/** Firestore에 쓰는 `YYYY-MM-DD HH:mm:ss`(로컬 시각)를 ms로. 비었거나 잘못된 값은 null. */
-export function parseWriteTime(value: string | null | undefined) {
-  if (!value) return null;
-  const time = new Date(value.replace(" ", "T")).getTime();
+/**
+ * Firestore에 쓰는 `YYYY-MM-DD HH:mm:ss`(로컬 시각)를 ms로. 비었거나 잘못된 값은 null. 트랜잭션이 읽는 원본 문서의
+ * 시각은 서버가 쓴 Timestamp일 수 있어(2026-11-02 stage) 그것도 읽음.
+ */
+export function parseWriteTime(value: unknown) {
+  const normalized = normalizeFirestoreTime(value);
+  if (typeof normalized !== "string" || !normalized) return null;
+  const time = new Date(normalized.replace(" ", "T")).getTime();
   return Number.isNaN(time) ? null : time;
 }
 

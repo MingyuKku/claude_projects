@@ -20,7 +20,7 @@ function renderWizard(onLinkSocial = vi.fn().mockResolvedValue(undefined)) {
   render(
     <MemoryRouter>
       <JoinWizard
-        tokenData={{ platform: "kakao", email: "a@b.co", uid: "1" }}
+        tokenData={{ platform: "kakao", email: "a@b.co", snsLinkToken: "tok" }}
         onLinkSocial={onLinkSocial}
       />
     </MemoryRouter>,

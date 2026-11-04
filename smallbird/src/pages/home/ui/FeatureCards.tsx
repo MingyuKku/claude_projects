@@ -1,16 +1,18 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
-import { useSession } from "@/entities/session";
 import { MainCard } from "@/shared/components/cards";
 import { LoginRequiredAlert } from "@/shared/components/login-required-alert";
 import { MEDIA_QUERY } from "@/shared/config";
 import { ROUTES } from "@/shared/config/routes";
 import { useTranslation } from "@/shared/i18n";
+import { usePromiseState } from "@/shared/lib";
 import { useMediaQuery } from "@/shared/lib/useMediaQuery";
 import { cn } from "@/shared/lib/utils";
 
 import { useTapAction } from "../lib/use-tap-action";
+
+import type { SessionViewModel } from "@/entities/session";
 
 // to가 없는 카드는 갈 화면이 아직 없어 비활성. 시안의 기본 모습은 유지하고 클릭만 막으며, 화면이 연결될 때 to를 채움.
 // isLoginRequired 카드는 비로그인이 누르면 로그인 안내 알럿을 띄움(디자인팀 QA 2026-10-28).
@@ -40,19 +42,23 @@ function TapCard({ onTap, ...props }: TapCardProps) {
 }
 
 interface FeatureCardsProps {
+  /** 셸과 같은 세션 확인 결과(라우터 loader가 넘긴 Promise). */
+  session: Promise<SessionViewModel>;
   className?: string;
 }
 
 // 카드 3개. 인플루언서 추천은 로그인하면 이동하고, 캠페인 등록/운영·요금 안내는 대상 화면이 생길 때까지 비활성.
 // 인플루언서 추천·캠페인 등록/운영은 비로그인이 누르면 로그인 안내 알럿을 띄움.
-export function FeatureCards({ className }: FeatureCardsProps) {
+export function FeatureCards({ session, className }: FeatureCardsProps) {
   const { t } = useTranslation("pages/home");
   const isMobile = useMediaQuery(MEDIA_QUERY.mobile);
   const navigate = useNavigate();
-  const { session, isLoading } = useSession(ROUTES.main);
+  const { result } = usePromiseState(session);
   const [isLoginAlertOpen, setIsLoginAlertOpen] = useState(false);
   // 세션을 확인하는 동안에는 비로그인으로 단정하지 않음(로그인한 사용자에게 알럿이 뜨지 않게). 확인이 끝나 401·오류·권한 거부면 비로그인.
-  const isGuest = !isLoading && session?.isAllowed !== true;
+  const isGuest =
+    result !== undefined &&
+    !(result.status === "fulfilled" && result.value.isAllowed);
 
   return (
     <div

@@ -1,4 +1,9 @@
-import { googleLogin, socialLink, socialLogin } from "./social-login-api";
+import {
+  appleLogin,
+  googleLogin,
+  kakaoLogin,
+  naverLogin,
+} from "./social-login-api";
 
 const fetchMock = vi.fn<typeof fetch>();
 
@@ -13,59 +18,200 @@ describe("social login api", () => {
   });
   afterEach(() => vi.unstubAllGlobals());
 
-  it("opens the session when the relay answers C01", async () => {
-    fetchMock
-      .mockResolvedValueOnce(
-        jsonResponse({
-          data: {
-            code: "C01",
-            tokenResponse: { tokenType: "Bearer ", accessToken: "tok" },
+  describe("googleLogin (V3)", () => {
+    it("{ code, redirectUri }를 보내 세션을 연다", async () => {
+      fetchMock.mockResolvedValueOnce(
+        jsonResponse({ userIdx: 3, authority: "ROLE_ADVERTISER" }),
+      );
+
+      await expect(
+        googleLogin("google-code", "https://example.com/auth/google"),
+      ).resolves.toEqual({ status: "success" });
+
+      const [url, init] = fetchMock.mock.calls[0] ?? [];
+      expect(String(url)).toContain("/v3/auth/sns/google/login");
+      expect(JSON.parse(String(init?.body))).toEqual({
+        code: "google-code",
+        redirectUri: "https://example.com/auth/google",
+      });
+    });
+
+    it("미가입(404 NEED_SIGNUP)이면 신원 토큰을 들고 연동 화면으로 넘긴다", async () => {
+      fetchMock.mockResolvedValueOnce(
+        jsonResponse(
+          {
+            result: false,
+            reason: "NEED_SIGNUP",
+            platform: "google",
+            email: "g@x.com",
+            snsLinkToken: "signed-token",
           },
-        }),
-      )
-      .mockResolvedValueOnce(jsonResponse({}));
+          404,
+        ),
+      );
+      await expect(googleLogin("c", "https://example.com/x")).resolves.toEqual({
+        status: "needsLink",
+        snsData: {
+          platform: "google",
+          email: "g@x.com",
+          snsLinkToken: "signed-token",
+        },
+      });
+    });
 
-    await expect(socialLogin({ platform: "naver", uid: "1" })).resolves.toEqual(
-      { status: "success" },
-    );
-
-    const jwtCall = fetchMock.mock.calls[1];
-    expect(String(jwtCall?.[0])).toContain("/jwt/login");
-    expect(jwtCall?.[1]?.headers).toMatchObject({
-      Authorization: "Bearer tok",
+    it("그 밖의 거절은 failed다", async () => {
+      fetchMock.mockResolvedValueOnce(
+        jsonResponse({ result: false, reason: "INVALID_SNS_CODE" }, 400),
+      );
+      await expect(googleLogin("c", "https://example.com/x")).resolves.toEqual({
+        status: "failed",
+      });
     });
   });
 
-  it("hands the provider identity over when the account is unregistered", async () => {
-    fetchMock.mockResolvedValue(jsonResponse({ data: { code: "C02" } }));
-    const payload = { platform: "kakao", uid: "7", email: "a@b.com" };
+  describe("kakaoLogin (V3)", () => {
+    it("인가 코드를 V3 로그인에 보내고 세션 쿠키로 열리므로 따로 세션을 열지 않는다", async () => {
+      fetchMock.mockResolvedValueOnce(
+        jsonResponse({ userIdx: 3, authority: "ROLE_ADVERTISER" }),
+      );
 
-    await expect(socialLogin(payload)).resolves.toEqual({
-      status: "needsLink",
-      snsData: payload,
+      await expect(
+        kakaoLogin("auth-code", "https://example.com/auth/kakao"),
+      ).resolves.toEqual({ status: "success" });
+
+      expect(fetchMock).toHaveBeenCalledOnce();
+      const [url, init] = fetchMock.mock.calls[0] ?? [];
+      expect(String(url)).toContain("/v3/auth/sns/kakao/login");
+      expect(JSON.parse(String(init?.body))).toEqual({
+        code: "auth-code",
+        redirectUri: "https://example.com/auth/kakao",
+      });
+    });
+
+    it("미가입(404 NEED_SIGNUP)이면 신원 토큰을 들고 연동 화면으로 넘긴다", async () => {
+      fetchMock.mockResolvedValueOnce(
+        jsonResponse(
+          {
+            result: false,
+            reason: "NEED_SIGNUP",
+            platform: "kakao",
+            email: "k@b.co",
+            snsLinkToken: "signed-token",
+          },
+          404,
+        ),
+      );
+      await expect(kakaoLogin("c", "https://example.com/x")).resolves.toEqual({
+        status: "needsLink",
+        snsData: {
+          platform: "kakao",
+          email: "k@b.co",
+          snsLinkToken: "signed-token",
+        },
+      });
+    });
+
+    it("신원 토큰이 없는 NEED_SIGNUP이나 그 밖의 거절은 failed다", async () => {
+      fetchMock.mockResolvedValueOnce(
+        jsonResponse({ result: false, reason: "NEED_SIGNUP" }, 404),
+      );
+      await expect(kakaoLogin("c", "https://example.com/x")).resolves.toEqual({
+        status: "failed",
+      });
+      fetchMock.mockResolvedValueOnce(
+        jsonResponse({ result: false, reason: "INVALID_SNS_CODE" }, 400),
+      );
+      await expect(kakaoLogin("c", "https://example.com/x")).resolves.toEqual({
+        status: "failed",
+      });
+    });
+
+    it("네트워크 오류는 삼키지 않고 던진다", async () => {
+      fetchMock.mockRejectedValueOnce(new TypeError("network"));
+      await expect(kakaoLogin("c", "https://example.com/x")).rejects.toThrow(
+        "network",
+      );
     });
   });
 
-  it("takes the google identity from the token response on C02", async () => {
-    fetchMock.mockResolvedValue(
-      jsonResponse({
-        data: { code: "C02", tokenResponse: { uid: "g1", email: "g@x.com" } },
-      }),
-    );
+  describe("naverLogin (V3)", () => {
+    it("{ code, state }를 보내 세션을 연다", async () => {
+      fetchMock.mockResolvedValueOnce(
+        jsonResponse({ userIdx: 3, authority: "ROLE_ADVERTISER" }),
+      );
 
-    await expect(googleLogin("code")).resolves.toEqual({
-      status: "needsLink",
-      snsData: { platform: "google", uid: "g1", email: "g@x.com" },
+      await expect(naverLogin("naver-code", "abc123")).resolves.toEqual({
+        status: "success",
+      });
+
+      const [url, init] = fetchMock.mock.calls[0] ?? [];
+      expect(String(url)).toContain("/v3/auth/sns/naver/login");
+      expect(JSON.parse(String(init?.body))).toEqual({
+        code: "naver-code",
+        state: "abc123",
+      });
+    });
+
+    it("미가입(404 NEED_SIGNUP)이면 신원 토큰을 들고 연동 화면으로 넘긴다", async () => {
+      fetchMock.mockResolvedValueOnce(
+        jsonResponse(
+          {
+            result: false,
+            reason: "NEED_SIGNUP",
+            platform: "naver",
+            email: "n@b.co",
+            snsLinkToken: "signed-token",
+          },
+          404,
+        ),
+      );
+      await expect(naverLogin("c", "s")).resolves.toEqual({
+        status: "needsLink",
+        snsData: {
+          platform: "naver",
+          email: "n@b.co",
+          snsLinkToken: "signed-token",
+        },
+      });
     });
   });
 
-  it("fails for any other code", async () => {
-    fetchMock.mockResolvedValue(jsonResponse({ data: { code: "C99" } }));
-    await expect(googleLogin("code")).resolves.toEqual({ status: "failed" });
-  });
+  describe("appleLogin (V3)", () => {
+    it("{ token }을 보내 세션을 연다", async () => {
+      fetchMock.mockResolvedValueOnce(
+        jsonResponse({ userIdx: 3, authority: "ROLE_ADVERTISER" }),
+      );
 
-  it("rejects a link response without a numeric code", async () => {
-    fetchMock.mockResolvedValue(jsonResponse({ code: "200" }));
-    await expect(socialLink("kakao", 1, "a@b.com", "7")).rejects.toThrow();
+      await expect(appleLogin("id-token")).resolves.toEqual({
+        status: "success",
+      });
+
+      const [url, init] = fetchMock.mock.calls[0] ?? [];
+      expect(String(url)).toContain("/v3/auth/sns/apple/login");
+      expect(JSON.parse(String(init?.body))).toEqual({ token: "id-token" });
+    });
+
+    it("미가입(404 NEED_SIGNUP)이면 신원 토큰을 들고 연동 화면으로 넘긴다", async () => {
+      fetchMock.mockResolvedValueOnce(
+        jsonResponse(
+          {
+            result: false,
+            reason: "NEED_SIGNUP",
+            platform: "apple",
+            email: "a@privaterelay.appleid.com",
+            snsLinkToken: "signed-token",
+          },
+          404,
+        ),
+      );
+      await expect(appleLogin("t")).resolves.toEqual({
+        status: "needsLink",
+        snsData: {
+          platform: "apple",
+          email: "a@privaterelay.appleid.com",
+          snsLinkToken: "signed-token",
+        },
+      });
+    });
   });
 });

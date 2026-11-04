@@ -24,6 +24,7 @@
     "subscribe": "订阅",
     "subscribed": "订阅中",
     "comingSoon": "筹备中",
+    "comingSoonPrice": "筹备中",
     "comingSoonText": {
       "line1": "即将推出。",
       "line2": "敬请期待!"
@@ -31,10 +32,7 @@
     "badge": {
       "brand": "品牌型",
       "groupBuy": "团购型",
-      "liveCommerce": "直播带货型",
-      "liveClass": "直播课程型",
-      "ota": "OTA型",
-      "smallBusiness": "小微商家型"
+      "undecided": "待定"
     },
     "recruit": {
       "features": {

@@ -5,6 +5,13 @@ import { useTranslation } from "@/shared/i18n";
 import { FeatureCards } from "./FeatureCards";
 import { HeroAvatars } from "./HeroAvatars";
 
+import type { SessionViewModel } from "@/entities/session";
+
+interface HomeContentProps {
+  /** 셸과 같은 세션 확인 결과. 카드의 로그인 안내 여부에 씀. */
+  session: Promise<SessionViewModel>;
+}
+
 // 키보드가 열린 동안 입력창은 본문 아래 끝(아래 여백 --keyboard-anchor-gap 위)에 고정되고 그 뒤로 본문만 스크롤됨(디자인 QA 2026-11-02).
 // 여백은 셸이 본문 아래를 흐리는 길이와 같은 변수를 써서 고정된 입력창이 흐려지지 않게 함.
 // sticky는 부모 영역 안에서만 붙으므로 입력창은 본문 전체(이 컨테이너)의 직속 자식이어야 함. 묶음 안에 두면 묶음이 스크롤로 빠질 때 같이 사라짐.
@@ -22,7 +29,7 @@ const FEATURE_CARDS_CLASS_NAME =
 // 키보드가 열릴 때 셸이 이 컨테이너의 아래 끝(입력창과 버튼 줄, 그 아래 여백 포함)이 보이게 한 번 스크롤함(data-keyboard-anchor).
 // 입력창이 sticky라 입력창 자신을 앵커로 두면 붙어 있는 위치 기준으로 계산되어 본문이 끝까지 스크롤되지 않음. 규칙은 .claude/skills/mobile-keyboard/SKILL.md.
 // 순서는 CSS(order)로만 바꿈. DOM을 옮기면 textarea가 다시 마운트되어 포커스와 한글 조합이 끊김.
-export function HomeContent() {
+export function HomeContent({ session }: HomeContentProps) {
   const { t } = useTranslation("pages/home");
 
   return (
@@ -52,7 +59,7 @@ export function HomeContent() {
         </p>
       </section>
       <InfluencerSearchForm className={SEARCH_FORM_CLASS_NAME} />
-      <FeatureCards className={FEATURE_CARDS_CLASS_NAME} />
+      <FeatureCards session={session} className={FEATURE_CARDS_CLASS_NAME} />
     </div>
   );
 }

@@ -74,6 +74,7 @@ describe("관리자 계정 전환", () => {
     );
     expect(serverApiV3.get).toHaveBeenCalledWith("/sec", {
       headers: { "X-Path": ROUTES.switchAccount },
+      signal: expect.any(AbortSignal),
     });
     expect(
       screen.getByRole("heading", { name: "아이디 변경" }),

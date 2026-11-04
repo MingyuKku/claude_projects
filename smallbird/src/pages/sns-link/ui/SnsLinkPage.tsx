@@ -67,7 +67,8 @@ export function SnsLinkPage() {
       setErrorCode(result.code);
       return;
     }
-    void navigate(ROUTES.main);
+    // 승인 전 계정은 연동만 되고 세션은 열리지 않으므로 로그인 화면으로 보냄(승인 뒤 SNS로 로그인됨).
+    void navigate(result.isSessionOpened ? ROUTES.main : ROUTES.login);
   }
 
   function handleClickLogin() {

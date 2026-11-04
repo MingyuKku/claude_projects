@@ -8,6 +8,11 @@
       "failure": "无法登记该卡，请重试。"
     }
   },
+  "register": {
+    "title": "注册支付卡",
+    "description": "尚未注册支付卡。请先注册支付卡，以便订阅付款。",
+    "action": "注册支付卡"
+  },
   "menu": {
     "label": "{{issuer}} {{number}} 卡菜单",
     "delete": "删除卡",
@@ -28,7 +33,7 @@
     }
   },
   "error": {
-    "defaultCardInUse": "订阅进行中，无法删除默认卡。请先将其他卡设为付款卡后再删除。",
+    "defaultCardInUse": "订阅进行中，无法删除默认卡。",
     "notFound": "该卡已被删除或不存在。"
   }
 }

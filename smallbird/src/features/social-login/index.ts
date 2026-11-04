@@ -1,13 +1,29 @@
 export {
-  completeAppleLogin,
   completeGoogleLogin,
   completeKakaoLogin,
   completeNaverLogin,
+  loginWithApple,
 } from "./api/complete-login";
-export { socialLink } from "./api/social-login-api";
+export { linkSnsWithToken } from "./api/social-login-api";
+export { preloadAppleSdk } from "./lib/apple-authorize";
+export { startAppleLink } from "./lib/apple-link";
+export {
+  completeKakaoLink,
+  readKakaoLinkCallback,
+  startKakaoLink,
+} from "./lib/kakao-link";
+export {
+  completeGoogleLink,
+  readGoogleLinkCallback,
+  startGoogleLink,
+} from "./lib/google-link";
+export {
+  completeNaverLink,
+  readNaverLinkCallback,
+  startNaverLink,
+} from "./lib/naver-link";
 export { socialLoginPayloadSchema } from "./model/schema";
 export type {
-  SocialLinkResult,
   SocialLoginOutcome,
   SocialLoginPayload,
   SocialPlatform,

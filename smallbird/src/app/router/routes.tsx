@@ -4,21 +4,48 @@ import { ROUTES } from "@/shared/config";
 
 import { AuthenticatedLayout } from "../layouts/AuthenticatedLayout";
 import { MypageLayout } from "../layouts/MypageLayout";
+import { OptionalSessionLayout } from "../layouts/OptionalSessionLayout";
 import { PageFallback } from "../layouts/PageFallback";
 import { RootLayout } from "../layouts/RootLayout";
+import { SessionCheckingFallback } from "../layouts/SessionCheckingFallback";
+import { SessionLayout } from "../layouts/SessionLayout";
 import { RouteErrorBoundary } from "../providers/ErrorBoundary";
+import {
+  forgetOtherPageSession,
+  optionalSessionLoader,
+  requireSession,
+  revalidateOnEveryNavigation,
+  sessionLoader,
+} from "./session-middleware";
 
 import type { ComponentType } from "react";
 import type { RouteObject } from "react-router";
 
 // Routes are declared here only. Each screen is a lazy import of a page's Public API,
 // so every page gets its own bundle.
-// Server data is fetched by each slice's SWR hook, not by route loaders (.claude/rules/routing.md).
+// Server data is fetched by each slice's SWR hook, not by route loaders. Loaders only pass the session
+// that decides whether a screen can open (.claude/rules/routing.md).
 // Paths come from ROUTES in shared/config/routes.ts; add new ones there first.
 function page(path: string, load: () => Promise<ComponentType>): RouteObject {
   return {
     path,
     lazy: async () => ({ Component: await load() }),
+  };
+}
+
+// 로그인이 필요한 화면을 묶는 레이아웃 라우트. 이동할 때마다 화면을 그리기 전에 세션을 확인하고(middleware),
+// 확인된 세션을 loader로 레이아웃에 넘김. 가드 규칙은 .claude/rules/routing.md.
+function requireSessionRoute(
+  Component: ComponentType,
+  children: RouteObject[],
+): RouteObject {
+  return {
+    Component,
+    middleware: [requireSession],
+    loader: sessionLoader,
+    shouldRevalidate: revalidateOnEveryNavigation,
+    HydrateFallback: SessionCheckingFallback,
+    children,
   };
 }
 
@@ -28,17 +55,26 @@ export const routes: RouteObject[] = [
     Component: RootLayout,
     ErrorBoundary: RouteErrorBoundary,
     HydrateFallback: PageFallback,
+    middleware: [forgetOtherPageSession],
     children: [
+      // 로그인이 선택인 화면. 세션 확인을 기다리지 않고 화면을 먼저 그림.
       {
-        index: true,
-        lazy: async () => ({
-          Component: (await import("@/pages/home")).HomePage,
-        }),
+        Component: OptionalSessionLayout,
+        loader: optionalSessionLoader,
+        shouldRevalidate: revalidateOnEveryNavigation,
+        children: [
+          {
+            index: true,
+            lazy: async () => ({
+              Component: (await import("@/pages/home")).HomePage,
+            }),
+          },
+          page(
+            ROUTES.influencerSearch,
+            async () => (await import("@/pages/coming-soon")).ComingSoonPage,
+          ),
+        ],
       },
-      page(
-        ROUTES.influencerSearch,
-        async () => (await import("@/pages/coming-soon")).ComingSoonPage,
-      ),
       page(ROUTES.introduction, async () => {
         return (await import("@/pages/introduction")).IntroductionPage;
       }),
@@ -61,55 +97,52 @@ export const routes: RouteObject[] = [
           replace(`${ROUTES.main}${new URL(request.url).search}`),
       },
 
-      page(
-        ROUTES.switchAccount,
-        async () => (await import("@/pages/switch-account")).SwitchAccountPage,
-      ),
+      requireSessionRoute(SessionLayout, [
+        page(
+          ROUTES.switchAccount,
+          async () =>
+            (await import("@/pages/switch-account")).SwitchAccountPage,
+        ),
+      ]),
 
-      {
-        Component: AuthenticatedLayout,
-        children: [
-          page(
-            ROUTES.customerCenterBigbirdThread,
-            async () =>
-              (await import("@/pages/customer-center-bigbird"))
-                .CustomerCenterBigbirdPage,
-          ),
-          page(
-            ROUTES.customerCenterBigbirdNew,
-            async () =>
-              (await import("@/pages/customer-center-bigbird-new"))
-                .CustomerCenterBigbirdNewPage,
-          ),
-          page(
-            ROUTES.customerCenterBuyerThread,
-            async () =>
-              (await import("@/pages/customer-center-buyer"))
-                .CustomerCenterBuyerPage,
-          ),
-        ],
-      },
+      requireSessionRoute(AuthenticatedLayout, [
+        page(
+          ROUTES.customerCenterBigbirdThread,
+          async () =>
+            (await import("@/pages/customer-center-bigbird"))
+              .CustomerCenterBigbirdPage,
+        ),
+        page(
+          ROUTES.customerCenterBigbirdNew,
+          async () =>
+            (await import("@/pages/customer-center-bigbird-new"))
+              .CustomerCenterBigbirdNewPage,
+        ),
+        page(
+          ROUTES.customerCenterBuyerThread,
+          async () =>
+            (await import("@/pages/customer-center-buyer"))
+              .CustomerCenterBuyerPage,
+        ),
+      ]),
 
-      // 마이페이지. 셸과 로그인 확인은 MypageLayout이 맡음(권한 검사 없음).
-      {
-        Component: MypageLayout,
-        children: [
-          page(
-            ROUTES.mypageSubscribe,
-            async () =>
-              (await import("@/pages/mypage-subscribe")).MyPageSubscribePage,
-          ),
-          page(
-            ROUTES.mypageMoney,
-            async () => (await import("@/pages/mypage-money")).MyPageMoneyPage,
-          ),
-          page(
-            ROUTES.mypageAccount,
-            async () =>
-              (await import("@/pages/mypage-account")).MyPageAccountPage,
-          ),
-        ],
-      },
+      // 마이페이지. 셸은 MypageLayout이 맡음.
+      requireSessionRoute(MypageLayout, [
+        page(
+          ROUTES.mypageSubscribe,
+          async () =>
+            (await import("@/pages/mypage-subscribe")).MyPageSubscribePage,
+        ),
+        page(
+          ROUTES.mypageMoney,
+          async () => (await import("@/pages/mypage-money")).MyPageMoneyPage,
+        ),
+        page(
+          ROUTES.mypageAccount,
+          async () =>
+            (await import("@/pages/mypage-account")).MyPageAccountPage,
+        ),
+      ]),
 
       // Account recovery and password change.
       page(ROUTES.find, async () => (await import("@/pages/find")).FindPage),
@@ -158,10 +191,6 @@ export const routes: RouteObject[] = [
         ROUTES.authGoogle,
         async () =>
           (await import("@/pages/social-callback")).GoogleCallbackPage,
-      ),
-      page(
-        ROUTES.authApple,
-        async () => (await import("@/pages/social-callback")).AppleCallbackPage,
       ),
 
       // 개발 서버에서만 등록하는 공통 컴포넌트 미리보기. 프로덕션 번들에는 포함되지 않음.

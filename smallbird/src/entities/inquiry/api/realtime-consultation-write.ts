@@ -2,6 +2,7 @@ import { getFirestoreDb } from "@/shared/api";
 
 import {
   planAbortClose,
+  planAcceptRequest,
   planAcquireLock,
   planAppendMessage,
   planBeginClose,
@@ -136,6 +137,15 @@ export function appendConsultationMessage(
     }),
   );
 }
+
+/** 구매자 실시간 요청을 광고주가 수락함(운영 역할). 이미 연결됐으면 건너뜀. */
+export const acceptRealtimeRequest = (
+  target: ConsultationTarget,
+  identifier: string | null,
+) =>
+  run(target, (consultation, account) =>
+    planAcceptRequest(consultation, account, { identifier, now: Date.now() }),
+  );
 
 export const cancelRealtimeRequest = (target: ConsultationTarget) =>
   run(target, (consultation) => planCancelRequest(consultation, Date.now()));

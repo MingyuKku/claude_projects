@@ -10,6 +10,20 @@
   "unlink": {
     "title": "解除快捷登录",
     "description": "要解除{{provider}}快捷登录绑定吗？解除后将无法使用{{provider}}账号登录。",
-    "action": "解除"
+    "action": "解除",
+    "toast": {
+      "done": "已解除{{provider}}绑定。",
+      "notLinked": "已是解除状态。",
+      "failed": "解除失败，请重试。"
+    }
+  },
+  "link": {
+    "toast": {
+      "done": "已绑定{{provider}}。",
+      "alreadyLinked": "已绑定其他{{provider}}账号，请先解除。",
+      "linkedToOther": "该{{provider}}账号已绑定其他账号。",
+      "emailRequired": "需同意提供邮箱才能绑定。",
+      "failed": "绑定失败，请重试。"
+    }
   }
 }

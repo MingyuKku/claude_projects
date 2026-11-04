@@ -3,7 +3,6 @@ import { createContext } from "react";
 import type { MenuPermissions } from "@/entities/session";
 
 export const NavigationContext = createContext<{
-  closeMenu: () => void;
   /** 비로그인이 로그인이 필요한 메뉴를 눌렀을 때 로그인 안내 알럿을 띄움. */
   showLoginRequired: () => void;
   isAuthenticated: boolean;
@@ -15,7 +14,6 @@ export const NavigationContext = createContext<{
    */
   permissions: MenuPermissions | null;
 }>({
-  closeMenu: () => {},
   showLoginRequired: () => {},
   isAuthenticated: false,
   canAccessSubscribe: false,

@@ -29,6 +29,8 @@ const active: Subscription = {
   paymentMethod: "card",
   cardKind: "credit",
   isCancelScheduled: false,
+  status: "active",
+  nextRetryAt: null,
 };
 
 function setup(subscriptions: Subscription[]) {
@@ -77,7 +79,7 @@ describe("SubscribedProductTable", () => {
   });
 
   it("해지 예정인 상품은 비활성 해지 예정 버튼을 보인다", () => {
-    setup([{ ...active, isCancelScheduled: true }]);
+    setup([{ ...active, isCancelScheduled: true, status: "cancelScheduled" }]);
     expect(screen.getByRole("button", { name: "해지 예정" })).toBeDisabled();
   });
 });

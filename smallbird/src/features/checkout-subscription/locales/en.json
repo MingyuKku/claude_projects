@@ -9,6 +9,22 @@
       "yearly": "Starts now, for 1 year"
     }
   },
+  "method": {
+    "title": "Payment method",
+    "card": "Card",
+    "required": "Required",
+    "defaultCard": "Default card"
+  },
+  "installment": {
+    "label": "{{card}} installments",
+    "lumpSum": "Lump sum",
+    "months": "{{months}} months"
+  },
+  "changeDefault": {
+    "title": "Change default card",
+    "description": "Payments are made with the default card only. Change your default card to the selected one?",
+    "action": "Set as default"
+  },
   "notice": {
     "title": "Notice",
     "agree": "I have read the notices below and agree to recurring payments and auto-renewal.",
@@ -23,7 +39,6 @@
   "summary": {
     "title": "Payment summary",
     "product": "Plan",
-    "card": "Payment card",
     "amount": "Amount",
     "pay": "Pay",
     "cancel": "Cancel"
@@ -46,6 +61,9 @@
     "productNotAvailable": "This plan isn't available right now.",
     "cardLimitExceeded": "You can register up to 2 cards.",
     "cardRegisterFailed": "Couldn't register the card. Please try again.",
-    "paymentFailed": "Payment failed. Please try again."
+    "paymentFailed": "Payment failed. Please try again.",
+    "cardNotFound": "This card was already deleted or doesn't exist.",
+    "invalidInstallment": "This installment period isn't available. Choose another.",
+    "installmentNotAllowedCard": "Debit cards can't pay in installments. Choose lump sum."
   }
 }

@@ -6,10 +6,13 @@ export {
   useCountdown,
 } from "./useCountdown";
 export { hardNavigate } from "./hardNavigate";
+export { navigateExternal } from "./navigateExternal";
 export { saveFile } from "./saveFile";
 export { packCircles } from "./packCircles";
 export type { PackedCircle } from "./packCircles";
 export { useMediaQuery } from "./useMediaQuery";
+export { usePromiseState } from "./usePromiseState";
+export type { PromiseState, SettledResult } from "./usePromiseState";
 export { useVisualViewport } from "./useVisualViewport";
 export { useVirtualKeyboardOpen } from "./useVirtualKeyboardOpen";
 export { useKeyboardViewport } from "./useKeyboardViewport";

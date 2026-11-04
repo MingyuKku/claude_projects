@@ -2,10 +2,10 @@ import { render } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { SWRConfig } from "swr";
 
-import { clearLastAllowedSession } from "@/entities/session";
 import { serverApiV3 } from "@/shared/api";
 
 import { routes } from "./routes";
+import { resetSessionMiddleware } from "./session-middleware";
 
 /**
  * 실제 라우트로 화면을 그림. 경로 배열을 넘기면 그 순서로 방문한 기록을 쌓고 마지막 경로에서 시작함
@@ -65,8 +65,8 @@ function installV3Get() {
 
 /** 테스트 시작 때 호출: 세션 응답을 정하고 `serverApiV3.get`을 경로별로 나눠 돌려줌. */
 export function resetSession(session: unknown) {
-  // 세션 모듈이 직전 확인 결과를 기억하므로(셸을 바로 그리려고) 앞 테스트의 사용자가 이 테스트의 셸에 남지 않게 비움.
-  clearLastAllowedSession();
+  // 세션 middleware가 직전 결과와 지금 화면을 기억하므로 앞 테스트의 상태가 남지 않게 비움.
+  resetSessionMiddleware();
   sessionOutcome = { kind: "value", value: session };
   sessionQueue = [];
   otherHandler = () => Promise.reject(new Error("unmocked"));

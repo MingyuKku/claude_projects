@@ -106,10 +106,9 @@ export function InfluencerSearchForm({ className }: InfluencerSearchFormProps) {
     onCollapsed: expand.finishCollapse,
   });
   const canSubmit = query.trim() !== "";
-  // 펼쳐도 커질 공간이 없으면 펼치기 버튼을 숨김. 펼친 뒤에는 접을 수 있게 축소 버튼을 둠.
-  const canExpand = expand.limit?.canExpand ?? true;
-  const shouldShowExpandAction =
-    expand.isExpanded || (isOverflowing && canExpand);
+  // 글이 넘치면 펼치기 버튼을 둠. 펼쳐도 커질 공간이 없을 때(키보드로 보이는 영역이 낮을 때)도 보임(디자인 QA 2026-11-02).
+  // 펼친 뒤에는 접을 수 있게 축소 버튼을 둠.
+  const shouldShowExpandAction = expand.isExpanded || isOverflowing;
   const formStyle: CssVariableStyle = {
     ...(expand.limit && {
       "--search-field-max-height": `${expand.limit.maxFieldHeight}px`,

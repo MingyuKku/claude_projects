@@ -35,7 +35,7 @@ vi.mock("@/shared/lib", async (importOriginal) => ({
   hardNavigate: vi.fn(),
 }));
 
-vi.mock("sonner", () => ({ toast: { error: vi.fn() } }));
+vi.mock("sonner", () => ({ toast: { error: vi.fn(), dismiss: vi.fn() } }));
 
 afterEach(() => vi.unstubAllGlobals());
 
@@ -71,6 +71,7 @@ describe("루트 메인과 공통 메뉴", () => {
     expect(router.state.location.pathname).toBe("/");
     expect(serverApiV3.get).toHaveBeenCalledWith("/sec", {
       headers: { "X-Path": "/" },
+      signal: expect.any(AbortSignal),
     });
     const nav = screen.getByRole("navigation", { name: "주 메뉴" });
     expect(within(nav).getByRole("link", { name: "홈" })).toHaveAttribute(
@@ -156,6 +157,44 @@ describe("루트 메인과 공통 메뉴", () => {
     expect(
       await screen.findByRole("button", { name: "내 프로필" }),
     ).toBeInTheDocument();
+  });
+
+  it("다시 시도가 또 실패하면 실패 토스트를 다시 띄우고, 성공하면 토스트를 닫는다", async () => {
+    const sessionFailedText =
+      "로그인 상태를 확인하지 못했습니다. 다시 시도해 주세요.";
+
+    function failedToastCalls() {
+      return vi
+        .mocked(toast.error)
+        .mock.calls.filter(([text]) => text === sessionFailedText);
+    }
+
+    async function clickRetry() {
+      const action = failedToastCalls().at(-1)?.[1]?.action;
+      if (!action || typeof action !== "object" || !("onClick" in action)) {
+        throw new Error("토스트에 재시도 액션이 없습니다");
+      }
+      await act(async () => {
+        action.onClick({} as never);
+      });
+    }
+
+    vi.mocked(toast.error).mockClear();
+    mockSessionErrorOnce(new ApiError(500, undefined));
+    mockSessionErrorOnce(new ApiError(500, undefined));
+    await renderRoute(ROUTES.main);
+    await waitFor(() => expect(failedToastCalls()).toHaveLength(1));
+
+    await clickRetry();
+    await waitFor(() => expect(failedToastCalls()).toHaveLength(2));
+
+    vi.mocked(toast.dismiss).mockClear();
+    await clickRetry();
+    expect(
+      await screen.findByRole("button", { name: "내 프로필" }),
+    ).toBeInTheDocument();
+    expect(failedToastCalls()).toHaveLength(2);
+    expect(toast.dismiss).toHaveBeenCalledWith("session-check-failed");
   });
 
   it("세션 확인 중에는 비로그인 UI 위에 전체 오버레이와 스피너를 덮는다", async () => {
@@ -378,6 +417,113 @@ describe("루트 메인과 공통 메뉴", () => {
       screen.getByRole("button", { name: "내 프로필" }),
     ).toBeInTheDocument();
     errorLog.mockRestore();
+  });
+});
+
+// 메뉴를 누른 뒤 세션 확인이 끝날 때까지 이전 화면에 머물므로, 누른 메뉴에 이동 중임을 표시함.
+describe("메뉴 이동 중 표시", () => {
+  it("LNB 메뉴를 누르면 이동이 끝날 때까지 그 메뉴를 이동 중으로 표시한다", async () => {
+    const user = userEvent.setup();
+    const router = await renderRoute(ROUTES.main);
+    await screen.findByRole("heading", { name: "홈" });
+    const nav = screen.getByRole("navigation", { name: "주 메뉴" });
+
+    const resolveSession = mockSessionPending();
+    await user.click(within(nav).getByRole("link", { name: "빅버드 문의" }));
+    expect(
+      within(nav).getByRole("link", { name: "빅버드 문의" }),
+    ).toHaveAttribute("aria-busy", "true");
+    expect(router.state.location.pathname).toBe(ROUTES.main);
+
+    await act(async () => resolveSession(session));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(ROUTES.customerCenterBigbird),
+    );
+  });
+
+  it("전체 메뉴는 이동하는 동안 열려 있고 이동이 끝나면 닫힌다", async () => {
+    const user = userEvent.setup();
+    const router = await renderRoute(ROUTES.main);
+    await user.click(await screen.findByRole("button", { name: "메뉴 열기" }));
+    const dialog = screen.getByRole("dialog");
+
+    const resolveSession = mockSessionPending();
+    await user.click(within(dialog).getByRole("link", { name: "빅버드 문의" }));
+    expect(screen.getByRole("dialog")).toBeInTheDocument();
+    expect(
+      within(dialog).getByRole("link", { name: "빅버드 문의" }),
+    ).toHaveAttribute("aria-busy", "true");
+
+    await act(async () => resolveSession(session));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(ROUTES.customerCenterBigbird),
+    );
+    await waitFor(() =>
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
+    );
+  });
+});
+
+// 로그인했지만 그 경로 권한이 없을 때(403). 세션 middleware가 처리함(app/router/session-middleware.ts).
+describe("권한 없는 화면", () => {
+  function sessionPaths() {
+    return vi
+      .mocked(serverApiV3.get)
+      .mock.calls.filter(([path]) => path === "/sec")
+      .map(
+        ([, options]) =>
+          (options as { headers: Record<string, string> }).headers["X-Path"],
+      );
+  }
+
+  it("주소로 바로 들어오면 홈으로 보내고 권한 없음을 알린다", async () => {
+    mockSessionErrorOnce(new ApiError(403, { result: false }));
+    const router = await renderRoute(ROUTES.customerCenterBuyer);
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(ROUTES.main),
+    );
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "해당 메뉴에 접근할 권한이 없습니다. Master ID에 권한을 요청해 주세요.",
+        expect.anything(),
+      ),
+    );
+  });
+
+  it("앱 안에서 옮기려 하면 지금 화면에 머물고 세션을 새로 받아 권한 표시를 갱신한다", async () => {
+    const router = await renderRoute(`${ROUTES.main}?from=test`);
+    await screen.findByRole("heading", { name: "홈" });
+    vi.mocked(toast.error).mockClear();
+
+    mockSessionErrorOnce(new ApiError(403, { result: false }));
+    await act(async () => {
+      await router.navigate(ROUTES.customerCenterBuyer);
+    });
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "해당 메뉴에 접근할 권한이 없습니다. Master ID에 권한을 요청해 주세요.",
+        expect.anything(),
+      ),
+    );
+    expect(router.state.location.pathname).toBe(ROUTES.main);
+    expect(router.state.location.search).toBe("?from=test");
+    expect(sessionPaths()).toEqual([
+      ROUTES.main,
+      ROUTES.customerCenterBuyer,
+      ROUTES.main,
+    ]);
+  });
+
+  it("Sub ID가 구독에 들어가면 안내 없이 계정 설정으로 보낸다", async () => {
+    mockSessionErrorOnce(new ApiError(403, { result: false }));
+    const router = await renderRoute(ROUTES.mypageSubscribe);
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(ROUTES.mypageAccount),
+    );
+    expect(toast.error).not.toHaveBeenCalledWith(
+      "해당 메뉴에 접근할 권한이 없습니다. Master ID에 권한을 요청해 주세요.",
+      expect.anything(),
+    );
   });
 });
 

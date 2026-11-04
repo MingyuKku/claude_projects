@@ -1,12 +1,15 @@
 import { ChevronDown } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
+import { Spinner } from "@/shared/ui/spinner";
 
 import type { LucideIcon } from "lucide-react";
 import type { ComponentProps, ComponentType, HTMLAttributes } from "react";
 
 // Figma Sidebar Base / Main Item(5052:72938)·Sub Item(5052:73211)·Sidebar / Navigation Button(5058:78648).
 // Figma의 Focus 상태는 현재 페이지(aria-current="page").
+// 링크 컴포넌트가 이동 중인 링크에 data-pending을 달면 아이콘 자리(하위 메뉴는 이름 오른쪽)에 스피너를 보여 줌.
+// 시안이 없어 레이아웃이 변하지 않는 자리에 둠. 이동 중 상태는 링크의 aria-busy로 알리므로 스피너는 읽지 않음.
 export interface SidebarLinkProps extends ComponentProps<"a"> {
   href: string;
   // 메뉴 항목의 id. 링크 컴포넌트가 항목별 동작(예: 로그인 안내)을 정할 때 씀.
@@ -52,6 +55,16 @@ const mainRowClass = cn(
   FOCUS_RING,
 );
 
+// 아이콘과 같은 자리에 겹쳐 두고 이동 중에만 바꿔 보임.
+function NavIcon({ icon: Icon }: { icon: LucideIcon }) {
+  return (
+    <>
+      <Icon className="size-4 shrink-0 in-data-pending:hidden" />
+      <Spinner aria-hidden className="hidden shrink-0 in-data-pending:block" />
+    </>
+  );
+}
+
 // 드롭다운 아이콘은 16px 아이콘 + 2px 여백 = 20×20 영역(Figma Icon Button 5052:72817). 행의 오른쪽 여백 12px(px-3)과 함께
 // 하위 메뉴가 있는 모든 행에서 같은 자리에 정렬됨.
 function NavChevron({ className }: { className?: string }) {
@@ -87,7 +100,7 @@ export function SidebarNavItem({
         className={cn(mainRowClass, className)}
         {...props}
       >
-        <Icon className="size-4 shrink-0" />
+        <NavIcon icon={Icon} />
         <span className="flex-1 truncate">{item.label}</span>
         {item.hasSubItems && <NavChevron />}
       </Link>
@@ -117,11 +130,15 @@ export function SidebarNavItem({
                 navId={subItem.id}
                 aria-current={subItem.isActive ? "page" : undefined}
                 className={cn(
-                  "block min-w-32 truncate rounded-sm p-1.5 text-sm leading-5 text-sidebar-foreground transition-colors hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:text-primary",
+                  "flex min-w-32 items-center gap-1.5 rounded-sm p-1.5 text-sm leading-5 text-sidebar-foreground transition-colors hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:text-primary",
                   FOCUS_RING,
                 )}
               >
-                {subItem.label}
+                <span className="truncate">{subItem.label}</span>
+                <Spinner
+                  aria-hidden
+                  className="hidden size-3.5 shrink-0 in-data-pending:block"
+                />
               </Link>
             </li>
           ))}
@@ -154,7 +171,7 @@ export function SidebarRailItem({
       )}
       {...props}
     >
-      <Icon className="size-4" />
+      <NavIcon icon={Icon} />
     </Link>
   );
 }

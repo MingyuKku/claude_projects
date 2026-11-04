@@ -9,7 +9,7 @@ import {
   AuthTermsFooter,
   AuthText,
 } from "@/shared/components/auth";
-import { HISTORY_BACK, ROUTES, TERMS_LINKS } from "@/shared/config";
+import { HISTORY_BACK, TERMS_LINKS } from "@/shared/config";
 import { Trans, useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
 
@@ -32,10 +32,6 @@ export function LoginPage() {
   const brandStyle: CssVariableStyle | undefined = brand.primaryColor
     ? { "--brand": brand.primaryColor }
     : undefined;
-
-  function handleSuccessKakao() {
-    void navigate(ROUTES.authKakao);
-  }
 
   function handleClickBack() {
     void navigate(HISTORY_BACK);
@@ -107,10 +103,7 @@ export function LoginPage() {
 
             <div className="flex flex-col gap-5 tablet:gap-6">
               <LoginForm onAccountLocked={setLockedUserId} />
-              <SnsLoginRow
-                onSuccessKakao={handleSuccessKakao}
-                onErrorStart={() => setHasSnsError(true)}
-              />
+              <SnsLoginRow onErrorStart={() => setHasSnsError(true)} />
               {hasSnsError && (
                 <AuthText
                   size="sm"

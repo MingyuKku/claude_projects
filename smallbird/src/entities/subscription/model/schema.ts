@@ -42,6 +42,10 @@ export const subscriptionListSchema = z.array(
     /** 가장 최근 결제에 쓴 카드의 종류(`credit`·`debit`). 결제 기록이 없거나 기프트카드면 null. 모르는 값도 읽도록 문자열로 받음. */
     cardKind: z.string().nullish(),
     isCancelScheduled: z.boolean(),
+    /** 구독 상태(`active`·`cancelScheduled`·`paymentFailed`). 모르는 값도 읽도록 문자열로 받고, 없으면 `isCancelScheduled`로 가림. */
+    status: z.string().nullish(),
+    /** 다음 재결제 날짜(`YYYY-MM-DD`, KST). `status`가 `paymentFailed`일 때만 있고 그 외 null. */
+    nextRetryAt: z.string().nullish(),
   }),
 );
 

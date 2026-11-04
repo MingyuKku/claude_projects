@@ -4,8 +4,9 @@ import type { CheckStatus } from "@/entities/account";
 
 export const snsTokenDataSchema = z.object({
   platform: z.string(),
-  email: z.string(),
-  uid: z.string(),
+  email: z.string().optional(),
+  /** V3 로그인이 준 서버 서명 신원(10분). 가입이 끝나면 이것으로 SNS를 연결함. */
+  snsLinkToken: z.string(),
 });
 
 /** Identity handed over when a visitor arrives from SNS and creates a new account. */

@@ -1,47 +1,6 @@
 // 실제로 호출하는 SDK 범위만 선언함. 제공사가 타입을 주지 않고,
 // 더 선언해도 런타임 보장 없이 유지 비용만 늘기 때문.
 
-interface NaverLoginModule {
-  init: () => void;
-  authorize: () => void;
-  getLoginStatus: (callback: (status: boolean) => void) => void;
-  /** 로그인 중일 때만 채워짐. */
-  user: { id: string; email: string };
-}
-
-interface NaverSdk {
-  LoginWithNaverId: new (options: {
-    clientId: string;
-    isPopup: string;
-    callbackUrl: string;
-    callbackHandle: boolean;
-  }) => NaverLoginModule;
-}
-
-/** 키 이름은 카카오 규격을 따름. */
-export interface KakaoProfile {
-  id: number;
-  kakao_account?: { email?: string };
-}
-
-interface KakaoSdk {
-  isInitialized: () => boolean;
-  init: (appKey: string) => void;
-  Auth: {
-    login: (options: {
-      success: (response: unknown) => void;
-      fail: () => void;
-    }) => void;
-  };
-  API: {
-    request: (options: {
-      url: string;
-      success: (response: KakaoProfile) => void;
-      fail: () => void;
-    }) => void;
-  };
-}
-
 interface GoogleSdk {
   accounts?: {
     oauth2: {
@@ -50,9 +9,15 @@ interface GoogleSdk {
         scope: string;
         ux_mode: string;
         redirect_uri: string;
+        state?: string;
       }) => { requestCode: () => void };
     };
   };
+}
+
+/** `signIn()`이 팝업에서 받아 resolve하는 값. 이름·이메일을 담은 `user`는 최초 승인에만 오고 서버는 ID 토큰의 이메일을 씀. */
+interface AppleSignInResponse {
+  authorization: { code: string; id_token: string; state?: string };
 }
 
 interface AppleSdk {
@@ -61,18 +26,20 @@ interface AppleSdk {
       clientId: string;
       scope: string;
       redirectURI: string;
-      responseMode: string;
+      state: string;
       usePopup: boolean;
     }) => void;
-    signIn: () => void;
+    /** 팝업을 닫으면 `{ error }`로 reject됨(`popup_closed_by_user`·`user_cancelled_authorize`). */
+    signIn: () => Promise<AppleSignInResponse>;
   };
 }
 
 declare global {
   interface Window {
-    naver?: NaverSdk;
-    Kakao?: KakaoSdk;
     google?: GoogleSdk;
     AppleID?: AppleSdk;
   }
 }
+
+// 전역 선언을 쓰려면 이 파일이 모듈이어야 함.
+export {};

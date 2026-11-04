@@ -24,6 +24,7 @@
     "subscribe": "申込",
     "subscribed": "契約中",
     "comingSoon": "準備中",
+    "comingSoonPrice": "準備中",
     "comingSoonText": {
       "line1": "提供予定です。",
       "line2": "お楽しみに!"
@@ -31,10 +32,7 @@
     "badge": {
       "brand": "ブランド型",
       "groupBuy": "共同購入型",
-      "liveCommerce": "ライブコマース型",
-      "liveClass": "ライブクラス型",
-      "ota": "OTA型",
-      "smallBusiness": "小規模事業者型"
+      "undecided": "未定"
     },
     "recruit": {
       "features": {

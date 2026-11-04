@@ -134,4 +134,32 @@ describe("BigbirdInquiryWorkspace 목록 카드", () => {
     expect(screen.getAllByText("기타문의")).toHaveLength(1);
     expect(screen.getByText("캠페인 문의")).toBeInTheDocument();
   });
+
+  it("캠페인 목록에 없는 캠페인도 목록 응답의 브랜드명·상품명으로 보인다", () => {
+    render(
+      <MemoryRouter>
+        <BigbirdInquiryWorkspace
+          threadUserIdx={undefined}
+          inquiries={[
+            {
+              ...base,
+              campaignIdx: 10,
+              brandName: "LG전자",
+              productName: "디오스 냉장고",
+            },
+          ]}
+          isLoading={false}
+          isError={false}
+          onClickRefresh={() => {}}
+          isPanelOpen={false}
+          panelLabel="대화"
+        >
+          <p>패널 내용</p>
+        </BigbirdInquiryWorkspace>
+      </MemoryRouter>,
+    );
+
+    expect(screen.getByText("LG전자")).toBeInTheDocument();
+    expect(screen.getByText("디오스 냉장고 문의")).toBeInTheDocument();
+  });
 });

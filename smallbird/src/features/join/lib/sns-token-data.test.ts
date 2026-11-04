@@ -2,7 +2,11 @@ import { readSnsTokenData } from "./sns-token-data";
 
 describe("readSnsTokenData", () => {
   it("returns the identity from router state", () => {
-    const tokenData = { platform: "kakao", email: "a@b.co", uid: "1" };
+    const tokenData = {
+      platform: "kakao",
+      email: "a@b.co",
+      snsLinkToken: "tok",
+    };
     expect(readSnsTokenData({ tokenData })).toEqual(tokenData);
   });
 

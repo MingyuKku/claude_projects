@@ -1,74 +1,56 @@
-import { loadNaverScript } from "../lib/load-script";
-import { parseAppleCallback } from "../lib/social-outcome";
-import { createNaverLogin, ensureKakaoSdk } from "../lib/start-login";
-import { GOOGLE_CODE_PARAM, KAKAO_PROFILE_URL } from "../model/constants";
-import { socialPlatformSchema } from "../model/schema";
-import { applyAuthSuccess, googleLogin, socialLogin } from "./social-login-api";
+import { requestAppleIdToken } from "../lib/apple-authorize";
+import { takeGoogleLoginCallback } from "../lib/google-login";
+import { takeKakaoLoginCallback } from "../lib/kakao-login";
+import { takeNaverLoginCallback } from "../lib/naver-login";
+import {
+  appleLogin,
+  googleLogin,
+  kakaoLogin,
+  naverLogin,
+} from "./social-login-api";
 
 import type { SocialLoginOutcome } from "../model/schema";
-import type { KakaoProfile } from "../model/sdk-types";
 
 const FAILED: SocialLoginOutcome = { status: "failed" };
 
-/** 카카오 콜백: SDK로 프로필을 읽어 우리 서버에 넘김. */
-export async function completeKakaoLogin(): Promise<SocialLoginOutcome> {
-  const kakao = await ensureKakaoSdk();
-  const profile = await new Promise<KakaoProfile | null>((resolve) => {
-    kakao.API.request({
-      url: KAKAO_PROFILE_URL,
-      success: resolve,
-      fail: () => resolve(null),
-    });
-  });
-  if (!profile) return FAILED;
-  return socialLogin({
-    platform: socialPlatformSchema.enum.kakao,
-    uid: String(profile.id),
-    email: profile.kakao_account?.email,
-  });
+/** 카카오 콜백: 우리가 시작한 로그인(`state` 일치)일 때만 인가 코드를 V3 로그인 API에 넘김. */
+export async function completeKakaoLogin(
+  search: string,
+): Promise<SocialLoginOutcome> {
+  const callback = takeKakaoLoginCallback(search);
+  if (!callback) return FAILED;
+  // 인가 코드가 주소·방문 기록에 남지 않게 쿼리를 지움.
+  history.replaceState(null, "", window.location.pathname);
+  return kakaoLogin(callback.code, callback.redirectUri);
 }
 
-/** 네이버 콜백: SDK가 URL 해시에서 토큰을 읽고 로그인 상태를 알려 줌. */
-export async function completeNaverLogin(): Promise<SocialLoginOutcome> {
-  await loadNaverScript();
-  const naverLogin = createNaverLogin();
-  const isLoggedIn = await new Promise<boolean>((resolve) => {
-    naverLogin.getLoginStatus(resolve);
-  });
-  if (!isLoggedIn) return FAILED;
-  return socialLogin({
-    platform: socialPlatformSchema.enum.naver,
-    uid: naverLogin.user.id,
-    email: naverLogin.user.email,
-  });
+/** 네이버 콜백: 우리가 시작한 로그인(`state` 일치)일 때만 인가 코드와 `state`를 V3 로그인 API에 넘김. */
+export async function completeNaverLogin(
+  search: string,
+): Promise<SocialLoginOutcome> {
+  const callback = takeNaverLoginCallback(search);
+  if (!callback) return FAILED;
+  // 인가 코드가 주소·방문 기록에 남지 않게 쿼리를 지움.
+  history.replaceState(null, "", window.location.pathname);
+  return naverLogin(callback.code, callback.state);
 }
 
-/** 구글 콜백: 인가 코드가 쿼리 문자열로 들어옴. */
+/** 구글 콜백: 우리가 시작한 로그인(`state` 일치)일 때만 인가 코드를 V3 로그인 API에 넘김. */
 export async function completeGoogleLogin(
   search: string,
 ): Promise<SocialLoginOutcome> {
-  const code = new URLSearchParams(search).get(GOOGLE_CODE_PARAM);
-  if (!code) return FAILED;
-  return googleLogin(code);
+  const callback = takeGoogleLoginCallback(search);
+  if (!callback) return FAILED;
+  // 인가 코드가 주소·방문 기록에 남지 않게 쿼리를 지움.
+  history.replaceState(null, "", window.location.pathname);
+  return googleLogin(callback.code, callback.redirectUri);
 }
 
-export async function completeAppleLogin(
-  search: string,
-): Promise<SocialLoginOutcome> {
-  const result = parseAppleCallback(search);
-  if (result.status === "success") {
-    await applyAuthSuccess(result.authorization);
-    return { status: "success" };
-  }
-  if (result.status === "needsLink") {
-    return {
-      status: "needsLink",
-      snsData: {
-        platform: socialPlatformSchema.enum.apple,
-        uid: result.uid,
-        email: result.email,
-      },
-    };
-  }
-  return FAILED;
+/** 애플 로그인: 팝업에서 받은 ID 토큰을 V3 로그인 API에 넘김. 팝업을 닫았으면 `cancelled`. */
+export async function loginWithApple(): Promise<
+  SocialLoginOutcome | { status: "cancelled" }
+> {
+  const token = await requestAppleIdToken();
+  if (!token) return { status: "cancelled" };
+  return appleLogin(token);
 }

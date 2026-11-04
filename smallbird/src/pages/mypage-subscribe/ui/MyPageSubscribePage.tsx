@@ -4,6 +4,7 @@ import {
   IS_SUBSCRIPTION_MOCK_ENABLED,
   isBillingPeriod,
   isActiveProductType,
+  useBillingCards,
 } from "@/entities/subscription";
 import { SubscriptionPlanList } from "@/features/browse-subscription-plans";
 import {
@@ -13,6 +14,7 @@ import {
 import {
   BillingCardList,
   BillingCardResultHandler,
+  RegisterCardDialog,
 } from "@/features/manage-billing-cards";
 import { SubscribedProductTable } from "@/features/manage-subscription";
 import { LIST_QUERY_PARAMS, PaymentHistory } from "@/features/payment-history";
@@ -26,6 +28,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 import {
   CHECKOUT_PERIOD_PARAM,
   CHECKOUT_PLAN_PARAM,
+  PANEL_PARAM,
   SUBSCRIBE_PANELS,
   SUBSCRIBE_TABS,
   USAGE_TYPE_PARAM,
@@ -42,7 +45,7 @@ import type { ActiveProductType, Subscription } from "@/entities/subscription";
 const CONTENT_WIDTH_CLASS_NAME = "mx-auto w-full max-w-292.5";
 // 탭을 바꾸면 하위 화면·상품 세그먼트·결제 내역 목록 쿼리(검색·필터·쪽)를 지움.
 const RESET_PARAMS = [
-  "panel",
+  PANEL_PARAM,
   CHECKOUT_PLAN_PARAM,
   CHECKOUT_PERIOD_PARAM,
   USAGE_TYPE_PARAM,
@@ -60,10 +63,16 @@ export function MyPageSubscribePage() {
     resetParams: RESET_PARAMS,
   });
   const { panel, openPanel, closePanel } = usePanelParam({
+    param: PANEL_PARAM,
     panels: SUBSCRIBE_PANELS,
     linkedParams: [CHECKOUT_PLAN_PARAM, CHECKOUT_PERIOD_PARAM],
   });
   const filterScreen = useFilterScreen("desktop");
+  // 구독하기를 누르기 전에 읽어 두어 카드가 없는지 바로 알 수 있게 함(결제 화면도 같은 키를 읽어 한 번만 요청함).
+  // 구독 화면이 닫힌 빌드(아래 준비 중)에서는 훅 순서상 여기서 호출돼도 요청이 나가지 않게 함. 플래그를 지울 때 이 인자도 지움.
+  const { data: cards } = useBillingCards({
+    enabled: IS_SUBSCRIPTION_MOCK_ENABLED,
+  });
 
   // 구독 API가 공개되기 전 빌드(stage·prod)에서는 목을 쓰지 않고 준비 중으로 둠(account.md §1). API가 공개되면 지움.
   if (!IS_SUBSCRIPTION_MOCK_ENABLED) {
@@ -87,8 +96,12 @@ export function MyPageSubscribePage() {
   const periodParam = searchParams.get(CHECKOUT_PERIOD_PARAM);
   const checkoutPeriod = isBillingPeriod(periodParam) ? periodParam : "monthly";
   // 결제 화면은 구독 탭에서 상품이 정해졌을 때만 열림(주소를 직접 고쳐 다른 탭·잘못된 상품을 넣어도 무시).
-  const isCheckout =
+  const isCheckoutRequested =
     panel === "checkout" && tab === "plans" && checkoutType !== null;
+  // 등록된 카드가 없으면 결제 화면 대신 구독 탭에서 카드 등록 안내를 띄움(스펙 §3 카드 없음). 주소로 바로 들어와도 같음.
+  // 카드를 읽기 전에는 알 수 없어 결제 화면이 먼저 열리고, 읽은 뒤 0장이면 구독 탭으로 돌아와 안내함.
+  const isCardRequired = isCheckoutRequested && cards?.length === 0;
+  const isCheckout = isCheckoutRequested && !isCardRequired;
   // TAB의 결제내역 필터 화면은 탭 줄까지 덮는 본문 전체 화면(탭 숨김은 의도, 스펙 §3).
   const isTabletFilter = tab === "payments" && filterScreen.isOpen;
 
@@ -140,7 +153,21 @@ export function MyPageSubscribePage() {
     <>
       <title>{t("title")}</title>
       <PaymentResultHandler />
-      {/* 카드 추가 후에는 카드가 보이는 결제내역 탭으로 옮김. */}
+      {/* 카드를 등록하고 돌아오면 구독하려던 상품·결제 주기의 결제 화면을 다시 열어 이어서 결제하게 함(§7 P-9 사용자 결정 2026-11-03). */}
+      <RegisterCardDialog
+        open={isCardRequired}
+        onCancel={closePanel}
+        returnParams={
+          checkoutType
+            ? {
+                [PANEL_PARAM]: "checkout",
+                [CHECKOUT_PLAN_PARAM]: checkoutType,
+                [CHECKOUT_PERIOD_PARAM]: checkoutPeriod,
+              }
+            : undefined
+        }
+      />
+      {/* 결제내역 탭의 카드 추가 후에는 카드가 보이는 결제내역 탭으로 옮김. */}
       <BillingCardResultHandler
         onRegistered={(params) => params.set("tab", "payments")}
       />

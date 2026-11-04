@@ -10,6 +10,20 @@
   "unlink": {
     "title": "Unlink social login",
     "description": "Unlink {{provider}} social login? You won't be able to log in with your {{provider}} account.",
-    "action": "Unlink"
+    "action": "Unlink",
+    "toast": {
+      "done": "{{provider}} unlinked.",
+      "notLinked": "Already unlinked.",
+      "failed": "Couldn't unlink. Try again."
+    }
+  },
+  "link": {
+    "toast": {
+      "done": "{{provider}} linked.",
+      "alreadyLinked": "Another {{provider}} account is linked. Unlink it first.",
+      "linkedToOther": "This {{provider}} account is linked to another account.",
+      "emailRequired": "Email consent is required to link.",
+      "failed": "Couldn't link. Try again."
+    }
   }
 }

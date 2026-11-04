@@ -21,6 +21,8 @@ interface PlanCardProps extends Omit<ComponentProps<"div">, "title"> {
   type?: PlanCardType;
   title: ReactNode;
   price: ReactNode;
+  /** 가격 위에 줄을 그어 보이는 할인 전 가격 */
+  originalPrice?: ReactNode;
   /** 가격 아래 배지 묶음(`<Badge>` 여러 개) */
   badges?: ReactNode;
   features?: PlanCardFeature[];
@@ -39,6 +41,7 @@ export function PlanCard({
   type = "default",
   title,
   price,
+  originalPrice,
   badges,
   features = [],
   comingSoonText,
@@ -54,6 +57,21 @@ export function PlanCard({
   const isDisabled = type === "disabled";
   const isExpandedWithDetail = isExpanded && Boolean(detail);
   const DetailIcon = isExpanded ? ChevronUp : ChevronDown;
+  const titleNode = (
+    <p
+      className={cn(
+        "text-lg leading-none font-semibold tracking-[-0.45px]",
+        isDisabled ? "text-muted-foreground" : "text-primary",
+      )}
+    >
+      {title}
+    </p>
+  );
+  const priceNode = (
+    <p className="text-xl leading-none font-semibold tracking-[-0.6px] tablet:text-2xl">
+      {price}
+    </p>
+  );
 
   return (
     <Card
@@ -62,17 +80,23 @@ export function PlanCard({
       {...props}
     >
       <div className="flex flex-col items-center gap-3 px-4 pt-4 tablet:gap-4 tablet:px-5 tablet:pt-5">
-        <p
-          className={cn(
-            "text-lg leading-none font-semibold tracking-[-0.45px]",
-            isDisabled ? "text-muted-foreground" : "text-primary",
-          )}
-        >
-          {title}
-        </p>
-        <p className="text-xl leading-none font-semibold tracking-[-0.6px] tablet:text-2xl">
-          {price}
-        </p>
+        {originalPrice ? (
+          // 할인 전 가격이 있는 시안(11755:97086)은 제목과 가격 묶음 사이가 12px로 좁음.
+          <div className="flex flex-col items-center gap-3">
+            {titleNode}
+            <div className="flex flex-col items-center">
+              <p className="text-sm leading-5 text-muted-foreground line-through">
+                {originalPrice}
+              </p>
+              {priceNode}
+            </div>
+          </div>
+        ) : (
+          <>
+            {titleNode}
+            {priceNode}
+          </>
+        )}
         {badges && <div className="flex gap-2">{badges}</div>}
         <Separator />
       </div>

@@ -22,7 +22,8 @@
   },
   "error": {
     "title": "문제가 발생했습니다",
-    "unexpected": "예상하지 못한 오류가 발생했습니다."
+    "unexpected": "예상하지 못한 오류가 발생했습니다.",
+    "forbidden": "해당 메뉴에 접근할 권한이 없습니다. Master ID에 권한을 요청해 주세요."
   },
   "password": {
     "show": "{{label}} 보기",

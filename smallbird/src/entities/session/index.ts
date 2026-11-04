@@ -1,9 +1,8 @@
 export {
-  clearLastAllowedSession,
+  fetchSession,
   formLogin,
   useFormLogin,
   useLogout,
-  useSession,
 } from "./api/session-api";
 export {
   clearLoginCredential,
@@ -20,5 +19,4 @@ export type {
   SessionViewModel,
   MenuPermissions,
 } from "./model/schema";
-export { AuthGuard } from "./ui/AuthGuard";
 export { useSwitchAccount, useSwitchAccounts } from "./api/switch-account-api";

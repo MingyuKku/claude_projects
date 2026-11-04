@@ -235,6 +235,8 @@ export function transformBigbirdInquiryListItemToViewModel(
     threadIdx: item.threadIdx,
     sequence: item.sequence ?? 0,
     campaignIdx: item.campaignIdx,
+    brandName: item.brandName,
+    productName: item.productName,
     isRealtime: item.boardType === false,
     isFinished: item.finishTime !== null,
     status: THREAD_STATUS[item.status],

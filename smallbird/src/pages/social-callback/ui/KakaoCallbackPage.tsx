@@ -1,8 +1,31 @@
+import { useState } from "react";
+
 import {
+  completeKakaoLink,
   completeKakaoLogin,
+  readKakaoLinkCallback,
   SocialCallbackScreen,
 } from "@/features/social-login";
 
+import { LinkCallbackScreen } from "./LinkCallbackScreen";
+
 export function KakaoCallbackPage() {
-  return <SocialCallbackScreen completeLogin={() => completeKakaoLogin()} />;
+  // 연결하려고 시작해 돌아온 주소인지는 처음 한 번만 정함. 연결을 이어 가면서 의도와 주소 쿼리를 지우므로 다시 읽으면 로그인으로 바뀜.
+  const [linkCallback] = useState(() => readKakaoLinkCallback());
+
+  if (linkCallback) {
+    return (
+      <LinkCallbackScreen
+        provider="kakao"
+        completeLink={() =>
+          completeKakaoLink(linkCallback.code, linkCallback.redirectUri)
+        }
+      />
+    );
+  }
+  return (
+    <SocialCallbackScreen
+      completeLogin={() => completeKakaoLogin(window.location.search)}
+    />
+  );
 }

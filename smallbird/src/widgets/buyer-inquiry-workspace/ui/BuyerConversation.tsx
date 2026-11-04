@@ -1,5 +1,5 @@
 import { LoaderCircle } from "lucide-react";
-import { Fragment } from "react";
+import { Fragment, useEffect, useRef } from "react";
 
 import {
   ConversationFiles,
@@ -15,6 +15,7 @@ import { useMediaQuery } from "@/shared/lib/useMediaQuery";
 
 import { formatDividerDate, formatMessageTime } from "../lib/format";
 import { IS_BUYER_WRITE_ENABLED } from "../model/constants";
+import { useAcceptRealtimeOnOpen } from "../model/useAcceptRealtimeOnOpen";
 import { QnaConversation } from "./QnaConversation";
 
 import type { BuyerInquiryViewModel } from "@/entities/inquiry";
@@ -23,26 +24,42 @@ const TABLET_ONLY_QUERY = "(min-width: 768px) and (max-width: 1439.98px)";
 
 interface BuyerConversationProps {
   inquiry: BuyerInquiryViewModel;
+  /** 실시간 상담 수락 메시지에 남길 광고주 계정 id(세션 값). */
+  identifier?: string;
 }
 
 /** 대화 영역의 메시지 부분. 구매자 문의는 구매자↔광고주 스레드, 상품 Q&A는 질문과 답변. */
-export function BuyerConversation({ inquiry }: BuyerConversationProps) {
+export function BuyerConversation({
+  inquiry,
+  identifier,
+}: BuyerConversationProps) {
   return inquiry.source === "qna" ? (
     <QnaConversation inquiry={inquiry} />
   ) : (
-    <PurchaserConversation inquiry={inquiry} />
+    <PurchaserConversation inquiry={inquiry} identifier={identifier} />
   );
 }
 
-function PurchaserConversation({ inquiry }: BuyerConversationProps) {
+function PurchaserConversation({
+  inquiry,
+  identifier,
+}: BuyerConversationProps) {
   const { t } = useTranslation("widgets/buyer-inquiry-workspace");
   const { t: tCommon } = useTranslation();
   // Figma 구매자 대화 말풍선: TAB(6791:59549)은 작은 형태(아바타 32·최대 200), MO·PC는 최대 340입니다.
   const isTablet = useMediaQuery(TABLET_ONLY_QUERY);
-  const { messages, isLoading, isError, mutate } =
+  const { messages, realtimeThread, isLoading, isError, mutate } =
     usePurchaserConversation(inquiry);
+  useAcceptRealtimeOnOpen(inquiry, realtimeThread, identifier ?? null);
   const writerName = inquiry.writerName ?? t("unknownWriter");
   const avatarSrc = useInquiryUserImage(inquiry.threadUserIdx);
+  const endRef = useRef<HTMLDivElement>(null);
+  // 새 메시지(보낸 것·받은 것)가 생기거나 문의를 바꿔 처음 들어오면 맨 아래로 내림(빅버드 문의와 같음).
+  const messageCount = messages?.length ?? 0;
+  useEffect(() => {
+    if (isLoading) return;
+    endRef.current?.scrollIntoView?.({ block: "end" });
+  }, [messageCount, isLoading, inquiry.key]);
 
   if (isLoading) {
     return (
@@ -81,56 +98,60 @@ function PurchaserConversation({ inquiry }: BuyerConversationProps) {
   }
 
   return (
-    <ol className="flex flex-col gap-3 tablet:gap-4">
-      {rows.map((row, index) => {
-        const createdAt =
-          row.type === "files" ? row.createdAt : row.message.createdAt;
-        const previous = rows[index - 1];
-        const previousCreatedAt =
-          previous?.type === "files"
-            ? previous.createdAt
-            : previous?.message.createdAt;
-        const day = formatDividerDate(createdAt);
-        const isNewDay =
-          !previousCreatedAt || formatDividerDate(previousCreatedAt) !== day;
-        const isMine = row.type === "files" ? row.isMine : row.message.isMine;
-        const senderId =
-          row.type === "files"
-            ? (row.text ?? row.messages[0])?.senderId
-            : row.message.senderId;
-        // 내 말풍선에는 보낸 광고주 계정 id를 보입니다(v2와 같음, Figma "광고주명"). 모를 때만 "광고주"입니다.
-        const name = isMine ? (senderId ?? t("advertiser")) : writerName;
-        return (
-          <li key={row.id} className="flex flex-col gap-3 tablet:gap-4">
-            {isNewDay && (
-              <ChatDivider className="self-center">{day}</ChatDivider>
-            )}
-            {row.type === "files" ? (
-              <ConversationFiles
-                row={row}
-                name={name}
-                time={
-                  row.text ? formatMessageTime(row.text.createdAt) : undefined
-                }
-              />
-            ) : (
-              <Fragment>
-                <EditableChatMessage
-                  message={row.message}
+    <>
+      <ol className="flex flex-col gap-3 tablet:gap-4">
+        {rows.map((row, index) => {
+          const createdAt =
+            row.type === "files" ? row.createdAt : row.message.createdAt;
+          const previous = rows[index - 1];
+          const previousCreatedAt =
+            previous?.type === "files"
+              ? previous.createdAt
+              : previous?.message.createdAt;
+          const day = formatDividerDate(createdAt);
+          const isNewDay =
+            !previousCreatedAt || formatDividerDate(previousCreatedAt) !== day;
+          const isMine = row.type === "files" ? row.isMine : row.message.isMine;
+          const senderId =
+            row.type === "files"
+              ? (row.text ?? row.messages[0])?.senderId
+              : row.message.senderId;
+          // 내 말풍선에는 보낸 광고주 계정 id를 보입니다(v2와 같음, Figma "광고주명"). 모를 때만 "광고주"입니다.
+          const name = isMine ? (senderId ?? t("advertiser")) : writerName;
+          return (
+            <li key={row.id} className="flex flex-col gap-3 tablet:gap-4">
+              {isNewDay && (
+                <ChatDivider className="self-center">{day}</ChatDivider>
+              )}
+              {row.type === "files" ? (
+                <ConversationFiles
+                  row={row}
                   name={name}
-                  avatarSrc={isMine ? undefined : avatarSrc}
-                  time={formatMessageTime(row.message.createdAt)}
-                  size={isTablet ? "sm" : "md"}
-                  // Figma 구매자 PC 내 메시지(6756:28994)는 아바타와 12px, 나머지는 8px입니다.
-                  rowClassName={isMine ? "desktop:gap-3" : undefined}
-                  canModify={IS_BUYER_WRITE_ENABLED}
-                  onChanged={() => void mutate()}
+                  time={
+                    row.text ? formatMessageTime(row.text.createdAt) : undefined
+                  }
                 />
-              </Fragment>
-            )}
-          </li>
-        );
-      })}
-    </ol>
+              ) : (
+                <Fragment>
+                  <EditableChatMessage
+                    message={row.message}
+                    name={name}
+                    avatarSrc={isMine ? undefined : avatarSrc}
+                    time={formatMessageTime(row.message.createdAt)}
+                    size={isTablet ? "sm" : "md"}
+                    // Figma 구매자 PC 내 메시지(6756:28994)는 아바타와 12px, 나머지는 8px입니다.
+                    rowClassName={isMine ? "desktop:gap-3" : undefined}
+                    // 음수 id는 실시간 상담 Firestore 메시지라 REST 수정·삭제를 쓸 수 없음.
+                    canModify={IS_BUYER_WRITE_ENABLED && row.message.id > 0}
+                    onChanged={() => void mutate()}
+                  />
+                </Fragment>
+              )}
+            </li>
+          );
+        })}
+      </ol>
+      <div ref={endRef} />
+    </>
   );
 }

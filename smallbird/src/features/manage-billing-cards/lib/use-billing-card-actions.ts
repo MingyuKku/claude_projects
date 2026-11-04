@@ -3,8 +3,8 @@ import { toast } from "sonner";
 import {
   deleteBillingCard,
   readApiErrorReason,
-  setDefaultBillingCard,
   useBillingCards,
+  useSetDefaultBillingCard,
 } from "@/entities/subscription";
 import { useTranslation } from "@/shared/i18n";
 
@@ -18,6 +18,7 @@ export function useBillingCardActions() {
   const { t } = useTranslation("features/manage-billing-cards");
   const { t: tCommon } = useTranslation();
   const { data: cards, mutate } = useBillingCards();
+  const setDefault = useSetDefaultBillingCard();
 
   function notifyFailure(error: unknown) {
     const reason = readApiErrorReason(error);
@@ -49,15 +50,7 @@ export function useBillingCardActions() {
 
   async function makeDefault(card: BillingCard) {
     try {
-      await mutate(() => setDefaultBillingCard(card.id).then(() => undefined), {
-        optimisticData: cards?.map((item) => ({
-          ...item,
-          isDefault: item.id === card.id,
-        })),
-        rollbackOnError: true,
-        populateCache: false,
-        revalidate: true,
-      });
+      await setDefault(card.id);
       return true;
     } catch (error) {
       notifyFailure(error);

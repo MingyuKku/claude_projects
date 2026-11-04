@@ -24,6 +24,7 @@
     "subscribe": "구독하기",
     "subscribed": "구독 중",
     "comingSoon": "준비중",
+    "comingSoonPrice": "준비 중",
     "comingSoonText": {
       "line1": "추후 제공 예정이에요.",
       "line2": "곧 만나요!"
@@ -31,10 +32,7 @@
     "badge": {
       "brand": "브랜드형",
       "groupBuy": "공구형",
-      "liveCommerce": "라이브커머스형",
-      "liveClass": "라이브클래스형",
-      "ota": "OTA형",
-      "smallBusiness": "소상공인형"
+      "undecided": "미정"
     },
     "recruit": {
       "features": {

@@ -83,5 +83,9 @@
   "card": {
     "campaignInquiry": "{{label}} 咨询",
     "unread": "未读消息"
+  },
+  "realtime": {
+    "end": "结束咨询",
+    "endFailed": "结束咨询失败,请重试。"
   }
 }

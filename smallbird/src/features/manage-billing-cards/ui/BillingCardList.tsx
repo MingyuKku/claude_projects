@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-import { useBillingCards } from "@/entities/subscription";
+import { useBillingCards, useSubscriptions } from "@/entities/subscription";
 import { PayCard, PayCardAddButton } from "@/shared/components/cards";
 import { EmptyState } from "@/shared/components/empty-state";
 import { useTranslation } from "@/shared/i18n";
@@ -10,6 +10,7 @@ import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Skeleton } from "@/shared/ui/skeleton";
 
+import { canDeleteCard } from "../lib/can-delete-card";
 import { useAddBillingCard } from "../lib/use-add-billing-card";
 import { useBillingCardActions } from "../lib/use-billing-card-actions";
 import { BillingCardMenu } from "./BillingCardMenu";
@@ -31,6 +32,9 @@ export function BillingCardList() {
   const { t } = useTranslation("features/manage-billing-cards");
   const { t: tCommon } = useTranslation();
   const { data: cards, isLoading, isError, mutate } = useBillingCards();
+  // 구독 결제 상품 표가 이미 읽는 같은 키라 추가 요청은 없음. 기본 카드 삭제를 보여 줄지 가리는 데 씀.
+  const { data: subscriptions, isLoading: isSubscriptionsLoading } =
+    useSubscriptions();
   const { removeCard, makeDefault } = useBillingCardActions();
   const { add: addCard, isAdding } = useAddBillingCard();
   const deleteDialog = useDialogTarget<BillingCard>();
@@ -82,13 +86,17 @@ export function BillingCardList() {
                   ) : undefined
                 }
                 menu={
-                  card.isDefault ? undefined : (
+                  canDeleteCard(card, {
+                    cards,
+                    subscriptions,
+                    isSubscriptionsLoading,
+                  }) ? (
                     <BillingCardMenu
                       card={card}
                       onSelectDelete={deleteDialog.open}
                       onSelectChange={changeDialog.open}
                     />
-                  )
+                  ) : undefined
                 }
               />
             </li>

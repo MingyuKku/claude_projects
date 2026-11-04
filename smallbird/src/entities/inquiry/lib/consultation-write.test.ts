@@ -5,6 +5,7 @@ import {
   formatWriteTime,
   getWaitDeadline,
   planAbortClose,
+  planAcceptRequest,
   planAcquireLock,
   planAppendMessage,
   planBeginClose,
@@ -587,5 +588,90 @@ describe("planRetryRequest", () => {
         now: NOW,
       }),
     ).toEqual({ kind: "reject", reason: "canceled" });
+  });
+});
+
+describe("서버가 Timestamp로 쓴 시각", () => {
+  const timestamp = (ms: number) => ({ toDate: () => new Date(ms) });
+
+  it("대기 마감과 요청 시각이 Timestamp여도 마감을 계산한다", () => {
+    const explicit = doc({
+      isConnect: false,
+      waitDeadline: timestamp(NOW + 60_000) as unknown as string,
+    });
+    expect(getWaitDeadline(explicit)).toBe(NOW + 60_000);
+
+    const requested = doc({
+      isConnect: false,
+      created: timestamp(NOW) as unknown as string,
+    });
+    expect(getWaitDeadline(requested)).toBe(NOW + 3 * 60_000);
+  });
+});
+
+describe("planAcceptRequest", () => {
+  const accept = (consultation: ConsultationDoc | undefined) =>
+    planAcceptRequest(
+      consultation,
+      { userIdx: 5546 },
+      { identifier: "adv", now: NOW },
+    );
+
+  it("대기 중인 요청을 연결하고 자동 메시지와 계정 응대 상태를 씀", () => {
+    expect(
+      accept(doc({ isConnect: false, waitDeadline: stamp(60_000) })),
+    ).toEqual({
+      kind: "write",
+      consultation: {
+        isConnect: true,
+        seqResponseDate: stamp(0),
+        messages: [
+          expect.objectContaining({
+            auto: true,
+            isUserMessage: false,
+            identifier: "adv",
+            created: stamp(0),
+          }),
+        ],
+      },
+      account: {
+        alarmData: null,
+        threadBoardType: 0,
+        newSenderUserIdx: 5546,
+        msgResponseDate: stamp(0),
+        updated: stamp(0),
+      },
+    });
+  });
+
+  it("이미 연결됐으면 건너뛰고, 취소·만료·마감 지난 요청은 거절함", () => {
+    expect(accept(doc())).toEqual({ kind: "skip" });
+    expect(accept(doc({ isConnect: false, canceledAt: stamp(-1) }))).toEqual({
+      kind: "reject",
+      reason: "canceled",
+    });
+    expect(accept(doc({ isConnect: false, waitDeadline: stamp(0) }))).toEqual({
+      kind: "reject",
+      reason: "expired",
+    });
+    expect(accept(undefined)).toEqual({ kind: "reject", reason: "missing" });
+  });
+});
+
+describe("서버가 Timestamp로 쓴 시각", () => {
+  const timestamp = (ms: number) => ({ toDate: () => new Date(ms) });
+
+  it("대기 마감과 요청 시각이 Timestamp여도 마감을 계산한다", () => {
+    const explicit = doc({
+      isConnect: false,
+      waitDeadline: timestamp(NOW + 60_000) as unknown as string,
+    });
+    expect(getWaitDeadline(explicit)).toBe(NOW + 60_000);
+
+    const requested = doc({
+      isConnect: false,
+      created: timestamp(NOW) as unknown as string,
+    });
+    expect(getWaitDeadline(requested)).toBe(NOW + 3 * 60_000);
   });
 });
