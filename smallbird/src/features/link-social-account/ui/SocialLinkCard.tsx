@@ -10,7 +10,7 @@ import {
 } from "@/entities/account";
 import { SectionCard } from "@/shared/components/section-card";
 import { useTranslation } from "@/shared/i18n";
-import { useDialogTarget } from "@/shared/lib";
+import { useDialogTarget, useOnPageRestore } from "@/shared/lib";
 import { cn } from "@/shared/lib/utils";
 import { Switch } from "@/shared/ui/switch";
 
@@ -27,24 +27,21 @@ import type {
 /** 해제하려는 플랫폼이 이미 연결돼 있지 않을 때 서버가 주는 `reason`(404). */
 const SNS_NOT_LINKED_REASON = "SNS_NOT_LINKED";
 
-/** 공급자 로그인을 시작함. 토큰을 바로 받거나, 화면을 옮겨 돌아온 뒤 이어 가거나, 취소됨(`SocialLinkRequest`). */
+/** 공급자 로그인을 시작함. 인가 코드를 바로 받거나, 화면을 옮겨 돌아온 뒤 이어 가거나, 취소됨(`SocialLinkRequest`). */
 type LinkRequester = () => Promise<SocialLinkRequest>;
 
 interface SocialLinkCardProps {
   links: Record<SocialProvider, SocialLinkViewModel>;
   /** 해제 뒤 서버가 돌려준 최신 연결 상태. 호출하는 쪽이 캐시를 바꿈. */
   onChangeLinks: (links: Record<SocialProvider, SocialLinkViewModel>) => void;
-  /**
-   * SNS별 연결 시작. 없는 SNS는 아직 연결을 지원하지 않아 켜면 "준비 중"으로 안내함.
-   * 공급자 SDK는 다른 feature(social-login)에 있어 페이지가 넘겨 줌.
-   */
-  linkRequesters?: Partial<Record<SocialProvider, LinkRequester>>;
+  /** SNS별 연결 시작. 공급자 로그인은 다른 feature(social-login)에 있어 페이지가 넘겨 줌. */
+  linkRequesters: Record<SocialProvider, LinkRequester>;
   className?: string;
 }
 
 // Figma 간편 로그인 연동(10061:200931): 카드 안 4행(브랜드 아이콘 24 + 이름 | Switch sm), 행 높이 48. 시안의 페이스북 행은 그리지 않음.
 // 해제는 `DELETE /v3/mypage/account/sns/{platform}`(2026-11-02 Stage)로 실제 호출하고, 응답의 최신 상태로 스위치를 바꿈(controlled).
-// 연결(켜기)은 공급자 토큰을 받아 `POST`로 보내고, 토큰 받기가 없는 SNS는 아직 "준비 중" 토스트만 띄움. 켜기·끄기 흐름은 스펙 §3.
+// 연결(켜기)은 공급자 인가 코드를 받아 `POST`로 보냄. 켜기·끄기 흐름은 스펙 §3.
 export function SocialLinkCard({
   links,
   onChangeLinks,
@@ -52,24 +49,19 @@ export function SocialLinkCard({
   className,
 }: SocialLinkCardProps) {
   const { t } = useTranslation("features/link-social-account");
-  const { t: tCommon } = useTranslation();
   const notifyLinkResult = useNotifyLinkResult();
   const unlinkDialog = useDialogTarget<SocialProvider>();
   // 연결·해제 요청 중인 SNS. 그 스위치만 비활성으로 둠.
   const [busyProvider, setBusyProvider] = useState<SocialProvider | null>(null);
-
-  function notifyComingSoon() {
-    toast(tCommon("status.comingSoon"));
-  }
+  // 공급자 화면에서 뒤로 가기로 돌아오면 복원된 화면에 "요청 중"이 남아 스위치가 계속 잠기므로 되돌림.
+  useOnPageRestore(() => setBusyProvider(null));
 
   function handleChangeLink(provider: SocialProvider, next: boolean) {
     if (!next) {
       unlinkDialog.open(provider);
       return;
     }
-    const requestLink = linkRequesters?.[provider];
-    if (requestLink) void handleLink(provider, requestLink);
-    else notifyComingSoon();
+    void handleLink(provider, linkRequesters[provider]);
   }
 
   async function handleLink(
@@ -91,7 +83,8 @@ export function SocialLinkCard({
     // 공급자 화면으로 전체 이동함. 돌아오는 화면이 연결을 이어 가므로 여기서는 스위치를 잠근 채 둠.
     if (request.status === "redirecting") return;
     const [error, nextLinks] = await tryit(linkSocial)(provider, {
-      token: request.token,
+      code: request.code,
+      redirectUri: request.redirectUri,
     });
     setBusyProvider(null);
     if (nextLinks) {

@@ -69,7 +69,7 @@ export async function unlinkSocial(platform: SocialProvider) {
 }
 
 /**
- * `POST /v3/mypage/account/sns/{platform}`. 카카오·구글은 인가 코드(`{ code, redirectUri }`), 네이버는 인가 코드와 `state`(`{ code, state }`), 애플은 ID 토큰(`{ token }`)만 보내고
+ * `POST /v3/mypage/account/sns/{platform}`. 카카오·구글·애플은 인가 코드(`{ code, redirectUri }`), 네이버는 인가 코드와 `state`(`{ code, state }`)만 보내고
  * 서버가 공급자에게 직접 확인해 로그인한 Master에 연결함. 같은 계정이 이미 연결돼 있으면 그대로 200이고, 응답은 처리 뒤 상태 4개.
  * 실패는 `readFailureReason`으로 읽음(409 `SNS_ALREADY_LINKED`·`SNS_LINKED_TO_OTHER_USER`, 400 `SNS_EMAIL_REQUIRED`·`INVALID_SNS_CODE` 등).
  */

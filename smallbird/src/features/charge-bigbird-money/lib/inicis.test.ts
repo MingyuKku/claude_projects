@@ -1,7 +1,9 @@
 import {
   buildInicisFields,
+  getChargeDeviceType,
   loadInicisScript,
   openInicisPayment,
+  submitInicisMobilePayment,
 } from "./inicis";
 
 import type { ChargeInit, PayResponse } from "../model/schema";
@@ -130,5 +132,49 @@ describe("loadInicisScript", () => {
     expect(document.head.querySelectorAll(`script[src="${url}"]`)).toHaveLength(
       1,
     );
+  });
+});
+
+describe("getChargeDeviceType", () => {
+  it.each([
+    ["Mozilla/5.0 (iPhone; CPU iPhone OS 17_0 like Mac OS X) Safari", "MOBILE"],
+    [
+      "Mozilla/5.0 (Linux; Android 14; SM-S918N) Chrome/120 Mobile Safari",
+      "MOBILE",
+    ],
+    [
+      "Mozilla/5.0 (iPad; CPU OS 12_0 like Mac OS X) Mobile/15E148 Safari",
+      "MOBILE",
+    ],
+    ["Mozilla/5.0 (Linux; Android 14; SM-X900) Chrome/120 Safari", "PC"],
+    ["Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) Safari", "PC"],
+    ["Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120", "PC"],
+  ])("%s → %s", (userAgent, expected) => {
+    expect(getChargeDeviceType(userAgent)).toBe(expected);
+  });
+});
+
+describe("submitInicisMobilePayment", () => {
+  it("서버 값을 숨은 폼에 넣어 paymentUrl로 EUC-KR POST 전송한다", () => {
+    const submit = vi
+      .spyOn(HTMLFormElement.prototype, "submit")
+      .mockImplementation(() => {});
+    submitInicisMobilePayment({
+      paymentUrl: "https://mobile.inicis.com/smart/payment/",
+      form: { P_MID: "INIpayTest", P_AMT: 100000, P_NOTI_URL: null },
+    });
+    const form = document.getElementById(
+      "SendPayForm_bigbird_mobile",
+    ) as HTMLFormElement;
+    expect(form.action).toBe("https://mobile.inicis.com/smart/payment/");
+    expect(form.method).toBe("post");
+    expect(form.acceptCharset).toBe("EUC-KR");
+    expect(Object.fromEntries(new FormData(form).entries())).toEqual({
+      P_MID: "INIpayTest",
+      P_AMT: "100000",
+      P_NOTI_URL: "",
+    });
+    expect(submit).toHaveBeenCalledOnce();
+    submit.mockRestore();
   });
 });

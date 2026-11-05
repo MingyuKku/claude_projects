@@ -3,7 +3,6 @@ import { useEffect, useRef } from "react";
 import { useCertInit } from "@/features/join";
 import { KMC_CERT_URL } from "@/shared/lib";
 
-const CERT_SERVICE_MOBILE = "mobile";
 const DEFAULT_TR_ADD = "Y";
 /** 폼을 제출하기 전에 값이 DOM에 반영되도록 함. */
 const SUBMIT_DELAY_MS = 1000;
@@ -14,7 +13,7 @@ const SUBMIT_DELAY_MS = 1000;
  */
 export function CertPage() {
   const formRef = useRef<HTMLFormElement>(null);
-  const { cert } = useCertInit(CERT_SERVICE_MOBILE);
+  const { cert } = useCertInit();
 
   useEffect(() => {
     if (!cert) return;

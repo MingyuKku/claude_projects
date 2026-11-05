@@ -8,7 +8,7 @@ interface ChargeStatusTextProps {
   status: ChargeStatus | null;
 }
 
-// 입금 상태는 배지가 아니라 글자로 보임(3.0.8 결정). 배지는 "구분" 열에만 씀.
+// 입금 상태는 배지가 아니라 글자로 보임(스펙 §3). 배지는 "구분" 열에만 씀.
 export function ChargeStatusText({
   serverValue,
   status,

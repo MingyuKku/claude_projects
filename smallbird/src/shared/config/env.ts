@@ -6,7 +6,6 @@ export const ENV = {
   // 로컬 개발은 경로 접두사를 넣고 개발 서버 프록시가 전달함.
   apiServerUrl: import.meta.env.VITE_API_SERVER_URL,
   apiMemberUrl: import.meta.env.VITE_API_MEMBER_URL,
-  apiSocialUrl: import.meta.env.VITE_API_SOCIAL_URL,
   apiAuthUrl: import.meta.env.VITE_API_AUTH_URL,
   // 결제 서버(bigbird-pay-be). 빅버드 머니 충전에서 결제 요청을 직접 보냄.
   apiPayUrl: import.meta.env.VITE_API_PAY_URL,

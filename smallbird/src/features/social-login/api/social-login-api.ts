@@ -41,9 +41,12 @@ export function kakaoLogin(
   return snsLoginV3(KAKAO_LOGIN_V3_PATH, { code, redirectUri });
 }
 
-/** 애플 V3 로그인. 팝업에서 받은 ID 토큰을 보냄(서버가 서명·`aud`를 확인). */
-export function appleLogin(token: string): Promise<SocialLoginOutcome> {
-  return snsLoginV3(APPLE_LOGIN_V3_PATH, { token });
+/** 애플 V3 로그인. 팝업에서 받은 인가 코드와 `init`에 쓴 `redirectUri`를 보냄. */
+export function appleLogin(
+  code: string,
+  redirectUri: string,
+): Promise<SocialLoginOutcome> {
+  return snsLoginV3(APPLE_LOGIN_V3_PATH, { code, redirectUri });
 }
 
 /** 네이버 V3 로그인. 인가 코드와 인가 요청에 쓴 `state`를 보냄. */

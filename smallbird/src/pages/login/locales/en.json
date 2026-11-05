@@ -13,6 +13,7 @@
     }
   },
   "startFailed": "Couldn't start login.",
+  "loginFailed": "Couldn't log in. Please try again.",
   "locked": {
     "title": "Bigbird advertiser review",
     "message": "The Biglink operations team is reviewing your company information to approve your advertiser membership.<br />We will contact you with the result as soon as the review is complete."

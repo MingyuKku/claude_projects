@@ -2,12 +2,12 @@ import { ENV } from "@/shared/config";
 
 import { createHttpClient } from "./http-client";
 
-/** Advertiser backend: session (`/sec`), form login, SNS linking. */
+/** 광고주 백엔드(V2 경로): 폼 로그인, 계정 전환, 만료 비밀번호, 본인인증 복호화. */
 export const serverApi = createHttpClient(ENV.apiServerUrl);
 
 /**
- * 광고주 백엔드의 `/v3` 경로. 백엔드가 API를 `/v3`로 점진 이전 중이라 지금은
- * 고객센터(`/v3/help/**`)만 쓴다. 전부 이전되면 `serverApi` 기준 URL에 합친다.
+ * 광고주 백엔드의 `/v3` 경로(세션 `/sec`, SNS 로그인·연결, 로그아웃, 마이페이지, 고객센터 등).
+ * 백엔드가 API를 `/v3`로 점진 이전 중이라 V2 경로는 `serverApi`가 맡음. 전부 이전되면 `serverApi` 기준 URL에 합침.
  */
 export const serverApiV3 = createHttpClient(`${ENV.apiServerUrl}/v3`);
 
@@ -19,9 +19,6 @@ export const memberApi = createHttpClient(ENV.apiMemberUrl);
  * `/v3/mypage/bigbird-money/init`이 준 암호화된 사용자 값으로 사용자를 알아보고, 쿠키를 보내면 CORS가 막힐 수 있음.
  */
 export const payApi = createHttpClient(ENV.apiPayUrl, { credentials: "omit" });
-
-/** Social-login relay shared by Kakao, Naver, Google and Apple. */
-export const socialApi = createHttpClient(ENV.apiSocialUrl);
 
 /**
  * Unified auth server, used only by the Kakao Talk verification flow. Credentials

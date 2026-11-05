@@ -30,3 +30,8 @@ export const INICIS_FORM_ID = "SendPayForm_bigbird";
  */
 export const PAYMENT_RETURN_PARAM = "isPaid";
 export const PAYMENT_RETURN_SUCCESS = "true";
+
+/** 결제 시작 API의 `deviceType`. 서버가 값에 따라 PC 표준결제 값 또는 모바일 폼 값을 줌. */
+export type DeviceType = "PC" | "MOBILE";
+/** 이니시스 모바일 결제 폼의 id. */
+export const INICIS_MOBILE_FORM_ID = "SendPayForm_bigbird_mobile";

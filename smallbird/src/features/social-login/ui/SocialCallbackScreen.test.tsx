@@ -7,6 +7,11 @@ import { SocialCallbackScreen } from "./SocialCallbackScreen";
 
 import type { SocialLoginOutcome } from "../model/schema";
 
+function LoginProbe() {
+  const { state } = useLocation();
+  return <p>login page {JSON.stringify(state)}</p>;
+}
+
 function SnsLinkProbe() {
   const { state } = useLocation();
   return <p>link {JSON.stringify(state)}</p>;
@@ -17,7 +22,7 @@ function renderScreen(run: () => Promise<SocialLoginOutcome>) {
     [
       { path: "/cb", element: <SocialCallbackScreen completeLogin={run} /> },
       { path: ROUTES.main, element: <p>main page</p> },
-      { path: ROUTES.login, element: <p>login page</p> },
+      { path: ROUTES.login, element: <LoginProbe /> },
       { path: ROUTES.snsLink, element: <SnsLinkProbe /> },
     ],
     { initialEntries: ["/cb"] },
@@ -45,8 +50,17 @@ describe("SocialCallbackScreen", () => {
     ).toBeInTheDocument();
   });
 
-  it("returns to login on failure or when the run throws", async () => {
-    renderScreen(() => Promise.reject(new Error("sdk missing")));
-    expect(await screen.findByText("login page")).toBeInTheDocument();
+  it("실패하면 로그인 실패 state와 함께 로그인 화면으로 간다", async () => {
+    renderScreen(() => Promise.resolve({ status: "failed" }));
+    expect(
+      await screen.findByText('login page {"snsLoginFailed":true}'),
+    ).toBeInTheDocument();
+  });
+
+  it("실행이 던져도 로그인 실패 state와 함께 로그인 화면으로 간다", async () => {
+    renderScreen(() => Promise.reject(new Error("network")));
+    expect(
+      await screen.findByText('login page {"snsLoginFailed":true}'),
+    ).toBeInTheDocument();
   });
 });

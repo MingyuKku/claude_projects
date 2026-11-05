@@ -1,17 +1,19 @@
 import useSWRMutation from "swr/mutation";
 
 import {
-  ApiError,
   serverApi,
   serverApiV3,
   revokeFirebaseToken,
   signOutFirebase,
 } from "@/shared/api";
-import { ENV } from "@/shared/config";
 
 import { clearLoginCredential } from "../lib/login-handoff";
 import { transformSessionToViewModel } from "../lib/transform-session";
-import { formLoginResultSchema, sessionSchema } from "../model/schema";
+import {
+  formLoginResultSchema,
+  logoutResponseSchema,
+  sessionSchema,
+} from "../model/schema";
 
 import type { FormLoginResult, SessionViewModel } from "../model/schema";
 
@@ -60,19 +62,15 @@ export function useFormLogin() {
   return { trigger, isMutating };
 }
 
-/** 기존 로그아웃은 JSON 대신 쿠키 만료와 302를 반환하므로 외부 Location을 따라가지 않는다. */
+/**
+ * `POST /v3/auth/logout`(2026-11-04 Stage). 세션을 끝내고 쿠키를 지운 뒤 `200 { result: true }`를 줌(세션이 없어도 200, 리다이렉트 없음).
+ * V2 `/logout`은 설정된 주소로 리다이렉트하므로 쓰지 않고, 화면 이동은 호출하는 쪽이 함.
+ */
 export async function logout(): Promise<void> {
   // 세션이 살아 있을 때 이 기기의 채팅방 잠금을 먼저 풂. 실패해도 로그아웃은 이어 감.
   await revokeFirebaseToken();
-  const response = await fetch(`${ENV.apiServerUrl}/logout`, {
-    method: "GET",
-    credentials: "include",
-    redirect: "manual",
-  });
-  // 브라우저는 수동 리다이렉트 응답의 상태·본문을 감추고 이 타입만 노출한다.
-  if (response.type !== "opaqueredirect") {
-    throw new ApiError(response.status, undefined);
-  }
+  const response = await serverApiV3.post("/auth/logout");
+  logoutResponseSchema.parse(response);
   clearLoginCredential();
   await signOutFirebase();
 }

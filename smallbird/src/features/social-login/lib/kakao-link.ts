@@ -23,7 +23,7 @@ export function startKakaoLink(): Promise<SocialLinkRequest> {
 
 /**
  * 돌아온 `/auth/kakao` 주소가 연결 흐름인지 읽음(부작용 없음). 쿼리의 `state`가 남겨 둔 의도와 같고 유효 시간 안일 때만
- * 인가 코드와 서버에 넘길 `redirectUri`를 돌려줌. SDK 로그인 복귀(`code`·`state` 없음)는 로그인으로 처리됨.
+ * 인가 코드와 서버에 넘길 `redirectUri`를 돌려줌. 연결 의도가 없거나 `state`가 다른 복귀(로그인 흐름)는 로그인으로 처리됨.
  */
 export function readKakaoLinkCallback(
   search: string = window.location.search,

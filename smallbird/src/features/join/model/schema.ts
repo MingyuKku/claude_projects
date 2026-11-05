@@ -9,14 +9,6 @@ export const validPasswordResultSchema = z.object({
 });
 export type ValidPasswordResult = z.infer<typeof validPasswordResultSchema>;
 
-/** Values handed to the KMC window. The names are KMC's contract. */
-export const certInitResultSchema = z.object({
-  trCert: z.string(),
-  trUrl: z.string(),
-  trAdd: z.string(),
-});
-export type CertInitResult = z.infer<typeof certInitResultSchema>;
-
 export const certDecryptResultSchema = z.object({
   result: z.union([z.string(), z.boolean()]).optional(),
   message: z.string().optional(),

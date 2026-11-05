@@ -75,14 +75,15 @@ EOF
 4. 브라우저에서 `https://stage.client.bigbird.co.kr`에 접속해 아이디·비밀번호로 로그인하고 인증을 진행합니다.
    - 마이페이지: 계정 설정 → 정보 수정 → 휴대폰 "인증"
    - 회원가입: `/join?service=client` → 본인인증 (member 서버의 `trUrl`은 아직 확인 전)
-   - 구독 결제: 마이페이지 > 구독 → "구독하기" → 안내사항 동의 → "결제"(아래 "구독 결제 확인")
+   - 구독 카드 등록: 마이페이지 > 구독 → 결제내역 탭 "카드 추가"(또는 카드 0장일 때 "구독하기" → "결제 카드 등록하기")(아래 "구독 결제 확인")
 
 ## 구독 결제 확인
 
-- 흐름: "결제" → `GET /v3/mypage/subscription/init` 토큰 → 결제 서버 `POST …:3101/v3/subscription/billing/subscribe/new-card` → 응답 값을 숨은 form에 담아 `issuanceUrl`(`inilitepay.inicis.com/pay/card/billing`)로 POST(전체 이동) → 이니시스 카드 입력 → 결제 서버 callback → `https://stage.client.bigbird.co.kr/mypage/subscribe?result=success|fail`로 복귀.
+- 결제창을 거치는 것은 **카드 등록**뿐입니다: `GET /v3/mypage/subscription/init` 토큰 → 결제 서버 `POST …:3101/v3/subscription/billing/cards/register` → 응답 값을 숨은 form에 담아 `issuanceUrl`(`inilitepay.inicis.com/pay/card/billing`)로 POST(전체 이동) → 이니시스 카드 입력 → 결제 서버 callback → `https://stage.client.bigbird.co.kr/mypage/subscribe?result=success&cardId=…|fail`로 복귀.
+- 구독 결제("구독하기" → "결제")는 결제 서버 `saved-card`에 JSON으로 요청하고 기본 카드로 바로 결제해 결제창이 없습니다. 이 요청도 결제 서버 CORS 때문에 Stage 도메인으로 열어야 합니다.
 - 요청 `origin`은 `window.location.origin`이고, 서버는 2026-10-29부터 이 값을 검증하지 않습니다(허용 목록 제거, `ORIGIN_NOT_ALLOWED` 없음). 다만 결제 후 이 origin으로 돌아오고 결제 서버 CORS는 Stage 도메인만 허용하므로, 로컬 테스트는 Stage 도메인으로 열어야 합니다.
-- 이 화면은 개발 서버(`pnpm dev`)에서만 열립니다(Stage·운영 빌드는 아직 "준비 중").
-- 테스트 상점(`INIBillTst`)입니다. 2026-10-28에 이 절차로 결제가 되어 서버에 구독 1건(모집형 월 99,000원)·기본 카드 1장·결제 1건(`paid`)이 반영된 것을 `GET /v3/mypage/subscription/{subscriptions,billing-cards,payments}`로 확인했습니다. 실제 청구 여부는 확인하지 못했으니 테스트 카드 정보를 백엔드에 문의하고(Q-9) 실제 카드는 쓰지 마세요.
+- 빌드에서는 이용요약 탭만 "준비 중"이고 구독·결제내역 탭은 열립니다.
+- 테스트 상점(`INIBillTst`)입니다. 2026-10-28에 당시 흐름(`new-card`, 지금은 쓰지 않음)으로 결제가 되어 서버에 구독 1건(모집형 월 99,000원)·기본 카드 1장·결제 1건(`paid`)이 반영된 것을 `GET /v3/mypage/subscription/{subscriptions,billing-cards,payments}`로 확인했습니다. 실제 청구 여부는 확인하지 못했으니 테스트 카드 정보를 백엔드에 문의하고(Q-9) 실제 카드는 쓰지 마세요.
 - 테스트 뒤 구독이 남으면 같은 상품을 다시 구독할 수 없습니다(`ALREADY_SUBSCRIBED`). 결제내역 탭의 "구독해지"로 정리하거나 다른 상품(PICK형)으로 확인합니다.
 - 같은 토큰으로 `issuance`를 부르면 주문번호가 서버에 남을 수 있으니 반복 호출은 피합니다.
 - 연결이 안 될 때: `ERR_CONNECTION_REFUSED` → Caddy에 `:3101` 블록이 없거나 Caddy가 꺼져 있음. CORS 오류 → `https://stage.client.bigbird.co.kr`가 아닌 주소(localhost·내부 IP)로 접속함. `502` → Caddy를 띄운 뒤 결제 서버 IP가 바뀌었을 수 있음. dig 값을 다시 확인하고 Caddy를 다시 띄움(위 "켜기" 3).
@@ -109,11 +110,11 @@ ping -c1 stage.client.bigbird.co.kr                   # 127.0.0.1이 아닌 실�
 ## 확인 방법
 
 - 연결: `curl -sk https://stage.client.bigbird.co.kr/` 가 로컬 `index.html`을 돌려주면 됩니다.
-- 결제 서버 연결: `curl -sk -X OPTIONS -H "Origin: https://stage.client.bigbird.co.kr" -H "Access-Control-Request-Method: POST" -i https://stage.client.bigbird.co.kr:3101/v3/subscription/billing/subscribe/new-card`가 `HTTP/2 200`과 `access-control-allow-origin`을 돌려주면 됩니다.
+- 결제 서버 연결: `curl -sk -X OPTIONS -H "Origin: https://stage.client.bigbird.co.kr" -H "Access-Control-Request-Method: POST" -i https://stage.client.bigbird.co.kr:3101/v3/subscription/billing/cards/register`가 `HTTP/2 200`과 `access-control-allow-origin`을 돌려주면 됩니다.
 - 인증: KMC 팝업이 7-3 에러 없이 통신사 선택 화면을 띄우고, 인증을 마치면 팝업이 닫히며 휴대폰 칸이 새 번호로 바뀝니다.
 
 ## 한계
 
-- 구독 결제는 결제창을 열고 복귀하는 흐름까지만 확인할 수 있고, 서버가 이니시스 결과를 처리해 구독을 만드는 부분은 서버 쪽 동작이라 프론트에서 보이지 않습니다.
+- 카드 등록은 결제창을 열고 복귀하는 흐름까지만 확인할 수 있고, 서버가 이니시스 결과를 처리해 카드를 저장하는 부분은 서버 쪽 동작이라 프론트에서 보이지 않습니다.
 - PC 팝업 흐름용입니다. 휴대폰 실기기는 hosts를 바꾸기 어려워 v3 Stage 배포 뒤 확인합니다.
 - 소셜 로그인은 제공자 콘솔에 등록된 콜백 주소가 달라 이 방법으로 확인하지 않습니다.

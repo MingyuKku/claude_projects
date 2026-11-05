@@ -5,7 +5,8 @@ FROM nginx:1.30.6-alpine
 # 배포 후 이 앱의 옛 이미지만 정리하는 표시(deploy:stage 의 image prune --filter). 같은 서버의 다른 서비스 이미지는 건드리지 않는다.
 LABEL kr.co.bigbird.app=client-fe
 
-COPY deploy/nginx/default.conf /etc/nginx/conf.d/default.conf
+# 템플릿은 컨테이너 시작 때 환경 값(PAY_UPSTREAM)을 채워 /etc/nginx/conf.d/default.conf 로 만들어진다.
+COPY deploy/nginx/default.conf.template /etc/nginx/templates/default.conf.template
 COPY dist /usr/share/nginx/html
 
 EXPOSE 80

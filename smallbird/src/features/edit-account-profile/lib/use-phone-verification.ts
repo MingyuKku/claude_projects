@@ -4,6 +4,7 @@ import { useLocation, useSearchParams } from "react-router";
 
 import { MEDIA_QUERY } from "@/shared/config";
 import {
+  fetchKmcRequestToken,
   KMC_RESULT_PARAMS,
   openKmcPopup,
   redirectToKmc,
@@ -11,7 +12,7 @@ import {
   useMediaQuery,
 } from "@/shared/lib";
 
-import { decryptCertResult, fetchCertToken } from "../api/cert-api";
+import { decryptCertResult } from "../api/cert-api";
 import {
   saveProfileDraft,
   takeProfileDraft,
@@ -77,7 +78,7 @@ export function usePhoneVerification(
   }, []);
 
   async function startVerification(draft: ProfileDraft) {
-    const [error, token] = await tryit(fetchCertToken)();
+    const [error, token] = await tryit(fetchKmcRequestToken)();
     if (error) {
       setState({ status: "failed" });
       return;

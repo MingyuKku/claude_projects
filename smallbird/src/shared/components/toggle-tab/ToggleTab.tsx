@@ -41,7 +41,9 @@ export function ToggleTab({
       onValueChange={onValueChange}
       orientation="horizontal"
       className={cn(
-        "relative inline-flex items-center rounded-md bg-muted p-1",
+        // 항목의 z-10(흰 알약 위로 올림)이 이 토글 안에서만 통하게 가둠. 가두지 않으면 같은 층의 고정 탭 줄(sticky z-10)과 겨뤄
+        // 나중에 그려지는 토글이 탭 줄 위로 비침.
+        "relative isolate inline-flex items-center rounded-md bg-muted p-1",
         className,
       )}
       {...props}

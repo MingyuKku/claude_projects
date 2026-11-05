@@ -12,7 +12,7 @@ vi.mock("@/shared/api", async (importOriginal) => {
   return {
     ...actual,
     serverApi: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn() },
-    serverApiV3: { get: vi.fn() },
+    serverApiV3: { get: vi.fn(), post: vi.fn() },
     revokeFirebaseToken: vi.fn(async () => {}),
   };
 });
@@ -49,7 +49,9 @@ describe("fetchSession", () => {
   });
 
   it("rejects with the server error", async () => {
-    vi.mocked(serverApiV3.get).mockRejectedValue(new ApiError(401, undefined));
+    vi.mocked(serverApiV3.get).mockRejectedValueOnce(
+      new ApiError(401, undefined),
+    );
 
     await expect(fetchSession("/")).rejects.toMatchObject({ status: 401 });
   });
@@ -74,26 +76,25 @@ describe("formLogin", () => {
 });
 
 describe("logout", () => {
-  afterEach(() => vi.unstubAllGlobals());
+  beforeEach(() => vi.mocked(serverApiV3.post).mockReset());
 
-  it("302 수동 응답이면 쿠키 만료 요청이 끝난다", async () => {
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({ type: "opaqueredirect" }),
-    );
+  it("POST /auth/logout이 { result: true }를 주면 끝난다", async () => {
+    vi.mocked(serverApiV3.post).mockResolvedValue({ result: true });
     await expect(logout()).resolves.toBeUndefined();
+    expect(serverApiV3.post).toHaveBeenCalledWith("/auth/logout");
     // 세션이 살아 있을 때 이 기기의 채팅방 잠금부터 풂(가이드 2026-11-03 5번)
     expect(revokeFirebaseToken).toHaveBeenCalledOnce();
   });
 
-  it.each([200, 401, 500])(
-    "리다이렉트가 아닌 %s 응답을 성공으로 간주하지 않는다",
-    async (status) => {
-      vi.stubGlobal(
-        "fetch",
-        vi.fn().mockResolvedValue(new Response(null, { status })),
-      );
-      await expect(logout()).rejects.toMatchObject({ status });
-    },
-  );
+  it.each([401, 500])("%s 응답이면 오류를 던진다", async (status) => {
+    vi.mocked(serverApiV3.post).mockRejectedValueOnce(
+      new ApiError(status, undefined),
+    );
+    await expect(logout()).rejects.toMatchObject({ status });
+  });
+
+  it("result가 true가 아니면 성공으로 간주하지 않는다", async () => {
+    vi.mocked(serverApiV3.post).mockResolvedValue({ result: false });
+    await expect(logout()).rejects.toThrow();
+  });
 });

@@ -79,12 +79,7 @@ export const routes: RouteObject[] = [
         return (await import("@/pages/introduction")).IntroductionPage;
       }),
 
-      // Login. `/logout` has no screen yet and shows the login page, as the old app did.
       page(ROUTES.login, async () => (await import("@/pages/login")).LoginPage),
-      page(
-        ROUTES.logout,
-        async () => (await import("@/pages/login")).LoginPage,
-      ),
 
       // 이니시스 결제창의 closeUrl. 결제창(레이어) 안에서 열려 결제창을 닫기만 하므로 로그인 확인과 셸이 없음.
       page(

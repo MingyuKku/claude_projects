@@ -2,7 +2,7 @@ import { useSearchParams } from "react-router";
 
 import {
   getSubscribedTypes,
-  IS_SUBSCRIPTION_MOCK_ENABLED,
+  IS_USAGE_MOCK_ENABLED,
   isBillingPeriod,
   isActiveProductType,
   useBillingCards,
@@ -45,6 +45,9 @@ import type { ActiveProductType, Subscription } from "@/entities/subscription";
 
 // 탭 본문의 최대 폭(시안 PC 1440 화면의 본문 폭 1170). 더 넓은 화면에서는 가운데 정렬함.
 const CONTENT_WIDTH_CLASS_NAME = "mx-auto w-full max-w-292.5";
+// 고정 탭 줄(sticky z-10)은 같은 층의 본문과 z-index로 겨루므로, 본문 안의 z-index(고정 제목줄·토글 등)가 탭 줄 위로 올라오지 않게
+// 탭 본문을 isolate로 가둠. 본문 안에서 z-index가 커져도 탭 줄 아래에 그려짐.
+const TAB_CONTENT_CLASS_NAME = `isolate ${CONTENT_WIDTH_CLASS_NAME}`;
 // 탭을 바꾸면 하위 화면·상품 세그먼트·결제 내역 목록 쿼리(검색·필터·쪽)를 지움.
 const RESET_PARAMS = [
   PANEL_PARAM,
@@ -71,29 +74,9 @@ export function MyPageSubscribePage() {
   });
   const filterScreen = useFilterScreen("desktop");
   // 구독하기를 누르기 전에 읽어 두어 카드가 없는지 바로 알 수 있게 함(결제 화면도 같은 키를 읽어 한 번만 요청함).
-  // 구독 화면이 닫힌 빌드(아래 준비 중)에서는 훅 순서상 여기서 호출돼도 요청이 나가지 않게 함. 플래그를 지울 때 이 인자도 지움.
-  const { data: cards } = useBillingCards({
-    enabled: IS_SUBSCRIPTION_MOCK_ENABLED,
-  });
+  const { data: cards } = useBillingCards();
   // 결제 화면 주소로 바로 들어왔을 때 이미 구독 중인 상품인지 확인함(구독 탭·결제내역과 같은 키라 한 번만 요청함).
-  const { data: subscriptions } = useSubscriptions({
-    enabled: IS_SUBSCRIPTION_MOCK_ENABLED,
-  });
-
-  // 구독 API가 공개되기 전 빌드(stage·prod)에서는 목을 쓰지 않고 준비 중으로 둠(account.md §1). API가 공개되면 지움.
-  if (!IS_SUBSCRIPTION_MOCK_ENABLED) {
-    return (
-      <>
-        <title>{t("title")}</title>
-        <div className="flex min-h-full items-center justify-center">
-          <EmptyState
-            type="construction"
-            title={tCommon("status.comingSoon")}
-          />
-        </div>
-      </>
-    );
-  }
+  const { data: subscriptions } = useSubscriptions();
 
   const checkoutParam = searchParams.get(CHECKOUT_PLAN_PARAM);
   const checkoutType = isActiveProductType(checkoutParam)
@@ -168,7 +151,7 @@ export function MyPageSubscribePage() {
     <>
       <title>{t("title")}</title>
       <PaymentResultHandler />
-      {/* 카드를 등록하고 돌아오면 구독하려던 상품·결제 주기의 결제 화면을 다시 열어 이어서 결제하게 함(§7 P-9 사용자 결정 2026-11-03). */}
+      {/* 카드를 등록하고 돌아오면 구독하려던 상품·결제 주기의 결제 화면을 다시 열어 이어서 결제하게 함(스펙 §3 카드 없음, 사용자 결정 2026-11-03). */}
       <RegisterCardDialog
         open={isCardRequired}
         onCancel={closePanel}
@@ -209,7 +192,7 @@ export function MyPageSubscribePage() {
         )}
         <TabsContent
           value="plans"
-          className={`${CONTENT_WIDTH_CLASS_NAME} pb-4 tablet:pb-5`}
+          className={`${TAB_CONTENT_CLASS_NAME} pb-4 tablet:pb-5`}
         >
           <SubscriptionPlansGate>
             {(catalog) => (
@@ -232,20 +215,30 @@ export function MyPageSubscribePage() {
         </TabsContent>
         <TabsContent
           value="usage"
-          className={`${CONTENT_WIDTH_CLASS_NAME} pb-4 tablet:pb-5`}
+          className={`${TAB_CONTENT_CLASS_NAME} pb-4 tablet:pb-5`}
         >
-          <SubscriptionsGate skeleton={<UsageSkeleton />}>
-            {(subscriptions) => (
-              <SubscriptionUsageDashboard
-                type={resolveUsageType(subscriptions)}
-                onChangeType={handleChangeUsageType}
+          {/* 이용요약 API가 없어(§7 B-1) 목은 개발 서버에서만 그리고, 빌드(stage·prod)에서는 이 탭만 준비 중으로 둠(account.md §1). API가 공개되면 지움. */}
+          {IS_USAGE_MOCK_ENABLED ? (
+            <SubscriptionsGate skeleton={<UsageSkeleton />}>
+              {(subscriptions) => (
+                <SubscriptionUsageDashboard
+                  type={resolveUsageType(subscriptions)}
+                  onChangeType={handleChangeUsageType}
+                />
+              )}
+            </SubscriptionsGate>
+          ) : (
+            <div className="flex min-h-80 items-center justify-center">
+              <EmptyState
+                type="construction"
+                title={tCommon("status.comingSoon")}
               />
-            )}
-          </SubscriptionsGate>
+            </div>
+          )}
         </TabsContent>
         <TabsContent
           value="payments"
-          className={`${CONTENT_WIDTH_CLASS_NAME} flex flex-col gap-4 pb-4 tablet:gap-6 tablet:pb-5`}
+          className={`${TAB_CONTENT_CLASS_NAME} flex flex-col gap-4 pb-4 tablet:gap-6 tablet:pb-5`}
         >
           {!isTabletFilter && (
             <>

@@ -10,6 +10,3 @@ export const SERVICE_INDEX = 1;
  * 인증 서버가 serviceId로 걸러 내는 데 달려 있음.
  */
 export const AUTH_SERVICE_ID = 1;
-
-/** KMC 본인인증 초기화 슬러그(`/cert/init/{slug}`). 숫자가 아니라 문자열. */
-export const CERT_SLUG = "client";

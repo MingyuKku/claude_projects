@@ -36,6 +36,9 @@ export const sessionSchema = z.object({
 });
 export type Session = z.infer<typeof sessionSchema>;
 
+/** Response of `POST /v3/auth/logout`. */
+export const logoutResponseSchema = z.object({ result: z.literal(true) });
+
 /** LNB 메뉴 접근 권한. 권한이 없는 Sub ID에게도 메뉴는 보이고 흐리게 비활성함(스펙 `main.md`). */
 export interface MenuPermissions {
   campaign: boolean;

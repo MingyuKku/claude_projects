@@ -1,14 +1,17 @@
 import { tryit } from "radash";
 import { useRef, useState } from "react";
 
-import { CERT_SLUG } from "@/shared/config";
-import { openKmcPopup, useKmcPopupResult } from "@/shared/lib";
+import {
+  fetchKmcRequestToken,
+  openKmcPopup,
+  useKmcPopupResult,
+} from "@/shared/lib";
 
-import { certDecrypt, certInit } from "../api/join-api";
+import { certDecrypt } from "../api/join-api";
 import { readApiErrorMessage } from "./api-error";
 
-import type { CertInitResult } from "../model/schema";
 import type { CertSuccess } from "../model/store";
+import type { KmcRequestToken } from "@/shared/lib";
 
 export type CertResult =
   | { status: "idle" }
@@ -25,8 +28,8 @@ export type CertResult =
 export function useCertAuth(onSuccess: (success: CertSuccess) => void) {
   const [result, setResult] = useState<CertResult>({ status: "idle" });
   const [isPopupBlocked, setIsPopupBlocked] = useState(false);
-  /** `/cert/init` is fetched once and reused. */
-  const certToken = useRef<CertInitResult | null>(null);
+  /** The KMC request token is fetched once and reused. */
+  const certToken = useRef<KmcRequestToken | null>(null);
 
   useKmcPopupResult(({ recCert, certNum }) => {
     void (async () => {
@@ -56,7 +59,7 @@ export function useCertAuth(onSuccess: (success: CertSuccess) => void) {
   async function open() {
     setIsPopupBlocked(false);
     if (!certToken.current) {
-      const [error, token] = await tryit(certInit)(CERT_SLUG);
+      const [error, token] = await tryit(fetchKmcRequestToken)();
       if (error) {
         setResult({ status: "fail", message: readApiErrorMessage(error) });
         return;

@@ -13,6 +13,7 @@
     }
   },
   "startFailed": "无法开始登录。",
+  "loginFailed": "登录失败，请重试。",
   "locked": {
     "title": "Bigbird广告主会员审核中",
     "message": "Biglink运营团队正在审核您的企业信息，以批准广告主会员资格。<br />审核完成后将尽快通过联系方式通知您。"

@@ -62,12 +62,46 @@ describe("PaymentResultHandler", () => {
     await waitFor(() =>
       expect(toast.error).toHaveBeenCalledWith(
         "결제에 실패했습니다. 다시 시도해 주세요.",
-        expect.anything(),
+        expect.objectContaining({ description: undefined }),
       ),
     );
     expect(screen.queryByRole("alertdialog")).toBeNull();
     await waitFor(() =>
       expect(screen.getByTestId("search")).toHaveTextContent(/^$/),
+    );
+  });
+
+  it("결제사 거절 사유(pgMessage)가 있으면 토스트 설명으로 그대로 보이고 pgCode와 함께 쿼리를 지운다", async () => {
+    setup(
+      `?result=fail&reason=PAYMENT_FAILED&pgCode=01&pgMessage=${encodeURIComponent("잔액부족")}`,
+    );
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "결제에 실패했습니다. 다시 시도해 주세요.",
+        expect.objectContaining({ description: "잔액부족" }),
+      ),
+    );
+    await waitFor(() =>
+      expect(screen.getByTestId("search")).toHaveTextContent(/^$/),
+    );
+  });
+
+  it("pgMessage가 공백뿐이면 설명 없이 공통 문구만 보인다", async () => {
+    setup(`?result=fail&reason=PAYMENT_FAILED&pgMessage=%20`);
+    await waitFor(() => expect(toast.error).toHaveBeenCalled());
+    expect(toast.error).toHaveBeenLastCalledWith(
+      expect.any(String),
+      expect.objectContaining({ description: undefined }),
+    );
+  });
+
+  it("pgMessage가 너무 길면 100자까지만 보인다", async () => {
+    setup(`?result=fail&reason=PAYMENT_FAILED&pgMessage=${"가".repeat(300)}`);
+    await waitFor(() => expect(toast.error).toHaveBeenCalled());
+    expect(toast.error).toHaveBeenLastCalledWith(
+      expect.any(String),
+      expect.objectContaining({ description: "가".repeat(100) }),
     );
   });
 });

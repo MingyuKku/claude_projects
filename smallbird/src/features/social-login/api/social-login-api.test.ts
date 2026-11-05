@@ -177,18 +177,23 @@ describe("social login api", () => {
   });
 
   describe("appleLogin (V3)", () => {
-    it("{ token }을 보내 세션을 연다", async () => {
+    it("{ code, redirectUri }를 보내 세션을 연다", async () => {
       fetchMock.mockResolvedValueOnce(
         jsonResponse({ userIdx: 3, authority: "ROLE_ADVERTISER" }),
       );
 
-      await expect(appleLogin("id-token")).resolves.toEqual({
+      await expect(
+        appleLogin("apple-code", "https://x.test/auth/apple"),
+      ).resolves.toEqual({
         status: "success",
       });
 
       const [url, init] = fetchMock.mock.calls[0] ?? [];
       expect(String(url)).toContain("/v3/auth/sns/apple/login");
-      expect(JSON.parse(String(init?.body))).toEqual({ token: "id-token" });
+      expect(JSON.parse(String(init?.body))).toEqual({
+        code: "apple-code",
+        redirectUri: "https://x.test/auth/apple",
+      });
     });
 
     it("미가입(404 NEED_SIGNUP)이면 신원 토큰을 들고 연동 화면으로 넘긴다", async () => {
@@ -204,7 +209,9 @@ describe("social login api", () => {
           404,
         ),
       );
-      await expect(appleLogin("t")).resolves.toEqual({
+      await expect(
+        appleLogin("c", "https://x.test/auth/apple"),
+      ).resolves.toEqual({
         status: "needsLink",
         snsData: {
           platform: "apple",

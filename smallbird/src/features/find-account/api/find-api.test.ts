@@ -14,7 +14,6 @@ vi.mock("@/shared/api", () => ({
   authApi: { post: vi.fn() },
   memberApi: { post: vi.fn() },
   serverApi: { post: vi.fn() },
-  socialApi: { post: vi.fn() },
 }));
 
 const authPost = vi.mocked(authApi.post);

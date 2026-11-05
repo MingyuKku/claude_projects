@@ -1,4 +1,6 @@
-import { requestAppleIdToken } from "../lib/apple-authorize";
+import { tryit } from "radash";
+
+import { requestAppleCode } from "../lib/apple-authorize";
 import { takeGoogleLoginCallback } from "../lib/google-login";
 import { takeKakaoLoginCallback } from "../lib/kakao-login";
 import { takeNaverLoginCallback } from "../lib/naver-login";
@@ -46,11 +48,21 @@ export async function completeGoogleLogin(
   return googleLogin(callback.code, callback.redirectUri);
 }
 
-/** 애플 로그인: 팝업에서 받은 ID 토큰을 V3 로그인 API에 넘김. 팝업을 닫았으면 `cancelled`. */
+/**
+ * 애플 로그인: 팝업에서 받은 인가 코드를 V3 로그인 API에 넘김. 팝업을 닫았으면 `cancelled`.
+ * 팝업을 열기까지의 오류(SDK 없음·`state` 불일치)는 던져 시작 실패로 알리고, 코드를 받은 뒤의 오류(네트워크·응답 형태)는
+ * 다른 공급자의 복귀 화면처럼 로그인 실패(`failed`)로 돌려줌.
+ */
 export async function loginWithApple(): Promise<
   SocialLoginOutcome | { status: "cancelled" }
 > {
-  const token = await requestAppleIdToken();
-  if (!token) return { status: "cancelled" };
-  return appleLogin(token);
+  const apple = await requestAppleCode();
+  if (!apple) return { status: "cancelled" };
+  const [error, outcome] = await tryit(appleLogin)(
+    apple.code,
+    apple.redirectUri,
+  );
+  if (!error) return outcome;
+  console.error(error);
+  return FAILED;
 }

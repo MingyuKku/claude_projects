@@ -26,7 +26,7 @@ interface HistoryScrollListProps<T> {
   renderCards: (records: T[]) => ReactNode;
 }
 
-// 충전/출금·사용 내역의 MO 목록: 쪽 이동 없이 스크롤 끝에서 다음 쪽을 이어 읽고 "맨 위로" 버튼을 둠(3.0.8 결정, 시안 FAB).
+// 충전/출금·사용 내역의 MO 목록: 쪽 이동 없이 스크롤 끝에서 다음 쪽을 이어 읽고 "맨 위로" 버튼을 둠(스펙 §3, 시안 FAB).
 export function HistoryScrollList<T>({
   records,
   totalCount,

@@ -9,6 +9,8 @@ services:
     restart: always
     environment:
       - TZ=Asia/Seoul
+      # 이니시스 결과 수신 주소를 넘길 결제 서버(nginx 템플릿에서 씀). 끝에 경로·슬래시를 붙이지 않는다(요청 경로를 그대로 넘김).
+      - PAY_UPSTREAM=https://stage.client.bigbird.co.kr:3101
     healthcheck:
       test: ["CMD-SHELL", "wget -q --spider http://127.0.0.1/ || exit 1"]
       interval: 30s

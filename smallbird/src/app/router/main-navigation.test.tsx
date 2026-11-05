@@ -27,7 +27,7 @@ vi.hoisted(() => {
 vi.mock("@/shared/api", async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   serverApi: { get: vi.fn(), post: vi.fn() },
-  serverApiV3: { get: vi.fn() },
+  serverApiV3: { get: vi.fn(), post: vi.fn() },
 }));
 
 vi.mock("@/shared/lib", async (importOriginal) => ({
@@ -382,27 +382,17 @@ describe("루트 메인과 공통 메뉴", () => {
   });
   it("로그아웃은 외부 리다이렉트를 따르지 않고 현재 앱의 홈을 재로드한다", async () => {
     const user = userEvent.setup();
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockResolvedValue({ type: "opaqueredirect" }),
-    );
+    vi.mocked(serverApiV3.post).mockResolvedValue({ result: true });
     await renderRoute(ROUTES.main);
     await user.click(await screen.findByRole("button", { name: "내 프로필" }));
     await user.click(screen.getByRole("menuitem", { name: "로그아웃" }));
     await waitFor(() => expect(hardNavigate).toHaveBeenCalledWith("/"));
-    expect(fetch).toHaveBeenCalledWith(expect.stringMatching(/\/logout$/), {
-      method: "GET",
-      credentials: "include",
-      redirect: "manual",
-    });
+    expect(serverApiV3.post).toHaveBeenCalledWith("/auth/logout");
   });
 
   it("로그아웃 실패는 현재 프로필을 유지하고 오류를 안내한다", async () => {
     const user = userEvent.setup();
-    vi.stubGlobal(
-      "fetch",
-      vi.fn().mockRejectedValue(new TypeError("연결 실패")),
-    );
+    vi.mocked(serverApiV3.post).mockRejectedValue(new TypeError("연결 실패"));
     const errorLog = vi.spyOn(console, "error").mockImplementation(() => {});
     await renderRoute(ROUTES.main);
     await user.click(await screen.findByRole("button", { name: "내 프로필" }));

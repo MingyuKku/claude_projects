@@ -17,7 +17,7 @@ const FAIL_TOAST_ID = "subscription-payment-fail";
  * 돌아오는 주소에는 결제 화면 쿼리(`panel`)가 없어 구독 탭이 열리므로 결제 화면이 아니라 페이지에 둠.
  */
 export function PaymentResultHandler() {
-  const { status, reason, clear } = usePaymentResult();
+  const { status, reason, pgMessage, clear } = usePaymentResult();
   const revalidate = useRevalidateSubscriptionData();
   const toErrorMessage = useIssuanceErrorMessage();
 
@@ -26,14 +26,17 @@ export function PaymentResultHandler() {
     if (next === "success") {
       void revalidate();
     } else if (next === "fail") {
-      toast.error(toErrorMessage(reason), { id: FAIL_TOAST_ID });
+      toast.error(toErrorMessage(reason), {
+        id: FAIL_TOAST_ID,
+        description: pgMessage,
+      });
       clear();
     }
   });
 
   useEffect(() => {
     handleResult(status);
-  }, [status, reason]);
+  }, [status, reason, pgMessage]);
 
   return (
     <PaymentCompletedDialog open={status === "success"} onConfirm={clear} />

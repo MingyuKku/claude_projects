@@ -1,6 +1,6 @@
 import { act, renderHook, waitFor } from "@testing-library/react";
 
-import { memberApi } from "@/shared/api";
+import { memberApi, serverApiV3 } from "@/shared/api";
 
 import { useCertAuth } from "./use-cert-auth";
 
@@ -9,16 +9,21 @@ import type * as SharedApi from "@/shared/api";
 vi.mock("@/shared/api", async (importOriginal) => ({
   ...(await importOriginal<typeof SharedApi>()),
   memberApi: { get: vi.fn(), post: vi.fn() },
+  serverApiV3: { get: vi.fn() },
 }));
 
 const get = vi.mocked(memberApi.get);
+const getV3 = vi.mocked(serverApiV3.get);
 
 function callCertResult() {
   window.cert_result?.({ rec_cert: "REC", certNum: "NUM" });
 }
 
 describe("useCertAuth", () => {
-  beforeEach(() => get.mockReset());
+  beforeEach(() => {
+    get.mockReset();
+    getV3.mockReset();
+  });
 
   it("registers the KMC callback and removes it on unmount", () => {
     const { unmount } = renderHook(() => useCertAuth(vi.fn()));
@@ -82,12 +87,15 @@ describe("useCertAuth", () => {
   });
 
   it("flags a blocked popup when window.open returns null", async () => {
-    get.mockResolvedValue({ trCert: "c", trUrl: "u", trAdd: "Y" });
+    getV3.mockResolvedValue({ trCert: "c", trUrl: "u", trAdd: "Y" });
     const openSpy = vi.spyOn(window, "open").mockReturnValue(null);
     const { result } = renderHook(() => useCertAuth(vi.fn()));
 
     await act(() => result.current.open());
 
+    expect(getV3).toHaveBeenCalledWith("/mypage/cert/init", {
+      params: { trUrl: `${window.location.origin}/cert/success` },
+    });
     expect(result.current.isPopupBlocked).toBe(true);
     openSpy.mockRestore();
   });

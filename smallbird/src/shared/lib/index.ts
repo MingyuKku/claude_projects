@@ -24,6 +24,7 @@ export { useOnPageRestore } from "./useOnPageRestore";
 export { useActiveTabIndicator } from "./useActiveTabIndicator";
 export { useDialogTarget } from "./useDialogTarget";
 export {
+  fetchKmcRequestToken,
   KMC_CERT_URL,
   KMC_RESULT_PARAMS,
   openKmcPopup,

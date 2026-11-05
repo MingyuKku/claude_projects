@@ -5,7 +5,7 @@
 광고주 담당자가 KMC(PASS) 휴대폰 본인인증 → 계정(아이디/비밀번호) → 회사 정보(이메일·사업자 서류) → 약관 동의 순으로 가입을 신청한다. 가입 직후 로그인되지 않고 **운영 승인 대기**(승인 시 문자 안내)이며 `/welcome`에서 이를 알린다.
 
 - 일반 가입: 로그인 화면 링크(`/join?service=client`) → `/join` → 본인인증 → info → company → terms → `/welcome`.
-- SNS 가입: 소셜 로그인 결과가 "미연동"이면 `/sns-link`로 가고, 거기서 "회원가입"을 누르면 `navigate(ROUTES.join, { state: { tokenData } })`. 가입 성공 후 SNS 계정을 새 userIdx에 연동한다.
+- SNS 가입: 소셜 로그인 결과가 "미연동"이면 `/sns-link`로 가고, 거기서 "회원가입"을 누르면 `navigate(ROUTES.join, { state: { tokenData } })`. 가입 성공 후 방금 입력한 아이디·비밀번호와 `snsLinkToken`으로 SNS를 연결한다(아래 API 표 "SNS 연동").
 - 모바일 본인인증은 `/cert`가 페이지 전체를 KMC로 POST 제출한다. `/cert/success`는 KMC 팝업 복귀 지점이다.
 
 ## URL 계약
@@ -21,7 +21,7 @@
 - 단계 전환은 URL이 아니라 스토어 상태다. 새로고침하면 본인인증 단계부터 초기화된다(location state의 tokenData만 재시드될 수 있다).
 - 모든 단계의 뒤로가기 화살표는 로그인(`/login`)으로 나간다(이전 단계로 안 돌아감). 약관 상세 뷰의 뒤로가기만 목록으로 복귀한다.
 - 진행 막대: cert 1/5, info 2/5, company 3/5, terms 4/5 (5/5 = `/welcome`).
-- `features/join`은 `features/social-login`을 import할 수 없어서 `JoinPage`가 `socialLink`를 `onLinkSocial` prop으로 주입한다.
+- `features/join`은 `features/social-login`을 import할 수 없어서 `JoinPage`가 `linkSnsWithToken`을 `onLinkSocial` prop으로 주입한다.
 - 스토어는 `JoinStoreProvider`가 마운트당 1개 생성한다(전역 싱글턴 아님). `tokenData`는 마운트 시 1회만 시드된다.
 
 ## 단계 게이팅
@@ -34,19 +34,19 @@
 
 ## 서버 계약
 
-모든 호출은 `memberApi`. 응답은 Zod로 `parse`하며, 형태가 다르면 throw하고 호출자는 이를 에러로 취급한다. OpenAPI 명세 위치는 미정(PRD 3절).
+표에 따로 적은 것(인증 초기화는 광고주 서버, SNS 연동은 `serverApiV3`) 외에는 `memberApi`. 응답은 Zod로 `parse`하며, 형태가 다르면 throw하고 호출자는 이를 에러로 취급한다. OpenAPI 명세 위치는 미정(PRD 3절).
 
 | 용도           | 요청                                                         | 응답 / 비고                                                                  |
 | -------------- | ------------------------------------------------------------ | ---------------------------------------------------------------------------- |
 | 아이디 중복    | `POST /check/id/1` `{id}`                                    | `{result:number}`, `> 0`이면 중복                                            |
 | 이메일 중복    | `POST /check/email/1` `{email}`                              | 동일                                                                         |
 | 비밀번호 검증  | `POST /valid/pw` `{id,password,certIdx}`                     | `{result:boolean, reason?}`                                                  |
-| 인증 초기화    | `GET /cert/init/{client\|mobile}`                            | `{trCert,trUrl,trAdd}`. 팝업은 `client`, 모바일 `/cert`는 `mobile`           |
+| 인증 초기화    | 광고주 서버 `GET /v3/mypage/cert/init?trUrl=<현재 출처>/cert/success` | `{trCert,trUrl,trAdd}`. 팝업과 모바일 `/cert`가 같은 호출(마이페이지와 공용). member 서버 `/cert/init/{slug}`는 `trUrl`이 `stage.member` 고정이라 KMC 7-3으로 거부돼 안 씀 |
 | 인증 복호화    | `GET /cert/decrypte/1?rec_cert=&certNum=`                    | `{result?, message?, certIdx?, phoneNumber?, name?}` 모두 optional           |
 | 파일 업로드    | `POST /file/upload/{companyRegistration\|mailorderBusiness}` | multipart, 필드명 **`multipartFile`**, 응답 미사용                           |
 | 가입           | `POST /join/1`                                               | `{result:string, userIdx?:number}`                                           |
 | 카테고리       | `GET /campaign/category`                                     | `{category:{id,name}[]}`, 세션당 1회 캐시, 실패 시 빈 목록(에러 표시 없음)   |
-| SNS 연동       | `PUT {SOCIAL_LINK_PATH}/{platform}/{userIdx}` `{platform,email,uid}` | `serverApi` 사용                                                     |
+| SNS 연동       | `POST /v3/auth/sns/link` `{id,password,snsLinkToken}`        | `serverApiV3` 사용. 방금 가입한 아이디·비밀번호와 토큰으로 연결, 세션은 열지 않음 |
 
 ### 가입 payload
 
@@ -77,7 +77,7 @@
 
 데스크톱(팝업):
 
-1. `/cert/init/client` 호출. **실패하면** 서버 메시지를 인증 단계에 표시하고 팝업을 열지 않는다.
+1. `GET /v3/mypage/cert/init` 호출. **실패하면** 서버 메시지를 인증 단계에 표시하고 팝업을 열지 않는다.
 2. 팝업 `window.open("", "KMCISWindow", "width=396, height=643, resizable=0, scrollbars=no, status=0, titlebar=0, toolbar=0, left=435, top=250")`. 차단되면 "팝업이 차단되었습니다 / 브라우저에서 팝업 차단을 해제한 뒤 다시 시도해 주세요." 알림.
 3. 인증 후 팝업이 `/cert/success?rec_cert=…&certNum=…`로 복귀하고, `CertSuccessPage`가 `window.opener.cert_result({rec_cert, certNum})`을 호출한 뒤 `window.close()`한다. `rec_cert`는 KMC 이름이라 변경 불가. `window.cert_result`는 훅이 mount 시 등록, unmount 시 삭제한다.
 4. 부모가 복호화를 호출해 분기한다.
@@ -105,7 +105,7 @@
 
 ## 동작 결정 · 엣지 케이스
 
-- **SNS tokenData**: `location.state.tokenData`를 `{platform,email,uid}`(모두 필수 string)로 `safeParse`하고, 아니거나 없으면 일반 가입이 된다. `uid/email`이 없는 소셜 payload는 스키마 불일치로 일반 가입이 되어 연동이 누락된다. tokenData는 UI에 노출되지 않는다.
+- **SNS tokenData**: `location.state.tokenData`를 `{platform,email?,snsLinkToken}`(`platform`·`snsLinkToken` 필수 string)로 `safeParse`하고, 아니거나 없으면 일반 가입이 된다. `snsLinkToken`이 없는 payload는 스키마 불일치로 일반 가입이 되어 연동이 누락된다. `snsLinkToken`은 서버 서명 신원(10분 유효)이라 읽지 않고 그대로 보낸다. tokenData는 UI에 노출되지 않는다.
 - **담당자 연락처**: 숫자만 11자, 기본값은 인증 휴대폰 번호.
 - **통신판매 번호**(연도 4자 / 지역 / 일련 5자): 지역은 한글만 남기고 4자 절단. 안내 문구 "한글이 있는 경우만 한글 기입".
 - **한글 조합 입력**: 지역 칸은 조합 중(`isComposing`)에는 필터 없이 원본을 저장하고(자모를 지우면 조합이 끊김), `compositionend`에서 필터링해 확정한다. 자모가 남은 채 제출하면 지역은 빈 것으로 처리된다.
@@ -141,7 +141,7 @@ v2 위치(읽기 전용 참고): `app/routes/join/*`, `app/routes/{cert,cert.suc
 | 필드·코드값 | 한국어 표시 | 사용 화면 | 비고 |
 | :-- | :-- | :-- | :-- |
 | `GET /campaign/category` → `category[].name` | 서버가 준 이름(예: 대분류명) | 가입 2단계 "회사 분류" 목록 | 언어별 이름 제공 방식(요청 언어 헤더, 언어별 필드 등) 확인 필요 |
-| `GET /cert/init/*` 실패 본문 `message`, `GET /cert/decrypte/1`의 `message` | 서버 원문 | 가입 1단계 본인인증 실패 안내 | 서버 원문이 화면에 그대로 나온다. 원문이 없을 때만 번역된 기본 문구(`cert.failFallback`). 에러 코드로 바꿔 줄 수 있는지 확인 필요 |
+| `GET /v3/mypage/cert/init` 실패 본문 `message`, `GET /cert/decrypte/1`의 `message` | 서버 원문 | 가입 1단계 본인인증 실패 안내 | 서버 원문이 화면에 그대로 나온다. 원문이 없을 때만 번역된 기본 문구(`cert.failFallback`). 에러 코드로 바꿔 줄 수 있는지 확인 필요 |
 
 ## 범위 밖 · 미해결
 

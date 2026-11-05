@@ -75,7 +75,7 @@ describe("readKakaoLinkCallback", () => {
     expect(readKakaoLinkCallback("?code=auth-code&state=abc123")).toBeNull();
   });
 
-  it("state가 다르거나 없으면 null이다(요청 위조·SDK 로그인 복귀가 연결로 바뀌지 않음)", () => {
+  it("state가 다르거나 없으면 null이다(요청 위조·로그인 복귀가 연결로 바뀌지 않음)", () => {
     saveIntent("abc123");
     expect(readKakaoLinkCallback("?code=auth-code&state=other")).toBeNull();
     expect(readKakaoLinkCallback("?code=auth-code")).toBeNull();

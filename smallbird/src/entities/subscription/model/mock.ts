@@ -1,4 +1,4 @@
-// 임시 목 데이터(스펙 §1·§5, 구독 API 요청 B-1). 구독 API가 공개되면 이 파일과 api/의 목 분기를 지움.
+// 이용요약 목 데이터(스펙 §5, 이용요약 API 요청 B-1). 이용요약 API가 공개되면 이 파일과 api/의 목 분기를 지움.
 // 개발 서버에서만 채우고 빌드(stage·prod)에서는 비어 있어 번들에 목 값이 들어가지 않음(account.md §1 "목은 개발 서버에서만").
 import { isActiveProductType, USAGE_METRICS_BY_TYPE } from "./codes";
 
@@ -11,8 +11,8 @@ import type {
   UsageSummary,
 } from "./types";
 
-/** 목 데이터를 쓸 수 있는지. false(빌드)면 화면은 "준비 중" 빈 상태를 보임. API가 공개되면 지움. */
-export const IS_SUBSCRIPTION_MOCK_ENABLED = import.meta.env.DEV;
+/** 이용요약 목 데이터를 쓸 수 있는지. false(빌드)면 이용요약 탭만 "준비 중" 빈 상태를 보임. 이용요약 API가 공개되면 지움. */
+export const IS_USAGE_MOCK_ENABLED = import.meta.env.DEV;
 
 /** 오늘(목 데이터 기준). 이용요약의 "올해는 이번 달까지"와 캐러셀 처음 위치에 씀. */
 export function getMockToday() {

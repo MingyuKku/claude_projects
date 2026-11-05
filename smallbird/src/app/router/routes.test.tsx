@@ -39,13 +39,6 @@ describe("app router", () => {
     ).toBeInTheDocument();
   });
 
-  it("/logout 은 로그인 화면을 보여준다", async () => {
-    renderAt(ROUTES.logout);
-    expect(
-      await screen.findByRole("button", { name: "로그인" }),
-    ).toBeInTheDocument();
-  });
-
   it("알 수 없는 경로는 404 페이지를 보여준다", async () => {
     renderAt("/does-not-exist");
     expect(

@@ -38,7 +38,7 @@ export type {
   SubscriptionProductType,
   UsageMetric,
 } from "./model/codes";
-export { getMockToday, IS_SUBSCRIPTION_MOCK_ENABLED } from "./model/mock";
+export { getMockToday, IS_USAGE_MOCK_ENABLED } from "./model/mock";
 export type {
   BillingCard,
   IssuanceForm,

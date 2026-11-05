@@ -17,12 +17,16 @@ function SnsLinkProbe() {
   return <p>link {JSON.stringify(state)}</p>;
 }
 
-function renderRow(onErrorStart = vi.fn()) {
+function renderRow() {
+  const onErrorStart = vi.fn();
+  const onFailLogin = vi.fn();
   const router = createMemoryRouter(
     [
       {
         path: ROUTES.login,
-        element: <SnsLoginRow onErrorStart={onErrorStart} />,
+        element: (
+          <SnsLoginRow onErrorStart={onErrorStart} onFailLogin={onFailLogin} />
+        ),
       },
       { path: ROUTES.main, element: <p>main page</p> },
       { path: ROUTES.snsLink, element: <SnsLinkProbe /> },
@@ -30,7 +34,7 @@ function renderRow(onErrorStart = vi.fn()) {
     { initialEntries: [ROUTES.login] },
   );
   render(<RouterProvider router={router} />);
-  return { onErrorStart };
+  return { onErrorStart, onFailLogin };
 }
 
 async function clickApple() {
@@ -57,13 +61,21 @@ describe("SnsLoginRow 애플 로그인", () => {
     expect(await screen.findByText(/snsLinkToken/)).toHaveTextContent("tok");
   });
 
-  it("팝업을 닫거나 서버가 거절하면 화면에 머물고 오류 안내도 띄우지 않는다", async () => {
+  it("팝업을 닫으면 화면에 머물고 안내를 띄우지 않는다", async () => {
     vi.mocked(loginWithApple).mockResolvedValueOnce({ status: "cancelled" });
-    const { onErrorStart } = renderRow();
+    const { onErrorStart, onFailLogin } = renderRow();
     await clickApple();
-    vi.mocked(loginWithApple).mockResolvedValueOnce({ status: "failed" });
-    await clickApple();
+    await vi.waitFor(() => expect(loginWithApple).toHaveBeenCalledOnce());
     expect(screen.queryByText("main page")).not.toBeInTheDocument();
+    expect(onErrorStart).not.toHaveBeenCalled();
+    expect(onFailLogin).not.toHaveBeenCalled();
+  });
+
+  it("로그인이 실패하면 화면에 머물고 로그인 실패로 알린다", async () => {
+    vi.mocked(loginWithApple).mockResolvedValueOnce({ status: "failed" });
+    const { onErrorStart, onFailLogin } = renderRow();
+    await clickApple();
+    await vi.waitFor(() => expect(onFailLogin).toHaveBeenCalledOnce());
     expect(onErrorStart).not.toHaveBeenCalled();
   });
 

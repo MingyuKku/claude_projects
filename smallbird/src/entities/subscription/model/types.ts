@@ -5,7 +5,7 @@ import type {
   UsageMetric,
 } from "./codes";
 
-/** 구독 탭의 상품 카드 한 장. 가격은 정책이 없어 더미(스펙 §1·§7 P-1). */
+/** 구독 탭의 상품 카드 한 장. 가격은 정책이 없어 더미(스펙 §1). */
 export interface SubscriptionPlan {
   type: SubscriptionProductType;
   /** false면 "준비중" 카드(라이브형·어플리에이터형). */

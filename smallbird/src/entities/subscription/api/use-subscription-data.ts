@@ -41,20 +41,13 @@ export function useSubscriptionPlans() {
 
 export const SUBSCRIPTIONS_KEY = ["mypage", "subscription", "subscriptions"];
 
-interface UseSubscriptionsOptions {
-  /** false면 조회하지 않음. 구독 API를 아직 열지 않은 빌드에서 안 쓰는 요청이 나가지 않게 함. */
-  enabled?: boolean;
-}
-
 /**
  * 구독 중인 상품들(해지 예정 포함). 구독 탭·결제 화면 진입 확인·결제내역·이용요약이 같은 키를 읽어 한 번만 요청함.
  * 해지·결제 뒤에는 `mutate()`로 다시 읽음.
  */
-export function useSubscriptions({
-  enabled = true,
-}: UseSubscriptionsOptions = {}) {
+export function useSubscriptions() {
   const { data, error, isLoading, mutate } = useSWR(
-    enabled ? SUBSCRIPTIONS_KEY : null,
+    SUBSCRIPTIONS_KEY,
     fetchSubscriptions,
   );
   return { data, isLoading, isError: Boolean(error), mutate };
@@ -76,17 +69,10 @@ export function useUsageSeries(
 
 export const BILLING_CARDS_KEY = ["mypage", "subscription", "billing-cards"];
 
-interface UseBillingCardsOptions {
-  /** false면 조회하지 않음. 구독 API를 아직 열지 않은 빌드에서 안 쓰는 요청이 나가지 않게 함. */
-  enabled?: boolean;
-}
-
 /** 정기결제 카드(최대 2장). 삭제·기본 카드 변경은 `mutate`의 낙관적 갱신으로 반영함. */
-export function useBillingCards({
-  enabled = true,
-}: UseBillingCardsOptions = {}) {
+export function useBillingCards() {
   const { data, error, isLoading, mutate } = useSWR(
-    enabled ? BILLING_CARDS_KEY : null,
+    BILLING_CARDS_KEY,
     fetchBillingCards,
   );
   return { data, isLoading, isError: Boolean(error), mutate };

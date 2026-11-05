@@ -30,5 +30,15 @@ export const payResponseSchema = z.object({
   merchantData: payFieldSchema.nullish(),
 });
 
+/**
+ * 모바일 결제(`deviceType: "MOBILE"`) 응답. 서버가 이니시스 모바일 폼 값(`P_*`)을 완성해서 주므로
+ * 프론트는 `form`을 숨은 폼에 그대로 넣어 `paymentUrl`로 보냄.
+ */
+export const mobilePayResponseSchema = z.object({
+  paymentUrl: z.url(),
+  form: z.record(z.string(), payFieldSchema.nullish()),
+});
+
 export type ChargeInit = z.infer<typeof chargeInitSchema>;
 export type PayResponse = z.infer<typeof payResponseSchema>;
+export type MobilePayResponse = z.infer<typeof mobilePayResponseSchema>;

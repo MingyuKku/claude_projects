@@ -43,7 +43,7 @@ export const KAKAO_AUTHORIZE_URL = "https://kauth.kakao.com/oauth/authorize";
 export const KAKAO_LOGIN_V3_PATH = "/auth/sns/kakao/login";
 /** 구글 V3 로그인. 카카오와 같이 `{ code, redirectUri }`를 보내면 서버가 교환하고 세션 쿠키를 엶. */
 export const GOOGLE_LOGIN_V3_PATH = "/auth/sns/google/login";
-/** 애플 V3 로그인. 팝업에서 받은 ID 토큰 `{ token }`을 보내고 서버가 서명·`aud`를 확인해 세션 쿠키를 엶. */
+/** 애플 V3 로그인. 팝업에서 받은 인가 코드 `{ code, redirectUri }`를 보내면 서버가 교환하고 세션 쿠키를 엶. */
 export const APPLE_LOGIN_V3_PATH = "/auth/sns/apple/login";
 /** 네이버 V3 로그인. 서버가 `{ code, state }`로 토큰을 교환하고 세션 쿠키를 엶(`state`는 인가 요청에 쓴 값). */
 export const NAVER_LOGIN_V3_PATH = "/auth/sns/naver/login";

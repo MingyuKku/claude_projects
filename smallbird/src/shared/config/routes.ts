@@ -7,7 +7,6 @@ export const ROUTES = {
   home: "/",
   introduction: "/introduction",
   login: "/login",
-  logout: "/logout",
   main: "/",
   switchAccount: "/a/change",
   customerCenterBigbird: "/customer-center/bigbird",

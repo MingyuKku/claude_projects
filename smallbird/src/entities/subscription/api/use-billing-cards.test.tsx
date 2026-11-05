@@ -34,25 +34,12 @@ beforeEach(() => {
 });
 
 describe("useBillingCards", () => {
-  it("기본적으로 카드 목록을 조회한다", async () => {
+  it("카드 목록을 조회한다", async () => {
     const { result } = renderHook(() => useBillingCards(), { wrapper });
 
     await waitFor(() => expect(result.current.data).toHaveLength(1));
     expect(serverApiV3.get).toHaveBeenCalledWith(
       "/mypage/subscription/billing-cards",
     );
-  });
-
-  it("enabled가 false면 조회하지 않고 로딩도 아니다", async () => {
-    const { result } = renderHook(() => useBillingCards({ enabled: false }), {
-      wrapper,
-    });
-
-    // 요청이 나갔다면 이 사이에 호출됨.
-    await new Promise((resolve) => setTimeout(resolve, 50));
-
-    expect(serverApiV3.get).not.toHaveBeenCalled();
-    expect(result.current.data).toBeUndefined();
-    expect(result.current.isLoading).toBe(false);
   });
 });

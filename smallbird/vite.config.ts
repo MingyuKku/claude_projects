@@ -2,9 +2,10 @@ import tailwindcss from "@tailwindcss/vite";
 import react from "@vitejs/plugin-react";
 import { defineConfig, loadEnv, type ProxyOptions } from "vite";
 
-// 백엔드 CORS 허용 목록에 이 앱 origin이 없어서, 개발 서버가 같은 origin에서 프록시합니다.
+// 로컬 개발 주소(내 IP 등)는 백엔드 CORS 허용 목록에 없어서, 개발 서버가 같은 origin에서 프록시합니다.
+// 배포 환경은 백엔드가 배포 도메인을 CORS 허용하므로 프록시 없이 절대 주소로 호출합니다.
 // VITE_API_*_URL(경로 접두사)과 VITE_PROXY_*_URL(실제 주소)이 둘 다 있는 백엔드만 프록시합니다.
-const BACKENDS = ["SERVER", "MEMBER", "SOCIAL", "AUTH", "PAY"] as const;
+const BACKENDS = ["SERVER", "MEMBER", "AUTH", "PAY"] as const;
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd());

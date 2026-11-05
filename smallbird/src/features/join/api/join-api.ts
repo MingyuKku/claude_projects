@@ -3,7 +3,6 @@ import { SERVICE_INDEX } from "@/shared/config";
 
 import {
   certDecryptResultSchema,
-  certInitResultSchema,
   checkResultSchema,
   joinResultSchema,
   validPasswordResultSchema,
@@ -34,11 +33,6 @@ export async function validPassword(
     certIdx,
   });
   return validPasswordResultSchema.parse(response);
-}
-
-export async function certInit(service: string | number) {
-  const response = await memberApi.get(`/cert/init/${service}`);
-  return certInitResultSchema.parse(response);
 }
 
 export async function certDecrypt(recCert: string, certNum: string) {

@@ -1,4 +1,4 @@
-import { requestAppleIdToken } from "./apple-authorize";
+import { requestAppleCode } from "./apple-authorize";
 
 const init = vi.fn();
 const signIn = vi.fn();
@@ -22,21 +22,25 @@ function stateSentToApple(): string {
   return options.state;
 }
 
-describe("requestAppleIdToken", () => {
-  it("팝업 모드로 init하고 같은 state가 돌아오면 ID 토큰을 돌려준다", async () => {
+describe("requestAppleCode", () => {
+  it("팝업 모드로 init하고 같은 state가 돌아오면 인가 코드와 redirectUri를 돌려준다", async () => {
     signIn.mockImplementation(() =>
       Promise.resolve({
         authorization: {
-          code: "c",
+          code: "apple-code",
           id_token: "id-token",
           state: stateSentToApple(),
         },
       }),
     );
 
-    await expect(requestAppleIdToken()).resolves.toBe("id-token");
+    const result = await requestAppleCode();
 
     const options = init.mock.calls[0]?.[0] as Record<string, unknown>;
+    expect(result).toEqual({
+      code: "apple-code",
+      redirectUri: options.redirectURI,
+    });
     expect(options.usePopup).toBe(true);
     expect(options.scope).toBe("email");
     expect(options.redirectURI).toMatch(/\/auth\/apple$/);
@@ -50,10 +54,10 @@ describe("requestAppleIdToken", () => {
         authorization: { code: "c", id_token: "t", state: stateSentToApple() },
       }),
     );
-    await requestAppleIdToken();
+    await requestAppleCode();
     const first = stateSentToApple();
     init.mockClear();
-    await requestAppleIdToken();
+    await requestAppleCode();
     expect(stateSentToApple()).not.toBe(first);
   });
 
@@ -61,35 +65,35 @@ describe("requestAppleIdToken", () => {
     signIn.mockResolvedValue({
       authorization: { code: "c", id_token: "t", state: "other" },
     });
-    await expect(requestAppleIdToken()).rejects.toThrow();
+    await expect(requestAppleCode()).rejects.toThrow();
   });
 
-  it("ID 토큰이 없으면 오류를 던진다", async () => {
+  it("인가 코드가 없으면 오류를 던진다", async () => {
     signIn.mockImplementation(() =>
       Promise.resolve({
-        authorization: { code: "c", id_token: "", state: stateSentToApple() },
+        authorization: { code: "", id_token: "t", state: stateSentToApple() },
       }),
     );
-    await expect(requestAppleIdToken()).rejects.toThrow();
+    await expect(requestAppleCode()).rejects.toThrow();
   });
 
   it.each(["popup_closed_by_user", "user_cancelled_authorize"])(
     "사용자가 팝업을 닫거나 취소하면(%s) null이다",
     async (error) => {
       signIn.mockRejectedValue({ error });
-      await expect(requestAppleIdToken()).resolves.toBeNull();
+      await expect(requestAppleCode()).resolves.toBeNull();
     },
   );
 
   it("그 밖의 오류는 삼키지 않고 던진다", async () => {
     signIn.mockRejectedValue({ error: "invalid_client" });
-    await expect(requestAppleIdToken()).rejects.toEqual({
+    await expect(requestAppleCode()).rejects.toEqual({
       error: "invalid_client",
     });
   });
 
   it("SDK가 없으면 오류를 던진다", async () => {
     delete window.AppleID;
-    await expect(requestAppleIdToken()).rejects.toThrow("애플 SDK");
+    await expect(requestAppleCode()).rejects.toThrow("애플 SDK");
   });
 });

@@ -25,7 +25,7 @@ import { MasterAccountGate } from "./MasterAccountGate";
 const MASTER_GRID_CLASS_NAME =
   "flex flex-col gap-5 desktop:grid desktop:grid-cols-2 desktop:items-start desktop:gap-x-5";
 
-// 연결(켜기)을 지원하는 SNS. 카카오·네이버·구글은 공급자 화면으로 옮겼다가 돌아와 이어 가고, 애플은 팝업에서 받은 ID 토큰으로 바로 연결함(스펙 B-10).
+// 연결(켜기)을 지원하는 SNS. 카카오·네이버·구글은 공급자 화면으로 옮겼다가 돌아와 이어 가고, 애플은 팝업에서 받은 인가 코드로 바로 연결함(스펙 B-10).
 const SOCIAL_LINK_REQUESTERS = {
   kakao: startKakaoLink,
   naver: startNaverLink,

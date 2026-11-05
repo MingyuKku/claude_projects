@@ -15,7 +15,7 @@ interface GoogleSdk {
   };
 }
 
-/** `signIn()`이 팝업에서 받아 resolve하는 값. 이름·이메일을 담은 `user`는 최초 승인에만 오고 서버는 ID 토큰의 이메일을 씀. */
+/** `signIn()`이 팝업에서 받아 resolve하는 값. 이름·이메일을 담은 `user`는 최초 승인에만 오고, 서버는 `code`를 교환해 받은 ID 토큰의 이메일을 씀. */
 interface AppleSignInResponse {
   authorization: { code: string; id_token: string; state?: string };
 }

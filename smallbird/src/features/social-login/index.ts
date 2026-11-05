@@ -22,7 +22,10 @@ export {
   readNaverLinkCallback,
   startNaverLink,
 } from "./lib/naver-link";
-export { socialLoginPayloadSchema } from "./model/schema";
+export {
+  snsLoginFailedStateSchema,
+  socialLoginPayloadSchema,
+} from "./model/schema";
 export type {
   SocialLoginOutcome,
   SocialLoginPayload,

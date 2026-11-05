@@ -1,8 +1,11 @@
-import { useState } from "react";
-import { Link, useNavigate } from "react-router";
+import { useEffect, useState } from "react";
+import { Link, useLocation, useNavigate } from "react-router";
 
 import { LoginForm, resolveBrand } from "@/features/login";
-import { SnsLoginRow } from "@/features/social-login";
+import {
+  SnsLoginRow,
+  snsLoginFailedStateSchema,
+} from "@/features/social-login";
 import moreHorizontal from "@/shared/assets/img/system/more-horizontal.svg";
 import {
   AlertPopup,
@@ -17,17 +20,33 @@ import { QuestionPanel } from "./QuestionPanel";
 
 import type { CssVariableStyle } from "@/shared/lib";
 
-/** `/logout`도 같은 화면을 보여 주므로 이 컴포넌트를 함께 씀. */
+/** 소셜 로그인 안내. 시작 실패(공급자 화면을 열지 못함)와 로그인 실패(공급자를 거친 뒤 거절·오류)를 나눔. */
+type SnsError = "start" | "login";
+
 export function LoginPage() {
   const { t } = useTranslation("pages/login");
   const { t: tCommon } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const brand = resolveBrand(window.location.hostname, window.location.search);
 
   const [isQuestionOpen, setIsQuestionOpen] = useState(false);
   const [isMoreMenuOpen, setIsMoreMenuOpen] = useState(false);
   const [lockedUserId, setLockedUserId] = useState<string | null>(null);
-  const [hasSnsError, setHasSnsError] = useState(false);
+  const hasFailedState = snsLoginFailedStateSchema.safeParse(
+    location.state,
+  ).success;
+  // 복귀 화면이 실패 state와 함께 보내면 처음부터 로그인 실패 안내를 보임.
+  const [snsError, setSnsError] = useState<SnsError | null>(() =>
+    hasFailedState ? "login" : null,
+  );
+
+  // 새로고침·뒤로가기로 같은 안내가 다시 뜨지 않게 방문 기록의 실패 state를 지움(안내는 위 state로 유지).
+  useEffect(() => {
+    if (hasFailedState) {
+      void navigate(location.pathname, { replace: true, state: null });
+    }
+  }, [hasFailedState, location.pathname, navigate]);
   // 펫플레이는 브랜드색만 바뀜. --brand를 덮어쓰면 bg-brand와 caret-brand가 함께 바뀜.
   const brandStyle: CssVariableStyle | undefined = brand.primaryColor
     ? { "--brand": brand.primaryColor }
@@ -103,15 +122,18 @@ export function LoginPage() {
 
             <div className="flex flex-col gap-5 tablet:gap-6">
               <LoginForm onAccountLocked={setLockedUserId} />
-              <SnsLoginRow onErrorStart={() => setHasSnsError(true)} />
-              {hasSnsError && (
+              <SnsLoginRow
+                onErrorStart={() => setSnsError("start")}
+                onFailLogin={() => setSnsError("login")}
+              />
+              {snsError && (
                 <AuthText
                   size="sm"
                   tone="negative"
                   className="text-center"
                   role="alert"
                 >
-                  {t("startFailed")}
+                  {snsError === "start" ? t("startFailed") : t("loginFailed")}
                 </AuthText>
               )}
               <button

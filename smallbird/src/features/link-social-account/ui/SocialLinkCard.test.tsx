@@ -1,4 +1,4 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { toast } from "sonner";
 
@@ -12,9 +12,13 @@ import type {
   SocialProvider,
 } from "@/entities/account";
 
-type LinkRequesters = Partial<
-  Record<SocialProvider, () => Promise<SocialLinkRequest>>
->;
+type LinkRequesters = Record<SocialProvider, () => Promise<SocialLinkRequest>>;
+
+// 테스트마다 필요한 SNS만 바꿔 끼우고, 나머지는 사용자가 창을 닫은 것처럼 취소로 둠.
+function cancelledRequesters(): LinkRequesters {
+  const cancel = () => Promise.resolve({ status: "cancelled" } as const);
+  return { kakao: cancel, naver: cancel, google: cancel, apple: cancel };
+}
 
 vi.mock("sonner", () => ({
   toast: Object.assign(vi.fn(), { error: vi.fn() }),
@@ -57,7 +61,7 @@ const AFTER_LINK_RESPONSE = {
   ],
 };
 
-function setup(linkRequesters?: LinkRequesters) {
+function setup(overrides: Partial<LinkRequesters> = {}) {
   const onChangeLinks = vi.fn();
   const links: Record<SocialProvider, SocialLinkViewModel> = {
     kakao: LINKED,
@@ -69,7 +73,7 @@ function setup(linkRequesters?: LinkRequesters) {
     <SocialLinkCard
       links={links}
       onChangeLinks={onChangeLinks}
-      linkRequesters={linkRequesters}
+      linkRequesters={{ ...cancelledRequesters(), ...overrides }}
     />,
   );
   return { user: userEvent.setup(), onChangeLinks };
@@ -93,21 +97,26 @@ describe("SocialLinkCard", () => {
     ]);
   });
 
-  it("토큰 받기가 없는 SNS를 켜면 준비 중으로 안내하고 값은 그대로 둔다", async () => {
+  it("켰다가 공급자 창을 닫으면 안내 없이 값을 그대로 둔다", async () => {
     const { user } = setup();
     const toggle = screen.getByRole("switch", {
       name: "구글 간편 로그인 연동",
     });
     await user.click(toggle);
-    expect(toast).toHaveBeenCalledWith("준비 중인 기능입니다.");
+    await waitFor(() => expect(toggle).not.toBeDisabled());
+    expect(toast).not.toHaveBeenCalled();
+    expect(toast.error).not.toHaveBeenCalled();
+    expect(serverApiV3.post).not.toHaveBeenCalled();
     expect(toggle).toHaveAttribute("aria-checked", "false");
   });
 
-  it("켜면 토큰을 받아 연결 API를 부르고 최신 상태를 알린다", async () => {
+  it("켜면 인가 코드를 받아 연결 API를 부르고 최신 상태를 알린다", async () => {
     vi.mocked(serverApiV3.post).mockResolvedValueOnce(AFTER_LINK_RESPONSE);
-    const requestLink = vi
-      .fn()
-      .mockResolvedValue({ status: "token", token: "google-id-token" });
+    const requestLink = vi.fn().mockResolvedValue({
+      status: "code",
+      code: "google-code",
+      redirectUri: "https://x.test/auth/google",
+    });
     const { user, onChangeLinks } = setup({ google: requestLink });
     await user.click(
       screen.getByRole("switch", { name: "구글 간편 로그인 연동" }),
@@ -117,9 +126,7 @@ describe("SocialLinkCard", () => {
     );
     expect(serverApiV3.post).toHaveBeenCalledWith(
       "/mypage/account/sns/google",
-      {
-        token: "google-id-token",
-      },
+      { code: "google-code", redirectUri: "https://x.test/auth/google" },
     );
     expect(onChangeLinks).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -160,6 +167,25 @@ describe("SocialLinkCard", () => {
     expect(toast.error).not.toHaveBeenCalled();
   });
 
+  it("공급자 화면에서 뒤로 가기로 돌아오면(bfcache 복원) 잠겼던 스위치를 다시 켠다", async () => {
+    const { user } = setup({
+      google: vi.fn().mockResolvedValue({ status: "redirecting" }),
+    });
+    const toggle = screen.getByRole("switch", {
+      name: "구글 간편 로그인 연동",
+    });
+    await user.click(toggle);
+    await waitFor(() => expect(toggle).toBeDisabled());
+
+    act(() => {
+      window.dispatchEvent(
+        new PageTransitionEvent("pageshow", { persisted: true }),
+      );
+    });
+
+    expect(toggle).toBeEnabled();
+  });
+
   it("토큰을 받다가 실패하면 일반 실패로 안내한다", async () => {
     const { user, onChangeLinks } = setup({
       google: vi.fn().mockRejectedValue(new Error("SDK 로드 실패")),
@@ -196,9 +222,11 @@ describe("SocialLinkCard", () => {
         new ApiError(status, { result: false, reason }),
       );
       const { user, onChangeLinks } = setup({
-        google: vi
-          .fn()
-          .mockResolvedValue({ status: "token", token: "google-id-token" }),
+        google: vi.fn().mockResolvedValue({
+          status: "code",
+          code: "google-code",
+          redirectUri: "https://x.test/auth/google",
+        }),
       });
       await user.click(
         screen.getByRole("switch", { name: "구글 간편 로그인 연동" }),

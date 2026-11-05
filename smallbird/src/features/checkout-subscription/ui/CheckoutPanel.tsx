@@ -92,7 +92,6 @@ export function CheckoutPanel({
   const [installmentMonths, setInstallmentMonths] = useState(LUMP_SUM);
   const [isAgreed, setIsAgreed] = useState(false);
   const agreeId = useId();
-  // 결제 화면에는 월간/연간 구분이 없어 월 요금을 씀.
   const plan = catalog.plans.find((item) => item.type === type);
   // 연간은 서버가 준 연간 결제 총액을 한 번에 결제함(스펙 §3 결제 흐름).
   const price =

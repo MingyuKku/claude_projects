@@ -24,11 +24,8 @@ import { PAGE_SIZE_OPTIONS } from "../model/constants";
 import { PaymentCardList } from "./PaymentCardList";
 import { PaymentTable } from "./PaymentTable";
 
-// 검색 대상이 정해지기 전(스펙 §7 P-3)에는 검색창을 막아 둠.
-function ignoreSearch() {}
-
 // 구독 결제 내역. PC는 표 + 인라인 툴바, TAB은 2열 카드, MO는 1열 카드 + 필터 모달. 한 페이지 10·20·50건(선택)·최신순.
-// 쪽 나누기·필터는 서버가 하고, 쪽·필터는 URL 쿼리가 소유함.
+// 쪽 나누기·필터는 서버가 하고, 쪽·필터는 URL 쿼리가 소유함. 검색창은 두지 않음(사용자 결정 2026-11-04, 스펙 §3).
 export function PaymentHistory() {
   const { t } = useTranslation("features/payment-history");
   const { t: tCommon } = useTranslation();
@@ -115,7 +112,6 @@ export function PaymentHistory() {
             options: PAGE_SIZE_OPTIONS,
             onChange: params.setPageSize,
           }}
-          search={{ keyword: "", onSubmit: ignoreSearch, isDisabled: true }}
         />
         {isLoading ? (
           <div className="flex flex-col gap-2">

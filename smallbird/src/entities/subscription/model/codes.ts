@@ -1,4 +1,4 @@
-/** 구독 상품 유형. 라이브형·어플리에이터형은 "준비중"으로만 노출함. 코드 체계는 백엔드 확인(스펙 §7 B-2) 전 임시. */
+/** 구독 상품 유형(스펙 §7 B-2). 라이브형·어플리에이터형은 "준비중"으로만 노출함. */
 export const SUBSCRIPTION_PRODUCT_TYPES = [
   "recruit",
   "pick",
@@ -18,11 +18,11 @@ export function isActiveProductType(
   return ACTIVE_PRODUCT_TYPES.some((type) => type === value);
 }
 
-/** 결제 상태. 임시 코드(스펙 §5, B-2). */
+/** 결제 상태(스펙 §7 B-2). 환불을 제공하지 않아 실제로는 `paid`만 옴. */
 export const PAYMENT_STATUSES = ["paid", "refunding", "refunded"] as const;
 export type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
 
-/** 결제 수단. 구독은 신용카드만(스펙 §3). 임시 코드(B-2). */
+/** 결제 수단. 구독은 신용카드만(스펙 §3), 일시불 `card`·할부 `cardInstallment`(B-2). */
 export const PAYMENT_METHODS = ["card", "cardInstallment"] as const;
 export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
 

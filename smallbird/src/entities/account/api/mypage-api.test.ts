@@ -103,11 +103,15 @@ describe("unlinkSocial", () => {
 });
 
 describe("linkSocial", () => {
-  it("공급자 토큰만 보내고 응답의 연결 뒤 상태를 돌려준다", async () => {
+  it("인가 코드만 보내고 응답의 연결 뒤 상태를 돌려준다", async () => {
     vi.mocked(serverApiV3.post).mockResolvedValueOnce(SNS_RESPONSE);
-    const links = await linkSocial("naver", { token: "naver-access-token" });
-    expect(serverApiV3.post).toHaveBeenCalledWith("/mypage/account/sns/naver", {
-      token: "naver-access-token",
+    const links = await linkSocial("apple", {
+      code: "apple-code",
+      redirectUri: "https://x.test/auth/apple",
+    });
+    expect(serverApiV3.post).toHaveBeenCalledWith("/mypage/account/sns/apple", {
+      code: "apple-code",
+      redirectUri: "https://x.test/auth/apple",
     });
     expect(links.kakao).toEqual({ isLinked: true, email: "k@example.com" });
   });

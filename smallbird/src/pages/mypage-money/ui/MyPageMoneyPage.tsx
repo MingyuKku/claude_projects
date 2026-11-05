@@ -89,7 +89,7 @@ export function MyPageMoneyPage() {
   });
   const isPanelOpen = sidePanel !== null;
 
-  // 충전/출금 탭 이름은 PC "충전/출금 내역", TAB·MO "충전 내역"(시안 그대로, 3.0.8 결정).
+  // 충전/출금 탭 이름은 PC "충전/출금 내역", TAB·MO "충전 내역"(시안 그대로, 스펙 §3).
   function tabLabel(moneyTab: MoneyTab) {
     if (moneyTab === "usage") return t("tabs.usage");
     return layout === "desktop" ? t("tabs.charge") : t("tabs.chargeShort");

@@ -108,8 +108,8 @@ export type SubscriptionCancelResponse = z.infer<
 export const subscriptionInitSchema = z.object({ token: z.string() });
 
 /**
- * 결제 서버 `POST /v3/subscription/billing/subscribe/new-card`(카드 추가는 `cards/register`) 응답. 결제창 주소(`issuanceUrl`)와, 그 주소로 POST할 값들(서명 포함).
- * 값 목록은 서버가 정하고 바뀔 수 있어 `issuanceUrl`만 검증하고 나머지는 이름 그대로 form에 실음(확정 전, 스펙 §7 B-1).
+ * 결제 서버 `POST /v3/subscription/billing/cards/register`(카드 등록) 응답. 결제창 주소(`issuanceUrl`)와, 그 주소로 POST할 값들(서명 포함).
+ * 값 목록은 서버가 정하고 바뀔 수 있어 `issuanceUrl`만 검증하고 나머지는 이름 그대로 form에 실음.
  */
 export const subscriptionIssuanceSchema = z
   .object({ issuanceUrl: z.string().min(1) })

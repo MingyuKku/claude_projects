@@ -31,7 +31,17 @@ export const snsLoginV3ResponseSchema = z.object({
   authority: z.string().optional(),
 });
 
-/** C01은 성공, C02는 먼저 연동해야 하는 미가입 SNS 계정. */
+/**
+ * 소셜 로그인이 실패해 로그인 화면으로 돌아갈 때 넘기는 router state. 로그인 화면이 실패 안내를 보이는 데 씀.
+ * 카카오·네이버·구글은 복귀 화면에서, 애플은 팝업 뒤 같은 화면에서 실패를 알림.
+ */
+export const snsLoginFailedStateSchema = z.object({
+  snsLoginFailed: z.literal(true),
+});
+export const SNS_LOGIN_FAILED_STATE: z.infer<typeof snsLoginFailedStateSchema> =
+  { snsLoginFailed: true };
+
+/** V3 간편 로그인 결과. `needsLink`는 미가입 SNS 계정(`404 NEED_SIGNUP`)이라 `snsLinkToken`을 들고 연동 화면으로 감. */
 export type SocialLoginOutcome =
   | { status: "success" }
   | { status: "needsLink"; snsData: SocialLoginPayload }

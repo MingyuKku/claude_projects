@@ -1,6 +1,15 @@
-import { INICIS_FORM_ID, PAYMENT_GOODS_NAME } from "../model/constants";
+import {
+  INICIS_FORM_ID,
+  INICIS_MOBILE_FORM_ID,
+  PAYMENT_GOODS_NAME,
+} from "../model/constants";
 
-import type { ChargeInit, PayResponse } from "../model/schema";
+import type { DeviceType } from "../model/constants";
+import type {
+  ChargeInit,
+  MobilePayResponse,
+  PayResponse,
+} from "../model/schema";
 
 declare global {
   interface Window {
@@ -42,6 +51,19 @@ export function buildInicisFields(
     acceptmethod: toText(pay.acceptmethod),
     merchantData: toText(pay.merchantData),
   };
+}
+
+// 이니시스 `INIStdPay_third-party.js`의 `$jINI.mobileBrowser`(detectmobilebrowser.com) 첫 번째 정규식을 그대로 옮김(2026-11-04 대조).
+// 스크립트는 이어서 UA 앞 4글자 목록(옛 피처폰용)도 검사하지만 요즘 브라우저 UA는 모두 `Mozi`/`Oper` 등으로 시작해 해당이 없어 뺌.
+// 이 기준이 스크립트와 다르면 PC 흐름으로 갔다가 이니시스가 "PC로 결제 진행" 알림만 띄움.
+const MOBILE_USER_AGENT =
+  /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od|ad)|iris|kindle|lge |maemo|midp|mmp|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows (ce|phone)|xda|xiino/i;
+
+/** 접속 기기에 맞는 결제 방식. 휴대폰은 PC용 `INIStdPay.pay()`를 쓸 수 없어 모바일 폼 전송으로 나눔. */
+export function getChargeDeviceType(
+  userAgent: string = navigator.userAgent,
+): DeviceType {
+  return MOBILE_USER_AGENT.test(userAgent) ? "MOBILE" : "PC";
 }
 
 const scriptLoads = new Map<string, Promise<void>>();
@@ -100,4 +122,30 @@ export function openInicisPayment(fields: Record<string, string>) {
   document.body.appendChild(form);
 
   window.INIStdPay.pay(INICIS_FORM_ID);
+}
+
+/**
+ * 모바일 결제: 서버가 준 값을 숨은 폼에 넣어 `paymentUrl`로 같은 창에서 POST함(이니시스 페이지로 넘어갔다가 `redirectUri`로 돌아옴).
+ * 한글 값이 깨지지 않게 이니시스 규격(EUC-KR)으로 인코딩해 보냄.
+ */
+export function submitInicisMobilePayment({
+  paymentUrl,
+  form: values,
+}: MobilePayResponse) {
+  document.getElementById(INICIS_MOBILE_FORM_ID)?.remove();
+  const form = document.createElement("form");
+  form.id = INICIS_MOBILE_FORM_ID;
+  form.method = "POST";
+  form.action = paymentUrl;
+  form.acceptCharset = "EUC-KR";
+  form.hidden = true;
+  for (const [name, value] of Object.entries(values)) {
+    const input = document.createElement("input");
+    input.type = "hidden";
+    input.name = name;
+    input.value = toText(value);
+    form.appendChild(input);
+  }
+  document.body.appendChild(form);
+  form.submit();
 }
