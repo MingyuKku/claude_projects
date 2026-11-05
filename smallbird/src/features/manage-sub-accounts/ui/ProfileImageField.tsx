@@ -19,10 +19,16 @@ export interface PickedImage {
 interface ProfileImageFieldProps {
   image: PickedImage | null;
   onChange: (image: PickedImage) => void;
+  /** 서버에 이미 등록된 이미지(수정 폼). 새로 고른 이미지가 없을 때 보임. */
+  currentImageUrl?: string | null;
 }
 
 // Sub ID 생성·수정 폼의 "프로필 이미지(선택)" 행. 고른 이미지를 바꾸거나 화면을 떠날 때 미리보기 주소를 풀어 줌.
-export function ProfileImageField({ image, onChange }: ProfileImageFieldProps) {
+export function ProfileImageField({
+  image,
+  onChange,
+  currentImageUrl,
+}: ProfileImageFieldProps) {
   const { t } = useTranslation("features/manage-sub-accounts");
   const inputRef = useRef<HTMLInputElement>(null);
 
@@ -52,7 +58,7 @@ export function ProfileImageField({ image, onChange }: ProfileImageFieldProps) {
       </p>
       <div className="flex justify-center">
         <AvatarEdit
-          src={image?.previewUrl}
+          src={image?.previewUrl ?? currentImageUrl ?? undefined}
           alt={t("create.profileImage.alt")}
           editLabel={t("create.profileImage.edit")}
           onClickEdit={() => inputRef.current?.click()}

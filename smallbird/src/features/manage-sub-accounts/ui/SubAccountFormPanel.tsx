@@ -49,7 +49,7 @@ interface SubAccountFormPanelProps {
 // Figma Sub ID 생성·수정(10724:186372 패널·10724:187263 TAB·10724:187989 MO): 서브헤더(제목 + X) · 필드 · 하단 고정 "Sub ID 생성하기"·"수정하기".
 // 두 화면은 필드가 같음(프로필 이미지·담당자명·아이디 + 중복 확인·비밀번호·비밀번호 확인·이메일). 필드 간격은 MO 8·TAB 이상 12,
 // 안쪽 여백은 MO 16·TAB 이상 20. PC는 고정 높이 패널이라 본문이 안에서 스크롤함.
-// 수정(Master가 Sub ID 정보를 고침)은 `PATCH /sub/{accountIdx}`로 바뀐 필드만 보냄(docs/mypage-api.md §4-21).
+// 수정(Master가 Sub ID 정보를 고침)은 `PATCH /sub/{accountIdx}`로 바뀐 필드만 보냄(docs/mypage-api.md §2 Sub ID).
 export function SubAccountFormPanel({
   account,
   onClose,
@@ -181,7 +181,11 @@ export function SubAccountFormPanel({
         }
       />
       <div className="flex flex-1 flex-col gap-2 p-4 tablet:gap-3 tablet:p-5 desktop:min-h-0 desktop:overflow-y-auto">
-        <ProfileImageField image={pickedImage} onChange={setPickedImage} />
+        <ProfileImageField
+          image={pickedImage}
+          onChange={setPickedImage}
+          currentImageUrl={account?.profileImageUrl}
+        />
 
         <FormField label={t("create.field.name.label")} isRequired>
           {(control) => (

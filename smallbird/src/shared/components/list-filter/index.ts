@@ -1,4 +1,4 @@
-export { FILTER_PANEL_PARAM } from "./constants";
+export { FILTER_PANEL, FILTER_PANEL_PARAM } from "./constants";
 export { resolveEmptyKind } from "./empty-kind";
 export { FilterScreen } from "./FilterScreen";
 export { FilterToolbar } from "./FilterToolbar";

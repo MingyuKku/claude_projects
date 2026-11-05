@@ -4,6 +4,7 @@ import { Button } from "@/shared/ui/button";
 
 import { useMoneyFormat } from "../lib/use-money-format";
 import { useUsageLabels } from "../lib/use-usage-labels";
+import { CampaignThumbnail } from "./CampaignThumbnail";
 import { UsageAmount } from "./UsageAmount";
 import { UsageTypeBadge } from "./UsageTypeBadge";
 
@@ -15,7 +16,7 @@ interface UsageCardListProps {
 }
 
 // Figma 건별 카드(TAB 2열 11224:104580, MO 1열 11224:105677): 위쪽 오른쪽 정렬 "상세 보기" 버튼, 아래 라벨 열(회색)·값 열 6행 표.
-// 캠페인 유형·캠페인 코드는 상세 보기에만 있음. 캠페인 썸네일은 응답에 이미지 필드가 없어 그리지 않음.
+// 캠페인 유형·캠페인 코드는 상세 보기에만 있음. 캠페인 명 옆에 40px 썸네일(`mainImageUrl`, 없으면 기본 이미지).
 // 값이 없는 항목도 행을 숨기지 않고 "-"로 둠(스펙 §3). TAB은 카드 사이 12px로 2열이고 같은 줄 카드는 높이를 맞춤.
 export function UsageCardList({ records, onClickDetail }: UsageCardListProps) {
   const { t } = useTranslation("features/bigbird-money-history");
@@ -36,7 +37,16 @@ export function UsageCardList({ records, onClickDetail }: UsageCardListProps) {
           },
           {
             key: "campaignName",
-            value: <FullTextHint text={record.campaignName} lines={2} />,
+            value: (
+              <div className="flex min-w-0 items-center gap-3">
+                <CampaignThumbnail record={record} />
+                <FullTextHint
+                  text={record.campaignName}
+                  lines={2}
+                  className="min-w-0 flex-1"
+                />
+              </div>
+            ),
           },
           { key: "usage", value: labels.usageDetail(record) },
           { key: "amount", value: <UsageAmount amount={record.amount} /> },

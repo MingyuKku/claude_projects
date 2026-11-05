@@ -268,6 +268,7 @@ describe("SubAccountFormPanel 수정", () => {
     identifier: "sub_user01",
     name: "김담당",
     email: "sub@bigbird.com",
+    profileImageUrl: null,
     createdAt: null,
   };
 

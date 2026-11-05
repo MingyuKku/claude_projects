@@ -21,6 +21,7 @@ describe("transformSubAccountList", () => {
             name: "김서브",
             email: "sub01@bigbird.local",
             created: "2026-10-23T09:30:00",
+            profileImageUrl: "https://cdn.bigbird.local/sub01.png",
           },
         ],
         pagingInfo: { page: 2, size: 8, totalCount: 9, totalPage: 2 },
@@ -33,6 +34,7 @@ describe("transformSubAccountList", () => {
           identifier: "sub01",
           name: "김서브",
           email: "sub01@bigbird.local",
+          profileImageUrl: "https://cdn.bigbird.local/sub01.png",
           createdAt: new Date(2026, 9, 23, 9, 30),
         },
       ],
@@ -54,6 +56,7 @@ describe("transformSubAccountList", () => {
       identifier: "sub07",
       name: "",
       email: "",
+      profileImageUrl: null,
       createdAt: null,
     });
 

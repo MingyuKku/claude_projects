@@ -15,6 +15,7 @@ const deduction: UsageRecord = {
   usedAtText: "2026-10-23 14:23:18",
   campaignName: "2026 여름 시즌 캠핑 용품 신제품 리뷰 캠페인",
   campaignCode: "CP0001",
+  campaignImageUrl: null,
   campaignType: "pick",
   campaignTypeText: "pick",
   usageDetail: "contractPick",
@@ -281,5 +282,22 @@ describe("UsageDetail", () => {
         /^$/,
       );
     }
+  });
+
+  it("캠페인 명 옆에 썸네일 칸을 그리고 충전·출금 행에는 그리지 않는다", () => {
+    const { container } = render(
+      <UsageTable
+        records={[
+          { ...deduction, campaignImageUrl: "https://cdn.bigbird.local/c.png" },
+          charge,
+        ]}
+        activeId={null}
+        onClickDetail={vi.fn()}
+      />,
+    );
+
+    const rows = container.querySelectorAll("tbody tr");
+    expect(rows[0]?.querySelector('[data-slot="avatar"]')).not.toBeNull();
+    expect(rows[1]?.querySelector('[data-slot="avatar"]')).toBeNull();
   });
 });

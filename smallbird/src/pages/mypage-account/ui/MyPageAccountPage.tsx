@@ -4,11 +4,12 @@ import { useSubAccount } from "@/features/manage-sub-accounts";
 import { NotificationConsentCards } from "@/features/notification-consent";
 import { WithdrawFlow } from "@/features/withdraw-account";
 import { EmptyState } from "@/shared/components/empty-state";
+import { StickyTabBar } from "@/shared/components/sticky-tab-bar";
 import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery, usePanelParam, useTabParam } from "@/shared/lib";
 import { cn } from "@/shared/lib/utils";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
+import { Tabs, TabsContent } from "@/shared/ui/tabs";
 
 import { getAccountTabs } from "../model/tabs";
 import { BankAccountTab } from "./BankAccountTab";
@@ -127,22 +128,14 @@ export function MyPageAccountPage() {
         {/* 탭 줄은 스크롤해도 화면 위에 고정함. 위 여백(MO·TAB 8px, PC 20px)은 고정 영역이 직접 가져 스크롤 내용이
             그 위로 비치지 않게 함. 모바일은 탭이 넘치면 가로로 스크롤하는데, 잘리는 위치가 콘텐츠 여백이 아니라
             화면 가장자리가 되도록 스크롤 영역을 레이아웃 좌우 여백(--mypage-gutter)만큼 넓히고 첫 탭을 콘텐츠 선에 맞추는 여백은 목록이 가짐. */}
-        <div className="sticky top-0 z-10 -mx-(--mypage-gutter) overflow-x-auto bg-background pt-2 tablet:mx-0 desktop:pt-5">
-          <TabsList
-            variant="line"
-            className="w-full min-w-max justify-start px-(--mypage-gutter) tablet:px-0"
-          >
-            {tabs.map((accountTab) => (
-              <TabsTrigger
-                key={accountTab}
-                value={accountTab}
-                className="flex-none"
-              >
-                {t(`tabs.${accountTab}`)}
-              </TabsTrigger>
-            ))}
-          </TabsList>
-        </div>
+        <StickyTabBar
+          scrollable
+          className="desktop:pt-5"
+          tabs={tabs.map((accountTab) => ({
+            value: accountTab,
+            label: t(`tabs.${accountTab}`),
+          }))}
+        />
         {tabs.map((accountTab) => (
           <TabsContent
             key={accountTab}

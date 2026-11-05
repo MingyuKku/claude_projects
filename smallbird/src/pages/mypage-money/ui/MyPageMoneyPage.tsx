@@ -5,6 +5,7 @@ import {
   LIST_QUERY_PARAMS,
   UsageHistory,
 } from "@/features/bigbird-money-history";
+import { StickyTabBar } from "@/shared/components/sticky-tab-bar";
 import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery, usePanelParam, useTabParam } from "@/shared/lib";
@@ -180,25 +181,16 @@ export function MyPageMoneyPage() {
       )}
     >
       {/* 탭 줄은 스크롤해도 화면 위에 고정함. 위 여백은 고정 영역이 직접 가져 스크롤 내용이 그 위로 비치지 않게 함. */}
-      <div
-        className={cn(
-          "sticky top-0 z-10 -mx-(--mypage-gutter) bg-background px-(--mypage-gutter) pt-2 tablet:mx-0 tablet:px-0",
-          // 카드 아래에서는 카드와 간격(TAB 16, PC 20), TAB에서 하위 화면이 열려 카드가 없으면 화면 위 8.
-          showsSummaryAboveTabs && "tablet:pt-4 desktop:pt-5",
-        )}
-      >
-        <TabsList variant="line" className="w-full justify-start">
-          {MONEY_TABS.map((moneyTab) => (
-            <TabsTrigger
-              key={moneyTab}
-              value={moneyTab}
-              className="flex-1 tablet:flex-none"
-            >
-              {tabLabel(moneyTab)}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </div>
+      <StickyTabBar
+        // 카드 아래에서는 카드와 간격(TAB 16, PC 20), TAB에서 하위 화면이 열려 카드가 없으면 화면 위 8.
+        className={
+          showsSummaryAboveTabs ? "tablet:pt-4 desktop:pt-5" : undefined
+        }
+        tabs={MONEY_TABS.map((moneyTab) => ({
+          value: moneyTab,
+          label: tabLabel(moneyTab),
+        }))}
+      />
       {MONEY_TABS.map((moneyTab) => (
         <TabsContent
           key={moneyTab}

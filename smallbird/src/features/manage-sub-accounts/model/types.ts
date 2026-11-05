@@ -8,6 +8,8 @@ export interface SubAccountViewModel {
   /** 담당자명. */
   name: string;
   email: string;
+  /** 프로필 이미지 주소. 이미지가 없으면 null(기본 아바타). */
+  profileImageUrl: string | null;
   /** 서버가 생성일을 주지 않으면 null. */
   createdAt: Date | null;
 }

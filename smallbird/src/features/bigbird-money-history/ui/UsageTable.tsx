@@ -14,6 +14,7 @@ import {
 
 import { useMoneyFormat } from "../lib/use-money-format";
 import { useUsageLabels } from "../lib/use-usage-labels";
+import { CampaignThumbnail } from "./CampaignThumbnail";
 import { UsageAmount } from "./UsageAmount";
 import { UsageTypeBadge } from "./UsageTypeBadge";
 
@@ -33,7 +34,7 @@ interface UsageTableProps {
 
 // Figma 사용 내역 표(11224:103786): 구분(배지)·일자·캠페인 명·내역·금액·잔액·상세 보기. 캠페인 코드 열은 없고 상세 보기에만 있음.
 // 지정한 폭은 자동 표 배치에서 최소 폭이 되어 시안 폭을 지킴. 캠페인 명은 두 줄까지 보이고 말줄임(행 높이 56, 시안 `11224:103786`).
-// 캠페인 썸네일은 응답에 이미지 필드가 없어 그리지 않음.
+// 캠페인 명 옆에 40px 썸네일(`mainImageUrl`, 없으면 기본 이미지).
 export function UsageTable({
   records,
   activeId,
@@ -94,7 +95,14 @@ export function UsageTable({
               </TableCell>
               {!isPanelOpen && (
                 <TableCell className="h-14 whitespace-normal">
-                  <FullTextHint text={record.campaignName} lines={2} />
+                  <div className="flex items-center gap-3">
+                    <CampaignThumbnail record={record} />
+                    <FullTextHint
+                      text={record.campaignName}
+                      lines={2}
+                      className="min-w-0 flex-1"
+                    />
+                  </div>
                 </TableCell>
               )}
               <TableCell className="h-14 whitespace-normal">

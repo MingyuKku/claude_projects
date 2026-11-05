@@ -23,9 +23,10 @@ import { LIST_QUERY_PARAMS, PaymentHistory } from "@/features/payment-history";
 import { SubscriptionUsageDashboard } from "@/features/view-subscription-usage";
 import { EmptyState } from "@/shared/components/empty-state";
 import { useFilterScreen } from "@/shared/components/list-filter";
+import { StickyTabBar } from "@/shared/components/sticky-tab-bar";
 import { useTranslation } from "@/shared/i18n";
 import { usePanelParam, useTabParam } from "@/shared/lib";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
+import { Tabs, TabsContent } from "@/shared/ui/tabs";
 
 import {
   CHECKOUT_PERIOD_PARAM,
@@ -176,19 +177,13 @@ export function MyPageSubscribePage() {
       >
         {!isTabletFilter && (
           // 탭 줄은 스크롤해도 화면 위에 고정함. 위 여백은 고정 영역이 직접 가져 스크롤 내용이 그 위로 비치지 않게 함.
-          <div className="sticky top-0 z-10 -mx-(--mypage-gutter) bg-background px-(--mypage-gutter) pt-2 tablet:mx-0 tablet:px-0 desktop:pt-5">
-            <TabsList variant="line" className="w-full justify-start">
-              {SUBSCRIBE_TABS.map((subscribeTab) => (
-                <TabsTrigger
-                  key={subscribeTab}
-                  value={subscribeTab}
-                  className="flex-1 tablet:flex-none"
-                >
-                  {t(`tabs.${subscribeTab}`)}
-                </TabsTrigger>
-              ))}
-            </TabsList>
-          </div>
+          <StickyTabBar
+            className="desktop:pt-5"
+            tabs={SUBSCRIBE_TABS.map((subscribeTab) => ({
+              value: subscribeTab,
+              label: t(`tabs.${subscribeTab}`),
+            }))}
+          />
         )}
         <TabsContent
           value="plans"

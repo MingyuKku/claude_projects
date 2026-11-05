@@ -1,6 +1,6 @@
 import { formatDate, useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
-import { Avatar, AvatarPlaceholder } from "@/shared/ui/avatar";
+import { Avatar, AvatarImage, AvatarPlaceholder } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 
 import { DATE_FORMAT } from "../model/constants";
@@ -56,6 +56,9 @@ export function SubAccountCardList({
           >
             <div className="flex min-w-0 items-center gap-3">
               <Avatar size="md">
+                {account.profileImageUrl && (
+                  <AvatarImage src={account.profileImageUrl} alt="" />
+                )}
                 <AvatarPlaceholder />
               </Avatar>
               <span className="min-w-0 truncate text-base leading-6 font-medium text-foreground">

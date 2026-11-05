@@ -46,7 +46,7 @@ export function changeSubEmail(email: string) {
 
 /**
  * 화면은 KMC 인증을 마친 번호만 보냄. 서버는 아직 번호만 받고 인증 증명(`certIdx`)을 받지 않음
- * (docs/mypage-api.md §4-13 ⑤, 받게 되면 함께 보냄).
+ * (docs/mypage-api.md §4-13 ⑥, 받게 되면 함께 보냄).
  */
 export function changeSubPhone(phone: string) {
   return serverApiV3.put("/mypage/account/sub/phone", { phone });

@@ -1,6 +1,6 @@
 import { formatDate, useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
-import { Avatar, AvatarPlaceholder } from "@/shared/ui/avatar";
+import { Avatar, AvatarImage, AvatarPlaceholder } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 import {
   Table,
@@ -77,6 +77,9 @@ export function SubAccountTable({
               <TableCell className="whitespace-normal">
                 <div className="flex items-center gap-3">
                   <Avatar size="md">
+                    {account.profileImageUrl && (
+                      <AvatarImage src={account.profileImageUrl} alt="" />
+                    )}
                     <AvatarPlaceholder />
                   </Avatar>
                   <span className={cn(CELL_TEXT_CLASS_NAME, "min-w-0 flex-1")}>

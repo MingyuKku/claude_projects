@@ -49,6 +49,8 @@ export interface UsageRecord {
   usedAtText: string;
   campaignName: string;
   campaignCode: string;
+  /** 캠페인 대표 이미지 주소. 공구샵이 없는 캠페인과 충전·출금은 null. */
+  campaignImageUrl: string | null;
   /** 캠페인 유형 코드. 모르는 서버 값이면 null이라 `campaignTypeText`를 그대로 보임. */
   campaignType: CampaignType | null;
   /** 코드로 바꾸지 못할 때 보일 서버 값. 값이 없으면 "-", 충전·출금은 빈 문자열. */

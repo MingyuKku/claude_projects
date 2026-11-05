@@ -10,6 +10,7 @@ const account: SubAccountViewModel = {
   identifier: "sub02",
   name: "이마케팅",
   email: "sub02@bigbird.com",
+  profileImageUrl: null,
   createdAt: new Date(2024, 4, 9),
 };
 

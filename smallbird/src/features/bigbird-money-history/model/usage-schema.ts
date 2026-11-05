@@ -11,6 +11,7 @@ export const usageItemSchema = z.object({
   campaignName: z.string().nullish(),
   campaignCode: z.string().nullish(),
   campaignType: z.string().nullish(),
+  mainImageUrl: z.string().nullish(),
   usageDetailCode: z.string().nullish(),
   usageDetailName: z.string().nullish(),
   usageAmount: z.number().nullish(),

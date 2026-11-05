@@ -58,6 +58,7 @@ export function transformUsageList(list: UsageList): UsageListViewModel {
         usedAtText: textOrDash(item.usageDate),
         campaignName: campaignText(item.campaignName),
         campaignCode: campaignText(item.campaignCode),
+        campaignImageUrl: isCampaignFree ? null : item.mainImageUrl || null,
         campaignType: isCampaignFree
           ? null
           : (CAMPAIGN_TYPE_BY_SERVER_VALUE.get(item.campaignType ?? "") ??

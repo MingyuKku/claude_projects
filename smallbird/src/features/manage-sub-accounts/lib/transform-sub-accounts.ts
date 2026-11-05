@@ -19,6 +19,7 @@ export function transformSubAccountList(
       identifier: account.identifier,
       name: account.name ?? "",
       email: account.email ?? "",
+      profileImageUrl: account.profileImageUrl || null,
       createdAt: parseServerDate(account.created),
     })),
     totalCount: list.pagingInfo.totalCount,

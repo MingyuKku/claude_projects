@@ -14,6 +14,7 @@ const subAccountSchema = z.object({
   name: z.string().nullish(),
   email: z.string().nullish(),
   created: z.string().nullish(),
+  profileImageUrl: z.string().nullish(),
 });
 
 /** `GET /v3/mypage/account/sub`(`SubAccountListResponse`). */

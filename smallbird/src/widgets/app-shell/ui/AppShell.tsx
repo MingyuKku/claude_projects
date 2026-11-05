@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 
 import { useBigbirdMoneyBalance } from "@/entities/bigbird-money";
@@ -22,6 +22,7 @@ import { useSidebarStore } from "../model/sidebar-store";
 import { useKeyboardAwareShell } from "../model/useKeyboardAwareShell";
 import { useLogoutAction } from "../model/useLogoutAction";
 import { useMobileMenu } from "../model/useMobileMenu";
+import { useScrollRestoration } from "../model/useScrollRestoration";
 import { useShellNavItems } from "../model/useShellNavItems";
 import { AlertPopover } from "./AlertPopover";
 import { DevLanguageSwitcher } from "./DevLanguageSwitcher";
@@ -97,6 +98,8 @@ export function AppShell({
     gapPaintStyle,
     isFittedToViewport,
   } = useKeyboardAwareShell(isKeyboardAware);
+  const mainRef = useRef<HTMLElement>(null);
+  useScrollRestoration(mainRef);
   const [isLoginAlertOpen, setIsLoginAlertOpen] = useState(false);
   const { handleClickLogout, isLoggingOut } = useLogoutAction();
   const { items, activeNavItem, currentNavItem, currentSubItem } =
@@ -230,6 +233,7 @@ export function AppShell({
             )}
           </AppHeader>
           <main
+            ref={mainRef}
             className={cn(
               "min-h-0 flex-1 overflow-auto",
               mainClassName ?? "p-5",
