@@ -50,7 +50,7 @@
 | `/dev/ui`       | `ui-preview`      | 공통 컴포넌트 미리보기(Figma 디자인 시스템 표와 같은 배치). 개발 서버(`pnpm dev`)에서만 등록되고 프로덕션 빌드에는 없음 |
 | `*`             | `not-found`       | 알 수 없는 경로                                                                                                         |
 
-OAuth 콜백 3개(카카오·네이버·구글. 애플은 팝업이라 화면 없음), `/changePw`(백엔드가 만드는 재설정 링크), `/cert/success`(KMC 반환 주소), `/inicis/close`(결제 서버를 거쳐 이니시스에 넘기는 닫기 주소)는 앱 밖의 설정과 연결된 경로입니다. 이 경로를 바꿀 때는 제공자 콘솔·백엔드·KMC 쪽도 함께 갱신해야 합니다. `/v3/mypage/bigbird-money/pay/result`는 화면이 아니라 배포 nginx(`deploy/nginx/default.conf.template`)가 결제 서버로 넘기는 이니시스 결과 수신 경로이므로 클라이언트 라우트로 쓰지 않습니다.
+OAuth 콜백 3개(카카오·네이버·구글. 애플은 팝업이라 화면 없음), `/changePw`(백엔드가 만드는 재설정 링크), `/cert/success`(KMC 반환 주소), `/inicis/close`(결제 서버를 거쳐 이니시스에 넘기는 닫기 주소)는 앱 밖의 설정과 연결된 경로입니다. 이 경로를 바꿀 때는 제공자 콘솔·백엔드·KMC 쪽도 함께 갱신해야 합니다. `/v3/mypage/bigbird-money/pay/result`(휴대폰은 `/result/mobile`)는 화면이 아니라 배포 nginx(`deploy/nginx/default.conf.template`)가 결제 서버로 넘기는 이니시스 결과 수신 경로이므로 클라이언트 라우트로 쓰지 않습니다.
 
 ## 2. 백엔드와 API
 

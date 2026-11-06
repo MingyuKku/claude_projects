@@ -22,8 +22,10 @@ server {
     }
 
     # 이니시스는 returnUrl 의 도메인이 결제를 요청한 페이지와 같아야 해서(V023) 결과를 이 앱 도메인으로 받아 결제 서버로 넘긴다.
+    # PC(표준결제)는 /pay/result, 휴대폰(모바일 일반결제)은 이니시스가 P_NEXT_URL 로 POST 하는 /pay/result/mobile 이다.
+    # 후자가 빠져 있으면 SPA 정적 서빙으로 떨어져 이니시스에서 "결제하기"를 누를 때 405 Not Allowed 가 난다.
     # 결제 서버 IP 가 고정이 아니어서 변수로 넘겨 요청 때마다 Docker 내장 DNS 로 다시 조회한다.
-    location = /v3/mypage/bigbird-money/pay/result {
+    location ~ ^/v3/mypage/bigbird-money/pay/result(/mobile)?$ {
         resolver 127.0.0.11 valid=30s ipv6=off;
         set $pay_upstream ${PAY_UPSTREAM};
         proxy_pass $pay_upstream;
