@@ -195,7 +195,11 @@ export function MyPageMoneyPage() {
         <TabsContent
           key={moneyTab}
           value={moneyTab}
-          className={cn("pb-4 tablet:pb-5", isScreenPanel && "flex flex-col")}
+          // isolate: 본문 안의 z-index(MO 세그먼트 토글의 z-10 등)를 본문에 가둬 고정 탭 줄(z-10) 아래에 그림.
+          className={cn(
+            "isolate pb-4 tablet:pb-5",
+            isScreenPanel && "flex flex-col",
+          )}
         >
           {tabBody(moneyTab)}
         </TabsContent>

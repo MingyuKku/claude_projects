@@ -4,6 +4,16 @@ const DEVICE_ID_PATTERN = /^[\w-]{8,64}$/;
 
 let memoryId: string | undefined;
 
+// 보안 컨텍스트(https·localhost)가 아닌 개발 주소(http 사설 IP, `pnpm dev --host`)에서는 `crypto.randomUUID`가 없어
+// `getRandomValues`로 만든 32자리 16진수를 씀(허용 형식에 맞음). 다른 모듈의 같은 폴백과 같은 방식.
+function createId(): string {
+  if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  const bytes = crypto.getRandomValues(new Uint8Array(16));
+  return Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join(
+    "",
+  );
+}
+
 /**
  * 브라우저(기기) 하나에 한 번 만들어 계속 쓰는 식별자. 실시간 채팅방 잠금이 이 값으로 같은 기기를 알아봄.
  * 저장소를 못 쓰면 이 페이지 안에서만 같은 값을 씀(새로고침하면 다른 기기로 보임).
@@ -12,11 +22,11 @@ export function getDeviceId(): string {
   try {
     const saved = localStorage.getItem(DEVICE_ID_KEY);
     if (saved && DEVICE_ID_PATTERN.test(saved)) return saved;
-    const id = crypto.randomUUID();
+    const id = createId();
     localStorage.setItem(DEVICE_ID_KEY, id);
     return id;
   } catch {
-    memoryId ??= crypto.randomUUID();
+    memoryId ??= createId();
     return memoryId;
   }
 }

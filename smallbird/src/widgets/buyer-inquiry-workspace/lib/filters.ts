@@ -10,16 +10,8 @@ import type {
   BuyerInquiryFilters,
 } from "@/entities/inquiry";
 
-// Figma 26/10/29(11315:50439) 탭 순서: 전체 · 답변 대기 · 상담 중 · 답변 완료
+// Figma 26/10/29(11315:50439) 탭 순서: 전체 · 답변 대기 · 상담 중 · 답변 완료(구매자·인플루언서 문의 공통, 사용자 결정 2026-11-05)
 export const STATUS_FILTERS = ["all", "waiting", "consulting", "done"] as const;
-
-/** 구매자 문의 탭 순서(요구명세서 24 I5). 인플루언서 문의는 STATUS_FILTERS 순서를 그대로 씀. */
-export const BUYER_STATUS_FILTERS = [
-  "all",
-  "consulting",
-  "waiting",
-  "done",
-] as const;
 
 function toPositiveNumber(value: string | null) {
   const number = Number(value);

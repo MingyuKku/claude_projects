@@ -4,7 +4,7 @@ import { z } from "zod";
 import { serverApiV3 } from "@/shared/api";
 import { ROUTES } from "@/shared/config";
 
-// KMC(한국모바일인증) 휴대폰 본인인증 공통 처리. 서버(`/v3/mypage/cert/init`)가 준 암호화 값을 KMC로 POST하면, 인증 뒤 KMC가
+// KMC(한국모바일인증) 휴대폰 본인인증 공통 처리. 서버(`/v3/auth/cert/init`)가 준 암호화 값을 KMC로 POST하면, 인증 뒤 KMC가
 // 창을 `trUrl`(우리 `/cert/success`)로 보내며 `rec_cert`·`certNum`을 쿼리로 붙임. 이를 복호화하는 API는 쓰는 쪽이 고름
 // (회원가입은 member 서버, 마이페이지는 광고주 서버).
 
@@ -21,7 +21,7 @@ export const KMC_RESULT_PARAMS = {
   certNum: "certNum",
 } as const;
 
-/** `/v3/mypage/cert/init` 응답(Swagger `CertInitResponse`). 이름은 KMC 계약. */
+/** `/v3/auth/cert/init` 응답(Swagger `CertInitV3Response`). 이름은 KMC 계약. */
 const kmcRequestTokenSchema = z.object({
   trCert: z.string(),
   trUrl: z.string(),
@@ -34,7 +34,7 @@ export type KmcRequestToken = z.infer<typeof kmcRequestTokenSchema>;
  * 서버 고정 주소(다른 도메인)로 가서 KMC가 요청을 거부(7-3)하지 않게 함. 회원가입·마이페이지가 함께 씀.
  */
 export async function fetchKmcRequestToken() {
-  const response = await serverApiV3.get("/mypage/cert/init", {
+  const response = await serverApiV3.get("/auth/cert/init", {
     params: { trUrl: `${window.location.origin}${ROUTES.certSuccess}` },
   });
   return kmcRequestTokenSchema.parse(response);

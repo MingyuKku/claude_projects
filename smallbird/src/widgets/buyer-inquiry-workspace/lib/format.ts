@@ -55,14 +55,18 @@ function toPreview(body: string) {
 }
 
 export type BuyerCardText =
-  | { kind: "campaign"; brandName: string | null; campaignName: string }
+  | {
+      kind: "campaign";
+      brandName: string | null;
+      campaignName: string;
+      influencerNickname: string | null;
+    }
   | { kind: "preview"; text: string };
 
 /**
- * 목록 카드 첫 줄(Figma 26/10/29 11315:50439): 회색 브랜드명 + "캠페인명 문의". 구매자 문의·상품 Q&A는 모두 캠페인에서
+ * 목록 카드 첫 줄(Figma 26/10/29 11315:50439, 요구명세서 24 I4): 회색 브랜드명 + "캠페인명 인플루언서 닉네임 문의". 구매자 문의·상품 Q&A는 모두 캠페인에서
  * 오므로 이름은 서버 값을 먼저, 없으면 캠페인 목록에서 찾음. 캠페인명을 못 찾으면(데이터 누락) 문의 내용 앞부분.
  */
-// TODO(backend): 인플루언서 닉네임 필드가 내려오면 [브랜드명][캠페인명][인플루언서 닉네임] 문의 표기와 닉네임만 남기는 상세로 교체 (요구명세서 24 I4·I26, 백엔드 요청 문서 5절 등록)
 export function getBuyerCardText(
   inquiry: BuyerInquiryViewModel,
   campaigns: readonly InquiryCampaignViewModel[] | undefined,
@@ -74,5 +78,10 @@ export function getBuyerCardText(
   if (!campaignName)
     return { kind: "preview", text: toPreview(inquiry.preview) };
   const brandName = (inquiry.brandName ?? campaign?.brandName)?.trim() || null;
-  return { kind: "campaign", brandName, campaignName };
+  return {
+    kind: "campaign",
+    brandName,
+    campaignName,
+    influencerNickname: inquiry.influencerNickname,
+  };
 }

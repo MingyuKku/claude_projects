@@ -108,7 +108,9 @@ describe("실시간 상담 대화", () => {
       inquiry({ status: "consulting", realtimePhase: "connected" }),
     );
     expect(screen.queryByText("상담 요청 중")).not.toBeInTheDocument();
-    expect(screen.getByText("상담 중")).toBeInTheDocument();
+    // 헤더 배지는 목록 탭의 "상담 중"이 아니라 "실시간 상담중"(REQ-23-0018)
+    expect(screen.getByText("실시간 상담중")).toBeInTheDocument();
+    expect(screen.queryByText("상담 중")).not.toBeInTheDocument();
   });
 
   it("종료된 상담은 완료 카드와 입력창이 있고 상담 종료는 비활성이다", () => {
@@ -144,14 +146,31 @@ describe("실시간 상담 대화", () => {
     expect(onClickRealtime).toHaveBeenCalledOnce();
   });
 
-  it("실시간 상담이나 종료된 문의에는 실시간 상담하기 버튼이 없다", () => {
+  it("실시간 상담 중인 문의에는 실시간 상담하기 버튼이 없다", () => {
     renderConversation(inquiry(), vi.fn());
     expect(
       screen.queryByRole("button", { name: "실시간 상담하기" }),
     ).not.toBeInTheDocument();
   });
 
-  it("종료된 일반 문의도 입력창이 있다", () => {
+  it("답변 완료·종료된 일반 문의에도 실시간 상담하기 버튼이 있다", async () => {
+    const onClickRealtime = vi.fn();
+    renderConversation(
+      inquiry({
+        isRealtime: false,
+        realtimePhase: null,
+        isFinished: true,
+        status: "done",
+      }),
+      onClickRealtime,
+    );
+    await userEvent.click(
+      screen.getByRole("button", { name: "실시간 상담하기" }),
+    );
+    expect(onClickRealtime).toHaveBeenCalledOnce();
+  });
+
+  it("종료된 일반 문의도 입력창이 있고 완료된 상담 안내는 뜨지 않는다", () => {
     renderConversation(
       inquiry({
         isRealtime: false,
@@ -160,8 +179,76 @@ describe("실시간 상담 대화", () => {
         status: "done",
       }),
     );
-    expect(screen.getByText("완료된 상담")).toBeInTheDocument();
+    // 일반 문의가 답변 완료·종료된 것만으로는 안내가 뜨지 않음.
+    expect(screen.queryByText("완료된 상담")).not.toBeInTheDocument();
     expect(screen.getByRole("textbox")).toBeEnabled();
+  });
+
+  describe("완료된 상담 안내", () => {
+    const message = (
+      id: number,
+      body: string,
+      kind: "text" | "notice" = "text",
+    ) => ({
+      id,
+      isMine: false,
+      kind,
+      body,
+      createdAt: new Date(`2026-10-19T10:0${id}:00`),
+      isDeleted: false,
+      isRead: false,
+      isEdited: false,
+      senderId: null,
+      campaign: null,
+      attachment: null,
+    });
+    const general = {
+      isRealtime: false,
+      realtimePhase: null,
+      status: "done" as const,
+    };
+
+    it("실시간 종료 안내가 대화의 마지막이면 보인다", () => {
+      renderConversation(
+        inquiry({
+          ...general,
+          messages: [
+            message(1, "문의합니다"),
+            message(2, "상담이 종료되었습니다.", "notice"),
+          ],
+        }),
+      );
+      expect(screen.getByText("완료된 상담")).toBeInTheDocument();
+    });
+
+    it("실시간이 다시 시작돼 진행 중이면 마지막 메시지가 예전 종료 안내여도 안 보인다", () => {
+      renderConversation(
+        inquiry({
+          isRealtime: true,
+          isFinished: false,
+          realtimePhase: "requesting",
+          status: "waiting",
+          messages: [
+            message(1, "문의합니다"),
+            message(2, "상담이 종료되었습니다.", "notice"),
+          ],
+        }),
+      );
+      expect(screen.queryByText("완료된 상담")).not.toBeInTheDocument();
+    });
+
+    it("종료 안내 뒤에 일반 메시지가 오면 마지막 상담이 일반이라 안 보인다", () => {
+      renderConversation(
+        inquiry({
+          ...general,
+          messages: [
+            message(1, "상담이 종료되었습니다.", "notice"),
+            message(2, "다시 문의합니다"),
+          ],
+        }),
+      );
+      expect(screen.queryByText("완료된 상담")).not.toBeInTheDocument();
+    });
   });
 });
 

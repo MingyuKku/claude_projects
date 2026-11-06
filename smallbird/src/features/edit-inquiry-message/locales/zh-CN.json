@@ -7,5 +7,6 @@
   "cancel": "取消",
   "deleteTitle": "删除这条消息?",
   "deleteDescription": "删除后的消息无法恢复。",
+  "deleted": "消息已删除。",
   "failed": "处理失败,请重试。"
 }

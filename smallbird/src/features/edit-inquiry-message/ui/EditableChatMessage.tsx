@@ -27,6 +27,7 @@ interface EditableChatMessageProps {
   message: InquiryMessageViewModel;
   name: string;
   avatarSrc?: string;
+  avatarClassName?: string;
   time: string;
   /** 말풍선 크기. 대화 패널 폭에 따라 시안이 다릅니다(구매자 문의 PC 340 = md). */
   size?: MessageSize;
@@ -36,6 +37,9 @@ interface EditableChatMessageProps {
   canModify: boolean;
   /** 수정·삭제가 끝나거나 서버 상태와 어긋났을 때 대화를 다시 받습니다. */
   onChanged: () => void;
+  /** 수정 저장·삭제 확인을 다른 API로 처리하는 대화(상품 Q&A 답변). 없으면 문의 메시지 API를 씁니다. */
+  onSubmitEdit?: (body: string) => Promise<void>;
+  onConfirmDelete?: () => Promise<void>;
 }
 
 // 서버 규칙: 본인이 보낸 메시지를 상대가 읽기 전에만 고치거나 지울 수 있습니다. 첨부·캠페인 카드·자동 메시지는
@@ -56,11 +60,14 @@ export function EditableChatMessage({
   message,
   name,
   avatarSrc,
+  avatarClassName,
   time,
   size,
   rowClassName,
   canModify,
   onChanged,
+  onSubmitEdit = (body) => editInquiryMessage(message.id, body),
+  onConfirmDelete = () => deleteInquiryMessage(message.id),
 }: EditableChatMessageProps) {
   const { t } = useTranslation("features/edit-inquiry-message");
   const [isEditing, setIsEditing] = useState(false);
@@ -70,12 +77,13 @@ export function EditableChatMessage({
   const side = message.isMine ? "me" : "other";
   const editedLabel = message.isEdited ? t("edited") : undefined;
 
-  async function run(action: () => Promise<void>) {
+  async function run(action: () => Promise<void>, onSucceeded?: () => void) {
     setIsBusy(true);
     try {
       await action();
       setIsEditing(false);
       onChanged();
+      onSucceeded?.();
     } catch (error) {
       console.error("메시지 수정·삭제 실패", error);
       // 읽힌 메시지(409)는 서버 상태와 화면이 어긋난 것이라 안내 없이 대화를 다시 받아 수정·삭제 버튼이 사라지게 합니다.
@@ -96,7 +104,7 @@ export function EditableChatMessage({
       setIsEditing(false);
       return;
     }
-    void run(() => editInquiryMessage(message.id, body));
+    void run(() => onSubmitEdit(body));
   }
 
   if (!canModify || !isModifiable(message)) {
@@ -104,6 +112,7 @@ export function EditableChatMessage({
       <ChatMessage
         name={name}
         avatarSrc={avatarSrc}
+        avatarClassName={avatarClassName}
         side={side}
         message={message.body}
         time={time}
@@ -137,6 +146,7 @@ export function EditableChatMessage({
       <ChatMessage
         name={name}
         avatarSrc={avatarSrc}
+        avatarClassName={avatarClassName}
         side={side}
         message={message.body}
         time={time}
@@ -178,7 +188,10 @@ export function EditableChatMessage({
           <AlertDialogFooter>
             <AlertDialogCancel>{t("cancel")}</AlertDialogCancel>
             <AlertDialogAction
-              onClick={() => void run(() => deleteInquiryMessage(message.id))}
+              onClick={() =>
+                // 삭제가 끝나면 공통 토스트로 알림(REQ-24-0045, REQ-34-0031). 수정에는 띄우지 않음.
+                void run(onConfirmDelete, () => toast(t("deleted")))
+              }
             >
               {t("delete")}
             </AlertDialogAction>

@@ -17,7 +17,11 @@ vi.mock("@/shared/api", async (importOriginal) => {
 
 function renderComposer(
   onSent = vi.fn(),
-  props: { isFinished?: boolean; campaignIdx?: number | null } = {},
+  props: {
+    isFinished?: boolean;
+    isClosed?: boolean;
+    campaignIdx?: number | null;
+  } = {},
 ) {
   const router = createMemoryRouter(
     [
@@ -98,6 +102,54 @@ describe("일반 문의 입력창", () => {
     );
     // 목록이 새 문의를 받아오기 전에 '찾을 수 없는 문의'가 보이지 않게 함
     expect(router.state.location.state).toEqual({ pendingThreadIdx: 202 });
+  });
+
+  it("종료된 캠페인 문의는 스레드를 새로 만들지 않고 같은 번호로 바로 보낸다", async () => {
+    const user = userEvent.setup();
+    vi.mocked(serverApiV3.post).mockResolvedValue({
+      result: true,
+      threadIdx: 101,
+    });
+    const { router, onSent } = renderComposer(vi.fn(), {
+      isFinished: true,
+      isClosed: true,
+      campaignIdx: 10,
+    });
+    await user.type(screen.getByRole("textbox"), "다시 문의{Enter}");
+    await waitFor(() => expect(onSent).toHaveBeenCalledOnce());
+    // POST /help/thread 없이 메시지만, 번호는 그대로이고 화면 이동도 없음.
+    expect(serverApiV3.post).toHaveBeenCalledTimes(1);
+    expect(serverApiV3.post).toHaveBeenCalledWith(
+      "/help/thread/message",
+      expect.objectContaining({ threadIdx: 101, body: "다시 문의" }),
+      { headers: { "X-Device-Id": expect.any(String) } },
+    );
+    expect(router.state.location.pathname).toBe("/customer-center/bigbird/101");
+  });
+
+  it("종료된 기타 문의는 지금처럼 일반 문의 스레드를 새로 만들어 그 번호로 보낸다", async () => {
+    const user = userEvent.setup();
+    vi.mocked(serverApiV3.post)
+      .mockResolvedValueOnce({
+        result: true,
+        data: { sequence: 9, threadIdx: 404 },
+      })
+      .mockResolvedValueOnce({ result: true, threadIdx: 404 });
+    const { router } = renderComposer(vi.fn(), {
+      isFinished: true,
+      isClosed: true,
+      campaignIdx: null,
+    });
+    await user.type(screen.getByRole("textbox"), "다시 문의{Enter}");
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(
+        "/customer-center/bigbird/404",
+      ),
+    );
+    expect(serverApiV3.post).toHaveBeenNthCalledWith(1, "/help/thread", {
+      isBoardType: true,
+      campaignIdx: null,
+    });
   });
 
   it("끝난 문의에 보내면 일반 문의 스레드를 먼저 만들고 그 스레드로 보낸다", async () => {

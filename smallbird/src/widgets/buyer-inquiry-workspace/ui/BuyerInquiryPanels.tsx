@@ -28,6 +28,7 @@ import { useAcceptRealtimeOnOpen } from "../model/useAcceptRealtimeOnOpen";
 import { BuyerConversation } from "./BuyerConversation";
 import { BuyerInquiryDetailPanel } from "./BuyerInquiryDetailPanel";
 import { BuyerReplyComposer } from "./BuyerReplyComposer";
+import { QnaReplyComposer } from "./QnaReplyComposer";
 
 import type { BuyerInquiryViewModel } from "@/entities/inquiry";
 
@@ -58,6 +59,8 @@ export function BuyerInquiryPanels({
   // 스레드 문의만 문의자 번호가 있음(Q&A는 null이라 기본 아바타).
   const avatarSrc = useInquiryUserImage(inquiry.threadUserIdx);
   const realtimeInquiryIdx = getRealtimeInquiryIdx(inquiry);
+  // 종료 버튼은 목록 상태가 아니라 이 스레드가 실제로 실시간(boardType false·안 끝남)일 때만 보임.
+  const { isRealtime: isThreadRealtime } = usePurchaserConversation(inquiry);
   // 상담 중이면 상담 문서를 구독해 새 메시지·연결·종료를 받고, 이미 연결된 상담은 다시 수락하지 않음.
   const { connection, isOtherDevice } = useConsultationSync(
     inquiry,
@@ -119,7 +122,7 @@ export function BuyerInquiryPanels({
           <strong className="-my-0.5 min-w-0 flex-1 truncate py-0.5 text-base leading-none font-semibold">
             {writerName}
           </strong>
-          {realtimeInquiryIdx !== null && (
+          {realtimeInquiryIdx !== null && isThreadRealtime && (
             <RealtimeFinishButton
               inquiry={inquiry}
               inquiryIdx={realtimeInquiryIdx}
@@ -144,9 +147,10 @@ export function BuyerInquiryPanels({
           <BuyerConversation inquiry={inquiry} isOtherDevice={isOtherDevice} />
         </div>
       </ScrollArea>
-      {/* Q&A는 답변 입력이 대화 안에 있습니다. */}
       {/* key로 문의마다 입력 중인 글·첨부를 분리함. 없으면 A에 쓰던 내용이 B로 오발송될 수 있음. */}
-      {!isQnaSource(inquiry.source) && (
+      {isQnaSource(inquiry.source) ? (
+        <QnaReplyComposer key={inquiry.key} inquiry={inquiry} />
+      ) : (
         <BuyerReplyComposer key={inquiry.key} inquiry={inquiry} />
       )}
     </section>

@@ -8,15 +8,13 @@ import {
   editQnaReply,
   fetchBigbirdInquiryPage,
   fetchBuyerInquiryDetail,
-  fetchInfluencerConversation,
-  fetchPurchaserConversation,
+  fetchThreadConversation,
   fetchQnaDetail,
   fetchBuyerInquiryPage,
   fetchBuyerProduct,
   fetchInquiryCampaigns,
   fetchInquiryUser,
   sendInquiryMessage,
-  toBuyerSearchType,
   uploadInquiryAttachment,
 } from "./inquiry-api";
 
@@ -256,28 +254,51 @@ describe("fetchBuyerInquiryPage", () => {
     ]);
   });
 
-  it.each([
-    ["김하루", "name"],
-    ["20261001-0001", "orderNumber"],
-    ["1234567", "orderNumber"],
-    ["하루2", "name"],
-  ])("검색어 %s는 searchType=%s로 전달한다", async (keyword, searchType) => {
+  it.each(["김하루", "20261001-0001", "1234567", "하루2"])(
+    "검색어 %s는 searchType 없이 keyword만 전달한다(서버가 여러 항목에서 찾음)",
+    async (keyword) => {
+      vi.mocked(serverApiV3.get).mockResolvedValue({
+        result: true,
+        list: [],
+        pagingInfo: { page: 1, size: 20, totalCount: 0, totalPage: 0 },
+      });
+      await fetchBuyerInquiryPage("all", 1, { sourceType: "ALL", keyword });
+      expect(serverApiV3.get).toHaveBeenCalledWith("/help/inquiry", {
+        params: {
+          status: "ALL",
+          sourceType: "ALL",
+          keyword,
+          page: 1,
+          entrySize: 20,
+        },
+      });
+    },
+  );
+
+  it("인플루언서 문의 목록은 searchType 없이 keyword만 보낸다(숫자 검색어도 같다)", async () => {
     vi.mocked(serverApiV3.get).mockResolvedValue({
       result: true,
       list: [],
       pagingInfo: { page: 1, size: 20, totalCount: 0, totalPage: 0 },
     });
-    await fetchBuyerInquiryPage("all", 1, { sourceType: "ALL", keyword });
-    expect(serverApiV3.get).toHaveBeenCalledWith("/help/inquiry", {
-      params: {
-        status: "ALL",
-        sourceType: "ALL",
-        searchType,
-        keyword,
-        page: 1,
-        entrySize: 20,
-      },
-    });
+    for (const keyword of ["강민규", "20261001"]) {
+      await fetchBuyerInquiryPage("all", 1, { sourceType: "ALL", keyword }, [
+        "influencer",
+        "campaignQna",
+      ]);
+      expect(serverApiV3.get).toHaveBeenLastCalledWith(
+        "/help/influencer-inquiry",
+        {
+          params: {
+            status: "ALL",
+            sourceType: "ALL",
+            keyword,
+            page: 1,
+            entrySize: 20,
+          },
+        },
+      );
+    }
   });
 
   it("등록일 범위는 시작일·종료일이 모두 있을 때만 서버로 보낸다", async () => {
@@ -410,10 +431,10 @@ describe("구매자 문의 상세·대화·Q&A", () => {
         },
       ],
     });
-    const items = await fetchQnaDetail(9, 10);
+    const items = await fetchQnaDetail(501);
+    // 목록 행의 inquiryIdx만 보내 그 문의 1건만 받음(userIdx+campaignIdx는 같은 사용자·캠페인의 문의를 전부 합침).
     expect(serverApiV3.post).toHaveBeenCalledWith("/help/qna", {
-      userIdx: 9,
-      campaignIdx: 10,
+      inquiryIdx: 501,
     });
     expect(items.map((item) => item.reply)).toEqual([
       null,
@@ -529,154 +550,119 @@ describe("fetchInquiryCampaigns", () => {
   });
 });
 
-describe("fetchInfluencerConversation", () => {
-  const message = (threadIdx: number, body: string) => ({
-    messageIdx: null,
-    threadIdx,
+describe("fetchThreadConversation", () => {
+  const message = (
+    messageIdx: number,
+    body: string,
+    userIdx: number | null,
+    isUserMessage: boolean,
+  ) => ({
+    messageIdx,
+    threadIdx: 2116,
     body,
-    userIdx: null,
+    userIdx,
     attachmentIdx: null,
-    writeTime: "2026-11-02 10:00:00",
+    writeTime: "2026-11-04 12:53:00",
     readTime: null,
     modifyTime: null,
     deleteTime: null,
     identifier: "",
-    isUserMessage: false,
+    isUserMessage,
     fileName: null,
     fileSize: null,
     fileType: null,
     auto: false,
   });
-
-  it("캠페인·인플루언서로 합쳐진 대화를 받고 마지막 메시지의 스레드로 답장한다", async () => {
-    vi.mocked(serverApiV3.get).mockResolvedValue({
-      result: true,
-      data: [message(3, "첫 문의"), message(9, "재문의")],
-    });
-    const result = await fetchInfluencerConversation(10, 77);
-    expect(serverApiV3.get).toHaveBeenCalledWith(
-      "/help/inquiry/influencer-campaign-timeline",
-      { params: { campaignIdx: 10, influencerThreadUserIdx: 77 } },
-    );
-    expect(result.messages.map((item) => item.body)).toEqual([
-      "첫 문의",
-      "재문의",
-    ]);
-    expect(result.latestThreadIdx).toBe(9);
+  const thread = (
+    threadIdx: number,
+    messages: ReturnType<typeof message>[],
+  ) => ({
+    threadIdx,
+    sequence: 1289,
+    viewing: null,
+    toUserIdx: 1,
+    fmUserIdx: 5546,
+    campaignIdx: 7531,
+    finishTime: null,
+    created: "2026-11-04T12:53:00",
+    boardType: true,
+    status: "WAITING",
+    messages,
   });
 
-  it("서버 isUserMessage가 아니라 보낸 사람으로 내 메시지를 가린다", async () => {
-    // stage 2026-11-03: 인플루언서 메시지가 isUserMessage true, 광고주 메시지가 false로 옴(Swagger와 반대)
+  it("행의 threadUserIdx·캠페인으로 스레드 목록을 받고 같은 스레드의 메시지만 보여 준다", async () => {
     vi.mocked(serverApiV3.get).mockResolvedValue({
       result: true,
       data: [
-        { ...message(9, "인플루언서"), userIdx: 77, isUserMessage: true },
-        { ...message(9, "광고주"), userIdx: 5, isUserMessage: false },
+        thread(2108, [message(1, "다른 문의", 5546, false)]),
+        thread(2116, [message(2, "이 문의", 5546, false)]),
       ],
     });
-    const result = await fetchInfluencerConversation(10, 77);
+    const result = await fetchThreadConversation(5546, 7531, 2116);
+    expect(serverApiV3.get).toHaveBeenCalledWith("/help/thread", {
+      params: { threadUserIdx: 5546, type: "client", campaignIdx: 7531 },
+    });
+    expect(result.messages.map((item) => item.body)).toEqual(["이 문의"]);
+  });
+
+  it("보낸 사람(userIdx)이 상대가 아니면 내 메시지이고, userIdx가 없으면 서버 값(광고주 true)을 쓴다", async () => {
+    vi.mocked(serverApiV3.get).mockResolvedValue({
+      result: true,
+      data: [
+        thread(2116, [
+          message(1, "구매자", 5546, false),
+          message(2, "광고주", 6032, true),
+          message(3, "실시간 구간 광고주", null, true),
+          message(4, "실시간 구간 구매자", null, false),
+        ]),
+      ],
+    });
+    const result = await fetchThreadConversation(5546, 7531, 2116);
     expect(result.messages.map((item) => [item.body, item.isMine])).toEqual([
-      ["인플루언서", false],
+      ["구매자", false],
       ["광고주", true],
+      ["실시간 구간 광고주", true],
+      ["실시간 구간 구매자", false],
     ]);
   });
 
-  it("404는 빈 대화로 본다", async () => {
-    vi.mocked(serverApiV3.get).mockRejectedValue(new ApiError(404, undefined));
-    await expect(fetchInfluencerConversation(10, 77)).resolves.toEqual({
+  it("스레드가 boardType false이고 안 끝났을 때만 실시간으로 본다", async () => {
+    const respond = (overrides: Record<string, unknown>) =>
+      vi.mocked(serverApiV3.get).mockResolvedValue({
+        result: true,
+        data: [{ ...thread(2116, []), ...overrides }],
+      });
+    respond({ boardType: false });
+    await expect(
+      fetchThreadConversation(5546, 7531, 2116),
+    ).resolves.toMatchObject({ isRealtime: true });
+    respond({ boardType: true });
+    await expect(
+      fetchThreadConversation(5546, 7531, 2116),
+    ).resolves.toMatchObject({ isRealtime: false });
+    respond({ boardType: false, finishTime: "2026-11-04T14:55:00" });
+    await expect(
+      fetchThreadConversation(5546, 7531, 2116),
+    ).resolves.toMatchObject({ isRealtime: false });
+  });
+
+  it("목록에 없는 스레드와 404는 빈 대화로 보고 다른 오류는 그대로 던진다", async () => {
+    vi.mocked(serverApiV3.get).mockResolvedValue({
+      result: true,
+      data: [thread(2108, [message(1, "다른 문의", 5546, false)])],
+    });
+    await expect(fetchThreadConversation(5546, 7531, 2116)).resolves.toEqual({
       messages: [],
-      latestThreadIdx: null,
-      sequence: null,
       isRealtime: false,
     });
-  });
-
-  it("마지막 스레드의 상담 문서 번호와 실시간 여부를 최상위 값으로 받는다", async () => {
-    vi.mocked(serverApiV3.get).mockResolvedValue({
-      result: true,
-      data: [message(9, "재문의")],
-      finishTime: null,
-      isBoardType: false,
-      sequence: 1280,
-    });
-    await expect(fetchInfluencerConversation(10, 77)).resolves.toMatchObject({
-      sequence: 1280,
-      isRealtime: true,
-    });
-    vi.mocked(serverApiV3.get).mockResolvedValue({
-      result: true,
-      data: [],
-      finishTime: "2026-11-04 10:00:00",
-      isBoardType: false,
-      sequence: 1280,
-    });
-    await expect(fetchInfluencerConversation(10, 77)).resolves.toMatchObject({
-      isRealtime: false,
-    });
-  });
-});
-
-describe("fetchPurchaserConversation", () => {
-  it("캠페인·구매자로 합쳐진 대화를 purchaser-campaign-timeline으로 받는다", async () => {
-    vi.mocked(serverApiV3.get).mockResolvedValue({
-      result: true,
-      data: [
-        {
-          messageIdx: null,
-          threadIdx: 2100,
-          body: "[TEST] 연결 후 텍스트",
-          userIdx: null,
-          attachmentIdx: null,
-          writeTime: "2026-11-03 16:41:00",
-          readTime: null,
-          modifyTime: null,
-          deleteTime: null,
-          identifier: "petpretty",
-          isUserMessage: false,
-          fileName: null,
-          fileSize: null,
-          fileType: null,
-          auto: false,
-        },
-      ],
-      finishTime: null,
-      isBoardType: false,
-      sequence: 1273,
-    });
-    const result = await fetchPurchaserConversation(7531, 5546);
-    expect(serverApiV3.get).toHaveBeenCalledWith(
-      "/help/inquiry/purchaser-campaign-timeline",
-      { params: { campaignIdx: 7531, purchaserThreadUserIdx: 5546 } },
-    );
-    expect(result).toMatchObject({
-      latestThreadIdx: 2100,
-      sequence: 1273,
-      isRealtime: true,
-    });
-    expect(result.messages.map((item) => item.body)).toEqual([
-      "[TEST] 연결 후 텍스트",
-    ]);
-  });
-
-  it("404는 빈 대화로 보고 다른 오류는 그대로 던진다", async () => {
     vi.mocked(serverApiV3.get).mockRejectedValue(new ApiError(404, null));
-    await expect(fetchPurchaserConversation(10, 77)).resolves.toMatchObject({
+    await expect(fetchThreadConversation(5546, 7531, 2116)).resolves.toEqual({
       messages: [],
       isRealtime: false,
     });
     vi.mocked(serverApiV3.get).mockRejectedValue(new ApiError(500, null));
-    await expect(fetchPurchaserConversation(10, 77)).rejects.toBeInstanceOf(
-      ApiError,
-    );
-  });
-});
-
-describe("toBuyerSearchType", () => {
-  it("숫자 검색어는 구매자 문의 메뉴에서만 주문번호로 찾는다", () => {
-    expect(toBuyerSearchType("20261001-0001")).toBe("orderNumber");
-    expect(toBuyerSearchType("20261001", ["influencer", "campaignQna"])).toBe(
-      "name",
-    );
-    expect(toBuyerSearchType("김하루")).toBe("name");
+    await expect(
+      fetchThreadConversation(5546, 7531, 2116),
+    ).rejects.toBeInstanceOf(ApiError);
   });
 });

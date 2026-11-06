@@ -76,7 +76,7 @@ function mockCert(decrypted: Record<string, unknown>) {
   vi.mocked(serverApi.get).mockResolvedValue(decrypted);
   vi.mocked(serverApiV3.get).mockImplementation((path: string) =>
     Promise.resolve(
-      path === "/mypage/cert/init" ? CERT_TOKEN : { profileUrl: null },
+      path === "/auth/cert/init" ? CERT_TOKEN : { profileUrl: null },
     ),
   );
 }
@@ -140,7 +140,7 @@ describe("AccountProfileForm", () => {
       expect(
         await screen.findByText("본인 인증에 성공하였습니다."),
       ).toBeInTheDocument();
-      expect(serverApiV3.get).toHaveBeenCalledWith("/mypage/cert/init", {
+      expect(serverApiV3.get).toHaveBeenCalledWith("/auth/cert/init", {
         params: { trUrl: `${window.location.origin}/cert/success` },
       });
       expect(serverApi.get).toHaveBeenCalledWith("/cert/decrypte", {

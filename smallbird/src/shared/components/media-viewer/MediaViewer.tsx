@@ -59,7 +59,7 @@ export function MediaViewer({
         }}
       >
         <header className="flex h-13 items-center gap-2 bg-slate-800 pr-2.5 pl-4 tablet:h-20 tablet:pr-5 tablet:pl-7 desktop:pl-8">
-          <DialogTitle className="text-base font-semibold tablet:text-lg">
+          <DialogTitle className="text-base font-semibold tablet:text-xl">
             {title}
           </DialogTitle>
           {current?.downloadHref && (

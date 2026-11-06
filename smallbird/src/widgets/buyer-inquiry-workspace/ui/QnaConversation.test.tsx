@@ -5,6 +5,7 @@ import { SWRConfig } from "swr";
 import { ApiError, serverApiV3 } from "@/shared/api";
 
 import { QnaConversation } from "./QnaConversation";
+import { QnaReplyComposer } from "./QnaReplyComposer";
 
 import type { BuyerInquiryViewModel } from "@/entities/inquiry";
 
@@ -49,6 +50,7 @@ const inquiry: BuyerInquiryViewModel = {
   brandName: null,
   campaignName: null,
   shopName: null,
+  influencerNickname: null,
 };
 
 function qna(replyInfo: Record<string, unknown>) {
@@ -87,6 +89,7 @@ function renderQna() {
   render(
     <SWRConfig value={{ provider: () => new Map() }}>
       <QnaConversation inquiry={inquiry} />
+      <QnaReplyComposer inquiry={inquiry} />
     </SWRConfig>,
   );
 }
@@ -94,7 +97,17 @@ function renderQna() {
 beforeEach(() => {
   flags.isWriteEnabled = true;
   vi.clearAllMocks();
+  // jsdom에는 matchMedia가 없어 터치 기기(hover 없음)로 흉내 냄. 툴바가 말풍선 탭으로 열림.
+  vi.stubGlobal(
+    "matchMedia",
+    vi.fn().mockImplementation((query: string) => ({
+      matches: query === "(hover: none)",
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })),
+  );
 });
+afterEach(() => vi.unstubAllGlobals());
 
 describe("상품 Q&A 대화", () => {
   it("답변이 없으면 입력창을 보여 주고 등록하면 최신 상태를 다시 받는다", async () => {
@@ -128,12 +141,14 @@ describe("상품 Q&A 대화", () => {
     vi.mocked(serverApiV3.put).mockResolvedValue({ result: true });
     renderQna();
     expect(await screen.findByText("내일 입고됩니다.")).toBeInTheDocument();
-    await user.click(screen.getByRole("button", { name: "수정" }));
-    const box = screen.getByRole("textbox");
+    // 말풍선에 마우스를 올리면(터치는 탭) 수정·삭제 버튼이 나타남. 구매자 문의와 같음.
+    await user.click(screen.getByText("내일 입고됩니다."));
+    await user.click(await screen.findByRole("button", { name: "수정" }));
+    const box = screen.getAllByRole("textbox")[0]!;
     expect(box).toHaveValue("내일 입고됩니다.");
     await user.clear(box);
     await user.type(box, "모레 입고됩니다.");
-    await user.click(screen.getByRole("button", { name: "저장" }));
+    await user.click(screen.getByRole("button", { name: "완료" }));
     await waitFor(() =>
       expect(serverApiV3.put).toHaveBeenCalledWith("/help/reply", {
         replyIdx: 5,
@@ -148,7 +163,8 @@ describe("상품 Q&A 대화", () => {
     vi.mocked(serverApiV3.delete).mockRejectedValue(new ApiError(409, null));
     renderQna();
     await screen.findByText("내일 입고됩니다.");
-    await user.click(screen.getByRole("button", { name: "삭제" }));
+    await user.click(screen.getByText("내일 입고됩니다."));
+    await user.click(await screen.findByRole("button", { name: "삭제" }));
     expect(serverApiV3.delete).not.toHaveBeenCalled();
     await user.click(
       within(screen.getByRole("alertdialog")).getByRole("button", {
@@ -190,6 +206,13 @@ describe("상품 Q&A 대화", () => {
     expect(
       screen.queryByRole("button", { name: "삭제" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("모든 질문에 답했으면 하단 입력창은 비활성이다", async () => {
+    vi.mocked(serverApiV3.post).mockResolvedValue(qna({ ...unread }));
+    renderQna();
+    await screen.findByText("내일 입고됩니다.");
+    expect(screen.getByRole("textbox")).toBeDisabled();
   });
 
   it("쓰기를 꺼 두면 답변이 없는 질문의 입력창은 비활성이다", async () => {

@@ -362,6 +362,8 @@ export const buyerInquirySchema = z.object({
   brandName: z.string().nullish(),
   campaignName: z.string().nullish(),
   shopName: z.string().nullish(),
+  /** 공구 진행 인플루언서 닉네임(client-be Swagger 2026-11-04). */
+  influencerNickname: z.string().nullish(),
 });
 export type BuyerInquiry = z.infer<typeof buyerInquirySchema>;
 
@@ -457,6 +459,7 @@ export const buyerInquiryDetailSchema = z.object({
   progressEndDate: z.string().nullable(),
   influencerPlatform: z.string().nullable(),
   influencerAccountLink: z.string().nullable(),
+  influencerNickname: z.string().nullish(),
   /** 공구샵 대표 이미지. 주문상품·캠페인 정보 공용이며 연관 캠페인이 없으면 null(Swagger). */
   mainImageUrl: z.string().nullable(),
   brandName: z.string().nullable(),
@@ -535,6 +538,7 @@ export interface BuyerInquiryViewModel {
   brandName: string | null;
   campaignName: string | null;
   shopName: string | null;
+  influencerNickname: string | null;
 }
 
 export interface BuyerInquiryDetailViewModel {
@@ -550,10 +554,8 @@ export interface BuyerInquiryDetailViewModel {
   progressStatus: string | null;
   progressStartDate: string | null;
   progressEndDate: string | null;
-  influencerPlatform: string | null;
-  influencerAccountLink: string | null;
-  /** 링크 마지막 경로에서 뽑은 계정명. 링크가 없으면 null. */
-  influencerAccountName: string | null;
+  /** 공구 진행 인플루언서 닉네임. 플랫폼 아이디·플랫폼 표시는 명세서 24 I26 삭제로 보이지 않음. */
+  influencerNickname: string | null;
   /** 상세 응답의 대표 이미지. 상품·캠페인 목록에서 못 찾을 때 대신 씀. */
   imageUrl: string | null;
   /** 상품·캠페인 목록과 같은 "브랜드 상품명" 표기. 둘 다 없으면 null. */

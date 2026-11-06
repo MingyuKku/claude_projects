@@ -51,6 +51,7 @@ const inquiry: BuyerInquiryViewModel = {
   brandName: null,
   campaignName: null,
   shopName: null,
+  influencerNickname: null,
 };
 
 const message = (
@@ -77,6 +78,26 @@ const message = (
   auto: false,
 });
 
+// GET /v3/help/thread는 스레드별 배열. 목록 행(inquiryIdx 501)과 같은 스레드만 화면에 보임.
+const threadOf = (messages: unknown[], threadIdx = 501) => ({
+  result: true,
+  data: [
+    {
+      threadIdx,
+      sequence: 1,
+      viewing: null,
+      toUserIdx: 1,
+      fmUserIdx: 77,
+      campaignIdx: 10,
+      finishTime: null,
+      created: "2026-10-01T10:00:00",
+      boardType: true,
+      status: "WAITING",
+      messages,
+    },
+  ],
+});
+
 const detail = {
   result: true,
   writerName: "김하루",
@@ -93,6 +114,7 @@ const detail = {
   progressEndDate: "2026.10.31",
   influencerPlatform: "instagram",
   influencerAccountLink: "https://instagram.com/bigbird",
+  influencerNickname: "gang33431",
   mainImageUrl: null,
   brandName: "빅버드",
   productName: "여섯별 스킨케어 세트",
@@ -102,14 +124,11 @@ beforeEach(() => {
   flags.isWriteEnabled = true;
   vi.mocked(serverApiV3.get).mockReset();
   vi.mocked(serverApiV3.get).mockImplementation(async (path: string) => {
-    if (path === "/help/inquiry/purchaser-campaign-timeline")
-      return {
-        result: true,
-        data: [
-          message(1, "배송이 언제 되나요?", false, "2026-10-01T10:00:00"),
-          message(2, "오늘 발송합니다.", true, "2026-10-01T11:00:00"),
-        ],
-      };
+    if (path === "/help/thread")
+      return threadOf([
+        message(1, "배송이 언제 되나요?", false, "2026-10-01T10:00:00"),
+        message(2, "오늘 발송합니다.", true, "2026-10-01T11:00:00"),
+      ]);
     return detail;
   });
 });
@@ -166,7 +185,16 @@ describe("인플루언서 문의 상담 종료", () => {
     status: "consulting",
   };
 
+  // 종료 버튼은 이 스레드가 실제로 실시간(boardType false·안 끝남)일 때만 보임.
+  const mockThread = (overrides: Record<string, unknown>) =>
+    vi.mocked(serverApiV3.get).mockImplementation(async (path: string) => {
+      if (path !== "/help/thread") return detail;
+      const base = threadOf([], 2092);
+      return { ...base, data: [{ ...base.data[0], ...overrides }] };
+    });
+
   it("실시간 상담 중이면 상담 종료로 그 스레드를 끝내고 목록을 다시 받게 한다", async () => {
+    mockThread({ boardType: false });
     vi.mocked(serverApiV3.put).mockResolvedValue({ result: true });
     const onChangeStatus = vi.fn();
     renderPanels(77, influencer, onChangeStatus);
@@ -205,6 +233,32 @@ describe("인플루언서 문의 상담 종료", () => {
     );
   });
 
+  it("목록 상태가 상담 중이어도 스레드가 일반(boardType true)이면 버튼이 없다", async () => {
+    mockThread({ boardType: true });
+    renderPanels(77, influencer);
+    await screen.findByText("김하루");
+    await waitFor(() =>
+      expect(serverApiV3.get).toHaveBeenCalledWith(
+        "/help/thread",
+        expect.anything(),
+      ),
+    );
+    expect(screen.queryByRole("button", { name: "상담 종료" })).toBeNull();
+  });
+
+  it("끝난 스레드(finishTime 있음)면 실시간이어도 버튼이 없다", async () => {
+    mockThread({ boardType: false, finishTime: "2026-10-01T12:00:00" });
+    renderPanels(77, influencer);
+    await screen.findByText("김하루");
+    await waitFor(() =>
+      expect(serverApiV3.get).toHaveBeenCalledWith(
+        "/help/thread",
+        expect.anything(),
+      ),
+    );
+    expect(screen.queryByRole("button", { name: "상담 종료" })).toBeNull();
+  });
+
   it("실시간 상담 중이 아니면 버튼이 없다", async () => {
     renderPanels(77, { ...influencer, status: "done" });
     await screen.findByText("김하루");
@@ -219,16 +273,34 @@ describe("구매자 문의 오른쪽 패널", () => {
     expect(screen.getByText("오늘 발송합니다.")).toBeInTheDocument();
     // 내 말풍선 위에는 보낸 광고주 계정 id가 보입니다.
     expect(screen.getByText("mgkang")).toBeInTheDocument();
-    expect(serverApiV3.get).toHaveBeenCalledWith(
-      "/help/inquiry/purchaser-campaign-timeline",
-      {
-        params: { campaignIdx: 10, purchaserThreadUserIdx: 77 },
-      },
-    );
+    expect(serverApiV3.get).toHaveBeenCalledWith("/help/thread", {
+      params: { threadUserIdx: 77, type: "client", campaignIdx: 10 },
+    });
     const texts = screen
       .getAllByText(/배송이 언제 되나요\?|오늘 발송합니다\./)
       .map((element) => element.textContent);
     expect(texts).toEqual(["배송이 언제 되나요?", "오늘 발송합니다."]);
+  });
+
+  it("같은 구매자·캠페인의 다른 스레드(별개 문의) 메시지는 보이지 않는다", async () => {
+    vi.mocked(serverApiV3.get).mockImplementation(async (path: string) => {
+      if (path !== "/help/thread") return detail;
+      return {
+        result: true,
+        data: [
+          ...threadOf(
+            [message(9, "다른 문의 내용", false, "2026-10-01T09:00:00")],
+            400,
+          ).data,
+          ...threadOf([
+            message(1, "이 문의 내용", false, "2026-10-01T10:00:00"),
+          ]).data,
+        ],
+      };
+    });
+    renderPanels();
+    expect(await screen.findByText("이 문의 내용")).toBeInTheDocument();
+    expect(screen.queryByText("다른 문의 내용")).not.toBeInTheDocument();
   });
 
   it("구매자 앱이 보낸 캠페인 JSON auto 메시지는 대화에 그리지 않는다", async () => {
@@ -239,17 +311,14 @@ describe("구매자 문의 오른쪽 패널", () => {
       productName: "냉장고",
     });
     vi.mocked(serverApiV3.get).mockImplementation(async (path: string) => {
-      if (path !== "/help/inquiry/purchaser-campaign-timeline") return detail;
-      return {
-        result: true,
-        data: [
-          {
-            ...message(1, campaignJson, false, "2026-10-01T10:00:00"),
-            auto: true,
-          },
-          message(2, "배송이 언제 되나요?", false, "2026-10-01T10:01:00"),
-        ],
-      };
+      if (path !== "/help/thread") return detail;
+      return threadOf([
+        {
+          ...message(1, campaignJson, false, "2026-10-01T10:00:00"),
+          auto: true,
+        },
+        message(2, "배송이 언제 되나요?", false, "2026-10-01T10:01:00"),
+      ]);
     });
     renderPanels();
     expect(await screen.findByText("배송이 언제 되나요?")).toBeInTheDocument();
@@ -258,17 +327,14 @@ describe("구매자 문의 오른쪽 패널", () => {
 
   it("삭제된 메시지는 삭제 표시 없이 대화에서 뺀다", async () => {
     vi.mocked(serverApiV3.get).mockImplementation(async (path: string) => {
-      if (path !== "/help/inquiry/purchaser-campaign-timeline") return detail;
-      return {
-        result: true,
-        data: [
-          message(1, "배송이 언제 되나요?", false, "2026-10-01T10:00:00"),
-          {
-            ...message(2, "지운 답변", true, "2026-10-01T10:01:00"),
-            deleteTime: "2026-10-01T10:02:00",
-          },
-        ],
-      };
+      if (path !== "/help/thread") return detail;
+      return threadOf([
+        message(1, "배송이 언제 되나요?", false, "2026-10-01T10:00:00"),
+        {
+          ...message(2, "지운 답변", true, "2026-10-01T10:01:00"),
+          deleteTime: "2026-10-01T10:02:00",
+        },
+      ]);
     });
     renderPanels();
     expect(await screen.findByText("배송이 언제 되나요?")).toBeInTheDocument();
@@ -290,10 +356,9 @@ describe("구매자 문의 오른쪽 패널", () => {
     expect(
       screen.getByRole("button", { name: /20261001-0001/ }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("link", { name: "bigbird" })).toHaveAttribute(
-      "href",
-      "https://instagram.com/bigbird",
-    );
+    // 플랫폼 아이디·표시는 없고 닉네임만 보임(명세서 24 I26).
+    expect(screen.getByText("gang33431")).toBeInTheDocument();
+    expect(screen.queryByRole("link", { name: "bigbird" })).toBeNull();
   });
 
   it("모바일 상세를 URL로 열고 목록으로 돌아갈 때 상태를 유지한다", async () => {
@@ -312,8 +377,7 @@ describe("구매자 문의 오른쪽 패널", () => {
 
   it("대화 조회가 실패하면 안내를 보여 준다", async () => {
     vi.mocked(serverApiV3.get).mockImplementation(async (path: string) => {
-      if (path === "/help/inquiry/purchaser-campaign-timeline")
-        throw new Error("500");
+      if (path === "/help/thread") throw new Error("500");
       return detail;
     });
     renderPanels();

@@ -5,7 +5,7 @@
 ## 왜 로컬에서 바로 안 되나
 
 - KMC는 인증 요청을 보낸 페이지의 도메인을 검사합니다. 등록되지 않은 도메인에서 요청하면 KMC 팝업에 **"요청 정보가 유효하지 않습니다.(7-3)"**이 뜹니다. 같은 요청값을 `https://stage.client.bigbird.co.kr`에서 보내면 정상입니다(2026-10-26 비교 확인).
-- 인증 뒤 돌아오는 주소(`trUrl`)는 `GET /v3/mypage/cert/init`에 프론트가 현재 출처의 `/cert/success`를 보내 정해집니다(2026-10-28 공개, `localhost`도 Stage에서 허용). KMC 등록이 `localhost`에는 없어 7-3은 그대로라, 아래 우회로는 계속 필요합니다.
+- 인증 뒤 돌아오는 주소(`trUrl`)는 `GET /v3/auth/cert/init`에 프론트가 현재 출처의 `/cert/success`를 보내 정해집니다(2026-10-28 공개, `localhost`도 Stage에서 허용). KMC 등록이 `localhost`에는 없어 7-3은 그대로라, 아래 우회로는 계속 필요합니다.
 - v3 도메인의 KMC 등록은 백엔드 요청 중입니다(`docs/mypage-api.md` §4-13). 그 전까지는 아래처럼 **Stage 도메인을 내 컴퓨터로 돌려** 로컬 v3를 그 주소로 띄웁니다.
 
 구독 결제도 같은 이유로 이 방법이 필요합니다. 결제 서버(`stage.client.bigbird.co.kr:3101`)가 만든 이니시스 결과 수신 주소(`returnUrl`)와 요청 페이지의 도메인이 같아야 하고, 결제 서버의 CORS 허용 목록에도 `https://stage.client.bigbird.co.kr`만 있어 `localhost`·내부 IP(`http://192.168.x.x:5173`)에서 직접 호출하면 CORS 오류가 납니다(2026-10-28 `OPTIONS`로 확인).

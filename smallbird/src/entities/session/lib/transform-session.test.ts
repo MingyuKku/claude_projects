@@ -45,6 +45,19 @@ describe("transformSessionToViewModel", () => {
     expect(transformSessionToViewModel(session).displayName).toBe("admin-dev");
   });
 
+  it("passes the profile image url and turns a missing or empty one into null", () => {
+    const url = "https://cdn.example.com/p.png";
+    expect(
+      transformSessionToViewModel({ ...base, profileImageUrl: url })
+        .profileImageUrl,
+    ).toBe(url);
+    expect(transformSessionToViewModel(base).profileImageUrl).toBeNull();
+    expect(
+      transformSessionToViewModel({ ...base, profileImageUrl: "" })
+        .profileImageUrl,
+    ).toBeNull();
+  });
+
   it("grants every menu permission to MASTER and ADMIN", () => {
     expect(transformSessionToViewModel(base).permissions).toEqual(ALL_TRUE);
     expect(

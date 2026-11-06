@@ -22,6 +22,8 @@ const TOUCH_QUERY = "(hover: none)";
 interface ChatMessageProps {
   name: string;
   avatarSrc?: string;
+  /** 아바타 이미지에 더하는 클래스(로고처럼 잘리면 안 되는 이미지에 여백을 줄 때). */
+  avatarClassName?: string;
   /** 메시지 본문. 텍스트로만 렌더링함. 첨부만 있는 메시지면 생략함. */
   message?: string;
   side?: MessageSide;
@@ -42,6 +44,7 @@ interface ChatMessageProps {
 export function ChatMessage({
   name,
   avatarSrc,
+  avatarClassName,
   message,
   side = "other",
   size = "lg",
@@ -60,7 +63,9 @@ export function ChatMessage({
 
   const avatar = (
     <Avatar size={isSmall ? "sm" : "md"}>
-      {avatarSrc && <AvatarImage src={avatarSrc} alt="" />}
+      {avatarSrc && (
+        <AvatarImage src={avatarSrc} alt="" className={avatarClassName} />
+      )}
       <AvatarPlaceholder />
     </Avatar>
   );

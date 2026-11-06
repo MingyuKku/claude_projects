@@ -12,7 +12,6 @@ import { Button } from "@/shared/ui/button";
 import { Tabs, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 
 import {
-  BUYER_STATUS_FILTERS,
   STATUS_FILTERS,
   toBuyerInquiryFilters,
   toBuyerStatusFilter,
@@ -77,8 +76,6 @@ export function BuyerInquiryWorkspace({
   // 목록 필터는 URL에 둠. 대화로 갔다가 뒤로 와도 유지됨.
   const [searchParams, setSearchParams] = useSearchParams();
   const statusFilter = toBuyerStatusFilter(searchParams.get("status"));
-  const statusFilters =
-    menu === "buyer" ? BUYER_STATUS_FILTERS : STATUS_FILTERS;
   const filters = toBuyerInquiryFilters(searchParams, menu);
   const sentinelRef = useRef<HTMLLIElement>(null);
   const { campaigns } = useInquiryCampaigns(threadUserIdx);
@@ -99,7 +96,11 @@ export function BuyerInquiryWorkspace({
     return text.kind === "campaign"
       ? {
           titlePrefix: text.brandName ?? undefined,
-          title: t("card.campaignInquiry", { label: text.campaignName }),
+          title: t("card.campaignInquiry", {
+            label: [text.campaignName, text.influencerNickname]
+              .filter(Boolean)
+              .join(" "),
+          }),
         }
       : { title: text.text };
   }
@@ -250,7 +251,7 @@ export function BuyerInquiryWorkspace({
         tabs={
           <Tabs value={statusFilter} onValueChange={handleChangeStatus}>
             <TabsList className="w-full">
-              {statusFilters.map((filter) => (
+              {STATUS_FILTERS.map((filter) => (
                 <TabsTrigger key={filter} value={filter}>
                   {t(filter)}
                 </TabsTrigger>

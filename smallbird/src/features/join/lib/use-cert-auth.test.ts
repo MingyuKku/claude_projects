@@ -93,7 +93,7 @@ describe("useCertAuth", () => {
 
     await act(() => result.current.open());
 
-    expect(getV3).toHaveBeenCalledWith("/mypage/cert/init", {
+    expect(getV3).toHaveBeenCalledWith("/auth/cert/init", {
       params: { trUrl: `${window.location.origin}/cert/success` },
     });
     expect(result.current.isPopupBlocked).toBe(true);

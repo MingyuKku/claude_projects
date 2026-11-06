@@ -22,6 +22,7 @@ import {
   bigbirdInquiryListSchema,
   buyerInquiryDetailSchema,
   campaignTimelineSchema,
+  inquiryThreadListSchema,
   buyerInquiryListSchema,
   INQUIRY_SOURCE_TYPE,
   buyerInfluencerOptionsSchema,
@@ -397,25 +398,11 @@ export interface BuyerInquiryFilters {
   sourceType: "ALL" | InquirySourceType;
   campaignIdx?: number;
   influencerThreadUserIdx?: number;
-  /** 검색어(이름 또는 주문번호). 비어 있으면 검색하지 않음. */
+  /** 검색어(서버가 여러 항목에서 한 번에 찾음). 비어 있으면 검색하지 않음. */
   keyword?: string;
   /** 등록일 범위(포함), `yyyy-MM-dd`. 둘 다 있을 때만 씁니다. */
   startDate?: string;
   endDate?: string;
-}
-
-/**
- * 검색 입력은 하나라서 서버의 검색 기준(`searchType`)을 검색어로 정함. 숫자와 하이픈만 있으면 주문번호, 그 밖에는
- * 이름(2026-10-21 가정: 주문번호 형식은 코드로 확인하지 못했고, 이름에 숫자만 있는 경우는 없다고 봄).
- */
-export function toBuyerSearchType(
-  keyword: string,
-  sources: readonly BuyerInquirySource[] = ["purchaser", "qna"],
-) {
-  // 주문번호는 구매자 문의만 있음(인플루언서 문의·캠페인 Q&A는 항상 null, Swagger).
-  return sources.includes("purchaser") && /^[0-9-]+$/.test(keyword)
-    ? "orderNumber"
-    : "name";
 }
 
 const BUYER_STATUS_PARAM = {
@@ -450,12 +437,10 @@ export async function fetchBuyerInquiryPage(
       ...(filters.influencerThreadUserIdx === undefined
         ? {}
         : { influencerThreadUserIdx: filters.influencerThreadUserIdx }),
-      ...(filters.keyword
-        ? {
-            searchType: toBuyerSearchType(filters.keyword, sources),
-            keyword: filters.keyword,
-          }
-        : {}),
+      // `searchType` 없이 `keyword`만 보내면 서버가 이름·주문번호·캠페인(상품)명·문의 유형명·최근 메시지(상품 Q&A는
+      // 본문)를 한 번에 찾음(두 목록 모두 stage 2026-11-06 12:21 실측, Swagger에는 아직 없음). 11:33까지는 `keyword`만
+      // 보내면 0건이라 `searchType`을 보냈음. 서버가 되돌리면 검색이 0건이 되므로 그때는 다시 `searchType`을 보내야 함.
+      ...(filters.keyword ? { keyword: filters.keyword } : {}),
       ...(filters.startDate && filters.endDate
         ? { startDate: filters.startDate, endDate: filters.endDate }
         : {}),
@@ -653,121 +638,82 @@ export function useBuyerInquiryDetail(inquiry: BuyerInquiryViewModel) {
   return { detail: data, isLoading, isError: Boolean(error), mutate };
 }
 
-const EMPTY_CONVERSATION = {
-  messages: [],
-  latestThreadIdx: null,
-  sequence: null,
-  isRealtime: false,
-};
-
 /**
- * 구매자·인플루언서 문의 대화: 캠페인 통합 타임라인(`GET /v3/help/inquiry/{purchaser|influencer}-campaign-timeline`).
- * 캠페인에 걸린 스레드 전부와 실시간 구간을 서버가 시간순으로 합쳐 줌. `GET /v3/help/thread`는 실시간 구간이 빠져 쓰지
- * 않음(Swagger 2026-11-04). 404는 빈 대화로 봄.
+ * 구매자·인플루언서 문의 대화: `GET /v3/help/thread?threadUserIdx={행의 threadUserIdx}&type=client&campaignIdx=`(백엔드 확정
+ * 2026-11-04). 스레드별 배열로 오므로 목록 행의 `inquiryIdx`(= threadIdx)와 같은 스레드의 메시지만 보여 주고 나머지
+ * 스레드(게시판형으로 올라온 별개 문의)는 버림. `*-campaign-timeline`은 같은 캠페인의 모든 스레드를 합치는 API라 채팅창에
+ * 쓰지 않음. 서버가 이 API에서는 광고주 메시지를 isUserMessage true로 줌. 404나 해당 스레드가 없으면 빈 대화.
  */
-async function fetchTimelineConversation(
-  path: string,
-  params: Record<string, number>,
-  counterpartThreadUserIdx: number,
+export async function fetchThreadConversation(
+  threadUserIdx: number,
+  campaignIdx: number,
+  inquiryIdx: number,
 ) {
   try {
-    const response = await serverApiV3.get(path, { params });
-    const timeline = ensureSucceeded(campaignTimelineSchema.parse(response));
+    const response = await serverApiV3.get("/help/thread", {
+      params: { threadUserIdx, type: "client", campaignIdx },
+    });
+    const { data } = ensureSucceeded(inquiryThreadListSchema.parse(response));
+    const thread = data.find((item) => item.threadIdx === inquiryIdx);
     return {
-      // 서버가 상대(구매자·인플루언서) 메시지를 isUserMessage true로 줌(stage 2026-11-03 인플루언서 실측, Swagger는 광고주가
-      // true). 값이 고쳐져도 맞도록 보낸 사람(userIdx)이 상대가 아니면 내 메시지로 봄. 실시간 구간은 userIdx가 없어 서버 값을 씀.
-      // ponytail: 실시간 구간의 방향은 stage 실데이터로 확인 전.
+      /** 이 스레드가 지금 실시간 상담 중인지(boardType false + 안 끝남). 자동 일반 전환은 대화를 다시 받으면 바로 반영됨. */
+      isRealtime: thread?.boardType === false && thread.finishTime === null,
+      // 보낸 사람(userIdx)이 상대가 아니면 내 메시지. 실시간 구간처럼 userIdx가 없으면 서버 값(광고주 true)을 씀.
+      // ponytail: 이 API의 실시간 구간 방향은 stage 실데이터로 확인 전.
       messages: transformInquiryMessagesToViewModels(
-        timeline.data,
+        thread?.messages ?? [],
         (message) =>
           message.userIdx === null
             ? message.isUserMessage
-            : message.userIdx !== counterpartThreadUserIdx,
+            : message.userIdx !== threadUserIdx,
       ),
-      // 마지막 메시지의 스레드(종료됐으면 서버가 같은 스레드를 다시 열거나 새 스레드를 만들어 보냄).
-      latestThreadIdx: timeline.data.at(-1)?.threadIdx ?? null,
-      /** 가장 마지막 스레드의 상담 문서 ID. */
-      sequence: timeline.sequence ?? null,
-      /** 마지막 스레드가 실시간 상담 중인지. */
-      isRealtime: timeline.isBoardType === false && !timeline.finishTime,
     };
   } catch (error) {
-    if (isApiError(error) && error.status === 404) return EMPTY_CONVERSATION;
+    if (isApiError(error) && error.status === 404)
+      return { messages: [], isRealtime: false };
     throw error;
   }
 }
 
-export function fetchPurchaserConversation(
-  campaignIdx: number,
-  purchaserThreadUserIdx: number,
-) {
-  return fetchTimelineConversation(
-    "/help/inquiry/purchaser-campaign-timeline",
-    { campaignIdx, purchaserThreadUserIdx },
-    purchaserThreadUserIdx,
-  );
-}
-
-export function fetchInfluencerConversation(
-  campaignIdx: number,
-  influencerThreadUserIdx: number,
-) {
-  return fetchTimelineConversation(
-    "/help/inquiry/influencer-campaign-timeline",
-    { campaignIdx, influencerThreadUserIdx },
-    influencerThreadUserIdx,
-  );
-}
-
 /** 구매자·인플루언서 문의 대화. 둘 다 항상 캠페인이 있음(Swagger). */
 export function usePurchaserConversation(inquiry: BuyerInquiryViewModel) {
-  const { threadUserIdx, campaignIdx, source } = inquiry;
+  const { threadUserIdx, campaignIdx, source, inquiryIdx } = inquiry;
   const { data, isLoading, error, mutate } = useSWR(
     threadUserIdx === null || campaignIdx === null
       ? null
-      : [`${source}-messages`, threadUserIdx, campaignIdx],
-    () =>
-      source === "influencer"
-        ? fetchInfluencerConversation(campaignIdx!, threadUserIdx!)
-        : fetchPurchaserConversation(campaignIdx!, threadUserIdx!),
+      : [`${source}-messages`, threadUserIdx, campaignIdx, inquiryIdx],
+    () => fetchThreadConversation(threadUserIdx!, campaignIdx!, inquiryIdx),
     // 열어 둔 사이에 온 메시지는 탭으로 돌아올 때 다시 받아 보여 줌(앱 전체 기본은 꺼져 있음).
     { revalidateOnFocus: true },
   );
   return {
     messages: data?.messages,
-    /**
-     * 답장을 보낼 스레드. 구매자 문의는 목록 행 번호(= 가장 최근 스레드 번호)로 보냄. 끝난 스레드면 서버가 같은 스레드를
-     * 다시 열고(캠페인 문의) 실시간 중이면 그 스레드에 이어 쌓임. 대화 내역이 없으면 null이라 보낼 수 없음.
-     */
-    threadIdx:
-      source === "purchaser"
-        ? inquiry.inquiryIdx
-        : (data?.latestThreadIdx ?? null),
+    /** 이 문의의 스레드가 실시간 상담 중인지. 대화를 받기 전에는 false. */
+    isRealtime: data?.isRealtime ?? false,
+    /** 답장을 보낼 스레드: 목록 행 번호(= 스레드 번호). 끝난 스레드면 서버가 같은 스레드를 다시 열음. */
+    threadIdx: inquiryIdx,
     isLoading,
     isError: Boolean(error),
     mutate,
   };
 }
 
-/** 상품 Q&A 상세(`POST /v3/help/qna`, 목록 행의 userIdx + campaignIdx). */
-export async function fetchQnaDetail(
-  userIdx: number,
-  campaignIdx: number | null,
-) {
-  const response = await serverApiV3.post("/help/qna", {
-    userIdx,
-    ...(campaignIdx === null ? {} : { campaignIdx }),
-  });
+/**
+ * 상품·캠페인 Q&A 상세(`POST /v3/help/qna`). 목록 행의 `inquiryIdx`를 넘겨 그 문의 1건(+답변)만 받고 읽음 처리도 그 문의만
+ * 됨(백엔드 확정 2026-11-05). userIdx+campaignIdx만 보내면 같은 사용자·캠페인의 문의가 전부 합쳐져 내려오고 전부 읽음 처리됨.
+ */
+export async function fetchQnaDetail(inquiryIdx: number) {
+  const response = await serverApiV3.post("/help/qna", { inquiryIdx });
   return transformQnaListToViewModel(
     ensureSucceeded(qnaDetailListSchema.parse(response)),
   );
 }
 
 export function useQnaDetail(inquiry: BuyerInquiryViewModel) {
-  const { userIdx, campaignIdx } = inquiry;
+  const { inquiryIdx } = inquiry;
   const { data, isLoading, error, mutate } = useSWR(
-    userIdx === null ? null : ["qna-detail", userIdx, campaignIdx],
-    () => fetchQnaDetail(userIdx!, campaignIdx),
+    ["qna-detail", inquiryIdx],
+    () => fetchQnaDetail(inquiryIdx),
     { revalidateOnFocus: true },
   );
   return { items: data, isLoading, isError: Boolean(error), mutate };

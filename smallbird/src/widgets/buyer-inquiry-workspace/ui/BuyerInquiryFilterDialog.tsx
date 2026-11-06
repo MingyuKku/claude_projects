@@ -120,6 +120,7 @@ export function BuyerInquiryFilterDialog({
         </fieldset>
         {/* 캠페인명·캠페인 코드로 검색해 고름(REQ-24-0006). Figma는 Select지만 인플루언서와 같은 콤보박스를 씀 */}
         <Combobox
+          size="sm"
           label={t("filter.campaign")}
           value={draft.campaignIdx?.toString() ?? ""}
           onValueChange={(selected) =>
@@ -145,6 +146,7 @@ export function BuyerInquiryFilterDialog({
         />
         {/* 인플루언서는 검색되는 콤보박스(Figma Combobox 6777:61876) */}
         <Combobox
+          size="sm"
           label={t("filter.influencer")}
           disabled={draft.campaignIdx === undefined}
           value={draft.influencerThreadUserIdx?.toString() ?? ""}

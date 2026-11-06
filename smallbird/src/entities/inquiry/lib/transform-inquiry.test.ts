@@ -493,7 +493,7 @@ describe("transformBuyerInquiryToViewModel", () => {
   });
 });
 
-describe("transformBuyerInquiryDetailToViewModel: 인플루언서 링크", () => {
+describe("transformBuyerInquiryDetailToViewModel: 대표 이미지·상품명·인플루언서 닉네임", () => {
   const detail = (link: string | null): BuyerInquiryDetail => ({
     result: true,
     writerName: null,
@@ -535,34 +535,16 @@ describe("transformBuyerInquiryDetailToViewModel: 인플루언서 링크", () =>
     ).toBeNull();
   });
 
-  it("http(s) 링크만 그대로 둔다", () => {
+  it("인플루언서 닉네임을 그대로 쓰고 비면 null", () => {
     expect(
-      transformBuyerInquiryDetailToViewModel(
-        detail("https://www.instagram.com/bigbird"),
-      ).influencerAccountLink,
-    ).toBe("https://www.instagram.com/bigbird");
-  });
-
-  it.each(["javascript:alert(1)", "data:text/html,x", "bigbird", ""])(
-    "다른 스킴이나 깨진 값(%s)은 null로 바꾼다",
-    (link) => {
-      const viewModel = transformBuyerInquiryDetailToViewModel(detail(link));
-      expect(viewModel.influencerAccountLink).toBeNull();
-      expect(viewModel.influencerAccountName).toBeNull();
-    },
-  );
-
-  it.each([
-    ["https://instagram.com/bigbirdinfluencer", "bigbirdinfluencer"],
-    ["https://www.youtube.com/@bigbird/", "bigbird"],
-    ["https://www.tiktok.com/@%EB%B9%85%EB%B2%84%EB%93%9C", "빅버드"],
-    ["https://instagram.com/", null],
-    ["https://instagram.com/abc%zz", "abc%zz"],
-  ])("링크(%s)의 마지막 경로를 계정명(%s)으로 뽑는다", (link, name) => {
+      transformBuyerInquiryDetailToViewModel({
+        ...detail(null),
+        influencerNickname: "gang33431",
+      }).influencerNickname,
+    ).toBe("gang33431");
     expect(
-      transformBuyerInquiryDetailToViewModel(detail(link))
-        .influencerAccountName,
-    ).toBe(name);
+      transformBuyerInquiryDetailToViewModel(detail(null)).influencerNickname,
+    ).toBeNull();
   });
 });
 

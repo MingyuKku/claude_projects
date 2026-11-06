@@ -41,7 +41,7 @@
 | 아이디 중복    | `POST /check/id/1` `{id}`                                    | `{result:number}`, `> 0`이면 중복                                            |
 | 이메일 중복    | `POST /check/email/1` `{email}`                              | 동일                                                                         |
 | 비밀번호 검증  | `POST /valid/pw` `{id,password,certIdx}`                     | `{result:boolean, reason?}`                                                  |
-| 인증 초기화    | 광고주 서버 `GET /v3/mypage/cert/init?trUrl=<현재 출처>/cert/success` | `{trCert,trUrl,trAdd}`. 팝업과 모바일 `/cert`가 같은 호출(마이페이지와 공용). member 서버 `/cert/init/{slug}`는 `trUrl`이 `stage.member` 고정이라 KMC 7-3으로 거부돼 안 씀 |
+| 인증 초기화    | 광고주 서버 `GET /v3/auth/cert/init?trUrl=<현재 출처>/cert/success` | `{trCert,trUrl,trAdd}`. 팝업과 모바일 `/cert`가 같은 호출(마이페이지와 공용). member 서버 `/cert/init/{slug}`는 `trUrl`이 `stage.member` 고정이라 KMC 7-3으로 거부돼 안 씀 |
 | 인증 복호화    | `GET /cert/decrypte/1?rec_cert=&certNum=`                    | `{result?, message?, certIdx?, phoneNumber?, name?}` 모두 optional           |
 | 파일 업로드    | `POST /file/upload/{companyRegistration\|mailorderBusiness}` | multipart, 필드명 **`multipartFile`**, 응답 미사용                           |
 | 가입           | `POST /join/1`                                               | `{result:string, userIdx?:number}`                                           |
@@ -77,7 +77,7 @@
 
 데스크톱(팝업):
 
-1. `GET /v3/mypage/cert/init` 호출. **실패하면** 서버 메시지를 인증 단계에 표시하고 팝업을 열지 않는다.
+1. `GET /v3/auth/cert/init` 호출. **실패하면** 서버 메시지를 인증 단계에 표시하고 팝업을 열지 않는다.
 2. 팝업 `window.open("", "KMCISWindow", "width=396, height=643, resizable=0, scrollbars=no, status=0, titlebar=0, toolbar=0, left=435, top=250")`. 차단되면 "팝업이 차단되었습니다 / 브라우저에서 팝업 차단을 해제한 뒤 다시 시도해 주세요." 알림.
 3. 인증 후 팝업이 `/cert/success?rec_cert=…&certNum=…`로 복귀하고, `CertSuccessPage`가 `window.opener.cert_result({rec_cert, certNum})`을 호출한 뒤 `window.close()`한다. `rec_cert`는 KMC 이름이라 변경 불가. `window.cert_result`는 훅이 mount 시 등록, unmount 시 삭제한다.
 4. 부모가 복호화를 호출해 분기한다.
@@ -141,7 +141,7 @@ v2 위치(읽기 전용 참고): `app/routes/join/*`, `app/routes/{cert,cert.suc
 | 필드·코드값 | 한국어 표시 | 사용 화면 | 비고 |
 | :-- | :-- | :-- | :-- |
 | `GET /campaign/category` → `category[].name` | 서버가 준 이름(예: 대분류명) | 가입 2단계 "회사 분류" 목록 | 언어별 이름 제공 방식(요청 언어 헤더, 언어별 필드 등) 확인 필요 |
-| `GET /v3/mypage/cert/init` 실패 본문 `message`, `GET /cert/decrypte/1`의 `message` | 서버 원문 | 가입 1단계 본인인증 실패 안내 | 서버 원문이 화면에 그대로 나온다. 원문이 없을 때만 번역된 기본 문구(`cert.failFallback`). 에러 코드로 바꿔 줄 수 있는지 확인 필요 |
+| `GET /v3/auth/cert/init` 실패 본문 `message`, `GET /cert/decrypte/1`의 `message` | 서버 원문 | 가입 1단계 본인인증 실패 안내 | 서버 원문이 화면에 그대로 나온다. 원문이 없을 때만 번역된 기본 문구(`cert.failFallback`). 에러 코드로 바꿔 줄 수 있는지 확인 필요 |
 
 ## 범위 밖 · 미해결
 

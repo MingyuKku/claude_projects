@@ -140,8 +140,10 @@ export function MyPageAccountPage() {
           <TabsContent
             key={accountTab}
             value={accountTab}
+            // isolate: 본문 안의 z-index를 본문에 가둬 고정 탭 줄(z-10) 아래에 그림.
             // 셸이 아래 여백을 두지 않으므로 직접 둠. Sub ID 관리는 MO의 하단 고정 버튼이 바닥에 붙어야 해서 MO만 제외.
             className={cn(
+              "isolate",
               TAB_CONTENT_WIDTH_CLASS_NAME,
               accountTab === "sub"
                 ? "data-[state=active]:flex data-[state=active]:flex-col tablet:pb-5"

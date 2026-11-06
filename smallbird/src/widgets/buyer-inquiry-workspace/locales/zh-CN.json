@@ -64,6 +64,7 @@
   "campaignCode": "活动代码",
   "shopCode": "店铺代码",
   "influencer": "网红",
+  "campaignShortcut": "前往活动",
   "detailError": "无法加载详情。",
   "copied": "已复制到剪贴板。",
   "copyFailed": "复制失败。",
@@ -74,14 +75,8 @@
   "reply": {
     "placeholder": "请输入回复 (最多3,000字)",
     "submit": "回复",
-    "edit": "编辑",
-    "delete": "删除",
-    "save": "保存",
-    "cancel": "取消",
     "failed": "处理失败，请重试。",
-    "exists": "该咨询已有回复。",
-    "deleteTitle": "删除该回复？",
-    "deleteDescription": "删除后无法恢复。"
+    "exists": "该咨询已有回复。"
   },
   "card": {
     "campaignInquiry": "{{label}} 咨询",

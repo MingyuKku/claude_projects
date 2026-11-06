@@ -16,6 +16,9 @@ type FilesRow = Extract<ConversationRow, { type: "files" }>;
 interface ConversationFilesProps {
   row: FilesRow;
   name: string;
+  /** 상대(왼쪽) 아바타 이미지와 그 이미지에 더할 클래스. 없으면 기본 아바타. */
+  avatarSrc?: string;
+  avatarClassName?: string;
   /** 앞의 텍스트 말풍선 옆에 보이는 시각. */
   time?: string;
   /** 말풍선 크기. TAB은 작은 형태(아바타 32·이름 한 줄)를 씀(Figma 11315:50501). 기본 md. */
@@ -29,6 +32,8 @@ interface ConversationFilesProps {
 export function ConversationFiles({
   row,
   name,
+  avatarSrc,
+  avatarClassName,
   time,
   size,
 }: ConversationFilesProps) {
@@ -62,6 +67,8 @@ export function ConversationFiles({
     <>
       <ChatMessage
         name={name}
+        avatarSrc={avatarSrc}
+        avatarClassName={avatarClassName}
         size={size}
         side={row.isMine ? "me" : "other"}
         message={row.text?.body}

@@ -51,6 +51,7 @@ function inquiry(
     brandName: null,
     campaignName: null,
     shopName: null,
+    influencerNickname: null,
     ...overrides,
   };
 }
@@ -133,6 +134,16 @@ describe("구매자 문의 목록", () => {
     // 탭에도 비슷한 이름이 있어 카드(li) 안에서만 찾음.
     const card = screen.getByText("구매자 문의").closest("li");
     expect(within(card!).getByText(label)).toBeInTheDocument();
+  });
+
+  it("상태 탭 순서는 전체·답변 대기·상담 중·답변 완료다", () => {
+    renderWorkspace();
+    expect(screen.getAllByRole("tab").map((tab) => tab.textContent)).toEqual([
+      "전체",
+      "답변 대기",
+      "상담 중",
+      "답변 완료",
+    ]);
   });
 
   it("상태 탭에 상담 중이 있고 누르면 status=consulting으로 바꾼다", async () => {

@@ -16,8 +16,13 @@ import { Button } from "@/shared/ui/button";
 
 interface BigbirdMessageComposerProps {
   threadIdx: number;
-  /** 끝난 문의면 먼저 일반 문의 스레드를 만들어 보냄(끝난 실시간 스레드로 보내면 새 스레드가 실시간으로 생길 수 있음). */
+  /** 끝난 문의·연결 실패한 실시간 문의면 먼저 일반 문의 스레드를 만들어(또는 일반으로 돌려) 보냄. */
   isFinished?: boolean;
+  /**
+   * 스레드가 실제로 종료된 상태(`finishTime` 있음). 캠페인 문의는 이때 선행 생성 없이 같은 번호로 보냄: 서버가 같은 스레드를
+   * 일반 문의로 재오픈하고 응답 번호가 그대로임(Swagger 2026-11-05, stage 실측). 기타 문의(캠페인 없음)는 새 스레드를 만듦.
+   */
+  isClosed?: boolean;
   campaignIdx?: number | null;
   /** 전송 뒤 목록·대화를 다시 받는 함수. */
   onSent?: () => void;
@@ -30,6 +35,7 @@ interface BigbirdMessageComposerProps {
 export function BigbirdMessageComposer({
   threadIdx,
   isFinished = false,
+  isClosed = false,
   campaignIdx = null,
   onSent,
 }: BigbirdMessageComposerProps) {
@@ -49,7 +55,9 @@ export function BigbirdMessageComposer({
       let target = threadIdx;
       const body = text.trim();
       const files = [...attachments.files];
-      if (isFinished) {
+      // 종료된 캠페인 스레드는 선행 생성 없이 그 번호로 바로 보냄(서버가 같은 번호로 재오픈, 첨부만 보내도 같은 번호).
+      const isReopenedByServer = isClosed && campaignIdx !== null;
+      if (isFinished && !isReopenedByServer) {
         // 끝난 문의: 같은 캠페인의 열린 스레드를 일반 문의로 이어받거나 새로 만들어 거기로 보냄.
         const [createError, created] =
           await tryit(createBigbirdInquiry)(campaignIdx);

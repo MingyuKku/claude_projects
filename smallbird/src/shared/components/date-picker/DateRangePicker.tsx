@@ -67,6 +67,10 @@ export function DateRangePicker({
   const calendar = (
     <Calendar
       mode="range"
+      // MO 시트(Figma 6790:138595)는 날짜 칸이 46px로 시트 폭을 채움. 기본 36px은 PC 팝오버용.
+      className={
+        hasTwoMonths ? undefined : "w-full p-2 [--cell-size:--spacing(11.5)]"
+      }
       numberOfMonths={hasTwoMonths ? 2 : 1}
       defaultMonth={value?.from}
       selected={value}

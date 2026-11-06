@@ -1,35 +1,17 @@
 import { LoaderCircle } from "lucide-react";
-import { useState } from "react";
-import { toast } from "sonner";
 
-import {
-  createQnaReply,
-  deleteQnaReply,
-  editQnaReply,
-  useQnaDetail,
-} from "@/entities/inquiry";
-import { isApiError } from "@/shared/api";
+import { deleteQnaReply, editQnaReply, useQnaDetail } from "@/entities/inquiry";
+import { EditableChatMessage } from "@/features/edit-inquiry-message";
 import { ChatDivider, ChatMessage } from "@/shared/components/chat-message";
 import { EmptyState } from "@/shared/components/empty-state";
-import { TextField } from "@/shared/components/text-field";
 import { useTranslation } from "@/shared/i18n";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from "@/shared/ui/alert-dialog";
-import { Button } from "@/shared/ui/button";
 
 import { formatDividerDate, formatMessageTime } from "../lib/format";
 import { IS_BUYER_WRITE_ENABLED } from "../model/constants";
 
 import type {
   BuyerInquiryViewModel,
+  InquiryMessageViewModel,
   QnaItemViewModel,
 } from "@/entities/inquiry";
 
@@ -37,7 +19,7 @@ interface QnaConversationProps {
   inquiry: BuyerInquiryViewModel;
 }
 
-/** 상품 Q&A: 질문마다 광고주 답변 하나. 답변 등록·수정·삭제는 REST이고, 구매자가 읽은 답변은 서버가 수정·삭제를 거절함. */
+/** 상품 Q&A: 질문마다 광고주 답변 하나. 답변 입력은 구매자 문의처럼 하단 고정 입력창(QnaReplyComposer), 수정·삭제는 호버 버튼. */
 export function QnaConversation({ inquiry }: QnaConversationProps) {
   const { t } = useTranslation("widgets/buyer-inquiry-workspace");
   const { t: tCommon } = useTranslation();
@@ -109,143 +91,31 @@ function QnaReply({
   advertiserName: string;
   onChanged: () => void;
 }) {
-  const { t } = useTranslation("widgets/buyer-inquiry-workspace");
-  const [text, setText] = useState("");
-  const [isEditing, setIsEditing] = useState(false);
-  const [isBusy, setIsBusy] = useState(false);
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
   const { reply } = item;
-
-  // 서버 상태 코드로 사유를 구분함: 409는 이미 답변이 있거나(등록) 이미 읽힌 답변(수정·삭제).
-  async function run(
-    action: () => Promise<void>,
-    conflictKey: "exists" | "read",
-  ) {
-    setIsBusy(true);
-    try {
-      await action();
-      setText("");
-      setIsEditing(false);
-      onChanged();
-    } catch (error) {
-      console.error("Q&A 답변 처리 실패", error);
-      const isConflict = isApiError(error) && error.status === 409;
-      // 이미 읽힌 답변(수정·삭제 409)은 안내 없이 최신 상태를 다시 받아 버튼이 사라지게 함. 등록 409(이미 답변 있음)는 안내함.
-      if (isConflict) onChanged();
-      if (!isConflict || conflictKey === "exists")
-        toast.error(isConflict ? t("reply.exists") : t("reply.failed"));
-    } finally {
-      setIsBusy(false);
-    }
-  }
-
-  if (reply && !isEditing) {
-    return (
-      <div className="flex flex-col items-end gap-2">
-        <ChatMessage
-          name={advertiserName}
-          side="me"
-          message={reply.body}
-          time={
-            reply.writtenAt ? formatMessageTime(reply.writtenAt) : undefined
-          }
-          className="w-full"
-        />
-        {IS_BUYER_WRITE_ENABLED && !reply.isRead && (
-          <div className="flex gap-2">
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={isBusy}
-              onClick={() => {
-                setText(reply.body);
-                setIsEditing(true);
-              }}
-            >
-              {t("reply.edit")}
-            </Button>
-            <Button
-              variant="outline"
-              size="sm"
-              disabled={isBusy}
-              onClick={() => setIsDeleteOpen(true)}
-            >
-              {t("reply.delete")}
-            </Button>
-          </div>
-        )}
-        <AlertDialog open={isDeleteOpen} onOpenChange={setIsDeleteOpen}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>{t("reply.deleteTitle")}</AlertDialogTitle>
-              <AlertDialogDescription>
-                {t("reply.deleteDescription")}
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>{t("reply.cancel")}</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() =>
-                  void run(() => deleteQnaReply(reply.replyIdx), "read")
-                }
-              >
-                {t("reply.delete")}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      </div>
-    );
-  }
-
-  // 답변이 없거나 수정 중: 입력창.
+  if (!reply) return null;
+  // 구매자 문의와 같은 말풍선·호버 수정·삭제를 쓰려고 답변을 메시지 모양으로 바꿈. 읽힌 답변은 버튼이 없음.
+  const message: InquiryMessageViewModel = {
+    id: reply.replyIdx,
+    isMine: true,
+    kind: "text",
+    body: reply.body,
+    createdAt: reply.writtenAt ?? item.question.writtenAt,
+    isDeleted: false,
+    isRead: reply.isRead,
+    isEdited: false,
+    senderId: null,
+    campaign: null,
+    attachment: null,
+  };
   return (
-    <form
-      className="flex flex-col gap-2"
-      onSubmit={(event) => {
-        event.preventDefault();
-        const body = text.trim();
-        if (!IS_BUYER_WRITE_ENABLED || !body || isBusy) return;
-        void (reply
-          ? run(() => editQnaReply(reply.replyIdx, body), "read")
-          : run(() => createQnaReply(item.inquiryIdx, body), "exists"));
-      }}
-    >
-      <TextField
-        variant="count"
-        isWide
-        maxLength={3000}
-        value={text}
-        onChange={(event) => setText(event.target.value)}
-        aria-label={t("reply.placeholder")}
-        placeholder={t("reply.placeholder")}
-        disabled={isBusy || !IS_BUYER_WRITE_ENABLED}
-        submit={
-          <div className="flex gap-2">
-            {isEditing && (
-              <Button
-                type="button"
-                variant="outline"
-                size="sm"
-                disabled={isBusy}
-                onClick={() => {
-                  setIsEditing(false);
-                  setText("");
-                }}
-              >
-                {t("reply.cancel")}
-              </Button>
-            )}
-            <Button
-              type="submit"
-              size="sm"
-              disabled={!IS_BUYER_WRITE_ENABLED || isBusy || !text.trim()}
-            >
-              {isEditing ? t("reply.save") : t("reply.submit")}
-            </Button>
-          </div>
-        }
-      />
-    </form>
+    <EditableChatMessage
+      message={message}
+      name={advertiserName}
+      time={reply.writtenAt ? formatMessageTime(reply.writtenAt) : ""}
+      canModify={IS_BUYER_WRITE_ENABLED}
+      onChanged={onChanged}
+      onSubmitEdit={(body) => editQnaReply(reply.replyIdx, body)}
+      onConfirmDelete={() => deleteQnaReply(reply.replyIdx)}
+    />
   );
 }

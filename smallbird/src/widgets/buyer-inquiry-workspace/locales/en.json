@@ -64,6 +64,7 @@
   "campaignCode": "Campaign code",
   "shopCode": "Shop code",
   "influencer": "Influencer",
+  "campaignShortcut": "Go to campaign",
   "detailError": "Couldn't load details.",
   "copied": "Copied to clipboard.",
   "copyFailed": "Couldn't copy.",
@@ -74,14 +75,8 @@
   "reply": {
     "placeholder": "Enter a reply. (max 3,000 characters)",
     "submit": "Reply",
-    "edit": "Edit",
-    "delete": "Delete",
-    "save": "Save",
-    "cancel": "Cancel",
     "failed": "Something went wrong. Please try again.",
-    "exists": "This inquiry already has a reply.",
-    "deleteTitle": "Delete this reply?",
-    "deleteDescription": "A deleted reply can't be restored."
+    "exists": "This inquiry already has a reply."
   },
   "card": {
     "campaignInquiry": "{{label}} inquiry",

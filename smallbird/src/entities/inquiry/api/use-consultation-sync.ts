@@ -40,7 +40,13 @@ export function useConsultationSync(
     ? [consultation.messages.length, last?.created, last?.messageId].join("|")
     : undefined;
   const stateSignature = consultation
-    ? [consultation.finishTime, consultation.acceptedAt].join("|")
+    ? [
+        consultation.finishTime,
+        consultation.acceptedAt,
+        // 서버가 자동으로 일반 문의로 돌리면 finishTime은 그대로이고 이 둘만 바뀜.
+        consultation.endReason,
+        consultation.matchRequestedAt,
+      ].join("|")
     : undefined;
   const previous = useRef<{ messages?: string; state?: string }>({});
   const onChangedRef = useRef(onChanged);
@@ -53,8 +59,11 @@ export function useConsultationSync(
     previous.current = { messages: signature, state: stateSignature };
     if (before.messages !== undefined && before.messages !== signature)
       void mutate();
-    if (before.state !== undefined && before.state !== stateSignature)
+    if (before.state !== undefined && before.state !== stateSignature) {
+      // 대화(실시간 여부)와 목록(상태)을 같이 다시 받음.
+      void mutate();
       onChangedRef.current?.();
+    }
   }, [signature, stateSignature, mutate]);
 
   let connection: ConsultationConnection = "missing";

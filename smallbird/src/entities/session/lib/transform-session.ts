@@ -41,6 +41,7 @@ export function transformSessionToViewModel(
     identifier: session.identifier,
     email: session.email,
     phone: session.phone,
+    profileImageUrl: session.profileImageUrl || null,
     permissions: toMenuPermissions(session),
   };
 }

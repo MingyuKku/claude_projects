@@ -50,10 +50,11 @@ describe("AttachmentTextField", () => {
       fileInput(),
       new File([new Uint8Array(2560)], "견적서.docx"),
     );
-    expect(screen.getByText("견적서.docx")).toBeInTheDocument();
+    // 파일 이름은 앞 5자 + "..."로 보임(Figma REQ-23-0009)
+    expect(screen.getByText("견적서.d...")).toBeInTheDocument();
     expect(screen.getByText("2.5KB")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: "첨부 삭제" }));
-    expect(screen.queryByText("견적서.docx")).not.toBeInTheDocument();
+    expect(screen.queryByText("견적서.d...")).not.toBeInTheDocument();
   });
 
   it("30MB가 넘는 문서는 담지 않고 문서 용량 안내를 띄운다", async () => {

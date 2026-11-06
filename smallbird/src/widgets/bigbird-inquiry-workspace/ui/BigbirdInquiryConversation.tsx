@@ -16,6 +16,7 @@ import {
   useRealtimeConsultationMessages,
 } from "@/entities/inquiry";
 import { EditableChatMessage } from "@/features/edit-inquiry-message";
+import managerSymbol from "@/shared/assets/img/brand/symbol.png";
 import { SubHeader } from "@/shared/components/app-header";
 import {
   ChatCodeCard,
@@ -67,6 +68,9 @@ interface BigbirdInquiryConversationProps {
 /** 연결 실패 안내 카드를 보여 주는 시간. 그 뒤 대화는 일반 문의처럼 이어감(사용자 결정 2026-10-29). */
 const FAILED_CARD_MS = 10_000;
 
+// 빅버드 문의는 항상 같은 빅버드 담당자와 하는 대화라 상대 아바타를 빅버드 로고(심볼)로 고정함. 로고가 원에 잘리지 않게 여백을 둠.
+const MANAGER_AVATAR_CLASS = "bg-background object-contain p-1.5";
+
 // Figma 빅버드 문의 채팅(5202:101654, 완료 9298:260494). 날짜가 바뀔 때마다 구분 칩을 넣음.
 export function BigbirdInquiryConversation({
   inquiry,
@@ -105,8 +109,10 @@ export function BigbirdInquiryConversation({
   const hasDetail = inquiry.campaignIdx !== null;
   const isDetailOpen = hasDetail && searchParams.get("panel") === "detail";
   // 열린 문의 남기기 대화에서만 실시간 상담을 요청할 수 있음(Figma 3.0.6 헤더의 "실시간 상담하기").
+  // 일반 문의면 상태(답변 완료·종료된 스레드 포함)와 상관없이 실시간으로 전환할 수 있음. 끝난 스레드면 서버가 같은
+  // 스레드를 다시 열거나 새 스레드 번호를 주고, 화면이 그 번호로 이동함.
   const canRequestRealtime =
-    !inquiry.isRealtime && !inquiry.isFinished && onClickRealtime !== undefined;
+    !inquiry.isRealtime && onClickRealtime !== undefined;
   const endRef = useRef<HTMLDivElement>(null);
   // 일반·실시간 문의 모두 캠페인 카드를 표시하고, 운영 앱용 인사말 등 자동 안내만 숨김.
   // 실시간 상담도 같은 대화창에 이어 보임: 일반 문의 내용(REST)에 상담 문서의 실시간 메시지를 합침.
@@ -158,13 +164,20 @@ export function BigbirdInquiryConversation({
   const isMatchFailed = isMatchFailureShown(endedConsultation);
   const isFailedCardVisible =
     (isFailed && !isFailedCardHidden) || isMatchFailed;
+  // "완료된 상담" 안내는 마지막 상담이 실시간이었고 그게 끝난 경우에만 보임: 실시간이 끝난 스레드이거나, 서버가 실시간을 끝내며
+  // 남긴 종료 안내(notice)가 대화의 마지막인 경우. 그 뒤에 일반 메시지가 오면 마지막 상담이 일반이라 안내를 걷음.
+  // 일반 문의가 답변 완료·종료된 것만으로는 보이지 않음.
+  // 실시간이 진행 중(요청 중·연결됨)이면 예전 종료 안내가 마지막 메시지여도 안내를 띄우지 않음.
+  const isRealtimeEnded = inquiry.isRealtime
+    ? inquiry.isFinished
+    : messages.at(-1)?.kind === "notice";
   // 대화 위에 고정되는 안내 카드(완료·요청 중·요청 실패). 첫 메시지가 가리지 않게 높이만큼 띄움.
   const hasTopCard =
-    inquiry.isFinished || phase === "requesting" || isFailedCardVisible;
+    isRealtimeEnded || phase === "requesting" || isFailedCardVisible;
 
   function renderTopCard() {
     const className = "absolute inset-x-4 top-4 z-10";
-    if (inquiry.isFinished) {
+    if (isRealtimeEnded) {
       return (
         <MessageAlert
           status="completed"
@@ -232,6 +245,8 @@ export function BigbirdInquiryConversation({
       return (
         <ChatMessage
           name={name}
+          avatarSrc={message.isMine ? undefined : managerSymbol}
+          avatarClassName={MANAGER_AVATAR_CLASS}
           side={side}
           card={
             <ChatCodeCard
@@ -253,6 +268,8 @@ export function BigbirdInquiryConversation({
       <EditableChatMessage
         message={message}
         name={name}
+        avatarSrc={message.isMine ? undefined : managerSymbol}
+        avatarClassName={MANAGER_AVATAR_CLASS}
         time={formatMessageTime(message.createdAt)}
         // 실시간 상담은 Firestore 메시지라 수정·삭제 API 대상이 아니고, 종료된 문의는 읽기 전용입니다.
         canModify={
@@ -296,8 +313,13 @@ export function BigbirdInquiryConversation({
                 onClick={handleClickDetail}
                 className="flex min-w-0 items-center gap-2 text-left disabled:cursor-default"
               >
+                {/* 헤더 배지는 목록 카드와 같은 "실시간 상담중"(REQ-23-0018). 목록 탭의 "상담 중"과는 다른 문구 */}
                 <Badge variant={STATUS_BADGE_VARIANT[inquiry.status]}>
-                  {t(inquiry.status)}
+                  {t(
+                    inquiry.status === "consulting"
+                      ? "consultingBadge"
+                      : inquiry.status,
+                  )}
                 </Badge>
                 <span className="-my-0.5 truncate py-0.5">
                   {t(title.key, { name: "name" in title ? title.name : "" })}
@@ -431,6 +453,8 @@ export function BigbirdInquiryConversation({
                       <ConversationFiles
                         row={row}
                         name={row.isMine ? myName : t("bigbirdManager")}
+                        avatarSrc={row.isMine ? undefined : managerSymbol}
+                        avatarClassName={MANAGER_AVATAR_CLASS}
                         time={
                           row.text
                             ? formatMessageTime(row.text.createdAt)
@@ -457,6 +481,7 @@ export function BigbirdInquiryConversation({
         <BigbirdMessageComposer
           threadIdx={inquiry.threadIdx}
           isFinished
+          isClosed={inquiry.isFinished}
           campaignIdx={inquiry.campaignIdx}
           onSent={onChangedMessage}
         />

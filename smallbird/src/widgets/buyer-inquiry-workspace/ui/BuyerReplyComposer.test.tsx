@@ -50,6 +50,7 @@ const inquiry: BuyerInquiryViewModel = {
   brandName: null,
   campaignName: null,
   shopName: null,
+  influencerNickname: null,
 };
 
 function mockTimeline() {
@@ -134,13 +135,6 @@ describe("구매자 문의 답장 입력창", () => {
           ),
       ).toBe(true),
     );
-  });
-
-  it("대화 내역(스레드)이 없으면 보낼 곳이 없어 입력이 막힌다", async () => {
-    mockTimeline();
-    renderComposer({ ...inquiry, source: "influencer", campaignIdx: null });
-    await waitFor(() => expect(screen.getByRole("textbox")).toBeDisabled());
-    expect(screen.getByRole("button", { name: "전송" })).toBeDisabled();
   });
 
   it("전송이 실패하면 입력을 지우지 않고 안내한다", async () => {

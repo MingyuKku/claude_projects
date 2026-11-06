@@ -209,6 +209,7 @@ export function AppShell({
                 <UserMenu
                   name={session.displayName}
                   email={session.email}
+                  avatarSrc={session.profileImageUrl ?? undefined}
                   menuLabel={t("header.profile")}
                   settingsLabel={t("header.settings")}
                   logoutLabel={

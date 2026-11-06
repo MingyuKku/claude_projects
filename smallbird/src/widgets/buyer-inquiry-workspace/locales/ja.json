@@ -64,6 +64,7 @@
   "campaignCode": "キャンペーンコード",
   "shopCode": "ショップコード",
   "influencer": "インフルエンサー",
+  "campaignShortcut": "キャンペーンへ移動",
   "detailError": "詳細を読み込めませんでした。",
   "copied": "クリップボードにコピーしました。",
   "copyFailed": "コピーできませんでした。",
@@ -74,14 +75,8 @@
   "reply": {
     "placeholder": "返信を入力 (最大3,000文字)",
     "submit": "返信",
-    "edit": "編集",
-    "delete": "削除",
-    "save": "保存",
-    "cancel": "キャンセル",
     "failed": "処理できませんでした。もう一度お試しください。",
-    "exists": "すでに返信があります。",
-    "deleteTitle": "返信を削除しますか?",
-    "deleteDescription": "削除した返信は元に戻せません。"
+    "exists": "すでに返信があります。"
   },
   "card": {
     "campaignInquiry": "{{label}} お問い合わせ",

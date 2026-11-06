@@ -80,8 +80,8 @@ describe("BigbirdInquiryDetailPanel", () => {
 
     expect(await screen.findByText("빅버드 스킨케어 캠페인")).toBeVisible();
     expect(screen.getByText("PICK형")).toBeVisible();
-    expect(screen.getByText("상품명")).toBeVisible();
-    expect(screen.getByText("스킨케어 캠페인")).toBeVisible();
+    // 상품명 줄은 없고 캠페인 유형·진행 상태·진행 기간만 보임(시안).
+    expect(screen.queryByText("상품명")).not.toBeInTheDocument();
     expect(screen.getByText("2026.10.01~2026.10.31")).toBeVisible();
     expect(screen.getByText("Q-123412341234")).toBeVisible();
     expect(await screen.findByText("진행 중")).toBeVisible();

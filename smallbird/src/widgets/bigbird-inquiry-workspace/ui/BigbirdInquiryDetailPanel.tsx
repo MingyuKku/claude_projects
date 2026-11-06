@@ -21,7 +21,7 @@ interface BigbirdInquiryDetailPanelProps {
 }
 
 // Figma 빅버드 문의 상세 정보(10819:40168 PC·TAB 277px 패널, 10819:41609 MO 전체 화면): 캠페인 정보.
-// 이름·상품명·캠페인 코드는 캠페인 목록(c-client-campaign), 이미지·유형·진행 상태·기간·공구샵 코드는
+// 이름·캠페인 코드는 캠페인 목록(c-client-campaign), 이미지·유형·진행 상태·기간·공구샵 코드는
 // 캠페인 정보 API(thread/campaign/{idx}, B7)가 먼저이고 없으면 목록 값을 씀. "캠페인 바로가기"는 이동할 v3 화면이 없어 비활성(P9).
 export function BigbirdInquiryDetailPanel({
   inquiry,
@@ -90,11 +90,6 @@ export function BigbirdInquiryDetailPanel({
                 {campaign.name}
               </strong>
               <Row label={t("campaignType")} value={typeName} />
-              {/* 상품명(REQ-23-0006) */}
-              <Row
-                label={t("productName")}
-                value={campaign.productName.trim() || null}
-              />
               <Row
                 label={t("progressStatus")}
                 value={detail?.progressStatus ?? null}

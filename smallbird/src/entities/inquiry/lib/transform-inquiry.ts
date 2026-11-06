@@ -1,5 +1,3 @@
-import { tryit } from "radash";
-
 import { campaignCardSchema } from "../model/schema";
 import { REALTIME_END_NOTICES } from "./consultation-write";
 
@@ -26,15 +24,6 @@ import type {
   QnaItemViewModel,
   RealtimeConsultation,
 } from "../model/schema";
-
-/** 서버가 준 링크 중 http(s)만 통과시킴. 다른 스킴이나 깨진 값은 링크로 쓰지 않음. */
-function toHttpUrl(value: string | null): string | null {
-  if (!value) return null;
-  // URL.parse는 아직 모든 브라우저에 없어 생성자를 씀.
-  const [error, url] = tryit(() => new URL(value))();
-  if (error) return null;
-  return url.protocol === "http:" || url.protocol === "https:" ? value : null;
-}
 
 // ponytail: 시간대 없는 `yyyy-MM-ddTHH:mm:ss`를 브라우저 지역 시간으로 읽음(KST 가정).
 // 서버 시간대가 확인되면 여기서만 고침.
@@ -417,6 +406,7 @@ export function transformBuyerInquiryToViewModel(
     brandName: inquiry.brandName || null,
     campaignName: inquiry.campaignName || null,
     shopName: inquiry.shopName || null,
+    influencerNickname: inquiry.influencerNickname || null,
   };
 }
 
@@ -436,24 +426,11 @@ export function transformBuyerInquiryDetailToViewModel(
     progressStatus: detail.progressStatus,
     progressStartDate: detail.progressStartDate,
     progressEndDate: detail.progressEndDate,
-    influencerPlatform: detail.influencerPlatform,
-    influencerAccountLink: toHttpUrl(detail.influencerAccountLink),
-    influencerAccountName: toAccountName(detail.influencerAccountLink),
+    influencerNickname: detail.influencerNickname || null,
     imageUrl: detail.mainImageUrl,
     name:
       toProductName(detail.brandName ?? "", detail.productName ?? "") || null,
   };
-}
-
-// 서버가 "플랫폼 URL 패턴 + 닉네임"으로 링크를 조합하므로(Swagger) 마지막 경로가 계정명
-function toAccountName(link: string | null): string | null {
-  const url = toHttpUrl(link);
-  if (!url) return null;
-  const name = new URL(url).pathname.split("/").filter(Boolean).at(-1);
-  if (!name) return null;
-  // 깨진 퍼센트 인코딩(%zz)은 decodeURIComponent가 예외를 던져 상세 전체가 실패하므로 원문을 씀
-  const [error, decoded] = tryit(() => decodeURIComponent(name))();
-  return (error ? name : decoded).replace(/^@/, "");
 }
 
 /** 주문/상품 정보를 상세 패널의 상품 표시(이름은 "브랜드 상품명")로 바꿈. */

@@ -15,7 +15,9 @@ vi.mock("@/shared/api", async (importOriginal) => {
     serverApiV3: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
   };
 });
-vi.mock("sonner", () => ({ toast: { error: vi.fn(), success: vi.fn() } }));
+vi.mock("sonner", () => ({
+  toast: Object.assign(vi.fn(), { error: vi.fn(), success: vi.fn() }),
+}));
 
 // jsdom에는 matchMedia가 없어 터치 기기(hover 없음)로 흉내 냅니다. 툴바가 말풍선 탭으로 열립니다.
 beforeEach(() => {
@@ -105,18 +107,36 @@ describe("EditableChatMessage", () => {
       body: "수정한 내용",
     });
     expect(onChanged).toHaveBeenCalledOnce();
+    // 토스트는 삭제에만 띄움
+    expect(toast).not.toHaveBeenCalled();
   });
 
-  it("삭제는 확인 뒤에 DELETE로 보낸다", async () => {
+  it("삭제는 확인 뒤에 DELETE로 보내고, 성공하면 삭제 토스트를 띄운다", async () => {
     const user = userEvent.setup();
     vi.mocked(serverApiV3.delete).mockResolvedValue({ result: true });
     const onChanged = renderMessage();
     await user.click(screen.getByText("배송 문의드립니다"));
     await user.click(screen.getByRole("button", { name: "삭제" }));
     expect(serverApiV3.delete).not.toHaveBeenCalled();
+    expect(toast).not.toHaveBeenCalled();
     await user.click(screen.getByRole("button", { name: "삭제" }));
     expect(serverApiV3.delete).toHaveBeenCalledWith("/help/thread/message/7");
     expect(onChanged).toHaveBeenCalledOnce();
+    expect(toast).toHaveBeenCalledWith("메시지가 삭제되었습니다.");
+  });
+
+  it("삭제가 실패하면 삭제 토스트 없이 실패 안내만 띄운다", async () => {
+    const user = userEvent.setup();
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    vi.mocked(serverApiV3.delete).mockRejectedValue(new ApiError(500, {}));
+    renderMessage();
+    await user.click(screen.getByText("배송 문의드립니다"));
+    await user.click(screen.getByRole("button", { name: "삭제" }));
+    await user.click(screen.getByRole("button", { name: "삭제" }));
+    expect(toast).not.toHaveBeenCalled();
+    expect(toast.error).toHaveBeenCalledWith(
+      "처리하지 못했습니다. 다시 시도해 주세요.",
+    );
   });
 
   it("이미 읽혀 409면 안내 없이 최신 상태를 다시 받는다", async () => {

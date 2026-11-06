@@ -45,7 +45,11 @@ describe("ConversationFiles", () => {
       />,
     );
 
-    expect(screen.getByText("견적서.pdf")).toBeInTheDocument();
+    // 파일 이름은 앞 5자 + "..."로 보이고(Figma REQ-23-0009), 전체 이름은 title과 내려받는 이름에 남음
+    expect(screen.getByText("견적서.p...")).toHaveAttribute(
+      "title",
+      "견적서.pdf",
+    );
     expect(screen.getByText("2.5MB")).toBeInTheDocument();
     const download = screen.getByRole("link", { name: "파일 받기" });
     expect(download.getAttribute("href")).toMatch(

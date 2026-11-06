@@ -1,4 +1,4 @@
-import { LoaderCircle } from "lucide-react";
+import { ChevronRight, LoaderCircle } from "lucide-react";
 import { toast } from "sonner";
 
 import {
@@ -7,12 +7,12 @@ import {
   useInquiryCampaigns,
   useInquiryUserImage,
 } from "@/entities/inquiry";
-import instagramIcon from "@/shared/assets/img/platform/instagram.svg";
 import { ClipboardButton } from "@/shared/components/clipboard-button";
 import { EmptyState } from "@/shared/components/empty-state";
 import { formatNumber, useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
 import { Avatar, AvatarImage, AvatarPlaceholder } from "@/shared/ui/avatar";
+import { Button } from "@/shared/ui/button";
 
 import { toInquiryMenu } from "../model/menu";
 
@@ -151,9 +151,10 @@ export function BuyerInquiryDetailPanel({
       {(detail.campaignCode || detail.campaignType || period) && (
         <Section
           title={t("campaignInfo")}
-          // 구매자 문의: Figma Container(6756:41103)는 높이 289 고정이고 배너가 남는 높이를 채움(PC 81·MO 97).
+          // 배너 높이는 Figma Container(11315:50441)의 Thumbnail 73(구매자 문의). 컨테이너는 289로 고정하지 않고 내용에
+          // 맡김: 캠페인명이 두 줄이거나 공구 진행 인플루언서 줄이 있어도 넘치지 않고, 기본 내용이면 289가 됨.
           // 인플루언서 문의는 공구샵 코드·바로가기가 없어 배너가 72 고정(Figma 11315:50442 상세 패널).
-          contentClassName={cn("gap-2 tablet:gap-3", isBuyerMenu && "h-72.25")}
+          contentClassName="gap-2 tablet:gap-3"
         >
           {/* 캠페인을 목록에서 못 찾거나 이미지가 없어도 배너 자리는 남깁니다. */}
           {campaignImageUrl ? (
@@ -162,16 +163,16 @@ export function BuyerInquiryDetailPanel({
               alt={campaignName ?? ""}
               loading="lazy"
               className={cn(
-                "min-h-0 w-full rounded-sm object-cover",
-                isBuyerMenu ? "flex-1" : "h-18",
+                "w-full rounded-sm object-cover",
+                isBuyerMenu ? "h-18.25" : "h-18",
               )}
             />
           ) : (
             <div
               aria-hidden
               className={cn(
-                "min-h-0 w-full rounded-sm bg-muted",
-                isBuyerMenu ? "flex-1" : "h-18",
+                "w-full rounded-sm bg-muted",
+                isBuyerMenu ? "h-18.25" : "h-18",
               )}
             />
           )}
@@ -198,42 +199,35 @@ export function BuyerInquiryDetailPanel({
                 {...copyProps}
               />
             )}
-            {/* TODO(backend): 인플루언서 닉네임 필드가 내려오면 [브랜드명][캠페인명][인플루언서 닉네임] 문의 표기와 닉네임만 남기는 상세로 교체 (요구명세서 24 I4·I26, 백엔드 요청 문서 5절 등록) */}
-            {isBuyerMenu && detail.influencerAccountLink && (
-              // Figma Info(6766:47012): 간격 없이 양끝 정렬, 라벨은 한 줄이고 계정명이 길면 버튼 쪽을 말줄임합니다.
-              <div className="flex items-center justify-between">
+            {isBuyerMenu && detail.influencerNickname && (
+              // 요구명세서 24 I26: 공구 진행 인플루언서는 닉네임만 보임(플랫폼 아이디·표시 삭제).
+              <div className="flex items-center justify-between gap-2">
                 <span className="shrink-0 text-xs leading-4 font-medium whitespace-nowrap text-muted-foreground">
                   {t("influencer")}
                 </span>
-                <a
-                  href={detail.influencerAccountLink}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex min-w-0 items-center justify-center gap-1 rounded-md border border-border bg-background px-1.75 py-1.25 text-xs leading-4 font-medium hover:bg-accent"
-                >
-                  {isInstagram(detail.influencerAccountLink) && (
-                    <img
-                      src={instagramIcon}
-                      alt=""
-                      className="size-4 shrink-0"
-                    />
-                  )}
-                  <span className="truncate">
-                    {detail.influencerAccountName ?? detail.influencerPlatform}
-                  </span>
-                </a>
+                <span className="min-w-0 truncate text-xs leading-4 font-medium">
+                  {detail.influencerNickname}
+                </span>
               </div>
+            )}
+            {isBuyerMenu && (
+              // Figma 캠페인 바로가기(11315:50441). 캠페인 화면이 만들어지기 전까지 빅버드 문의 상세와 같이 비활성(사용자 결정
+              // 2026-11-06). 인플루언서 문의 상세에는 두지 않음.
+              <Button
+                variant="outline-foreground"
+                size="sm"
+                className="w-full"
+                disabled
+              >
+                {t("campaignShortcut")}
+                <ChevronRight className="size-4" />
+              </Button>
             )}
           </div>
         </Section>
       )}
     </div>
   );
-}
-
-// 시안은 인스타그램 아이콘만 있습니다. 다른 플랫폼은 계정명만 보입니다.
-function isInstagram(link: string) {
-  return new URL(link).hostname.endsWith("instagram.com");
 }
 
 // Figma Chat Details Base / List(6756:41083): 제목 14px leading-none, 제목과 내용 12px.

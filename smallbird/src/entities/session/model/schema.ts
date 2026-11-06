@@ -23,6 +23,8 @@ export const sessionSchema = z.object({
   phone: z.string().optional(),
   // SUB 계정일 때만 오는 본인 이름. 연락처는 `phone`.
   name: z.string().nullish(),
+  // 헤더 프로필에 쓰는 이미지 주소. 없으면 null이거나 빈 문자열.
+  profileImageUrl: z.string().nullish(),
   // 메뉴 권한 7개(LNB 노출용). MASTER·ADMIN은 모두 true, SUB는 마스터가 정한 값이고 호출할 때마다 새로 읽음.
   // 진입이 거부된 경로는 403이라 오지 않으므로 없으면 false로 읽음.
   isCampaignAccess: z.boolean().optional(),
@@ -61,6 +63,7 @@ export interface SessionViewModel {
   identifier: string;
   email: string;
   phone?: string;
+  profileImageUrl: string | null;
   permissions: MenuPermissions;
 }
 

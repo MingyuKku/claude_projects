@@ -23,6 +23,17 @@ const ICON_BY_EXTENSION: Record<string, string> = {
   pptx: pptIcon,
 };
 
+// Figma 파일 이름은 "파일명파일..."처럼 앞 5자만 보임(REQ-23-0009, 11315:49623). 확장자는 시안에 없어 이름 전체
+// (확장자 포함)를 기준으로 자르고, 형식은 앞의 아이콘이 알려 줌. 전체 이름은 title과 내려받는 이름에 남김.
+const MAX_NAME_LENGTH = 5;
+
+function toDisplayName(name: string) {
+  const characters = Array.from(name);
+  return characters.length <= MAX_NAME_LENGTH
+    ? name
+    : `${characters.slice(0, MAX_NAME_LENGTH).join("")}...`;
+}
+
 function toIconSrc(name: string) {
   const extension = name.split(".").pop()?.toLowerCase() ?? "";
   return ICON_BY_EXTENSION[extension] ?? pdfIcon;
@@ -106,8 +117,11 @@ export function FileItem({
           className="size-9 shrink-0"
         />
         <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-          <p className="truncate text-sm leading-none font-medium text-card-foreground">
-            {name}
+          <p
+            title={name}
+            className="truncate text-sm leading-none font-medium text-card-foreground"
+          >
+            {toDisplayName(name)}
           </p>
           <p className="text-xs leading-5 text-muted-foreground">{sizeLabel}</p>
         </div>
