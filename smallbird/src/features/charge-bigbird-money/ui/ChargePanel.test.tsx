@@ -102,7 +102,7 @@ describe("ChargePanel", () => {
     await user.type(input, "155500");
     await user.click(cta());
     await user.click(screen.getByRole("button", { name: "동의 및 충전하기" }));
-    expect(requestCharge).toHaveBeenCalledWith(155500);
+    expect(requestCharge).toHaveBeenCalledWith(155500, undefined);
   });
 
   it("닫기를 누르면 닫는다", async () => {

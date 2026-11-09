@@ -1,0 +1,19 @@
+{
+  "title": "Register campaign",
+  "heading": "Basic info",
+  "sidebar": {
+    "label": "Campaign registration steps",
+    "summary": "Basic info",
+    "steps": {
+      "campaignInfo": "Enter campaign info",
+      "product": "Enter product info",
+      "influencer": "Set influencer conditions",
+      "addOns": "Add-on services",
+      "intro": "Write 캠페인 소개서",
+      "conditions": "Set conditions",
+      "policy": "Agree to campaign policies",
+      "payment": "Payment"
+    },
+    "open": "Open step list"
+  }
+}

@@ -4,8 +4,15 @@ import { useState } from "react";
 
 import { FormField } from "@/shared/components/form-field";
 import { formatDate } from "@/shared/i18n";
+import { useMediaQuery } from "@/shared/lib/useMediaQuery";
 import { cn } from "@/shared/lib/utils";
 import { Calendar } from "@/shared/ui/calendar";
+import {
+  Drawer,
+  DrawerContent,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/shared/ui/drawer";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 
 import type { ComponentProps, ReactNode } from "react";
@@ -38,6 +45,10 @@ interface DatePickerProps extends Omit<
   errorText?: string;
   icon?: ReactNode;
   disabled?: boolean;
+  /** 캘린더 팝오버를 트리거의 어느 쪽에 맞출지. 기본은 가운데이고, 시안이 오른쪽 정렬이면 end. */
+  popoverAlign?: ComponentProps<typeof PopoverContent>["align"];
+  /** MO(768 미만)에서 팝오버 대신 아래에서 올라오는 시트로 엶(Figma 캘린더 시트 7555:420549). 기본은 끔. */
+  isSheetOnMobile?: boolean;
   calendarProps?: Omit<
     ComponentProps<typeof Calendar>,
     "mode" | "selected" | "onSelect"
@@ -55,16 +66,39 @@ export function DatePicker({
   errorText,
   icon,
   disabled = false,
+  popoverAlign,
+  isSheetOnMobile = false,
   calendarProps,
   className,
   ...triggerProps
 }: DatePickerProps) {
   const [isOpen, setIsOpen] = useState(false);
+  const isTabletUp = useMediaQuery("(min-width: 768px)");
+  const isSheet = isSheetOnMobile && !isTabletUp;
 
   const handleSelectDate = (nextValue: Date | undefined) => {
     onValueChange?.(nextValue);
     setIsOpen(false);
   };
+
+  function renderTrigger(control: object) {
+    return (
+      <button
+        {...triggerProps}
+        {...control}
+        type="button"
+        className={cn(triggerVariants({ isInvalid: Boolean(errorText) }))}
+      >
+        {icon && (
+          <span className="mr-2 flex shrink-0 [&_svg]:size-4">{icon}</span>
+        )}
+        <span className="min-w-0 flex-1 truncate">
+          {value ? formatValue(value) : placeholder}
+        </span>
+        <CalendarIcon className="ml-4 size-4 shrink-0" />
+      </button>
+    );
+  }
 
   return (
     <FormField
@@ -74,36 +108,43 @@ export function DatePicker({
       disabled={disabled}
       className={className}
     >
-      {(control) => (
-        <Popover open={isOpen} onOpenChange={setIsOpen}>
-          <PopoverTrigger asChild>
-            <button
-              {...triggerProps}
-              {...control}
-              type="button"
-              className={cn(triggerVariants({ isInvalid: Boolean(errorText) }))}
+      {(control) =>
+        isSheet ? (
+          <Drawer open={isOpen} onOpenChange={setIsOpen}>
+            <DrawerTrigger asChild>{renderTrigger(control)}</DrawerTrigger>
+            {/* 손잡이 아래 16, 좌우 8: 캘린더가 폭을 채움(Figma 7555:420549). */}
+            <DrawerContent className="px-2 pb-4">
+              <DrawerTitle className="sr-only">
+                {label ?? placeholder}
+              </DrawerTitle>
+              <div className="pt-4">
+                <Calendar
+                  {...calendarProps}
+                  className={cn("w-full", calendarProps?.className)}
+                  mode="single"
+                  selected={value}
+                  onSelect={handleSelectDate}
+                />
+              </div>
+            </DrawerContent>
+          </Drawer>
+        ) : (
+          <Popover open={isOpen} onOpenChange={setIsOpen}>
+            <PopoverTrigger asChild>{renderTrigger(control)}</PopoverTrigger>
+            <PopoverContent
+              align={popoverAlign}
+              className="w-auto border-0 p-0"
             >
-              {icon && (
-                <span className="mr-2 flex shrink-0 [&_svg]:size-4">
-                  {icon}
-                </span>
-              )}
-              <span className="min-w-0 flex-1 truncate">
-                {value ? formatValue(value) : placeholder}
-              </span>
-              <CalendarIcon className="ml-4 size-4 shrink-0" />
-            </button>
-          </PopoverTrigger>
-          <PopoverContent className="w-auto border-0 p-0">
-            <Calendar
-              {...calendarProps}
-              mode="single"
-              selected={value}
-              onSelect={handleSelectDate}
-            />
-          </PopoverContent>
-        </Popover>
-      )}
+              <Calendar
+                {...calendarProps}
+                mode="single"
+                selected={value}
+                onSelect={handleSelectDate}
+              />
+            </PopoverContent>
+          </Popover>
+        )
+      }
     </FormField>
   );
 }

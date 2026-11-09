@@ -1,0 +1,19 @@
+{
+  "title": "캠페인 등록",
+  "heading": "기본 정보",
+  "sidebar": {
+    "label": "캠페인 등록 단계",
+    "summary": "기본정보",
+    "steps": {
+      "campaignInfo": "캠페인 정보 입력",
+      "product": "제품 정보 입력",
+      "influencer": "인플루언서 조건 설정",
+      "addOns": "부가서비스",
+      "intro": "캠페인 소개서 작성",
+      "conditions": "진행 조건 설정",
+      "policy": "캠페인 정책 동의",
+      "payment": "결제"
+    },
+    "open": "단계 목록 열기"
+  }
+}

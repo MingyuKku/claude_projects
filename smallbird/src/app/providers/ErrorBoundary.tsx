@@ -1,7 +1,9 @@
 import { useEffect } from "react";
 import { isRouteErrorResponse, useRouteError } from "react-router";
 
+import { NotFoundPage } from "@/pages/not-found";
 import { useTranslation } from "@/shared/i18n";
+import { NotFoundError } from "@/shared/lib";
 
 // 라우트 단위 전역 에러 화면. 사용자에게는 다음 행동(재시도)을 보여주고, 원인은 콘솔에 남긴다.
 // 독립적으로 실패할 수 있는 위젯에는 지역 바운더리를 따로 둔다 (.claude/rules/error-handling.md).
@@ -13,6 +15,12 @@ export function RouteErrorBoundary() {
   useEffect(() => {
     console.error(error);
   }, [error]);
+
+  // 화면이 없는 대상을 열었다는 오류는 알 수 없는 경로와 같은 화면으로 보냄.
+  const isNotFound =
+    error instanceof NotFoundError ||
+    (isRouteErrorResponse(error) && error.status === 404);
+  if (isNotFound) return <NotFoundPage />;
 
   const message = isRouteErrorResponse(error)
     ? `${error.status} ${error.statusText}`

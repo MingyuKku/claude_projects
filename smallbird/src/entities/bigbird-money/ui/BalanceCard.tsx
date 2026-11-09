@@ -12,6 +12,8 @@ interface BalanceCardProps {
   headerAction?: ReactNode;
   /** 금액 아래 버튼 자리(충전하기). 없으면 그리지 않음. */
   action?: ReactNode;
+  /** 제목의 헤딩 레벨. 다른 화면 안에 놓일 때 그 화면의 제목 계층에 맞춤(기본 h2). */
+  titleAs?: "h2" | "h3";
   className?: string;
 }
 
@@ -21,6 +23,7 @@ export function BalanceCard({
   amount,
   headerAction,
   action,
+  titleAs: Title = "h2",
   className,
 }: BalanceCardProps) {
   const { t } = useTranslation("entities/bigbird-money");
@@ -33,10 +36,10 @@ export function BalanceCard({
       )}
     >
       <div className="flex items-center gap-2 px-4 pt-4 pb-1.5 tablet:px-5">
-        <h2 className="flex min-w-0 flex-1 items-center gap-1.5 text-sm leading-6 font-semibold text-card-foreground">
+        <Title className="flex min-w-0 flex-1 items-center gap-1.5 text-sm leading-6 font-semibold text-card-foreground">
           <Wallet aria-hidden className="size-4 shrink-0" />
           {t("balance.title")}
-        </h2>
+        </Title>
         {headerAction}
       </div>
       <p

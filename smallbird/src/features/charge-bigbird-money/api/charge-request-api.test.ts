@@ -72,6 +72,36 @@ describe("requestCharge", () => {
     ).toEqual({ P_MID: "INIpayTest", P_GOODS: "빅버드 머니 충전", P_NOTI: "" });
   });
 
+  it("복귀 경로를 넘기면 redirectUri로 보낸다", async () => {
+    useUserAgent(IPHONE_UA);
+    vi.spyOn(HTMLFormElement.prototype, "submit").mockImplementation(() => {});
+    vi.mocked(payApi.post).mockResolvedValueOnce({
+      paymentUrl: "https://mobile.inicis.com/smart/payment/",
+      form: { P_MID: "INIpayTest" },
+    });
+
+    await requestCharge(15500, "/campaign/register/CMP-1");
+
+    const [, body] = vi.mocked(payApi.post).mock.calls[0] ?? [];
+    expect(body).toMatchObject({
+      redirectUri: "/campaign/register/CMP-1",
+    });
+  });
+
+  it("복귀 경로를 넘기지 않으면 마이페이지 빅버드 머니로 돌아온다", async () => {
+    useUserAgent(IPHONE_UA);
+    vi.spyOn(HTMLFormElement.prototype, "submit").mockImplementation(() => {});
+    vi.mocked(payApi.post).mockResolvedValueOnce({
+      paymentUrl: "https://mobile.inicis.com/smart/payment/",
+      form: { P_MID: "INIpayTest" },
+    });
+
+    await requestCharge(15500);
+
+    const [, body] = vi.mocked(payApi.post).mock.calls[0] ?? [];
+    expect(body).toMatchObject({ redirectUri: "/mypage/money" });
+  });
+
   it("휴대폰인데 모바일 응답 모양이 아니면 결제창으로 보내지 않고 던진다", async () => {
     useUserAgent(IPHONE_UA);
     const submit = vi.spyOn(HTMLFormElement.prototype, "submit");

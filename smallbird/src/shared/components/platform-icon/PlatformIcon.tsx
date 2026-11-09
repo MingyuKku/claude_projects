@@ -2,19 +2,25 @@ import facebookIcon from "@/shared/assets/img/sns/facebook.svg";
 import instagramIcon from "@/shared/assets/img/sns/instagram.svg";
 import naverIcon from "@/shared/assets/img/sns/naver.svg";
 import tiktokIcon from "@/shared/assets/img/sns/tiktok.svg";
+import xIcon from "@/shared/assets/img/sns/x.svg";
+import youtubeIcon from "@/shared/assets/img/sns/youtube.svg";
 import { cn } from "@/shared/lib/utils";
 
-import type { InfluencerPlatform } from "../model/platforms";
+/** 로고를 가진 플랫폼. 블로그는 `naver`의 로고를 씀. */
+export type PlatformIconName =
+  "instagram" | "naver" | "tiktok" | "facebook" | "youtube" | "x";
 
-const PLATFORM_ICON_SRC: Record<InfluencerPlatform, string> = {
+const PLATFORM_ICON_SRC: Record<PlatformIconName, string> = {
   instagram: instagramIcon,
   naver: naverIcon,
   tiktok: tiktokIcon,
   facebook: facebookIcon,
+  youtube: youtubeIcon,
+  x: xIcon,
 };
 
 interface PlatformIconProps {
-  platform: InfluencerPlatform;
+  platform: PlatformIconName;
   className?: string;
 }
 

@@ -1,4 +1,4 @@
-import { TextAlignJustify } from "lucide-react";
+import { ChevronLeft, TextAlignJustify } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
 
@@ -7,6 +7,9 @@ import type { ReactNode } from "react";
 // Figma Header / Main(5045:50670, PC 1210×64)·Header / Main / Mobile(5084:122374, 360×52).
 // 모바일 시안에는 제목이 없어 화면에서는 숨기고 스크린 리더용 h1로만 남김. 고객센터처럼 모바일 시안에 제목이 있는 화면은 `isTitleVisibleOnMobile`로 보여 줌.
 // PC 헤더 레이아웃은 사이드바 레일이 노출되는 tablet(768)부터 적용함. 그 아래에서는 메뉴 버튼으로 사이드바를 엶.
+const ICON_BUTTON_CLASS =
+  "flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-md text-foreground transition-colors outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2";
+
 interface AppHeaderProps {
   title?: string;
   // PC에서 제목 앞에 붙는 20px 아이콘 (모바일 시안에는 없음)
@@ -15,6 +18,9 @@ interface AppHeaderProps {
   isTitleVisibleOnMobile?: boolean;
   menuLabel: string;
   onClickMenu?: () => void;
+  /** 넘기면 메뉴 버튼 대신 뒤로가기("<") 버튼을 모든 폭에서 보여 줌. 사이드바 없이 한 작업에 집중하는 화면(캠페인 등록)에서 씀. */
+  backLabel?: string;
+  onClickBack?: () => void;
   // 오른쪽 영역: HeaderPointButton·HeaderAlertButton·UserMenu 또는 HeaderGuestActions
   children?: ReactNode;
   className?: string;
@@ -26,6 +32,8 @@ export function AppHeader({
   isTitleVisibleOnMobile = false,
   menuLabel,
   onClickMenu,
+  backLabel,
+  onClickBack,
   children,
   className,
 }: AppHeaderProps) {
@@ -37,15 +45,30 @@ export function AppHeader({
       )}
     >
       <div className="flex min-w-0 flex-1 items-center tablet:gap-2">
-        <button
-          type="button"
-          aria-label={menuLabel}
-          onClick={onClickMenu}
-          className="flex size-11 shrink-0 cursor-pointer items-center justify-center rounded-md text-foreground transition-colors outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 tablet:hidden"
-        >
-          {/* Figma 예외: 메뉴 아이콘 선 1.5px(전역 1px 규칙과 다름). */}
-          <TextAlignJustify className="size-6" strokeWidth={1.5} />
-        </button>
+        {backLabel ? (
+          // Figma Header / Main: PC·TAB은 테두리 있는 32px 아이콘 버튼(16px 아이콘), 모바일(Header / Main / Mobile)은 테두리 없는 44px 버튼(24px 아이콘).
+          <button
+            type="button"
+            aria-label={backLabel}
+            onClick={onClickBack}
+            className={cn(
+              ICON_BUTTON_CLASS,
+              "tablet:mr-1 tablet:size-8 tablet:border tablet:border-border",
+            )}
+          >
+            <ChevronLeft className="size-6 tablet:size-4" />
+          </button>
+        ) : (
+          <button
+            type="button"
+            aria-label={menuLabel}
+            onClick={onClickMenu}
+            className={cn(ICON_BUTTON_CLASS, "tablet:hidden")}
+          >
+            {/* Figma 예외: 메뉴 아이콘 선 1.5px(전역 1px 규칙과 다름). */}
+            <TextAlignJustify className="size-6" strokeWidth={1.5} />
+          </button>
+        )}
         {icon && (
           <span className="hidden shrink-0 text-foreground tablet:flex [&_svg]:size-5">
             {icon}

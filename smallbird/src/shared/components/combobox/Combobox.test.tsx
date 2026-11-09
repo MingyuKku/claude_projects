@@ -20,6 +20,10 @@ beforeAll(() => {
     disconnect() {}
   };
   Element.prototype.scrollIntoView = () => {};
+  // MO 시트(vaul)가 드래그를 시작할 때 쓰는 포인터 캡처가 jsdom에 없음.
+  Element.prototype.setPointerCapture = () => {};
+  Element.prototype.releasePointerCapture = () => {};
+  Element.prototype.hasPointerCapture = () => false;
 });
 
 // jsdom에는 matchMedia가 없어 화면 폭을 흉내 냄. 기본은 TAB 이상(팝오버), MO 시트 테스트만 좁은 폭으로 바꿈.
@@ -140,5 +144,52 @@ describe("Combobox", () => {
 
     expect(screen.queryByPlaceholderText("검색")).toBeNull();
     expect(screen.getAllByRole("option")).toHaveLength(3);
+  });
+});
+
+describe("Combobox 맨 위 추가 줄", () => {
+  function renderWithAction(onAction = vi.fn()) {
+    render(
+      <Combobox
+        options={OPTIONS}
+        placeholder="지역 선택"
+        searchPlaceholder="검색"
+        emptyText="결과 없음"
+        isSearchable={false}
+        action={{ label: "지역 추가", onSelect: onAction }}
+      />,
+    );
+    return onAction;
+  }
+
+  it("목록 맨 위에 추가 줄이 보이고, 누르면 메뉴가 닫히며 동작을 부른다", async () => {
+    const user = userEvent.setup();
+    const onAction = renderWithAction();
+
+    await user.click(screen.getByRole("combobox"));
+    await user.click(screen.getByRole("button", { name: "지역 추가" }));
+
+    expect(onAction).toHaveBeenCalledTimes(1);
+    expect(screen.queryByRole("option")).not.toBeInTheDocument();
+  });
+
+  it("추가 줄은 선택지가 아니라서 옵션에 들어가지 않는다", async () => {
+    const user = userEvent.setup();
+    renderWithAction();
+
+    await user.click(screen.getByRole("combobox"));
+
+    expect(screen.getAllByRole("option")).toHaveLength(OPTIONS.length);
+  });
+
+  it("MO(시트)에서도 추가 줄을 쓸 수 있다", async () => {
+    stubWidth(false);
+    const user = userEvent.setup();
+    const onAction = renderWithAction();
+
+    await user.click(screen.getByRole("combobox"));
+    await user.click(await screen.findByRole("button", { name: "지역 추가" }));
+
+    expect(onAction).toHaveBeenCalledTimes(1);
   });
 });

@@ -18,6 +18,8 @@ interface OptionSelectProps {
   onChangeValue: (value: string) => void;
   placeholder?: string;
   disabled?: boolean;
+  /** 메뉴의 최대 높이 같은 크기 조정(예: 항목이 많을 때 스크롤하는 높이). */
+  contentClassName?: string;
   id?: string;
   "aria-labelledby"?: string;
   "aria-describedby"?: string;
@@ -30,6 +32,7 @@ export function OptionSelect({
   onChangeValue,
   placeholder,
   disabled,
+  contentClassName,
   ...controlProps
 }: OptionSelectProps) {
   return (
@@ -37,7 +40,7 @@ export function OptionSelect({
       <SelectTrigger {...controlProps}>
         <SelectValue placeholder={placeholder} />
       </SelectTrigger>
-      <SelectContent>
+      <SelectContent className={contentClassName}>
         {options.map((option) => (
           <SelectItem key={option.value} value={option.value}>
             {option.label}

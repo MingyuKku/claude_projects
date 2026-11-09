@@ -1,0 +1,440 @@
+{
+  "step": {
+    "campaign-info": {
+      "title": "キャンペーン情報"
+    },
+    "product": {
+      "title": "商品情報"
+    },
+    "influencer": {
+      "title": "インフルエンサー条件"
+    },
+    "add-ons": {
+      "title": "付加サービス"
+    },
+    "intro": {
+      "title": "캠페인 소개서 作成"
+    },
+    "conditions": {
+      "title": "進行条件"
+    },
+    "policy": {
+      "title": "ポリシー同意"
+    },
+    "payment": {
+      "title": "決済"
+    }
+  },
+  "sidebar": {
+    "label": "キャンペーン登録ステップ",
+    "open": "ステップ一覧を開く",
+    "summary": "基本情報"
+  },
+  "footer": {
+    "saveDraft": "一時保存",
+    "prev": "戻る",
+    "next": "次へ",
+    "pay": "決済する",
+    "preview": "プレビュー"
+  },
+  "incomplete": {
+    "title": "必須項目が未入力です",
+    "stepDescription": "このページの項目をすべて入力しないとキャンペーンを登録できません。",
+    "payDescription": "未入力の項目があるため決済できません。表示されたステップの必須項目をすべて入力してください。"
+  },
+  "toast": {
+    "saved": "一時保存しました。",
+    "saveFailed": "保存できませんでした。しばらくしてからもう一度お試しください。"
+  },
+  "campaignInfo": {
+    "code": {
+      "label": "キャンペーンコード"
+    },
+    "name": {
+      "label": "キャンペーン名",
+      "placeholder": "キャンペーン名を入力してください。"
+    },
+    "type": {
+      "label": "キャンペーンタイプ"
+    },
+    "brand": {
+      "label": "ブランド名",
+      "placeholder": "ブランドを選択してください。",
+      "add": "ブランド追加"
+    },
+    "startDate": {
+      "label": "開始希望日",
+      "placeholder": "日付を選択してください。",
+      "help": "終了日は自動で30日後に設定されます。"
+    },
+    "period": {
+      "label": "キャンペーン期間"
+    },
+    "typeChange": {
+      "title": "キャンペーンタイプ変更",
+      "description": "キャンペーンタイプを変更すると、商品情報とタイプ別の進行条件に入力した内容がリセットされます。変更しますか？",
+      "confirm": "変更"
+    }
+  },
+  "addBrand": {
+    "title": "ブランド追加",
+    "nameKo": {
+      "label": "ブランド名(韓国語)"
+    },
+    "nameEn": {
+      "label": "ブランド名(英語)"
+    },
+    "name": {
+      "placeholder": "ブランド名を入力してください。"
+    },
+    "image": {
+      "label": "ブランド画像",
+      "title": "ブランド画像をアップロードしてください。",
+      "description": "未設定の場合は基本プロフィールになります。"
+    }
+  },
+  "fileError": {
+    "format": "JPG、PNGファイルのみアップロードできます。",
+    "size": "10MB以下のファイルのみアップロードできます。",
+    "count": "最大5個までアップロードできます。"
+  },
+  "loadPrevious": {
+    "title": "以前のキャンペーンを読み込む",
+    "open": "以前のキャンペーンを読み込む",
+    "searchPlaceholder": "キャンペーン名またはブランド名で検索",
+    "search": "検索",
+    "listTitle": "キャンペーン一覧",
+    "column": {
+      "name": "キャンペーン名",
+      "brand": "ブランド",
+      "type": "タイプ",
+      "platform": "プラットフォーム",
+      "createdDate": "登録日"
+    },
+    "select": "{{name}}を選択",
+    "submit": "キャンペーンを読み込む",
+    "overwrite": {
+      "title": "以前のキャンペーンを読み込む",
+      "description": "選択したキャンペーンの内容で、現在入力中の1〜6ステップの内容が置き換わります。読み込みますか？",
+      "confirm": "読み込む"
+    }
+  },
+  "product": {
+    "delivery": {
+      "name": {
+        "label": "協賛製品名と数量",
+        "placeholder": "協賛製品名を入力してください。"
+      },
+      "quantity": {
+        "label": "1人あたりの提供数量",
+        "placeholder": "1人あたりの提供数量を入力してください。",
+        "unit": "個"
+      },
+      "return": {
+        "label": "返品回収(任意)",
+        "no": "回収なし",
+        "yes": "回収あり",
+        "inform": "最終選定されたクリエイターがキャンペーンを取り消す場合に備え、協賛製品の返品回収先住所を入力してください。",
+        "address": {
+          "label": "協賛製品の返品回収先住所",
+          "placeholder": "回収先住所を入力してください。"
+        },
+        "fee": {
+          "label": "返品回収の送料",
+          "placeholder": "返品の送料を入力してください。"
+        },
+        "contact": {
+          "label": "返品回収の連絡先",
+          "placeholder": "回収時の連絡先を入力してください。"
+        }
+      },
+      "price": {
+        "label": "協賛製品の金額",
+        "placeholder": "製品1個あたりの金額を入力してください。",
+        "unit": "ウォン"
+      },
+      "rental": {
+        "label": "대여 상품",
+        "no": "通常商品",
+        "yes": "대여 상품",
+        "inform1": "協賛製品の金額が100万ウォン以上の高価な製品は、대여 상품としてキャンペーンを進行できます。",
+        "inform2": "ただし、商品の回収は広告主が直接行う必要があります。",
+        "address": {
+          "label": "대여 상품の回収先住所",
+          "placeholder": "回収先住所を入力してください。"
+        },
+        "fee": {
+          "label": "商品回収の送料",
+          "placeholder": "回収の送料を入力してください。"
+        },
+        "contact": {
+          "label": "商品回収の連絡先",
+          "placeholder": "回収時の連絡先を入力してください。"
+        }
+      }
+    },
+    "pickup": {
+      "feeUnit": "ウォン"
+    },
+    "press": {
+      "notice": {
+        "title": "次のステップで入力してください。",
+        "scope": "기자단형は、商品提供・店舗訪問・購入ではなく、ブランドやサービスの取材・記事作成を行うキャンペーンです。",
+        "guide": "記事作成ガイド(テーマ、キーワード、参考資料など)は「{{stepName}}」ステップで詳しく案内できます。"
+      },
+      "empty": {
+        "title": "기자단형は協賛情報の入力が不要です。",
+        "description1": "記事の方向性と詳細ガイドは",
+        "description2": "次のステップ「{{stepName}}」で入力してください。"
+      },
+      "stepName": "캠페인 소개서"
+    },
+    "storeVisit": {
+      "name": {
+        "label": "訪問店舗名",
+        "placeholder": "訪問店舗名を入力してください。"
+      },
+      "address": {
+        "label": "店舗住所",
+        "placeholder": "店舗住所を入力してください。"
+      },
+      "coupon": {
+        "label": "訪問クーポン認証番号",
+        "placeholder": "訪問クーポン認証番号を入力してください。"
+      },
+      "benefit": {
+        "label": "訪問時の特典と数量",
+        "placeholder": "訪問時に提供する特典と数量を詳しく入力してください。"
+      }
+    },
+    "purchase": {
+      "name": {
+        "label": "購入商品名",
+        "placeholder": "購入商品名を入力してください。"
+      },
+      "price": {
+        "label": "購入商品金額",
+        "placeholder": "購入商品金額を入力してください。",
+        "unit": "ウォン"
+      },
+      "url": {
+        "label": "購入先リンク(URL)",
+        "placeholder": "購入先リンクを入力してください。",
+        "check": "URL確認",
+        "valid": "有効なURLです。",
+        "invalid": "無効なURLです。"
+      },
+      "guide": {
+        "label": "購入に関する案内",
+        "placeholder": "購入方法、オプション、注意事項など購入に関する内容を入力してください。"
+      }
+    }
+  },
+  "addressSearch": {
+    "button": "住所検索",
+    "detailPlaceholder": "詳細住所を入力",
+    "failed": "住所検索を読み込めませんでした。しばらくしてからもう一度お試しください。"
+  },
+  "influencer": {
+    "platform": {
+      "label": "プラットフォーム選択"
+    },
+    "gender": {
+      "label": "希望性別"
+    },
+    "ageGroup": {
+      "label": "希望年齢層(複数選択可)"
+    },
+    "topic": {
+      "label": "投稿テーマ(複数選択可)"
+    }
+  },
+  "addOns": {
+    "notice": {
+      "title": "追加サービスは任意です。",
+      "body": "必要な場合のみ選択でき、選択しなくても次のステップに進めます。"
+    },
+    "price": {
+      "total": "{{amount}}ウォン",
+      "perInfluencer": "募集インフルエンサー1人あたり{{amount}}ウォン"
+    },
+    "description": {
+      "AI_POSTING_GUIDE": "キャンペーンの目的と商品に合った最適な投稿ガイドを自動で作成します。",
+      "AI_MANUSCRIPT_CONFIRM": "インフルエンサーが作成した原稿をAIが確認し、ガイドの遵守状況をお知らせします。",
+      "AI_RECEIPT_REVIEW": "インフルエンサーが作成したレシートレビューをAIが確認し、ガイドの遵守状況をお知らせします。"
+    }
+  },
+  "intro": {
+    "mode": {
+      "label": "作成方法",
+      "ai": {
+        "title": "AI 캠페인 소개서",
+        "description": "商品情報をもとにAIがガイドを作成します。"
+      },
+      "manual": {
+        "title": "自分で作成",
+        "description": "캠페인 소개서を自分で作成して詳しく案内できます。"
+      }
+    },
+    "mainImage": {
+      "label": "メイン画像",
+      "title": "上部に表示される代表画像をアップロードしてください。",
+      "description": "JPG、PNG、10MB以下(推奨 1200 x 630)"
+    },
+    "media": {
+      "label": "商品詳細画像/動画",
+      "title": "商品詳細画像/動画をアップロードしてください。",
+      "drop": "商品詳細画像/動画をドラッグ&ドロップしてください。",
+      "description": "最大{{max}}個までアップロード可能",
+      "remove": "削除"
+    },
+    "description": {
+      "label": "キャンペーン説明",
+      "placeholder": "キャンペーンの紹介と期待する内容を入力してください。"
+    },
+    "notice": {
+      "label": "注意事項",
+      "placeholder": "キャンペーンの注意事項を入力してください。"
+    },
+    "hashtags": {
+      "label": "必須ハッシュタグ(キーワード)",
+      "placeholder": "キーワードを入力してEnterで追加",
+      "remove": "{{tag}}を削除"
+    },
+    "ai": {
+      "url": {
+        "label": "商品/サービスURL",
+        "placeholder": "URLを入力してください。",
+        "help": "入力されたURLとキャンペーン情報をもとにブランドの特徴と商品情報を分析し、캠페인 소개서を作成します。"
+      },
+      "generate": "AI生成",
+      "regenerate": "再生成",
+      "result": {
+        "title": "AI生成"
+      },
+      "generating": {
+        "title": "AI 캠페인 소개서を生成中",
+        "message": "生成が完了すると캠페인 소개서を確認できます。",
+        "note": "状況により最大5分かかることがあります。"
+      },
+      "failed": "AI生成に失敗しました。URLを確認してもう一度お試しください。",
+      "startFailed": "AI生成を開始できませんでした。しばらくしてからもう一度お試しください。",
+      "done": "AI生成が完了しました。",
+      "sidebarBusy": "生成中"
+    }
+  },
+  "conditions": {
+    "headcount": {
+      "label": "進行人数",
+      "recruitLabel": "募集人数",
+      "unit": "名",
+      "decrease": "人数を減らす",
+      "increase": "人数を増やす"
+    },
+    "period": {
+      "label": "投稿維持期間",
+      "option": "{{count}}か月",
+      "custom": "直接入力",
+      "placeholder": "期間を入力してください。",
+      "unit": "か月"
+    },
+    "copyright": {
+      "label": "2차 저작권の使用",
+      "yes": "使用",
+      "no": "使用しない"
+    },
+    "reward": {
+      "label": "리워드",
+      "placeholder": "インフルエンサーに支払う리워드金額を入力してください。",
+      "unit": "ウォン",
+      "help": "入力した리워드金額はキャンペーン終了後の最終精算金額に反映されます。",
+      "helpWithMax": "最大{{amount}}ウォンまで可能で、入力した리워드金額はキャンペーン終了後の最終精算金額に反映されます。",
+      "placeholderShort": "支払う리워드金額を入力"
+    },
+    "empty": {
+      "title": "設定する進行条件はありません。",
+      "body": "PICK형 구매리뷰형は入力する進行条件がありません。次のステップへお進みください。"
+    }
+  },
+  "policy": {
+    "all": "規約にすべて同意",
+    "agree": "同意する",
+    "view": "{{title}}の全文を見る",
+    "items": {
+      "service": {
+        "label": "サービス利用規約に同意",
+        "title": "サービス利用規約"
+      },
+      "privacy": {
+        "label": "個人情報処理方針に同意",
+        "title": "個人情報処理方針"
+      },
+      "operation": {
+        "label": "キャンペーン運営ポリシーに同意",
+        "title": "キャンペーン運営ポリシー"
+      },
+      "reward": {
+        "label": "리워드及び決済関連ポリシーに同意",
+        "title": "리워드及び決済関連ポリシー"
+      }
+    }
+  },
+  "payment": {
+    "won": "{{amount}}ウォン",
+    "summary": {
+      "title": "キャンペーン概要",
+      "serviceType": "サービスタイプ",
+      "campaignType": "キャンペーンタイプ",
+      "headcount": "{{count}}名",
+      "reward": "리워드",
+      "rewardProduct": "製品提供({{amount}}ウォン相当)",
+      "period": "キャンペーン期間",
+      "periodValue": "{{start}} - {{end}}({{days}}日)"
+    },
+    "amount": {
+      "title": "決済概要",
+      "addOnProducts": "追加サービス決済商品",
+      "addOnAmount": "追加サービス金額",
+      "perInfluencer": "(1件あたり{{unitPrice}}ウォン * 募集人数{{count}}名)",
+      "reward": "리워드",
+      "total": "合計決済金額",
+      "notice": "決済はビッグバードマネーのみで行われます。"
+    },
+    "policy": {
+      "title": "規約同意"
+    },
+    "method": {
+      "title": "決済方法",
+      "bigbirdMoney": "ビッグバードマネー",
+      "required": "必須"
+    },
+    "alert": {
+      "insufficient": {
+        "title": "決済金額不足",
+        "description": "ビッグバードマネーの残高が不足しています。チャージしてからもう一度決済してください。"
+      },
+      "done": {
+        "title": "決済完了",
+        "description": "決済が完了しました。"
+      }
+    },
+    "error": {
+      "failed": "決済に失敗しました。しばらくしてからもう一度お試しください。",
+      "amountChanged": "決済金額が変更されました。決済概要を確認してからもう一度決済してください。"
+    }
+  },
+  "editLock": {
+    "amount": "決済金額に影響する値のため修正できません。",
+    "done": "すでに同意・決済済みの内容のため修正できません。"
+  },
+  "saveBlocked": {
+    "NOT_EDITABLE": {
+      "title": "修正できない状態です",
+      "description": "このキャンペーンはすでに承認審査中または承認済みのため、修正できません。登録内容に移動します。"
+    },
+    "VERSION_CONFLICT": {
+      "title": "他の画面で修正されました",
+      "description": "このキャンペーンが他の画面で先に修正されたため、保存できません。最新の内容を再読み込みします。"
+    }
+  }
+}

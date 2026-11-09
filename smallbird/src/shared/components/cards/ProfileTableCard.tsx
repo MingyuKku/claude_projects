@@ -13,7 +13,8 @@ export interface ProfileTableCardRow {
 }
 
 interface ProfileTableCardProps extends ComponentProps<"div"> {
-  avatar: ReactNode;
+  /** 이름 앞 프로필 이미지. 없으면 이름만 보임. */
+  avatar?: ReactNode;
   name: ReactNode;
   description?: ReactNode;
   /** 오른쪽 위 버튼 묶음(`<Toggle variant="outline" size="sm">` 등) */

@@ -12,11 +12,11 @@ export function useRequestCharge() {
   // state는 같은 렌더 안의 연속 제출(Enter 연타)을 못 막아서 ref로도 막음.
   const isInFlightRef = useRef(false);
 
-  async function request(amount: number) {
+  async function request(amount: number, returnPath?: string) {
     if (isInFlightRef.current) return null;
     isInFlightRef.current = true;
     setIsRequesting(true);
-    const [error] = await tryit(requestCharge)(amount);
+    const [error] = await tryit(requestCharge)(amount, returnPath);
     isInFlightRef.current = false;
     setIsRequesting(false);
     if (error) {

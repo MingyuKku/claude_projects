@@ -1,0 +1,19 @@
+{
+  "title": "活动注册",
+  "heading": "基本信息",
+  "sidebar": {
+    "label": "活动注册步骤",
+    "summary": "基本信息",
+    "steps": {
+      "campaignInfo": "填写活动信息",
+      "product": "填写产品信息",
+      "influencer": "设置达人条件",
+      "addOns": "附加服务",
+      "intro": "撰写캠페인 소개서",
+      "conditions": "设置执行条件",
+      "policy": "同意活动政策",
+      "payment": "支付"
+    },
+    "open": "打开步骤列表"
+  }
+}

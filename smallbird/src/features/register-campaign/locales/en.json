@@ -1,0 +1,440 @@
+{
+  "step": {
+    "campaign-info": {
+      "title": "Campaign info"
+    },
+    "product": {
+      "title": "Product info"
+    },
+    "influencer": {
+      "title": "Influencer criteria"
+    },
+    "add-ons": {
+      "title": "Add-ons"
+    },
+    "intro": {
+      "title": "Write 캠페인 소개서"
+    },
+    "conditions": {
+      "title": "Conditions"
+    },
+    "policy": {
+      "title": "Campaign policy"
+    },
+    "payment": {
+      "title": "Payment"
+    }
+  },
+  "sidebar": {
+    "label": "Campaign registration steps",
+    "open": "Open steps",
+    "summary": "Basic info"
+  },
+  "footer": {
+    "saveDraft": "Save draft",
+    "prev": "Back",
+    "next": "Next",
+    "pay": "Pay",
+    "preview": "Preview"
+  },
+  "incomplete": {
+    "title": "Required fields missing",
+    "stepDescription": "You can't register the campaign until every field on this page is filled in.",
+    "payDescription": "Some fields are empty, so payment isn't possible. Fill in the required fields in the marked steps."
+  },
+  "toast": {
+    "saved": "Draft saved.",
+    "saveFailed": "Couldn't save. Please try again later."
+  },
+  "campaignInfo": {
+    "code": {
+      "label": "Campaign code"
+    },
+    "name": {
+      "label": "Campaign name",
+      "placeholder": "Enter the campaign name."
+    },
+    "type": {
+      "label": "Campaign type"
+    },
+    "brand": {
+      "label": "Brand",
+      "placeholder": "Select a brand.",
+      "add": "Add brand"
+    },
+    "startDate": {
+      "label": "Desired start date",
+      "placeholder": "Select a date.",
+      "help": "The end date is automatically set to 30 days later."
+    },
+    "period": {
+      "label": "Campaign period"
+    },
+    "typeChange": {
+      "title": "Change campaign type",
+      "description": "Changing the campaign type resets what you entered in Product info and the type-specific conditions. Change it?",
+      "confirm": "Change"
+    }
+  },
+  "addBrand": {
+    "title": "Add brand",
+    "nameKo": {
+      "label": "Brand name (Korean)"
+    },
+    "nameEn": {
+      "label": "Brand name (English)"
+    },
+    "name": {
+      "placeholder": "Enter the brand name."
+    },
+    "image": {
+      "label": "Brand image",
+      "title": "Upload a brand image.",
+      "description": "A default profile is used if none is uploaded."
+    }
+  },
+  "fileError": {
+    "format": "Only JPG and PNG files can be uploaded.",
+    "size": "Only files up to 10MB can be uploaded.",
+    "count": "You can upload up to 5 files."
+  },
+  "loadPrevious": {
+    "title": "Load previous campaign",
+    "open": "Load previous campaign",
+    "searchPlaceholder": "Search by campaign or brand name",
+    "search": "Search",
+    "listTitle": "Campaigns",
+    "column": {
+      "name": "Campaign",
+      "brand": "Brand",
+      "type": "Type",
+      "platform": "Platform",
+      "createdDate": "Registered"
+    },
+    "select": "Select {{name}}",
+    "submit": "Load campaign",
+    "overwrite": {
+      "title": "Load previous campaign",
+      "description": "The selected campaign will replace what you entered in steps 1–6. Load it?",
+      "confirm": "Load"
+    }
+  },
+  "product": {
+    "delivery": {
+      "name": {
+        "label": "Sponsored product and quantity",
+        "placeholder": "Enter the sponsored product name."
+      },
+      "quantity": {
+        "label": "Quantity per influencer",
+        "placeholder": "Enter the quantity per influencer.",
+        "unit": "pcs"
+      },
+      "return": {
+        "label": "Product return (optional)",
+        "no": "No return",
+        "yes": "Return",
+        "inform": "If the selected creator cancels the campaign, enter the return address for the sponsored product.",
+        "address": {
+          "label": "Return address for sponsored product",
+          "placeholder": "Enter the return address."
+        },
+        "fee": {
+          "label": "Return shipping fee",
+          "placeholder": "Enter the return shipping fee."
+        },
+        "contact": {
+          "label": "Return contact",
+          "placeholder": "Enter a contact number for the return."
+        }
+      },
+      "price": {
+        "label": "Sponsored product price",
+        "placeholder": "Enter the price per product.",
+        "unit": "KRW"
+      },
+      "rental": {
+        "label": "대여 상품",
+        "no": "Standard",
+        "yes": "대여 상품",
+        "inform1": "Sponsored products worth 1,000,000 KRW or more can run as 대여 상품.",
+        "inform2": "However, you must collect the product yourself.",
+        "address": {
+          "label": "Return address for 대여 상품",
+          "placeholder": "Enter the return address."
+        },
+        "fee": {
+          "label": "Product return shipping fee",
+          "placeholder": "Enter the return shipping fee."
+        },
+        "contact": {
+          "label": "Product return contact",
+          "placeholder": "Enter a contact number for the return."
+        }
+      }
+    },
+    "pickup": {
+      "feeUnit": "KRW"
+    },
+    "press": {
+      "notice": {
+        "title": "Enter this in the next step.",
+        "scope": "기자단형 covers reporting and article writing about a brand or service, not product provision, store visits or purchases.",
+        "guide": "Article guidelines such as topics, keywords and references can be detailed in the '{{stepName}}' step."
+      },
+      "empty": {
+        "title": "기자단형 needs no product details.",
+        "description1": "Enter the article direction and detailed guide",
+        "description2": "in the next step, '{{stepName}}'."
+      },
+      "stepName": "캠페인 소개서"
+    },
+    "storeVisit": {
+      "name": {
+        "label": "Store name",
+        "placeholder": "Enter the store name."
+      },
+      "address": {
+        "label": "Store address",
+        "placeholder": "Enter the store address."
+      },
+      "coupon": {
+        "label": "Visit coupon code",
+        "placeholder": "Enter the visit coupon code."
+      },
+      "benefit": {
+        "label": "Visit benefits and quantity",
+        "placeholder": "Describe the benefits and quantity offered on a visit."
+      }
+    },
+    "purchase": {
+      "name": {
+        "label": "Purchase product name",
+        "placeholder": "Enter the purchase product name."
+      },
+      "price": {
+        "label": "Purchase product price",
+        "placeholder": "Enter the purchase product price.",
+        "unit": "KRW"
+      },
+      "url": {
+        "label": "Purchase link (URL)",
+        "placeholder": "Enter the purchase link.",
+        "check": "Check URL",
+        "valid": "This URL is valid.",
+        "invalid": "This URL is not valid."
+      },
+      "guide": {
+        "label": "Purchase guide",
+        "placeholder": "Enter purchase details such as how to buy, options and precautions."
+      }
+    }
+  },
+  "addressSearch": {
+    "button": "Find address",
+    "detailPlaceholder": "Detail address",
+    "failed": "Couldn't load address search. Please try again later."
+  },
+  "influencer": {
+    "platform": {
+      "label": "Select platform"
+    },
+    "gender": {
+      "label": "Preferred gender"
+    },
+    "ageGroup": {
+      "label": "Preferred age group (multiple allowed)"
+    },
+    "topic": {
+      "label": "Post topics (multiple allowed)"
+    }
+  },
+  "addOns": {
+    "notice": {
+      "title": "Add-on services are optional.",
+      "body": "Select them only if needed. You can go to the next step without choosing any."
+    },
+    "price": {
+      "total": "{{amount}} KRW",
+      "perInfluencer": "{{amount}} KRW per recruited influencer"
+    },
+    "description": {
+      "AI_POSTING_GUIDE": "Automatically creates the best posting guide for your campaign goal and product.",
+      "AI_MANUSCRIPT_CONFIRM": "AI reviews the draft written by the influencer and checks guide compliance.",
+      "AI_RECEIPT_REVIEW": "AI reviews the receipt review written by the influencer and checks guide compliance."
+    }
+  },
+  "intro": {
+    "mode": {
+      "label": "Writing method",
+      "ai": {
+        "title": "AI 캠페인 소개서",
+        "description": "AI creates a guide from your product info."
+      },
+      "manual": {
+        "title": "Write it myself",
+        "description": "Write the 캠페인 소개서 yourself for more detail."
+      }
+    },
+    "mainImage": {
+      "label": "Main image",
+      "title": "Upload the cover image shown at the top.",
+      "description": "JPG, PNG, up to 10MB (1200 x 630 recommended)"
+    },
+    "media": {
+      "label": "Product images/videos",
+      "title": "Upload product images or videos.",
+      "drop": "Drag and drop product images or videos.",
+      "description": "Up to {{max}} files",
+      "remove": "Remove"
+    },
+    "description": {
+      "label": "Campaign description",
+      "placeholder": "Describe the campaign and what you expect."
+    },
+    "notice": {
+      "label": "Notes",
+      "placeholder": "Enter campaign notes."
+    },
+    "hashtags": {
+      "label": "Required hashtags (keywords)",
+      "placeholder": "Type a keyword and press Enter",
+      "remove": "Remove {{tag}}"
+    },
+    "ai": {
+      "url": {
+        "label": "Product/service URL",
+        "placeholder": "Enter a URL.",
+        "help": "AI analyzes brand features and product info from the URL and campaign details to create the 캠페인 소개서."
+      },
+      "generate": "Generate with AI",
+      "regenerate": "Regenerate",
+      "result": {
+        "title": "AI generated"
+      },
+      "generating": {
+        "title": "Generating AI 캠페인 소개서",
+        "message": "You can review the 캠페인 소개서 once it is ready.",
+        "note": "This may take up to 5 minutes."
+      },
+      "failed": "AI generation failed. Check the URL and try again.",
+      "startFailed": "Could not start AI generation. Please try again later.",
+      "done": "AI generation is complete.",
+      "sidebarBusy": "Generating"
+    }
+  },
+  "conditions": {
+    "headcount": {
+      "label": "Participants",
+      "recruitLabel": "Recruits",
+      "unit": "people",
+      "decrease": "Decrease",
+      "increase": "Increase"
+    },
+    "period": {
+      "label": "Posting retention period",
+      "option": "{{count}} mo.",
+      "custom": "Custom",
+      "placeholder": "Enter the period.",
+      "unit": "mo."
+    },
+    "copyright": {
+      "label": "Use of 2차 저작권",
+      "yes": "Allowed",
+      "no": "Not allowed"
+    },
+    "reward": {
+      "label": "리워드",
+      "placeholder": "Enter the 리워드 paid to each influencer.",
+      "unit": "KRW",
+      "help": "The 리워드 you enter is reflected in the final settlement after the campaign ends.",
+      "helpWithMax": "Up to {{amount}} KRW. The 리워드 you enter is reflected in the final settlement after the campaign ends.",
+      "placeholderShort": "Enter 리워드 per influencer"
+    },
+    "empty": {
+      "title": "No campaign conditions to set.",
+      "body": "PICK형 구매리뷰형 has no conditions to enter. Please continue to the next step."
+    }
+  },
+  "policy": {
+    "all": "Agree to all terms",
+    "agree": "Agree",
+    "view": "View {{title}}",
+    "items": {
+      "service": {
+        "label": "Agree to Terms of Service",
+        "title": "Terms of Service"
+      },
+      "privacy": {
+        "label": "Agree to Privacy Policy",
+        "title": "Privacy Policy"
+      },
+      "operation": {
+        "label": "Agree to Campaign Operation Policy",
+        "title": "Campaign Operation Policy"
+      },
+      "reward": {
+        "label": "Agree to 리워드 and Payment Policy",
+        "title": "리워드 and Payment Policy"
+      }
+    }
+  },
+  "payment": {
+    "won": "{{amount}} KRW",
+    "summary": {
+      "title": "Campaign summary",
+      "serviceType": "Service type",
+      "campaignType": "Campaign type",
+      "headcount": "{{count}}",
+      "reward": "리워드",
+      "rewardProduct": "Product provided (worth {{amount}} KRW)",
+      "period": "Campaign period",
+      "periodValue": "{{start}} - {{end}} ({{days}} days)"
+    },
+    "amount": {
+      "title": "Payment summary",
+      "addOnProducts": "Add-on services",
+      "addOnAmount": "Add-on amount",
+      "perInfluencer": "({{unitPrice}} KRW each * {{count}} recruits)",
+      "reward": "리워드",
+      "total": "Total payment",
+      "notice": "Payment is made with BigBird Money only."
+    },
+    "policy": {
+      "title": "Terms agreement"
+    },
+    "method": {
+      "title": "Payment method",
+      "bigbirdMoney": "BigBird Money",
+      "required": "Required"
+    },
+    "alert": {
+      "insufficient": {
+        "title": "Insufficient balance",
+        "description": "Your BigBird Money balance is not enough. Please top up and try again."
+      },
+      "done": {
+        "title": "Payment complete",
+        "description": "Your payment is complete."
+      }
+    },
+    "error": {
+      "failed": "Payment failed. Please try again later.",
+      "amountChanged": "The payment amount has changed. Please review the payment summary and try again."
+    }
+  },
+  "editLock": {
+    "amount": "This value affects the payment amount, so it cannot be edited.",
+    "done": "This has already been agreed to and paid, so it cannot be edited."
+  },
+  "saveBlocked": {
+    "NOT_EDITABLE": {
+      "title": "This campaign can no longer be edited",
+      "description": "This campaign is already under review or approved, so it can no longer be edited. You will be taken to the campaign details."
+    },
+    "VERSION_CONFLICT": {
+      "title": "Edited elsewhere",
+      "description": "This campaign was edited on another screen first, so your changes cannot be saved. The latest version will be loaded."
+    }
+  }
+}

@@ -1,0 +1,19 @@
+{
+  "title": "キャンペーン登録",
+  "heading": "基本情報",
+  "sidebar": {
+    "label": "キャンペーン登録ステップ",
+    "summary": "基本情報",
+    "steps": {
+      "campaignInfo": "キャンペーン情報入力",
+      "product": "製品情報入力",
+      "influencer": "インフルエンサー条件設定",
+      "addOns": "追加サービス",
+      "intro": "캠페인 소개서作成",
+      "conditions": "進行条件設定",
+      "policy": "キャンペーンポリシー同意",
+      "payment": "決済"
+    },
+    "open": "ステップ一覧を開く"
+  }
+}

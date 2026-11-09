@@ -1,8 +1,8 @@
 import {
   INFLUENCER_PLATFORMS,
-  PlatformIcon,
   isInfluencerPlatform,
 } from "@/entities/platform";
+import { PlatformIcon } from "@/shared/components/platform-icon";
 import { useTranslation } from "@/shared/i18n";
 import {
   Select,

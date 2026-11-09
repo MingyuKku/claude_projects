@@ -28,7 +28,17 @@ let current: { pathname: string; href: string } | undefined;
 let hasForbiddenNotice = false;
 
 // Sub ID는 권한과 관계없이 들어갈 수 없는 화면. 서버도 403으로 막으며, 안내 없이 계정 설정으로 보냄(스펙 main.md).
-const MASTER_ONLY_PATHS: readonly string[] = [ROUTES.mypageSubscribe];
+// 하위 경로(`/campaign/register/:campaignId`)도 막도록 접두사로 비교함. 캠페인 등록 내역(`/campaign/:campaignId`)은 막지 않음.
+const MASTER_ONLY_PATHS: readonly string[] = [
+  ROUTES.mypageSubscribe,
+  ROUTES.campaignRegister,
+];
+
+function isMasterOnlyPath(pathname: string) {
+  return MASTER_ONLY_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`),
+  );
+}
 
 /** 화면을 그린 뒤 지금 주소를 남김. 권한 없는 이동을 막을 때 돌아올 곳. */
 export function rememberCurrentLocation({ pathname, search, hash }: Location) {
@@ -46,8 +56,7 @@ export function takeForbiddenNotice() {
 // 앱 안의 이동이면 지금 화면에 머물고, 첫 진입이면 홈으로 보낸 뒤 토스트로 알림. 돌아온 화면은 세션을 새로 받아
 // LNB 권한 표시도 갱신됨(다른 화면으로 옮기며 직전 결과를 버렸으므로).
 function forbidden(pathname: string): never {
-  if (MASTER_ONLY_PATHS.includes(pathname))
-    throw redirect(ROUTES.mypageAccount);
+  if (isMasterOnlyPath(pathname)) throw redirect(ROUTES.mypageAccount);
   // 홈마저 막히면 더 보낼 곳이 없으므로 에러 화면으로 끝냄. 홈이 보호 화면이 되어도 되돌려 보내기가 반복되지 않게 함.
   if (pathname === ROUTES.main) throw data(null, { status: 403 });
   hasForbiddenNotice = true;
@@ -94,7 +103,7 @@ export const requireSession: MiddlewareFunction = async ({
     throw error;
   }
   if (!session.isAllowed) forbidden(url.pathname);
-  if (session.authority === "SUB" && MASTER_ONLY_PATHS.includes(url.pathname)) {
+  if (session.authority === "SUB" && isMasterOnlyPath(url.pathname)) {
     throw redirect(ROUTES.mypageAccount);
   }
 

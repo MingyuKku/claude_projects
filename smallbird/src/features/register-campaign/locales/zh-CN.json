@@ -1,0 +1,440 @@
+{
+  "step": {
+    "campaign-info": {
+      "title": "活动信息"
+    },
+    "product": {
+      "title": "商品信息"
+    },
+    "influencer": {
+      "title": "网红条件"
+    },
+    "add-ons": {
+      "title": "附加服务"
+    },
+    "intro": {
+      "title": "填写 캠페인 소개서"
+    },
+    "conditions": {
+      "title": "进行条件"
+    },
+    "policy": {
+      "title": "活动政策同意"
+    },
+    "payment": {
+      "title": "支付"
+    }
+  },
+  "sidebar": {
+    "label": "活动登记步骤",
+    "open": "打开步骤列表",
+    "summary": "基本信息"
+  },
+  "footer": {
+    "saveDraft": "临时保存",
+    "prev": "上一步",
+    "next": "下一步",
+    "pay": "支付",
+    "preview": "预览"
+  },
+  "incomplete": {
+    "title": "必填项未填写",
+    "stepDescription": "未填写此页面的全部项目将无法登记活动。",
+    "payDescription": "有未填写的项目，无法支付。请填写标记步骤中的所有必填项。"
+  },
+  "toast": {
+    "saved": "已临时保存。",
+    "saveFailed": "保存失败，请稍后重试。"
+  },
+  "campaignInfo": {
+    "code": {
+      "label": "活动编号"
+    },
+    "name": {
+      "label": "活动名称",
+      "placeholder": "请输入活动名称。"
+    },
+    "type": {
+      "label": "活动类型"
+    },
+    "brand": {
+      "label": "品牌名称",
+      "placeholder": "请选择品牌。",
+      "add": "添加品牌"
+    },
+    "startDate": {
+      "label": "期望开始日期",
+      "placeholder": "请选择日期。",
+      "help": "结束日期将自动设为30天后。"
+    },
+    "period": {
+      "label": "活动周期"
+    },
+    "typeChange": {
+      "title": "更改活动类型",
+      "description": "更改活动类型后，商品信息和按类型设置的进行条件将被重置。要更改吗？",
+      "confirm": "更改"
+    }
+  },
+  "addBrand": {
+    "title": "添加品牌",
+    "nameKo": {
+      "label": "品牌名称(韩文)"
+    },
+    "nameEn": {
+      "label": "品牌名称(英文)"
+    },
+    "name": {
+      "placeholder": "请输入品牌名称。"
+    },
+    "image": {
+      "label": "品牌图片",
+      "title": "请上传品牌图片。",
+      "description": "未上传时将使用默认头像。"
+    }
+  },
+  "fileError": {
+    "format": "仅可上传 JPG、PNG 文件。",
+    "size": "仅可上传 10MB 以下的文件。",
+    "count": "最多可上传5个。"
+  },
+  "loadPrevious": {
+    "title": "加载以往活动",
+    "open": "加载以往活动",
+    "searchPlaceholder": "按活动名称或品牌名称搜索",
+    "search": "搜索",
+    "listTitle": "活动列表",
+    "column": {
+      "name": "活动名称",
+      "brand": "品牌",
+      "type": "类型",
+      "platform": "平台",
+      "createdDate": "登记日期"
+    },
+    "select": "选择{{name}}",
+    "submit": "加载活动",
+    "overwrite": {
+      "title": "加载以往活动",
+      "description": "所选活动的内容将替换您当前输入的第1~6步内容。要加载吗？",
+      "confirm": "加载"
+    }
+  },
+  "product": {
+    "delivery": {
+      "name": {
+        "label": "赞助商品名称及数量",
+        "placeholder": "请输入赞助商品名称。"
+      },
+      "quantity": {
+        "label": "每人提供数量",
+        "placeholder": "请输入每人提供数量。",
+        "unit": "件"
+      },
+      "return": {
+        "label": "退货回收(选填)",
+        "no": "不回收",
+        "yes": "回收",
+        "inform": "如果最终入选的创作者取消活动，请填写赞助商品的退货回收地址。",
+        "address": {
+          "label": "赞助商品退货回收地址",
+          "placeholder": "请输入回收地址。"
+        },
+        "fee": {
+          "label": "退货回收运费",
+          "placeholder": "请输入退货运费。"
+        },
+        "contact": {
+          "label": "退货回收联系方式",
+          "placeholder": "请输入回收时的联系方式。"
+        }
+      },
+      "price": {
+        "label": "赞助商品金额",
+        "placeholder": "请输入每件商品金额。",
+        "unit": "韩元"
+      },
+      "rental": {
+        "label": "대여 상품",
+        "no": "普通商品",
+        "yes": "대여 상품",
+        "inform1": "赞助商品金额达100万韩元以上的高价商品可作为 대여 상품 开展活动。",
+        "inform2": "但商品回收需由广告主自行办理。",
+        "address": {
+          "label": "대여 상품回收地址",
+          "placeholder": "请输入回收地址。"
+        },
+        "fee": {
+          "label": "商品回收运费",
+          "placeholder": "请输入回收运费。"
+        },
+        "contact": {
+          "label": "商品回收联系方式",
+          "placeholder": "请输入回收时的联系方式。"
+        }
+      }
+    },
+    "pickup": {
+      "feeUnit": "韩元"
+    },
+    "press": {
+      "notice": {
+        "title": "请在下一步输入。",
+        "scope": "기자단형不提供产品、不到店、不购买,而是对品牌及服务进行采访和撰写报道。",
+        "guide": "主题、关键词、参考资料等报道撰写指南可在“{{stepName}}”步骤中详细说明。"
+      },
+      "empty": {
+        "title": "기자단형无需输入赞助信息。",
+        "description1": "报道方向和详细指南",
+        "description2": "请在下一步“{{stepName}}”中输入。"
+      },
+      "stepName": "캠페인 소개서"
+    },
+    "storeVisit": {
+      "name": {
+        "label": "到访门店名称",
+        "placeholder": "请输入到访门店名称。"
+      },
+      "address": {
+        "label": "门店地址",
+        "placeholder": "请输入门店地址。"
+      },
+      "coupon": {
+        "label": "到访优惠券验证码",
+        "placeholder": "请输入到访优惠券验证码。"
+      },
+      "benefit": {
+        "label": "到访时提供的福利及数量",
+        "placeholder": "请详细输入到访时提供的福利及数量。"
+      }
+    },
+    "purchase": {
+      "name": {
+        "label": "购买产品名称",
+        "placeholder": "请输入购买产品名称。"
+      },
+      "price": {
+        "label": "购买产品金额",
+        "placeholder": "请输入购买产品金额。",
+        "unit": "韩元"
+      },
+      "url": {
+        "label": "购买链接(URL)",
+        "placeholder": "请输入购买链接。",
+        "check": "确认URL",
+        "valid": "URL有效。",
+        "invalid": "URL无效。"
+      },
+      "guide": {
+        "label": "购买相关说明",
+        "placeholder": "请输入购买方式、选项、注意事项等购买相关内容。"
+      }
+    }
+  },
+  "addressSearch": {
+    "button": "搜索地址",
+    "detailPlaceholder": "请输入详细地址",
+    "failed": "无法加载地址搜索。请稍后重试。"
+  },
+  "influencer": {
+    "platform": {
+      "label": "选择平台"
+    },
+    "gender": {
+      "label": "偏好性别"
+    },
+    "ageGroup": {
+      "label": "偏好年龄段(可多选)"
+    },
+    "topic": {
+      "label": "发布主题(可多选)"
+    }
+  },
+  "addOns": {
+    "notice": {
+      "title": "附加服务为选填项。",
+      "body": "仅在需要时选择即可,不选择也可以进入下一步。"
+    },
+    "price": {
+      "total": "{{amount}}韩元",
+      "perInfluencer": "每位招募的网红{{amount}}韩元"
+    },
+    "description": {
+      "AI_POSTING_GUIDE": "自动生成符合活动目的和商品的最佳发布指南。",
+      "AI_MANUSCRIPT_CONFIRM": "AI会审核网红撰写的稿件,确认是否遵守指南。",
+      "AI_RECEIPT_REVIEW": "AI会审核网红撰写的小票评价,确认是否遵守指南。"
+    }
+  },
+  "intro": {
+    "mode": {
+      "label": "撰写方式",
+      "ai": {
+        "title": "AI 캠페인 소개서",
+        "description": "AI根据商品信息生成指南。"
+      },
+      "manual": {
+        "title": "自行撰写",
+        "description": "自行撰写캠페인 소개서,可更详细地说明。"
+      }
+    },
+    "mainImage": {
+      "label": "主图",
+      "title": "请上传显示在顶部的代表图片。",
+      "description": "JPG、PNG,10MB以内(建议 1200 x 630)"
+    },
+    "media": {
+      "label": "商品详情图片/视频",
+      "title": "请上传商品详情图片/视频。",
+      "drop": "请拖放商品详情图片/视频。",
+      "description": "最多可上传{{max}}个",
+      "remove": "删除"
+    },
+    "description": {
+      "label": "活动说明",
+      "placeholder": "请填写活动介绍和期待内容。"
+    },
+    "notice": {
+      "label": "注意事项",
+      "placeholder": "请填写活动注意事项。"
+    },
+    "hashtags": {
+      "label": "必填话题标签(关键词)",
+      "placeholder": "输入关键词后按Enter添加",
+      "remove": "删除{{tag}}"
+    },
+    "ai": {
+      "url": {
+        "label": "商品/服务URL",
+        "placeholder": "请输入URL。",
+        "help": "AI将根据输入的URL和活动信息分析品牌特点与商品信息,并生成캠페인 소개서。"
+      },
+      "generate": "AI生成",
+      "regenerate": "重新生成",
+      "result": {
+        "title": "AI生成"
+      },
+      "generating": {
+        "title": "正在生成AI 캠페인 소개서",
+        "message": "生成完成后即可查看캠페인 소개서。",
+        "note": "视情况最长需要5分钟。"
+      },
+      "failed": "AI生成失败,请确认URL后重试。",
+      "startFailed": "无法开始AI生成,请稍后重试。",
+      "done": "AI生成已完成。",
+      "sidebarBusy": "生成中"
+    }
+  },
+  "conditions": {
+    "headcount": {
+      "label": "执行人数",
+      "recruitLabel": "招募人数",
+      "unit": "人",
+      "decrease": "减少人数",
+      "increase": "增加人数"
+    },
+    "period": {
+      "label": "帖子保留期限",
+      "option": "{{count}}个月",
+      "custom": "自定义",
+      "placeholder": "请输入期限。",
+      "unit": "个月"
+    },
+    "copyright": {
+      "label": "是否使用2차 저작권",
+      "yes": "使用",
+      "no": "不使用"
+    },
+    "reward": {
+      "label": "리워드",
+      "placeholder": "请输入支付给达人的리워드金额。",
+      "unit": "韩元",
+      "help": "填写的리워드金额将计入活动结束后的最终结算金额。",
+      "helpWithMax": "最高{{amount}}韩元,填写的리워드金额将计入活动结束后的最终结算金额。",
+      "placeholderShort": "请输入리워드金额"
+    },
+    "empty": {
+      "title": "无需设置执行条件。",
+      "body": "PICK형 구매리뷰형没有需要填写的执行条件,请进入下一步。"
+    }
+  },
+  "policy": {
+    "all": "同意全部条款",
+    "agree": "同意",
+    "view": "查看{{title}}全文",
+    "items": {
+      "service": {
+        "label": "同意服务使用条款",
+        "title": "服务使用条款"
+      },
+      "privacy": {
+        "label": "同意个人信息处理方针",
+        "title": "个人信息处理方针"
+      },
+      "operation": {
+        "label": "同意活动运营政策",
+        "title": "活动运营政策"
+      },
+      "reward": {
+        "label": "同意리워드及支付相关政策",
+        "title": "리워드及支付相关政策"
+      }
+    }
+  },
+  "payment": {
+    "won": "{{amount}}韩元",
+    "summary": {
+      "title": "活动概要",
+      "serviceType": "服务类型",
+      "campaignType": "活动类型",
+      "headcount": "{{count}}人",
+      "reward": "리워드",
+      "rewardProduct": "提供产品(价值{{amount}}韩元)",
+      "period": "活动期间",
+      "periodValue": "{{start}} - {{end}}({{days}}天)"
+    },
+    "amount": {
+      "title": "支付概要",
+      "addOnProducts": "附加服务支付商品",
+      "addOnAmount": "附加服务金额",
+      "perInfluencer": "(每人{{unitPrice}}韩元 * 招募人数{{count}}人)",
+      "reward": "리워드",
+      "total": "总支付金额",
+      "notice": "仅可使用大鸟币支付。"
+    },
+    "policy": {
+      "title": "条款同意"
+    },
+    "method": {
+      "title": "支付方式",
+      "bigbirdMoney": "大鸟币",
+      "required": "必填"
+    },
+    "alert": {
+      "insufficient": {
+        "title": "支付金额不足",
+        "description": "大鸟币余额不足,请充值后重新支付。"
+      },
+      "done": {
+        "title": "支付完成",
+        "description": "支付已完成。"
+      }
+    },
+    "error": {
+      "failed": "支付失败,请稍后重试。",
+      "amountChanged": "支付金额已变更,请确认支付概要后重新支付。"
+    }
+  },
+  "editLock": {
+    "amount": "该值会影响支付金额,因此无法修改。",
+    "done": "该内容已同意并支付,因此无法修改。"
+  },
+  "saveBlocked": {
+    "NOT_EDITABLE": {
+      "title": "当前状态无法修改",
+      "description": "该活动已在审核中或已通过审批,无法再修改。将跳转到注册详情。"
+    },
+    "VERSION_CONFLICT": {
+      "title": "已在其他页面修改",
+      "description": "该活动已在其他页面先被修改,无法保存。将重新加载最新内容。"
+    }
+  }
+}

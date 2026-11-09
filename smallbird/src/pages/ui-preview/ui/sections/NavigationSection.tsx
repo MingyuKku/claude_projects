@@ -7,6 +7,7 @@ import photo1 from "@/shared/assets/img/sample/photo-1.png";
 import photo2 from "@/shared/assets/img/sample/photo-2.png";
 import photo3 from "@/shared/assets/img/sample/photo-3.png";
 import { DatePicker } from "@/shared/components/date-picker";
+import { StepSidebar } from "@/shared/components/step-sidebar";
 import { cn } from "@/shared/lib/utils";
 import { Calendar, CalendarDayButton } from "@/shared/ui/calendar";
 import {
@@ -39,6 +40,7 @@ import { PreviewMatrix, previewStateProps } from "../PreviewMatrix";
 import { Section } from "../Section";
 
 import type { PreviewState } from "../PreviewMatrix";
+import type { StepSidebarItem } from "@/shared/components/step-sidebar";
 import type { ComponentProps } from "react";
 
 const ERROR_TEXT = "Your one-time password must be 6 characters.";
@@ -518,6 +520,9 @@ export function NavigationSection() {
           />
         </div>
       </Section>
+      <Section title="Step Sidebar (7432:199272 · 모바일 7701:251947)">
+        <StepSidebarExamples />
+      </Section>
       <Section title="Pagination (6901:49805)">
         <div className="flex flex-col gap-10">
           <PaginationExamples />
@@ -525,5 +530,57 @@ export function NavigationSection() {
         </div>
       </Section>
     </>
+  );
+}
+
+const STEP_SIDEBAR_ITEMS: StepSidebarItem[] = [
+  { id: "1", label: "캠페인 정보 입력", number: 1, state: "done" },
+  { id: "2", label: "제품 정보 입력", number: 2, state: "current" },
+  {
+    id: "3",
+    label: "인플루언서 조건 설정",
+    number: 3,
+    state: "visited",
+    hasAlert: true,
+    alertLabel: "필수 항목 미입력",
+  },
+  { id: "4", label: "부가서비스", number: 4, state: "visited" },
+  { id: "5", label: "캠페인 소개서 작성", number: 5, state: "unvisited" },
+  { id: "6", label: "진행 조건 설정", number: 6, state: "unvisited" },
+  { id: "7", label: "캠페인 정책 동의", number: 7, state: "unvisited" },
+  { id: "8", label: "결제", number: 8, state: "unvisited" },
+];
+
+function StepSidebarExamples() {
+  return (
+    <div className="flex flex-wrap items-start gap-6">
+      <div className="h-[800px] w-[222px] border-r bg-muted/40 px-4 py-5">
+        <StepSidebar
+          navLabel="단계"
+          items={STEP_SIDEBAR_ITEMS}
+          onSelect={() => {}}
+        />
+      </div>
+      <div className="h-[800px] w-[222px] border-r bg-muted/40 px-4 py-5">
+        <StepSidebar
+          navLabel="단계(등록 내역)"
+          header={{ id: "overview", label: "기본정보", isCurrent: true }}
+          items={STEP_SIDEBAR_ITEMS.map((item) => ({
+            ...item,
+            state: "done",
+            hasAlert: false,
+          }))}
+          onSelect={() => {}}
+        />
+      </div>
+      <div className="h-[600px] w-[222px] bg-muted/40 px-4 py-6">
+        <StepSidebar
+          navLabel="단계(모바일)"
+          size="sm"
+          items={STEP_SIDEBAR_ITEMS}
+          onSelect={() => {}}
+        />
+      </div>
+    </div>
   );
 }

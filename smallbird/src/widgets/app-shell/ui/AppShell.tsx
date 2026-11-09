@@ -1,18 +1,12 @@
 import { useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 
-import { useBigbirdMoneyBalance } from "@/entities/bigbird-money";
-import {
-  AppHeader,
-  HeaderGuestActions,
-  HeaderPointButton,
-  UserMenu,
-} from "@/shared/components/app-header";
+import { AppHeader } from "@/shared/components/app-header";
 import { LoginRequiredAlert } from "@/shared/components/login-required-alert";
 import { SidebarNav } from "@/shared/components/sidebar-nav";
 import { ToggleTab } from "@/shared/components/toggle-tab";
 import { ROUTES } from "@/shared/config";
-import { formatNumber, useTranslation } from "@/shared/i18n";
+import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
 import { Sheet, SheetContent, SheetTitle } from "@/shared/ui/sheet";
 
@@ -20,12 +14,11 @@ import { CLIENT_GUIDE_URL } from "../model/navigation";
 import { NavigationContext } from "../model/navigation-context";
 import { useSidebarStore } from "../model/sidebar-store";
 import { useKeyboardAwareShell } from "../model/useKeyboardAwareShell";
-import { useLogoutAction } from "../model/useLogoutAction";
 import { useMobileMenu } from "../model/useMobileMenu";
 import { useScrollRestoration } from "../model/useScrollRestoration";
 import { useShellNavItems } from "../model/useShellNavItems";
-import { AlertPopover } from "./AlertPopover";
 import { DevLanguageSwitcher } from "./DevLanguageSwitcher";
+import { ShellHeaderActions } from "./ShellHeaderActions";
 import { ShellLink } from "./ShellLink";
 
 import type { ShellNavId } from "../model/navigation";
@@ -101,7 +94,6 @@ export function AppShell({
   const mainRef = useRef<HTMLElement>(null);
   useScrollRestoration(mainRef);
   const [isLoginAlertOpen, setIsLoginAlertOpen] = useState(false);
-  const { handleClickLogout, isLoggingOut } = useLogoutAction();
   const { items, activeNavItem, currentNavItem, currentSubItem } =
     useShellNavItems(activeNavId);
   const {
@@ -114,8 +106,6 @@ export function AppShell({
   const isCollapsed = useSidebarStore((state) => state.isCollapsed);
   const toggleCollapsed = useSidebarStore((state) => state.toggleCollapsed);
 
-  // 잔액은 로그인했을 때만 읽고, 불러오지 못하면 "—"로 둠.
-  const { balance } = useBigbirdMoneyBalance(session !== null);
   const isAdmin = session?.authority === "ADMIN";
   const isCustomerCenterPath = CUSTOMER_CENTER_PATH_PREFIXES.some((prefix) =>
     pathname.startsWith(prefix),
@@ -196,42 +186,10 @@ export function AppShell({
             menuLabel={t("menu.open")}
             onClickMenu={openMenu}
           >
-            {session ? (
-              <>
-                <HeaderPointButton
-                  amount={balance ? formatNumber(balance.amount) : "—"}
-                  label={t("header.points")}
-                  onClick={() => {
-                    void navigate(ROUTES.mypageMoney);
-                  }}
-                />
-                <AlertPopover />
-                <UserMenu
-                  name={session.displayName}
-                  email={session.email}
-                  avatarSrc={session.profileImageUrl ?? undefined}
-                  menuLabel={t("header.profile")}
-                  settingsLabel={t("header.settings")}
-                  logoutLabel={
-                    isLoggingOut ? t("header.loggingOut") : t("header.logout")
-                  }
-                  onClickSettings={() => {
-                    void navigate(ROUTES.mypageAccount);
-                  }}
-                  onClickLogout={() => void handleClickLogout()}
-                  isLogoutDisabled={isLoggingOut}
-                />
-              </>
-            ) : (
-              <HeaderGuestActions
-                guideLabel={t("guide")}
-                loginLabel={t("header.login")}
-                onClickGuide={sidebarProps.onClickGuide}
-                onClickLogin={() => {
-                  void navigate(ROUTES.login);
-                }}
-              />
-            )}
+            <ShellHeaderActions
+              session={session}
+              onClickGuide={sidebarProps.onClickGuide}
+            />
           </AppHeader>
           <main
             ref={mainRef}

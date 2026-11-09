@@ -1,0 +1,40 @@
+{
+  "banner": {
+    "reviewing": {
+      "title": "This campaign is under review.",
+      "description": "Our team is reviewing the campaign. If changes are needed, cancel the approval request and edit the campaign."
+    },
+    "rejected": {
+      "title": "Some items need to be revised.",
+      "description": "Check the rejection reasons, revise the marked items, and request re-approval."
+    },
+    "reReviewing": {
+      "title": "This campaign is under re-review.",
+      "description": "Our team is reviewing the revised campaign. If changes are needed, cancel the approval request and edit the campaign. (Up to 2 times)"
+    },
+    "approved": {
+      "title": "This campaign has been approved.",
+      "description": "You can check the confirmed campaign information."
+    }
+  },
+  "dev": {
+    "label": "Dev review switch",
+    "approve": "Switch to approved",
+    "reject": "Switch to rejected",
+    "failed": "Could not change the review result."
+  },
+  "cancel": {
+    "action": "Cancel approval request",
+    "title": "Cancel approval request",
+    "description": "If you cancel the approval request, your payment will be refunded and the campaign will return to the draft state. Pay again after editing to resubmit.",
+    "confirm": "Cancel approval request"
+  },
+  "reapproval": {
+    "action": "Request re-approval",
+    "title": "Re-approval requested.",
+    "description": "Your changes will be sent to our team again. You can run the campaign once it is approved."
+  },
+  "error": {
+    "failed": "The request failed. Please try again later."
+  }
+}

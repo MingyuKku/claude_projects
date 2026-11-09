@@ -1,0 +1,137 @@
+{
+  "serviceType": {
+    "PICK": "PICK형",
+    "RECRUIT": "모집형"
+  },
+  "productType": {
+    "BRAND": "브랜드형"
+  },
+  "serviceProduct": "{{service}} {{product}}",
+  "campaignType": {
+    "PRODUCT_DELIVERY": "제품발송형",
+    "PRESS": "기자단형",
+    "STORE_VISIT": "매장방문형",
+    "PURCHASE_REVIEW": "구매리뷰형"
+  },
+  "platform": {
+    "INSTAGRAM": "인스타그램",
+    "NAVER_BLOG": "블로그",
+    "FACEBOOK": "페이스북",
+    "YOUTUBE": "유튜브",
+    "TIKTOK": "틱톡",
+    "X": "엑스"
+  },
+  "gender": {
+    "FEMALE": "여성",
+    "MALE": "남성",
+    "ALL": "전체"
+  },
+  "ageGroup": {
+    "AGE_10S": "10대",
+    "AGE_20S": "20대",
+    "AGE_30S": "30대",
+    "AGE_40S": "40대",
+    "AGE_50S_PLUS": "50대 이상"
+  },
+  "topic": {
+    "BEAUTY": "뷰티",
+    "FASHION": "패션",
+    "FOOD": "푸드",
+    "TRAVEL": "여행",
+    "PARENTING": "육아",
+    "LIFESTYLE": "라이프",
+    "HEALTH": "건강",
+    "IT": "IT"
+  },
+  "addOn": {
+    "AI_POSTING_GUIDE": "AI 포스팅 가이드",
+    "AI_MANUSCRIPT_CONFIRM": "AI 원고컨펌",
+    "AI_RECEIPT_REVIEW": "AI 영수증 리뷰"
+  },
+  "summary": {
+    "won": "{{amount}}원",
+    "campaignInfo": {
+      "title": "캠페인 정보",
+      "name": "캠페인명",
+      "code": "캠페인 코드",
+      "type": "캠페인 유형",
+      "brand": "브랜드 명",
+      "period": "진행 기간",
+      "brandImage": "브랜드 이미지"
+    },
+    "product": {
+      "title": "제품 정보",
+      "type": "협찬 유형",
+      "price": "협찬 제품 금액",
+      "delivery": "협찬 제품",
+      "deliveryValue": "{{name}} ({{count}}개)",
+      "returnStatus": "회수 여부",
+      "returnRequired": "회수 있음",
+      "returnNone": "회수 안함",
+      "rental": "대여 상품",
+      "couponCode": "방문 쿠폰 인증번호",
+      "storeName": "방문 매장명",
+      "storeAddress": "매장 주소",
+      "benefit": "제공 혜택 또는 체험 내용",
+      "purchaseName": "구매제품명",
+      "purchasePrice": "구매제품 금액",
+      "purchaseUrl": "구매처 링크",
+      "purchaseGuide": "구매 안내 및 유의사항"
+    },
+    "influencer": {
+      "title": "인플루언서 조건",
+      "platform": "플랫폼",
+      "ageGroup": "연령대",
+      "gender": "성별",
+      "topic": "포스팅 주제"
+    },
+    "addOns": {
+      "title": "부가서비스",
+      "none": "신청한 부가서비스",
+      "applied": "신청함",
+      "appliedPerInfluencer": "신청함 ({{amount}}원/인)"
+    },
+    "intro": {
+      "title": "캠페인 소개서",
+      "mode": "작성 방식",
+      "modeValue": {
+        "AI": "AI 생성 가이드 사용",
+        "MANUAL": "직접 작성"
+      },
+      "description": "캠페인 설명",
+      "notice": "유의사항",
+      "hashtags": "필수 해시태그(키워드)",
+      "images": "메인 / 상품상세 이미지",
+      "main": "메인"
+    },
+    "conditions": {
+      "title": "진행 조건",
+      "none": "설정한 진행 조건",
+      "headcount": "진행 인원",
+      "recruitHeadcount": "모집 인원",
+      "headcountValue": "{{count}}명",
+      "period": "콘텐츠 유지 기간",
+      "periodValue": "{{count}}개월 이상",
+      "copyright": "2차 저작권 사용",
+      "copyrightAllowed": "사용함 (상업적 사용 포함)",
+      "copyrightDenied": "사용 안 함",
+      "reward": "리워드",
+      "rewardValue": "{{amount}}원 (1인당)"
+    },
+    "policy": {
+      "title": "정책 동의",
+      "required": "필수 동의 항목",
+      "all": "전체 동의 완료",
+      "partial": "일부 미동의"
+    },
+    "payment": {
+      "title": "결제 정보",
+      "amount": "결제 금액",
+      "method": "결제 수단",
+      "methodValue": "빅버드 머니 결제",
+      "paidAt": "결제 일시"
+    },
+    "rejected": "수정 필요",
+    "edit": "수정"
+  }
+}

@@ -1,6 +1,7 @@
 // pnpm i18n 이 생성하는 파일입니다. 직접 수정하지 않습니다.
 // 각 namespace 의 ko.json 을 키 원본으로 삼아 t() 의 키를 타입 검사합니다.
 import type entitiesBigbirdMoney from "../../entities/bigbird-money/locales/ko.json";
+import type entitiesCampaign from "../../entities/campaign/locales/ko.json";
 import type entitiesSubscription from "../../entities/subscription/locales/ko.json";
 import type featuresBigbirdMoneyHistory from "../../features/bigbird-money-history/locales/ko.json";
 import type featuresBrowseSubscriptionPlans from "../../features/browse-subscription-plans/locales/ko.json";
@@ -17,18 +18,22 @@ import type featuresJoin from "../../features/join/locales/ko.json";
 import type featuresLinkSocialAccount from "../../features/link-social-account/locales/ko.json";
 import type featuresLogin from "../../features/login/locales/ko.json";
 import type featuresManageBillingCards from "../../features/manage-billing-cards/locales/ko.json";
+import type featuresManageCampaignApproval from "../../features/manage-campaign-approval/locales/ko.json";
 import type featuresManageSubAccounts from "../../features/manage-sub-accounts/locales/ko.json";
 import type featuresManageSubscription from "../../features/manage-subscription/locales/ko.json";
 import type featuresNewBigbirdInquiry from "../../features/new-bigbird-inquiry/locales/ko.json";
 import type featuresNotificationConsent from "../../features/notification-consent/locales/ko.json";
 import type featuresPaymentHistory from "../../features/payment-history/locales/ko.json";
 import type featuresRealtimeConsultation from "../../features/realtime-consultation/locales/ko.json";
+import type featuresRegisterCampaign from "../../features/register-campaign/locales/ko.json";
 import type featuresSearchInfluencer from "../../features/search-influencer/locales/ko.json";
 import type featuresSocialLogin from "../../features/social-login/locales/ko.json";
 import type featuresSwitchAccount from "../../features/switch-account/locales/ko.json";
 import type featuresViewSubscriptionUsage from "../../features/view-subscription-usage/locales/ko.json";
 import type featuresWithdrawAccount from "../../features/withdraw-account/locales/ko.json";
 import type featuresWithdrawBigbirdMoney from "../../features/withdraw-bigbird-money/locales/ko.json";
+import type pagesCampaignDetail from "../../pages/campaign-detail/locales/ko.json";
+import type pagesCampaignRegister from "../../pages/campaign-register/locales/ko.json";
 import type pagesCertSuccess from "../../pages/cert-success/locales/ko.json";
 import type pagesChangePassword from "../../pages/change-password/locales/ko.json";
 import type pagesComingSoon from "../../pages/coming-soon/locales/ko.json";
@@ -61,6 +66,7 @@ declare module "i18next" {
     resources: {
       common: typeof common;
       "entities/bigbird-money": typeof entitiesBigbirdMoney;
+      "entities/campaign": typeof entitiesCampaign;
       "entities/subscription": typeof entitiesSubscription;
       "features/bigbird-money-history": typeof featuresBigbirdMoneyHistory;
       "features/browse-subscription-plans": typeof featuresBrowseSubscriptionPlans;
@@ -77,18 +83,22 @@ declare module "i18next" {
       "features/link-social-account": typeof featuresLinkSocialAccount;
       "features/login": typeof featuresLogin;
       "features/manage-billing-cards": typeof featuresManageBillingCards;
+      "features/manage-campaign-approval": typeof featuresManageCampaignApproval;
       "features/manage-sub-accounts": typeof featuresManageSubAccounts;
       "features/manage-subscription": typeof featuresManageSubscription;
       "features/new-bigbird-inquiry": typeof featuresNewBigbirdInquiry;
       "features/notification-consent": typeof featuresNotificationConsent;
       "features/payment-history": typeof featuresPaymentHistory;
       "features/realtime-consultation": typeof featuresRealtimeConsultation;
+      "features/register-campaign": typeof featuresRegisterCampaign;
       "features/search-influencer": typeof featuresSearchInfluencer;
       "features/social-login": typeof featuresSocialLogin;
       "features/switch-account": typeof featuresSwitchAccount;
       "features/view-subscription-usage": typeof featuresViewSubscriptionUsage;
       "features/withdraw-account": typeof featuresWithdrawAccount;
       "features/withdraw-bigbird-money": typeof featuresWithdrawBigbirdMoney;
+      "pages/campaign-detail": typeof pagesCampaignDetail;
+      "pages/campaign-register": typeof pagesCampaignRegister;
       "pages/cert-success": typeof pagesCertSuccess;
       "pages/change-password": typeof pagesChangePassword;
       "pages/coming-soon": typeof pagesComingSoon;

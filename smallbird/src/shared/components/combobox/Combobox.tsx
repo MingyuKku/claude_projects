@@ -1,10 +1,11 @@
 import { cva } from "class-variance-authority";
-import { ChevronsUpDown } from "lucide-react";
+import { ChevronsUpDown, Plus } from "lucide-react";
 import { useId, useState } from "react";
 
 import { FormField } from "@/shared/components/form-field";
 import { useMediaQuery } from "@/shared/lib/useMediaQuery";
 import { cn } from "@/shared/lib/utils";
+import { Button } from "@/shared/ui/button";
 import {
   Command,
   CommandEmpty,
@@ -60,12 +61,18 @@ interface ComboboxProps extends Omit<
   searchPlaceholder: string;
   emptyText: string;
   label?: string;
+  /** 라벨 뒤에 필수 표시(*)를 붙임. */
+  isRequired?: boolean;
   helpText?: string;
   errorText?: string;
   icon?: ReactNode;
   size?: "md" | "sm";
   /** 검색 입력을 보일지. 선택지가 몇 개 안 되면 끔. */
   isSearchable?: boolean;
+  /** 목록 맨 위에 두는 "+ 추가" 줄(Figma Context Menu의 Ghost 버튼). 누르면 메뉴를 닫고 `onSelect`를 부름. */
+  action?: { label: string; onSelect: () => void };
+  /** 트리거 오른쪽 아이콘. 기본은 위아래 화살표(ChevronsUpDown)이고, 시안이 선택 메뉴(Select)처럼 아래 화살표면 바꿈. */
+  triggerIcon?: ReactNode;
   disabled?: boolean;
   className?: string;
 }
@@ -78,11 +85,14 @@ export function Combobox({
   searchPlaceholder,
   emptyText,
   label,
+  isRequired,
   helpText,
   errorText,
   icon,
   size = "md",
   isSearchable = true,
+  action,
+  triggerIcon,
   disabled = false,
   className,
   ...triggerProps
@@ -116,7 +126,7 @@ export function Combobox({
         <span className="min-w-0 flex-1 truncate">
           {selectedLabel ?? placeholder}
         </span>
-        <ChevronsUpDown className="ml-4 size-4 shrink-0" />
+        {triggerIcon ?? <ChevronsUpDown className="ml-4 size-4 shrink-0" />}
       </button>
     );
   }
@@ -125,6 +135,23 @@ export function Combobox({
     return (
       <Command>
         {isSearchable && <CommandInput placeholder={searchPlaceholder} />}
+        {action && (
+          <div className="p-1 pb-0">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="w-full justify-start"
+              onClick={() => {
+                setIsOpen(false);
+                action.onSelect();
+              }}
+            >
+              <Plus />
+              {action.label}
+            </Button>
+          </div>
+        )}
         <CommandList className={listClassName}>
           <CommandEmpty>{emptyText}</CommandEmpty>
           <CommandGroup>
@@ -149,6 +176,7 @@ export function Combobox({
   return (
     <FormField
       label={label}
+      isRequired={isRequired}
       helpText={helpText}
       errorText={errorText}
       disabled={disabled}

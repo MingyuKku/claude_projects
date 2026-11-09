@@ -49,6 +49,19 @@ function requireSessionRoute(
   };
 }
 
+const CAMPAIGN_COMING_SOON_PATHS = [
+  ROUTES.campaignRegister,
+  ROUTES.campaignRegisterDraft,
+  ROUTES.campaignDetail,
+];
+
+function comingSoonPage(path: string) {
+  return page(
+    path,
+    async () => (await import("@/pages/coming-soon")).ComingSoonPage,
+  );
+}
+
 export const routes: RouteObject[] = [
   {
     path: ROUTES.home,
@@ -73,6 +86,10 @@ export const routes: RouteObject[] = [
             ROUTES.influencerSearch,
             async () => (await import("@/pages/coming-soon")).ComingSoonPage,
           ),
+          // 캠페인 등록 API가 나오기 전이라 stage·prod 빌드에서는 준비 중 화면임. 개발 서버에서는 목으로 동작하는 화면을 아래에서 엶.
+          ...(import.meta.env.DEV
+            ? []
+            : CAMPAIGN_COMING_SOON_PATHS.map(comingSoonPage)),
         ],
       },
       page(ROUTES.introduction, async () => {
@@ -98,6 +115,26 @@ export const routes: RouteObject[] = [
           async () =>
             (await import("@/pages/switch-account")).SwitchAccountPage,
         ),
+        // 캠페인 등록: 새로 만들기와 작성이 한 화면이고 셸은 화면이 그림. Sub ID는 세션 middleware가 막음.
+        // 등록 내역(`/campaign/:campaignId`)도 같은 셸을 쓰고, 조회는 할당된 Sub ID도 가능함(서버가 403으로 막음).
+        ...(import.meta.env.DEV
+          ? [
+              ...[ROUTES.campaignRegister, ROUTES.campaignRegisterDraft].map(
+                (path) =>
+                  page(
+                    path,
+                    async () =>
+                      (await import("@/pages/campaign-register"))
+                        .CampaignRegisterPage,
+                  ),
+              ),
+              page(
+                ROUTES.campaignDetail,
+                async () =>
+                  (await import("@/pages/campaign-detail")).CampaignDetailPage,
+              ),
+            ]
+          : []),
       ]),
 
       requireSessionRoute(AuthenticatedLayout, [

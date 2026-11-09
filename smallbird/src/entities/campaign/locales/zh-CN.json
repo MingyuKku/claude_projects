@@ -1,0 +1,137 @@
+{
+  "serviceType": {
+    "PICK": "PICK型",
+    "RECRUIT": "招募型"
+  },
+  "productType": {
+    "BRAND": "品牌型"
+  },
+  "serviceProduct": "{{service}} {{product}}",
+  "campaignType": {
+    "PRODUCT_DELIVERY": "제품발송형",
+    "PRESS": "기자단형",
+    "STORE_VISIT": "매장방문형",
+    "PURCHASE_REVIEW": "구매리뷰형"
+  },
+  "platform": {
+    "INSTAGRAM": "Instagram",
+    "NAVER_BLOG": "博客",
+    "FACEBOOK": "Facebook",
+    "YOUTUBE": "YouTube",
+    "TIKTOK": "TikTok",
+    "X": "X"
+  },
+  "gender": {
+    "FEMALE": "女性",
+    "MALE": "男性",
+    "ALL": "不限"
+  },
+  "ageGroup": {
+    "AGE_10S": "10多岁",
+    "AGE_20S": "20多岁",
+    "AGE_30S": "30多岁",
+    "AGE_40S": "40多岁",
+    "AGE_50S_PLUS": "50岁以上"
+  },
+  "topic": {
+    "BEAUTY": "美妆",
+    "FASHION": "时尚",
+    "FOOD": "美食",
+    "TRAVEL": "旅行",
+    "PARENTING": "育儿",
+    "LIFESTYLE": "生活",
+    "HEALTH": "健康",
+    "IT": "IT"
+  },
+  "addOn": {
+    "AI_POSTING_GUIDE": "AI发帖指南",
+    "AI_MANUSCRIPT_CONFIRM": "AI稿件审核",
+    "AI_RECEIPT_REVIEW": "AI 영수증 리뷰"
+  },
+  "summary": {
+    "won": "{{amount}}韩元",
+    "campaignInfo": {
+      "title": "活动信息",
+      "name": "活动名称",
+      "code": "活动编号",
+      "type": "活动类型",
+      "brand": "品牌名称",
+      "period": "执行期间",
+      "brandImage": "品牌图片"
+    },
+    "product": {
+      "title": "产品信息",
+      "type": "赞助类型",
+      "price": "赞助产品金额",
+      "delivery": "赞助产品",
+      "deliveryValue": "{{name}}({{count}}件)",
+      "returnStatus": "是否回收",
+      "returnRequired": "需回收",
+      "returnNone": "无需回收",
+      "rental": "대여 상품",
+      "couponCode": "到店优惠券验证码",
+      "storeName": "到店门店名称",
+      "storeAddress": "门店地址",
+      "benefit": "提供的福利或体验内容",
+      "purchaseName": "购买产品名称",
+      "purchasePrice": "购买产品金额",
+      "purchaseUrl": "购买链接",
+      "purchaseGuide": "购买说明及注意事项"
+    },
+    "influencer": {
+      "title": "达人条件",
+      "platform": "平台",
+      "ageGroup": "年龄段",
+      "gender": "性别",
+      "topic": "发布主题"
+    },
+    "addOns": {
+      "title": "附加服务",
+      "none": "已申请的附加服务",
+      "applied": "已申请",
+      "appliedPerInfluencer": "已申请(每人{{amount}}韩元)"
+    },
+    "intro": {
+      "title": "캠페인 소개서",
+      "mode": "撰写方式",
+      "modeValue": {
+        "AI": "使用AI生成指南",
+        "MANUAL": "自行撰写"
+      },
+      "description": "活动说明",
+      "notice": "注意事项",
+      "hashtags": "必填话题标签(关键词)",
+      "images": "主图 / 商品详情图片",
+      "main": "主图"
+    },
+    "conditions": {
+      "title": "执行条件",
+      "none": "已设置的执行条件",
+      "headcount": "执行人数",
+      "recruitHeadcount": "招募人数",
+      "headcountValue": "{{count}}人",
+      "period": "内容保留期限",
+      "periodValue": "{{count}}个月以上",
+      "copyright": "2차 저작권 사용",
+      "copyrightAllowed": "使用(含商业用途)",
+      "copyrightDenied": "不使用",
+      "reward": "리워드",
+      "rewardValue": "{{amount}}韩元(每人)"
+    },
+    "policy": {
+      "title": "条款同意",
+      "required": "必选同意项",
+      "all": "已全部同意",
+      "partial": "部分未同意"
+    },
+    "payment": {
+      "title": "支付信息",
+      "amount": "支付金额",
+      "method": "支付方式",
+      "methodValue": "大鸟币支付",
+      "paidAt": "支付时间"
+    },
+    "rejected": "需修改",
+    "edit": "修改"
+  }
+}

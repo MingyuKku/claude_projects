@@ -72,8 +72,9 @@ export function Inform({
         {title && (
           <p
             className={cn(
-              "leading-none font-semibold text-foreground",
               styles.title,
+              // text-* 가 줄 높이를 함께 정하므로 뒤에 둬야 시안의 leading-none 이 남음.
+              "leading-none font-semibold text-foreground",
             )}
           >
             {title}

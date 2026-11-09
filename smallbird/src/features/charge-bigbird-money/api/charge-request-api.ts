@@ -22,14 +22,14 @@ import {
  * 2) 결제 서버 v3 전용 API로 결제 정보를 받아(현재 도메인 `origin`과 복귀·닫기 경로를 보냄)
  * 3) PC는 이니시스 표준결제 스크립트를 불러와 결제창을 열고, 휴대폰은(PC용 결제창이 휴대폰을 막음) 서버가 준 모바일 폼을
  *    이니시스로 같은 창에서 전송함. 결제 뒤에는 `redirectUri`로 돌아옴.
- * 어느 단계든 실패하면 던짐.
+ * `returnPath`를 넘기면 결제 뒤 마이페이지 대신 그 화면으로 돌아옴. 어느 단계든 실패하면 던짐.
  */
-export async function requestCharge(amount: number) {
+export async function requestCharge(amount: number, returnPath?: string) {
   const init = chargeInitSchema.parse(
     await serverApiV3.get("/mypage/bigbird-money/init"),
   );
   const { origin } = window.location;
-  const { redirectUri, closeUrl } = buildChargePaths();
+  const { redirectUri, closeUrl } = buildChargePaths(returnPath);
   const deviceType = getChargeDeviceType();
   const isMobile = deviceType === "MOBILE";
   const response = await payApi.post(PAY_REQUEST_PATH, {

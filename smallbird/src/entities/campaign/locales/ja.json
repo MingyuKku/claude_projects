@@ -1,0 +1,137 @@
+{
+  "serviceType": {
+    "PICK": "PICK型",
+    "RECRUIT": "募集型"
+  },
+  "productType": {
+    "BRAND": "ブランド型"
+  },
+  "serviceProduct": "{{service}} {{product}}",
+  "campaignType": {
+    "PRODUCT_DELIVERY": "제품발송형",
+    "PRESS": "기자단형",
+    "STORE_VISIT": "매장방문형",
+    "PURCHASE_REVIEW": "구매리뷰형"
+  },
+  "platform": {
+    "INSTAGRAM": "Instagram",
+    "NAVER_BLOG": "ブログ",
+    "FACEBOOK": "Facebook",
+    "YOUTUBE": "YouTube",
+    "TIKTOK": "TikTok",
+    "X": "X"
+  },
+  "gender": {
+    "FEMALE": "女性",
+    "MALE": "男性",
+    "ALL": "すべて"
+  },
+  "ageGroup": {
+    "AGE_10S": "10代",
+    "AGE_20S": "20代",
+    "AGE_30S": "30代",
+    "AGE_40S": "40代",
+    "AGE_50S_PLUS": "50代以上"
+  },
+  "topic": {
+    "BEAUTY": "ビューティー",
+    "FASHION": "ファッション",
+    "FOOD": "フード",
+    "TRAVEL": "旅行",
+    "PARENTING": "育児",
+    "LIFESTYLE": "ライフ",
+    "HEALTH": "健康",
+    "IT": "IT"
+  },
+  "addOn": {
+    "AI_POSTING_GUIDE": "AI投稿ガイド",
+    "AI_MANUSCRIPT_CONFIRM": "AI原稿チェック",
+    "AI_RECEIPT_REVIEW": "AI 영수증 리뷰"
+  },
+  "summary": {
+    "won": "{{amount}}ウォン",
+    "campaignInfo": {
+      "title": "キャンペーン情報",
+      "name": "キャンペーン名",
+      "code": "キャンペーンコード",
+      "type": "キャンペーンタイプ",
+      "brand": "ブランド名",
+      "period": "進行期間",
+      "brandImage": "ブランド画像"
+    },
+    "product": {
+      "title": "製品情報",
+      "type": "協賛タイプ",
+      "price": "協賛製品金額",
+      "delivery": "協賛製品",
+      "deliveryValue": "{{name}}({{count}}個)",
+      "returnStatus": "回収の有無",
+      "returnRequired": "回収あり",
+      "returnNone": "回収なし",
+      "rental": "대여 상품",
+      "couponCode": "訪問クーポン認証番号",
+      "storeName": "訪問店舗名",
+      "storeAddress": "店舗住所",
+      "benefit": "提供特典または体験内容",
+      "purchaseName": "購入製品名",
+      "purchasePrice": "購入製品金額",
+      "purchaseUrl": "購入先リンク",
+      "purchaseGuide": "購入案内・注意事項"
+    },
+    "influencer": {
+      "title": "インフルエンサー条件",
+      "platform": "プラットフォーム",
+      "ageGroup": "年齢層",
+      "gender": "性別",
+      "topic": "投稿テーマ"
+    },
+    "addOns": {
+      "title": "追加サービス",
+      "none": "申込済みの追加サービス",
+      "applied": "申込済み",
+      "appliedPerInfluencer": "申込済み(1名あたり{{amount}}ウォン)"
+    },
+    "intro": {
+      "title": "캠페인 소개서",
+      "mode": "作成方法",
+      "modeValue": {
+        "AI": "AI生成ガイドを使用",
+        "MANUAL": "直接作成"
+      },
+      "description": "キャンペーン説明",
+      "notice": "注意事項",
+      "hashtags": "必須ハッシュタグ(キーワード)",
+      "images": "メイン/商品詳細画像",
+      "main": "メイン"
+    },
+    "conditions": {
+      "title": "進行条件",
+      "none": "設定した進行条件",
+      "headcount": "進行人数",
+      "recruitHeadcount": "募集人数",
+      "headcountValue": "{{count}}名",
+      "period": "コンテンツ維持期間",
+      "periodValue": "{{count}}か月以上",
+      "copyright": "2차 저작권 사용",
+      "copyrightAllowed": "使用可(商用利用を含む)",
+      "copyrightDenied": "使用不可",
+      "reward": "리워드",
+      "rewardValue": "{{amount}}ウォン(1名あたり)"
+    },
+    "policy": {
+      "title": "規約同意",
+      "required": "必須同意項目",
+      "all": "すべて同意済み",
+      "partial": "一部未同意"
+    },
+    "payment": {
+      "title": "決済情報",
+      "amount": "決済金額",
+      "method": "決済方法",
+      "methodValue": "ビッグバードマネー決済",
+      "paidAt": "決済日時"
+    },
+    "rejected": "修正必要",
+    "edit": "修正"
+  }
+}
