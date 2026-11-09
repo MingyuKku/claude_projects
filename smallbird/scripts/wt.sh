@@ -24,13 +24,13 @@ cmd_new() {
   git -C "$MAIN" fetch origin
   git -C "$MAIN" worktree add -b "$1" "$dir" origin/stage
   git -C "$dir" branch --unset-upstream 2>/dev/null || true # stage 로 push 되지 않게
-  # .gitignore 의 `.claude/figma-cache/` 는 디렉터리만 무시해서 링크는 untracked 로 보인다. 로컬에서만 제외한다.
   local exclude="$MAIN/.git/info/exclude"
-  grep -qxF '.claude/figma-cache' "$exclude" 2>/dev/null || echo '.claude/figma-cache' >> "$exclude"
   for f in "${LINKS[@]}"; do
     [[ -e "$MAIN/$f" ]] || continue
     mkdir -p "$(dirname "$dir/$f")"
     ln -sfn "$MAIN/$f" "$dir/$f"
+    # .gitignore 가 링크를 무시하지 못하면(예: `.claude/figma-cache/` 는 디렉터리만 무시) untracked 로 보이므로 로컬에서만 제외한다.
+    git -C "$dir" check-ignore -q "$f" || grep -qxF "$f" "$exclude" 2>/dev/null || echo "$f" >> "$exclude"
   done
   (cd "$dir" && pnpm install --frozen-lockfile)
   echo "완료: $dir ($1)"
@@ -38,8 +38,9 @@ cmd_new() {
 
 cmd_rm() {
   [[ $# -eq 1 ]] || die "사용법: wt.sh rm <이름>  예) wt.sh rm auth-signup"
-  local dir; dir="$(cd "$(dir_of "$1")" && pwd)" || die "워크트리 없음: $1"
-  [[ "$PWD" != "$dir"* ]] || die "지울 워크트리 안에서는 실행할 수 없음. 메인 폴더에서 실행해."
+  local dir; dir="$(cd "$(dir_of "$1")" && pwd -P)" || die "워크트리 없음: $1"
+  # 슬래시 경계로 비교해야 이름이 비슷한 다른 워크트리(-a / -ab)를 오탐하지 않고, -P 로 링크 경로도 실제 경로로 맞춘다
+  [[ "$(pwd -P)/" != "$dir/"* ]] || die "지울 워크트리 안에서는 실행할 수 없음. 메인 폴더에서 실행해."
   git -C "$MAIN" fetch origin
   local branch; branch="$(git -C "$dir" branch --show-current)"
   [[ -z "$(git -C "$dir" status --porcelain)" ]] || die "커밋 안 된 변경이 있음: $dir"

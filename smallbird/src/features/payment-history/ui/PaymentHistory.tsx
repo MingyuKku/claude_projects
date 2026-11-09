@@ -3,13 +3,11 @@ import { useEffect } from "react";
 import { usePaymentRecords } from "@/entities/subscription";
 import { EmptyState } from "@/shared/components/empty-state";
 import {
-  FilterScreen,
   FilterToolbar,
   hasActiveFilter,
   ListEmptyState,
   ListPagination,
   resolveEmptyKind,
-  useFilterScreen,
 } from "@/shared/components/list-filter";
 import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
@@ -25,15 +23,13 @@ import { PAGE_SIZE_OPTIONS } from "../model/constants";
 import { PaymentCardList } from "./PaymentCardList";
 import { PaymentTable } from "./PaymentTable";
 
-// 구독 결제 내역. PC는 표 + 인라인 툴바, TAB은 2열 카드, MO는 1열 카드 + 필터 모달. 한 페이지 10·20·30건(선택)·최신순.
+// 구독 결제 내역. PC는 표, TAB은 2열 카드, MO는 1열 카드이고 툴바는 TAB부터 인라인(MO만 필터 모달). 한 페이지 10·20·30건(선택)·최신순.
 // 쪽 나누기·필터는 서버가 하고, 쪽·필터는 URL 쿼리가 소유함. 검색창은 두지 않음(사용자 결정 2026-11-04, 스펙 §3).
 export function PaymentHistory() {
   const { t } = useTranslation("features/payment-history");
   const { t: tCommon } = useTranslation();
   // 표는 PC(1440~)만 씀. TAB은 2열 카드, MO는 1열 카드.
   const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
-  // TAB은 "필터" 버튼으로 본문을 대체하는 필터 화면을 엶(스펙 §3). PC는 인라인, MO는 모달.
-  const filterScreen = useFilterScreen("desktop");
   const fields = usePaymentFilterFields();
   const params = useListParams(fields);
   const { dateFrom, dateTo, item, method, status } = params.filters;
@@ -75,17 +71,6 @@ export function PaymentHistory() {
       />
     ) : undefined;
 
-  if (filterScreen.isOpen) {
-    return (
-      <FilterScreen
-        onClose={filterScreen.close}
-        fields={fields}
-        values={params.filters}
-        onApply={params.applyFiltersAndClosePanel}
-      />
-    );
-  }
-
   return (
     // 제목과 툴바는 MO 8px·TAB/PC 16px, 툴바와 목록은 MO 16px·TAB/PC 12px(시안).
     <section
@@ -108,7 +93,6 @@ export function PaymentHistory() {
             params.reset();
             void mutate();
           }}
-          inlineFrom="desktop"
           pageSize={{
             value: params.pageSize,
             options: PAGE_SIZE_OPTIONS,
