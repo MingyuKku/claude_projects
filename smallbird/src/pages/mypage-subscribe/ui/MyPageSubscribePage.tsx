@@ -173,7 +173,8 @@ export function MyPageSubscribePage() {
       <Tabs
         value={tab}
         onValueChange={setTab}
-        className="gap-4 tablet:gap-5 desktop:gap-6"
+        // --sticky-tab-bar-height: 고정된 탭 줄 높이(위 여백 + 탭 36: MO·TAB 44, PC 56). 탭 본문 안에서 탭 줄 아래에 고정하는 요소(월간·연간 결제 토글)가 읽음.
+        className="gap-4 [--sticky-tab-bar-height:--spacing(11)] tablet:gap-5 desktop:gap-6 desktop:[--sticky-tab-bar-height:--spacing(14)]"
       >
         {!isTabletFilter && (
           // 탭 줄은 스크롤해도 화면 위에 고정함. 위 여백은 고정 영역이 직접 가져 스크롤 내용이 그 위로 비치지 않게 함.

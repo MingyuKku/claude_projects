@@ -11,6 +11,7 @@ import {
   DialogDescription,
   DialogTitle,
 } from "@/shared/ui/dialog";
+import { ScrollArea } from "@/shared/ui/scroll-area";
 
 interface ChargeTermsDialogProps {
   isOpen: boolean;
@@ -64,9 +65,15 @@ export function ChargeTermsDialog({
         {/* 설명은 본문(약관) 자체라 별도 문구 없이 접근성 연결만 비워 둠. */}
         <DialogDescription className="sr-only" />
         <div className="flex min-h-0 flex-1 flex-col px-5 pt-5 pb-3">
-          <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto rounded-md border border-input bg-background p-4">
-            <TermsDocument kind="charge" />
-          </div>
+          {/* 약관 박스의 스크롤바는 회원 탈퇴 약관과 같이 시안의 Scroll-area라서 `ScrollArea`로 그림(겹쳐서 자리를 차지하지 않음). Radix 안쪽 래퍼(display: table)는 긴 글을 줄바꿈하지 않아 block으로 되돌림. */}
+          <ScrollArea
+            type="auto"
+            className="min-h-0 flex-1 rounded-md border border-input bg-background [&_[data-slot=scroll-area-viewport]>div]:block!"
+          >
+            <div className="flex flex-col gap-5 p-4">
+              <TermsDocument kind="charge" />
+            </div>
+          </ScrollArea>
         </div>
         <div className="flex items-center gap-2 p-5">
           <Button

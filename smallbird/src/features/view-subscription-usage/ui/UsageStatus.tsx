@@ -87,7 +87,7 @@ export function UsageStatus({ type, isSubscribed }: UsageStatusProps) {
         {t("status.title")}
       </h2>
       <div className="flex flex-col gap-3 tablet:flex-row tablet:items-start tablet:justify-between">
-        <div className="flex flex-wrap items-center gap-2 tablet:gap-3 [&_[data-slot=select-trigger]]:w-auto [&_[data-slot=select-trigger]]:gap-2 tablet:[&_[data-slot=select-trigger]]:gap-4">
+        <div className="flex flex-wrap items-center gap-2 **:data-[slot=select-trigger]:w-auto **:data-[slot=select-trigger]:gap-2 tablet:gap-3 tablet:**:data-[slot=select-trigger]:gap-4">
           <span id={`${labelId}-metric`} className="sr-only">
             {t("filter.metric")}
           </span>
@@ -123,7 +123,7 @@ export function UsageStatus({ type, isSubscribed }: UsageStatusProps) {
         </div>
         <ToggleTab
           aria-label={t("filter.granularity")}
-          className="self-start [&>[role=radio]]:min-w-14 max-tablet:[&>[role=radio]]:py-1"
+          className="self-start *:[[role=radio]]:min-w-14 max-tablet:*:[[role=radio]]:py-1"
           value={granularity}
           options={[
             { value: "monthly", label: t("filter.monthly") },

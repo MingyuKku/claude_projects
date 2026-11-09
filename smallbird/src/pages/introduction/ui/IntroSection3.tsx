@@ -43,7 +43,7 @@ export function IntroSection3({ className }: Props) {
           원본 png 는 1024x512(2:1)로 노드의 비율과 다름. 디자인이 늘려 쓰므로
           background-size 100% 100% 가 같은 결과를 냄. */}
       <div
-        className="pointer-events-none absolute top-0 left-1/2 aspect-[1440/497] w-[1440px] min-w-full -translate-x-1/2 [background-size:100%_100%] opacity-80 mix-blend-screen invert max-introtab:w-[1322px] max-mo:w-[1236px]"
+        className="pointer-events-none absolute top-0 left-1/2 aspect-1440/497 w-[1440px] min-w-full -translate-x-1/2 bg-size-[100%_100%] opacity-80 mix-blend-screen invert max-introtab:w-[1322px] max-mo:w-[1236px]"
         style={{ backgroundImage: `url(${S3_DOTS})` }}
         aria-hidden="true"
       />
@@ -76,14 +76,14 @@ export function IntroSection3({ className }: Props) {
         <div
           className={cn(
             ROW,
-            "animate-[intro-s3-left_29.6s_linear_infinite] [background-size:1308.6px_63px]",
+            "animate-[intro-s3-left_29.6s_linear_infinite] bg-size-[1308.6px_63px]",
           )}
           style={{ backgroundImage: `url(${S3_LOGOS_TOP})` }}
         />
         <div
           className={cn(
             ROW,
-            "animate-[intro-s3-right_40s_linear_infinite] [background-size:1769.6px_63px]",
+            "animate-[intro-s3-right_40s_linear_infinite] bg-size-[1769.6px_63px]",
           )}
           style={{ backgroundImage: `url(${S3_LOGOS_BOTTOM})` }}
         />

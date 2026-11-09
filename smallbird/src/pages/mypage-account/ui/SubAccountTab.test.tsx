@@ -46,6 +46,15 @@ function respond(path: string) {
   return Promise.reject(new Error(`unexpected ${path}`));
 }
 
+// Radix ScrollArea(패널·약관 본문 스크롤)가 쓰는 브라우저 API가 jsdom에 없어 이 파일에서만 채움.
+beforeAll(() => {
+  globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+});
+
 beforeEach(() => {
   isPurchaserQuestionAccess = false;
   vi.mocked(serverApiV3.get)
@@ -316,7 +325,7 @@ describe("SubAccountTab 수정", () => {
   it("수정을 열면 PC는 목록 옆 패널에 현재 값을 채워 보인다", async () => {
     setup({ panel: "edit", panelAccountIdx: 9000 });
     expect(await screen.findByText("Sub ID 수정")).toBeInTheDocument();
-    expect(screen.getByRole("textbox", { name: /담당자명/ })).toHaveValue(
+    expect(screen.getByRole("textbox", { name: /담당자 명/ })).toHaveValue(
       "김담당",
     );
     expect(screen.getByText("sub02")).toBeInTheDocument();

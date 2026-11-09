@@ -15,13 +15,13 @@ interface CompanyInfoCardProps {
   onSaved: () => void;
 }
 
-// 회사정보는 보기 → "수정" → 관리자 비밀번호 확인 → 입력 모드 → 취소·저장(Figma 10724:185906·185867). 수정에 들어갈 때마다 비밀번호를 다시 물음.
-// 아직 등록한 회사정보가 없으면 보여 줄 값이 없어 곧바로 입력 모드로 열림(시안에 없는 경우, 스펙 §3).
+// 회사정보는 보기 → "수정"(미등록은 "등록") → 관리자 비밀번호 확인 → 입력 모드 → 취소·저장(Figma 10724:185906·185867). 들어갈 때마다 비밀번호를 다시 물음.
+// 미등록은 회원가입에서 필수라 시안에 없어 디자인 QA(26/11/05 - PC - 33)대로 계좌정보처럼 빈 보기 → "등록"으로 시작함.
 export function CompanyInfoCard({ company, onSaved }: CompanyInfoCardProps) {
   const [isEditing, setIsEditing] = useState(false);
   const [isConfirming, setIsConfirming] = useState(false);
 
-  if (company === null || isEditing) {
+  if (isEditing) {
     return (
       <CompanyInfoForm
         company={company}

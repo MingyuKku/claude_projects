@@ -27,6 +27,7 @@
     },
     "password": {
       "label": "Change password",
+      "placeholder": "Enter password",
       "error": {
         "format": "8–20 characters with letters, numbers and symbols.",
         "containsId": "Must not contain your ID",
@@ -35,6 +36,7 @@
     },
     "passwordCheck": {
       "label": "Confirm password",
+      "placeholder": "Enter password",
       "mismatch": "Passwords don't match."
     },
     "phone": {

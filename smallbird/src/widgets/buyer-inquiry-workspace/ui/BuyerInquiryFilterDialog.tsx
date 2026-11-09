@@ -259,7 +259,7 @@ export function BuyerInquiryFilterDialog({
       <DialogTrigger asChild>{trigger}</DialogTrigger>
       {/* MO 시안은 앱 헤더를 어둡게 하지 않으므로 배경 막은 투명 */}
       <DialogContent
-        className="top-13 left-0 flex h-[calc(100dvh-3.25rem)] w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none border-0 p-0"
+        className="top-(--app-header-height) left-0 flex h-[calc(100dvh-var(--app-header-height))] w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none border-0 p-0 sm:max-w-none"
         overlayClassName="bg-transparent"
         showCloseButton={false}
         aria-describedby={undefined}

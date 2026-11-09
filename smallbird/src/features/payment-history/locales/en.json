@@ -25,6 +25,16 @@
       "label": "Payment date",
       "placeholder": "Select a date."
     },
+    "item": {
+      "label": "Description",
+      "placeholder": "Select a description.",
+      "option": {
+        "monthly_pick": "Monthly plan_PICK",
+        "monthly_recruit": "Monthly plan_Recruitment",
+        "yearly_pick": "Yearly plan_PICK",
+        "yearly_recruit": "Yearly plan_Recruitment"
+      }
+    },
     "method": {
       "label": "Payment method",
       "placeholder": "Select a payment method."

@@ -28,7 +28,7 @@ export interface ChargeRecord {
   accountNumber: string;
   /** 입금자 명(충전) / 예금주 명(출금). */
   holderName: string;
-  /** 완료 일시(입금 완료·출금 완료). 아직이면 null이고 원문은 "-". */
+  /** 완료 일시(입금 완료·출금 완료). 아직이면 null이고 원문은 빈 문자열. */
   completedAt: Date | null;
   completedAtText: string;
   /** 거래명세서 주소. 입금 완료이고 안전한 주소일 때만 값이 있음. */

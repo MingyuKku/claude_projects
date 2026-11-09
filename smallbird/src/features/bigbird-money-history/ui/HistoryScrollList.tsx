@@ -4,6 +4,7 @@ import {
   ScrollToTopButton,
 } from "@/shared/components/infinite-list";
 import { useTranslation } from "@/shared/i18n";
+import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 import { Skeleton } from "@/shared/ui/skeleton";
 
@@ -23,6 +24,8 @@ interface HistoryScrollListProps<T> {
   skeleton: ReactNode;
   /** 0건일 때 목록 자리에 그릴 안내. */
   emptyContent: ReactNode;
+  /** 0건일 때 안내를 감싸는 묶음에 더할 클래스(최대 높이). */
+  emptyClassName?: string;
   renderCards: (records: T[]) => ReactNode;
 }
 
@@ -39,6 +42,7 @@ export function HistoryScrollList<T>({
   onRetry,
   skeleton,
   emptyContent,
+  emptyClassName,
   renderCards,
 }: HistoryScrollListProps<T>) {
   const { t: tCommon } = useTranslation();
@@ -58,7 +62,13 @@ export function HistoryScrollList<T>({
       />
     );
   }
-  if (totalCount === 0) return emptyContent;
+  if (totalCount === 0) {
+    return (
+      <div className={cn("flex flex-1 flex-col", emptyClassName)}>
+        {emptyContent}
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-5">

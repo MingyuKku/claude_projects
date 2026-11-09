@@ -26,7 +26,7 @@ export function IntroSection1({ className }: Props) {
       className={cn(
         "bg-[#f1f3f5] py-25 max-introtab:py-20 max-mo:py-15",
         // 리사이즈 중에는 목업과 비디오가 같은 순간에 움직여야 함.
-        isResizing && "[&_*]:transition-none!",
+        isResizing && "**:transition-none!",
         className,
       )}
     >

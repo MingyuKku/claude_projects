@@ -18,13 +18,14 @@ import { Button } from "@/shared/ui/button";
 import { Skeleton } from "@/shared/ui/skeleton";
 
 import { countPages } from "../lib/count-pages";
+import { toPaymentItemQuery } from "../lib/payment-item";
 import { useListParams } from "../lib/use-list-params";
 import { usePaymentFilterFields } from "../lib/use-payment-filter-fields";
 import { PAGE_SIZE_OPTIONS } from "../model/constants";
 import { PaymentCardList } from "./PaymentCardList";
 import { PaymentTable } from "./PaymentTable";
 
-// 구독 결제 내역. PC는 표 + 인라인 툴바, TAB은 2열 카드, MO는 1열 카드 + 필터 모달. 한 페이지 10·20·50건(선택)·최신순.
+// 구독 결제 내역. PC는 표 + 인라인 툴바, TAB은 2열 카드, MO는 1열 카드 + 필터 모달. 한 페이지 10·20·30건(선택)·최신순.
 // 쪽 나누기·필터는 서버가 하고, 쪽·필터는 URL 쿼리가 소유함. 검색창은 두지 않음(사용자 결정 2026-11-04, 스펙 §3).
 export function PaymentHistory() {
   const { t } = useTranslation("features/payment-history");
@@ -35,7 +36,7 @@ export function PaymentHistory() {
   const filterScreen = useFilterScreen("desktop");
   const fields = usePaymentFilterFields();
   const params = useListParams(fields);
-  const { dateFrom, dateTo, method, status } = params.filters;
+  const { dateFrom, dateTo, item, method, status } = params.filters;
   const {
     data: list,
     isLoading,
@@ -47,6 +48,7 @@ export function PaymentHistory() {
     // 기간은 시작·종료가 모두 있어야 거름(필터 필드가 한 쌍으로 다룸).
     from: dateFrom && dateTo ? dateFrom : undefined,
     to: dateFrom && dateTo ? dateTo : undefined,
+    ...toPaymentItemQuery(item),
     method: method || undefined,
     status: status || undefined,
   });
@@ -69,6 +71,7 @@ export function PaymentHistory() {
         kind={resolveEmptyKind("", hasActiveFilter(params.filters))}
         keyword=""
         noneTitle={t("empty.none")}
+        height="compact"
       />
     ) : undefined;
 
@@ -106,7 +109,6 @@ export function PaymentHistory() {
             void mutate();
           }}
           inlineFrom="desktop"
-          isNarrowSelect
           pageSize={{
             value: params.pageSize,
             options: PAGE_SIZE_OPTIONS,

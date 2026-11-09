@@ -71,7 +71,7 @@ export function IntroSection5({ className }: Props) {
               <article className="group relative flex h-[443px] flex-col items-start justify-between overflow-hidden rounded-[4px] px-5 pt-5 pb-8 max-mo:aspect-square max-mo:h-auto">
                 {/* ::after 는 디자인대로 아래로 갈수록 어두워지는 그라데이션과 전체 톤다운. */}
                 <div
-                  className="pointer-events-none absolute inset-0 overflow-hidden rounded-[4px] after:absolute after:inset-0 after:rounded-[4px] after:[background-image:linear-gradient(180deg,rgba(34,34,34,0)_41.196%,rgba(34,34,34,0.8)_76.479%),linear-gradient(90deg,rgba(0,0,0,0.2)_0%,rgba(0,0,0,0.2)_100%)] after:content-['']"
+                  className="pointer-events-none absolute inset-0 overflow-hidden rounded-[4px] after:absolute after:inset-0 after:rounded-[4px] after:bg-[linear-gradient(180deg,rgba(34,34,34,0)_41.196%,rgba(34,34,34,0.8)_76.479%),linear-gradient(90deg,rgba(0,0,0,0.2)_0%,rgba(0,0,0,0.2)_100%)] after:content-['']"
                   aria-hidden="true"
                 >
                   {/* 호버하면 배경 사진만 136.63%(106.1% 의 1.288배)로 커짐. PC 폭에서 마우스일 때만 켬:

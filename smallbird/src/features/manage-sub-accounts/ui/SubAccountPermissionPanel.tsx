@@ -11,6 +11,7 @@ import {
 import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
+import { ScrollArea } from "@/shared/ui/scroll-area";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 
 import {
@@ -86,25 +87,28 @@ export function SubAccountPermissionPanel({
           </Button>
         }
       />
-      <Tabs
-        defaultValue="service"
-        className="gap-4 p-4 tablet:p-5 desktop:min-h-0 desktop:flex-1 desktop:overflow-y-auto"
+      {/* PC는 패널 안에서 스크롤함. 스크롤바는 시안의 Scroll-area라 `ScrollArea`로 그림(겹쳐서 자리를 차지하지 않음). Radix 안쪽 래퍼(display: table)는 block으로 되돌림. */}
+      <ScrollArea
+        type="auto"
+        className="desktop:min-h-0 desktop:flex-1 [&_[data-slot=scroll-area-viewport]>div]:block!"
       >
-        <TabsList className="w-full">
-          <TabsTrigger value="service" className="flex-1">
-            {t("access.tab.service")}
-          </TabsTrigger>
-          <TabsTrigger value="campaign" className="flex-1">
-            {t("access.tab.campaign")}
-          </TabsTrigger>
-        </TabsList>
-        <TabsContent value="service">
-          <ServicePermissions accountIdx={accountIdx} />
-        </TabsContent>
-        <TabsContent value="campaign">
-          <CampaignAssignments className={campaignClassName} />
-        </TabsContent>
-      </Tabs>
+        <Tabs defaultValue="service" className="gap-4 p-4 tablet:p-5">
+          <TabsList className="w-full">
+            <TabsTrigger value="service" className="flex-1">
+              {t("access.tab.service")}
+            </TabsTrigger>
+            <TabsTrigger value="campaign" className="flex-1">
+              {t("access.tab.campaign")}
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="service">
+            <ServicePermissions accountIdx={accountIdx} />
+          </TabsContent>
+          <TabsContent value="campaign">
+            <CampaignAssignments className={campaignClassName} />
+          </TabsContent>
+        </Tabs>
+      </ScrollArea>
     </div>
   );
 }

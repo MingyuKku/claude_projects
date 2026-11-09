@@ -21,6 +21,8 @@ interface SidebarNavProps {
   logoHref?: string;
   logoLinkLabel?: string;
   isCollapsed?: boolean;
+  // 접힌 레일에서 하위 메뉴가 있는 항목을 눌렀을 때. 넘기면 이동하지 않고 이 함수를 부름(사이드바를 펼치고 그 그룹을 열 때 씀)
+  onClickRailGroup?: (itemId: string) => void;
   toggleLabel: string;
   onClickToggle?: () => void;
   // 상단 주요 버튼 (예: 캠페인 등록하기). 레일에서는 아이콘 버튼으로 표시
@@ -67,6 +69,7 @@ export function SidebarNav({
   logoHref,
   logoLinkLabel,
   isCollapsed = false,
+  onClickRailGroup,
   toggleLabel,
   onClickToggle,
   primaryActionLabel,
@@ -148,7 +151,11 @@ export function SidebarNav({
             {items.map((item) => (
               <li key={item.id}>
                 {isCollapsed ? (
-                  <SidebarRailItem item={item} linkAs={linkAs} />
+                  <SidebarRailItem
+                    item={item}
+                    linkAs={linkAs}
+                    onClickGroup={onClickRailGroup}
+                  />
                 ) : (
                   <SidebarNavItem item={item} linkAs={linkAs} />
                 )}

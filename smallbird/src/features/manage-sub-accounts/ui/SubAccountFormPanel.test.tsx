@@ -30,7 +30,7 @@ function field(name: RegExp) {
 }
 
 async function fillAll(user: ReturnType<typeof userEvent.setup>) {
-  await user.type(field(/담당자명/), "김담당");
+  await user.type(field(/담당자 명/), "김담당");
   await user.type(field(/아이디/), "sub_user01");
   await user.type(screen.getByLabelText("비밀번호*"), PASSWORD);
   await user.type(screen.getByLabelText("비밀번호 확인*"), PASSWORD);
@@ -63,6 +63,15 @@ function rejectCreate(reason: string) {
       : Promise.reject(new ApiError(400, { result: false, reason })),
   );
 }
+
+// Radix ScrollArea(패널·약관 본문 스크롤)가 쓰는 브라우저 API가 jsdom에 없어 이 파일에서만 채움.
+beforeAll(() => {
+  globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+});
 
 beforeEach(() => {
   vi.mocked(toast).mockReset();
@@ -288,18 +297,17 @@ describe("SubAccountFormPanel 수정", () => {
   it("제목과 버튼이 수정으로 바뀌고 현재 값을 채운다(비밀번호는 빈 칸)", () => {
     setupEdit();
     expect(screen.getByText("Sub ID 수정")).toBeInTheDocument();
-    expect(field(/담당자명/)).toHaveValue("김담당");
+    expect(field(/담당자 명/)).toHaveValue("김담당");
     expect(field(/아이디/)).toHaveValue("sub_user01");
     expect(field(/이메일/)).toHaveValue("sub@bigbird.com");
-    expect(screen.getByLabelText("비밀번호")).toHaveValue("");
+    expect(screen.getByLabelText("비밀번호*")).toHaveValue("");
     expect(screen.queryByRole("textbox", { name: /휴대폰/ })).toBeNull();
   });
 
-  it("비밀번호는 바꿀 때만 입력하므로 필수 표시(*)가 없다", () => {
+  it("수정에서도 시안대로 비밀번호·비밀번호 확인에 필수 표시(*)가 있다", () => {
     setupEdit();
-    expect(screen.getByLabelText("비밀번호")).toBeInTheDocument();
-    expect(screen.getByLabelText("비밀번호 확인")).toBeInTheDocument();
-    expect(screen.queryByLabelText("비밀번호*")).toBeNull();
+    expect(screen.getByLabelText("비밀번호*")).toBeInTheDocument();
+    expect(screen.getByLabelText("비밀번호 확인*")).toBeInTheDocument();
   });
 
   it("바꾼 것이 없으면 수정할 수 없다", () => {
@@ -310,8 +318,8 @@ describe("SubAccountFormPanel 수정", () => {
   it("아이디를 그대로 두면 중복확인 없이 바뀐 필드만 PATCH로 보낸다", async () => {
     vi.mocked(serverApiV3.patch).mockResolvedValue({ result: true });
     const { user, onSaved } = setupEdit();
-    await user.clear(field(/담당자명/));
-    await user.type(field(/담당자명/), "이담당");
+    await user.clear(field(/담당자 명/));
+    await user.type(field(/담당자 명/), "이담당");
     await user.click(screen.getByRole("button", { name: "수정하기" }));
     await waitFor(() => expect(onSaved).toHaveBeenCalled());
     const [path, form] = vi.mocked(serverApiV3.patch).mock.calls[0] as [
@@ -348,8 +356,8 @@ describe("SubAccountFormPanel 수정", () => {
       new ApiError(400, { result: false, reason: "existing id" }),
     );
     const { user, onSaved } = setupEdit();
-    await user.clear(field(/담당자명/));
-    await user.type(field(/담당자명/), "이담당");
+    await user.clear(field(/담당자 명/));
+    await user.type(field(/담당자 명/), "이담당");
     await user.click(screen.getByRole("button", { name: "수정하기" }));
     await waitFor(() => expect(serverApiV3.patch).toHaveBeenCalled());
     expect(onSaved).not.toHaveBeenCalled();

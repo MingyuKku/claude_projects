@@ -4,9 +4,15 @@
     "bank": "Bank",
     "accountNumber": "Account number",
     "accountHolder": "Account holder",
-    "bankBook": "Bankbook copy"
+    "bankBook": "Bankbook copy",
+    "placeholder": {
+      "bank": "Enter bank name",
+      "accountNumber": "Enter account number",
+      "accountHolder": "Enter account holder"
+    }
   },
   "file": {
+    "placeholder": "Upload a file",
     "upload": "Upload",
     "uploadFor": "Upload {{label}}",
     "registered": "Registered",

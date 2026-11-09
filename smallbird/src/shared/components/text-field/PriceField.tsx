@@ -53,7 +53,7 @@ export function PriceField({
             {...props}
             id={inputId}
             disabled={disabled}
-            className="min-w-0 flex-1 bg-transparent text-sm leading-5 text-foreground outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed supports-[-webkit-touch-callout:none]:text-base"
+            className="min-w-0 flex-1 bg-transparent text-sm leading-5 text-ellipsis text-foreground outline-none placeholder:text-muted-foreground disabled:cursor-not-allowed supports-[-webkit-touch-callout:none]:text-base"
           />
           <span className="shrink-0 pl-4 text-sm leading-5 text-foreground">
             {unit}

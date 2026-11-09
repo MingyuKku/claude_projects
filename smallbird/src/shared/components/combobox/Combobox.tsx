@@ -25,7 +25,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 import type { ComponentProps, ReactNode } from "react";
 
 // Figma 디자인 시스템 Combobox(6777:61876). Size md 40 / sm 36, 오류 문구가 있으면 Destructive.
-const triggerVariants = cva(
+export const comboboxTriggerVariants = cva(
   "flex w-full items-center rounded-md border border-input bg-background px-3 text-left text-sm leading-5 text-foreground outline-none transition-colors hover:bg-accent focus-visible:bg-background focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-background data-[state=open]:ring-2 data-[state=open]:ring-primary data-[state=open]:ring-offset-2",
   {
     variants: {
@@ -118,7 +118,7 @@ export function Combobox({
         role="combobox"
         aria-expanded={isOpen}
         aria-controls={listId}
-        className={cn(triggerVariants({ size, isInvalid }))}
+        className={cn(comboboxTriggerVariants({ size, isInvalid }))}
       >
         {icon && (
           <span className="mr-2 flex shrink-0 [&_svg]:size-4">{icon}</span>

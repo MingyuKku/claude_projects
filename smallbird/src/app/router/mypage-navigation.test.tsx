@@ -339,11 +339,12 @@ describe("마이페이지 · 계정 설정 셸", () => {
     expect(screen.getByRole("button", { name: "수정" })).toBeInTheDocument();
   });
 
-  it("?tab=company에 등록된 회사정보가 없으면 곧바로 입력 모드로 연다", async () => {
+  it("?tab=company에 등록된 회사정보가 없으면 빈 보기와 등록 버튼으로 연다", async () => {
     await renderRoute(`${ROUTES.mypageAccount}?tab=company`);
-    expect(await screen.findByRole("textbox", { name: /회사명/ })).toHaveValue(
-      "",
-    );
+    expect(
+      await screen.findByRole("button", { name: "등록" }),
+    ).toBeInTheDocument();
+    expect(screen.queryByRole("textbox", { name: /회사명/ })).toBeNull();
   });
 
   function mockCompleteCompany() {
@@ -589,13 +590,44 @@ describe("마이페이지 · 계정 설정 셸", () => {
     expect(router.state.location.pathname).toBe(ROUTES.mypageAccount);
   });
 
-  it("접힌 레일의 마이페이지 아이콘은 계정 설정으로 이동한다", async () => {
-    await renderRoute(ROUTES.main);
-    await screen.findByRole("button", { name: "내 프로필" });
-    const rail = screen.getByRole("navigation", { name: "축소 메뉴" });
-    expect(
-      within(rail).getByRole("link", { name: "마이페이지" }),
-    ).toHaveAttribute("href", ROUTES.mypageAccount);
+  describe("접힌 레일의 하위 메뉴가 있는 항목", () => {
+    // 이동하지 않고 LNB를 펼치면서 그 메뉴를 펼침. 태블릿 레일은 전체 메뉴(Sheet)를 엶.
+    it("마이페이지 아이콘은 이동하지 않고 전체 메뉴를 열어 마이페이지를 펼친다", async () => {
+      const user = userEvent.setup();
+      const router = await renderRoute(ROUTES.main);
+      await screen.findByRole("button", { name: "내 프로필" });
+      const rail = screen.getByRole("navigation", { name: "축소 메뉴" });
+
+      await user.click(
+        within(rail).getByRole("button", { name: "마이페이지" }),
+      );
+
+      const fullMenu = await screen.findByRole("navigation", {
+        name: "전체 메뉴",
+      });
+      expect(router.state.location.pathname).toBe(ROUTES.main);
+      expect(
+        within(fullMenu).getByText("마이페이지").closest("details"),
+      ).toHaveAttribute("open");
+      expect(
+        within(fullMenu).getByRole("link", { name: "빅버드 머니" }),
+      ).toBeVisible();
+      // 눌러 펼친 그룹만 열림.
+      expect(
+        within(fullMenu).getByText("고객센터").closest("details"),
+      ).not.toHaveAttribute("open");
+    });
+
+    it("하위 메뉴가 없는 홈 아이콘은 그대로 이동하는 링크다", async () => {
+      await renderRoute(ROUTES.mypageAccount);
+      await screen.findByRole("tab", { name: "Master ID 관리" });
+      const rail = screen.getByRole("navigation", { name: "축소 메뉴" });
+
+      expect(within(rail).getByRole("link", { name: "홈" })).toHaveAttribute(
+        "href",
+        ROUTES.main,
+      );
+    });
   });
 
   it("Master의 LNB 빅버드 머니는 활성이고 빅버드 머니 화면으로 이동한다", async () => {

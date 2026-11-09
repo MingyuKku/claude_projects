@@ -66,7 +66,7 @@ describe("UsageHistory (MO)", () => {
     expect(screen.getByRole("searchbox")).toBeEnabled();
     expect(screen.getByRole("button", { name: "필터" })).toBeInTheDocument();
     expect(
-      screen.getByRole("combobox", { name: "한 번에 볼 개수" }),
+      screen.getByRole("button", { name: /^한 번에 볼 개수/ }),
     ).toBeEnabled();
   });
 

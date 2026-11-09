@@ -25,6 +25,16 @@
       "label": "결제 일자",
       "placeholder": "날짜를 선택하세요."
     },
+    "item": {
+      "label": "결제 내역",
+      "placeholder": "결제 내역을 선택하세요.",
+      "option": {
+        "monthly_pick": "월 구독 상품_PICK형",
+        "monthly_recruit": "월 구독 상품_모집형",
+        "yearly_pick": "연 구독 상품_PICK형",
+        "yearly_recruit": "연 구독 상품_모집형"
+      }
+    },
     "method": {
       "label": "결제 수단",
       "placeholder": "결제 수단을 선택하세요."

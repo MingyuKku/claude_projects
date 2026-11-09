@@ -41,7 +41,7 @@ const textareaVariants = cva("h-auto", {
         "min-h-[4lh] max-h-[8lh] in-data-[keyboard=open]:min-h-[min(4lh,var(--search-textarea-max-height))] in-data-[keyboard=open]:max-h-[min(8lh,var(--search-textarea-max-height))]",
     },
     hasExpandAction: {
-      true: "[scrollbar-gutter:stable]",
+      true: "scrollbar-gutter-stable",
       false: "",
     },
   },

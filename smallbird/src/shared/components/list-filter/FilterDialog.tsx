@@ -57,7 +57,10 @@ export function FilterDialog({
   return (
     <Dialog open={isOpen} onOpenChange={(next) => !next && onClose()}>
       <DialogContent
-        className="top-0 left-0 flex h-dvh w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none border-0 p-0"
+        // MO 헤더를 두고 그 아래만 덮음.
+        // 오버레이는 헤더 자리만 보이므로, 헤더가 어둡게 가려지지 않게 딤을 없앰.
+        overlayClassName="bg-transparent"
+        className="top-(--app-header-height) left-0 flex h-[calc(100dvh-var(--app-header-height))] w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none border-0 p-0 sm:max-w-none"
         aria-describedby={undefined}
       >
         <DialogHeader className="border-b border-border px-4 py-4 text-left">
@@ -108,9 +111,11 @@ export function FilterDialogBody({
     <>
       <div
         className={cn(
-          "flex flex-1 flex-col overflow-y-auto",
+          "flex flex-1 flex-col",
+          // TAB 화면은 <main>이 스크롤하므로 overflow를 두지 않음. overflow-y-auto는 가로도 auto로 바꿔
+          // 좌우 여백이 없는 이 화면에서 셀렉트·날짜 입력의 포커스 링을 잘라 냄.
           // MO 모달 시안(빅버드 머니 `11224:105649`): 본문 16/16/12/16, 하단 16 여백에 구분선 없음.
-          isScreen ? "gap-3 py-5" : "gap-4 px-4 pt-4 pb-3",
+          isScreen ? "gap-3 py-5" : "gap-4 overflow-y-auto px-4 pt-4 pb-3",
         )}
       >
         {fields.map((field) => {

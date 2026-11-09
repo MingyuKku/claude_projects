@@ -99,7 +99,7 @@ export function UserMenu({
               aria-label={settingsLabel}
               onSelect={onClickSettings}
               disabled={isSettingsDisabled}
-              className="size-5 min-h-0 min-w-0 shrink-0 cursor-pointer justify-center rounded-md p-0.5 text-foreground data-[disabled]:opacity-100"
+              className="size-5 min-h-0 min-w-0 shrink-0 cursor-pointer justify-center rounded-md p-0.5 text-foreground data-disabled:opacity-100"
             >
               <Settings className="size-4 text-foreground" />
             </DropdownMenuItem>

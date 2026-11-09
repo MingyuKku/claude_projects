@@ -173,7 +173,8 @@ export function CheckoutPanel({
             </ul>
           </SectionCard>
         </div>
-        <Card>
+        {/* PC 2단에서는 왼쪽 본문이 길어 스크롤해도 결제 요약이 화면에 남게 고정함. 위 여백(top-5)은 본문 위 여백(pt-5)과 같음. */}
+        <Card className="desktop:sticky desktop:top-5">
           <CardHeader className={cn("py-4", CARD_SIDE_CLASS)}>
             <CardTitle role="heading" aria-level={2}>
               {t("summary.title")}

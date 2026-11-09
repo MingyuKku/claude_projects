@@ -17,8 +17,6 @@ import type {
   UsageType,
 } from "../model/usage-types";
 
-const EMPTY_TEXT = "-";
-
 // 객체 리터럴이면 `constructor`·`toString` 같은 프로토타입 이름도 조회되므로 Map으로 둠.
 const USAGE_TYPE_BY_SERVER_VALUE = new Map<string, UsageType>(
   USAGE_TYPES.map((type) => [SERVER_USAGE_TYPE[type], type]),
@@ -35,27 +33,28 @@ export function toUsageDetail(serverValue: string | null | undefined) {
   return USAGE_DETAIL_BY_SERVER_VALUE.get(serverValue ?? "") ?? null;
 }
 
-function textOrDash(value: string | null | undefined) {
-  return value?.trim() ? value : EMPTY_TEXT;
+// 값이 없으면 빈 문자열(표 UI는 빈 값을 "-" 없이 비워 둠).
+function textOrEmpty(value: string | null | undefined) {
+  return value?.trim() ? value : "";
 }
 
 export function transformUsageList(list: UsageList): UsageListViewModel {
   return {
     records: list.list.map((item) => {
       const type = USAGE_TYPE_BY_SERVER_VALUE.get(item.type) ?? null;
-      // 충전·출금은 캠페인과 무관해 서버 "-"도 빈칸으로 둠(시안). 사용·환급의 빈 값은 "-".
+      // 충전·출금은 캠페인과 무관해 서버 "-"도 빈칸으로 둠(시안).
       const isCampaignFree =
         type !== null && NON_CAMPAIGN_USAGE_TYPES.includes(type);
       const campaignText = (value: string | null | undefined) =>
-        isCampaignFree ? "" : textOrDash(value);
+        isCampaignFree ? "" : textOrEmpty(value);
       const target = item.contractTarget;
 
       return {
         id: item.id,
         type,
-        typeText: textOrDash(item.type),
+        typeText: textOrEmpty(item.type),
         usedAt: parseServerDate(item.usageDate),
-        usedAtText: textOrDash(item.usageDate),
+        usedAtText: textOrEmpty(item.usageDate),
         campaignName: campaignText(item.campaignName),
         campaignCode: campaignText(item.campaignCode),
         campaignImageUrl: isCampaignFree ? null : item.mainImageUrl || null,

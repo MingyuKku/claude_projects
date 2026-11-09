@@ -19,6 +19,9 @@ interface UsageTypeBadgeProps {
 export function UsageTypeBadge({ record }: UsageTypeBadgeProps) {
   const { t } = useTranslation("features/bigbird-money-history");
 
+  // 구분을 알 수 없고 서버 값도 없으면 빈 배지를 그리지 않음.
+  if (!record.type && !record.typeText) return null;
+
   return (
     <Badge
       variant={record.type ? VARIANT_BY_TYPE[record.type] : "gray"}

@@ -72,7 +72,7 @@ describe("transformChargeList", () => {
     expect(records.map((record) => record.receiptUrl)).toEqual([null, null]);
   });
 
-  it("값이 없는 항목은 대시로 두고 날짜·금액은 null이다", () => {
+  it("값이 없는 항목은 빈 문자열로 두고 날짜·금액은 null이다", () => {
     const [record] = transform({
       status: "PENDING",
       completedDate: null,
@@ -84,11 +84,11 @@ describe("transformChargeList", () => {
     }).records;
     expect(record).toMatchObject({
       completedAt: null,
-      completedAtText: "-",
+      completedAtText: "",
       amount: null,
-      bankName: "-",
-      accountNumber: "-",
-      holderName: "-",
+      bankName: "",
+      accountNumber: "",
+      holderName: "",
       payMethod: "",
     });
   });

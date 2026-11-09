@@ -27,6 +27,7 @@
     },
     "password": {
       "label": "パスワード変更",
+      "placeholder": "パスワードを入力",
       "error": {
         "format": "英数字・記号を組み合わせた8〜20文字",
         "containsId": "IDを含むパスワードは不可",
@@ -35,6 +36,7 @@
     },
     "passwordCheck": {
       "label": "パスワード確認",
+      "placeholder": "パスワードを入力",
       "mismatch": "パスワードが一致しません。"
     },
     "phone": {

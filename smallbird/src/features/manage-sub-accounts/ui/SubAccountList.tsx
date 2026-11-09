@@ -2,15 +2,24 @@ import { useEffect } from "react";
 import { useSearchParams } from "react-router";
 
 import { EmptyState } from "@/shared/components/empty-state";
+import {
+  EmptyTableFrame,
+  emptyHeightVariants,
+} from "@/shared/components/list-filter";
 import { PageNavigator } from "@/shared/components/page-navigator";
 import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery } from "@/shared/lib";
+import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 
 import { useSubAccounts } from "../api/use-sub-accounts";
 import { useListParams } from "../lib/use-list-params";
-import { KEYWORD_PARAM, PAGE_PARAM } from "../model/constants";
+import {
+  EMPTY_LIST_MAX_HEIGHT_CLASS,
+  KEYWORD_PARAM,
+  PAGE_PARAM,
+} from "../model/constants";
 import { CreateSubAccountButton } from "./CreateSubAccountButton";
 import { SubAccountCardList } from "./SubAccountCardList";
 import { SubAccountListSkeleton } from "./SubAccountListSkeleton";
@@ -43,6 +52,7 @@ export function SubAccountList({
   const { t: tCommon } = useTranslation();
   const [searchParams, setSearchParams] = useSearchParams();
   const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
+  const isTabletUp = useMediaQuery(MEDIA_QUERY.tabletUp);
 
   const { keyword, page: requestedPage } = useListParams();
   const { list, isLoading, isError, mutate } = useSubAccounts({
@@ -104,13 +114,12 @@ export function SubAccountList({
           : t("list.empty.none.title")
       }
       description={keyword ? undefined : t("list.empty.none.description")}
-      // 시안의 빈 표는 화면 높이를 채움(본문 높이 MO 346·TAB 448·PC 532).
-      className="min-h-86.5 tablet:min-h-112 desktop:min-h-133"
+      className={emptyHeightVariants()}
     />
   ) : undefined;
 
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-1 flex-col gap-4">
       <div className="flex items-start justify-between gap-4">
         <SubAccountSearch
           // 적용된 검색어가 바뀌면(뒤로 가기 등) 입력칸도 맞춤.
@@ -125,7 +134,7 @@ export function SubAccountList({
         />
       </div>
 
-      {/* 표(또는 카드)와 쪽 이동은 12px 간격으로 한 묶음(시안). */}
+      {/* 표(또는 카드)와 쪽 이동은 12px 간격으로 한 묶음(시안). 빈 상태가 남은 높이를 채우되 시안 높이까지만 늘어남. */}
       {isLoading ? (
         <SubAccountListSkeleton isTable={isDesktop} />
       ) : isError || !list ? (
@@ -140,7 +149,12 @@ export function SubAccountList({
           }
         />
       ) : (
-        <div className="flex flex-col gap-3">
+        <div
+          className={cn(
+            "flex flex-1 flex-col gap-3",
+            isEmpty && EMPTY_LIST_MAX_HEIGHT_CLASS,
+          )}
+        >
           {isDesktop ? (
             <SubAccountTable
               accounts={accounts}
@@ -152,7 +166,14 @@ export function SubAccountList({
             />
           ) : (
             <>
-              {emptyContent ?? (
+              {emptyContent ? (
+                // TAB 시안만 빈 상태를 테두리 박스에 담고 MO는 테두리가 없음.
+                isTabletUp ? (
+                  <EmptyTableFrame>{emptyContent}</EmptyTableFrame>
+                ) : (
+                  emptyContent
+                )
+              ) : (
                 <SubAccountCardList
                   accounts={accounts}
                   activeAccountIdx={activeAccountIdx}

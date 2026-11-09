@@ -42,7 +42,7 @@ export function AlertPopup({
   const { t } = useTranslation();
 
   return (
-    <div className="fixed inset-0 z-[9998] flex items-center justify-center bg-dark/60">
+    <div className="fixed inset-0 z-9998 flex items-center justify-center bg-dark/60">
       <div
         role="alertdialog"
         aria-modal="true"

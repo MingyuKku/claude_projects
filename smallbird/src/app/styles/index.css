@@ -381,6 +381,15 @@
   }
 }
 
+/* 앱 헤더(AppHeader) 높이: MO 52·TAB 이상 64. 헤더 아래를 채우는 모달·패널·화면이 같은 값을 쓰도록 변수로 둠.
+   모달은 body 아래에 그려지므로 :root에 둠. */
+:root {
+  --app-header-height: --spacing(13);
+  @variant tablet {
+    --app-header-height: --spacing(16);
+  }
+}
+
 @layer base {
   * {
     @apply border-border;

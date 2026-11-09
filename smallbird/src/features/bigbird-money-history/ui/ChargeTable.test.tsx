@@ -44,7 +44,7 @@ const pending: ChargeRecord = {
   status: "pending",
   statusText: "PENDING",
   completedAt: null,
-  completedAtText: "-",
+  completedAtText: "",
   receiptUrl: null,
 };
 const withdrawal: ChargeRecord = {
@@ -258,8 +258,8 @@ describe("ChargeDetail", () => {
       "대기 중",
     );
     expect(
-      screen.getByText("입금 완료 일").nextElementSibling,
-    ).toHaveTextContent("-");
+      screen.getByText("입금 완료 일").nextElementSibling?.textContent,
+    ).toBe("");
     expect(screen.getByText("신한은행")).toBeInTheDocument();
     expect(screen.getByText("1234567890123456")).toBeInTheDocument();
     expect(

@@ -1,15 +1,14 @@
-import { RotateCw, Settings2 } from "lucide-react";
+import { ChevronsUpDown, RotateCw, Settings2 } from "lucide-react";
 
-import { Combobox } from "@/shared/components/combobox";
+import { comboboxTriggerVariants } from "@/shared/components/combobox";
 import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
-import { useMediaQuery } from "@/shared/lib";
+import { useMediaQuery, type CssVariableStyle } from "@/shared/lib";
 import { usePanelParam } from "@/shared/lib/usePanelParam";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 
-import { FILTER_PANEL } from "./constants";
-import { hasActiveFilter } from "./filter-values";
+import { DEFAULT_FIELD_WIDTH, FILTER_PANEL } from "./constants";
 import { FilterDialog } from "./FilterDialog";
 import { InlineDateField, SelectField } from "./FilterFields";
 import { ListSearch } from "./ListSearch";
@@ -43,8 +42,6 @@ interface FilterToolbarProps {
    * MO 필터 버튼은 아이콘만 둠. 없으면 기존 배치.
    */
   pageSize?: PageSizeSelect;
-  /** 인라인 Select 폭을 시안의 140px로 좁힘(구독 결제 내역). 기본은 222px. */
-  isNarrowSelect?: boolean;
   /**
    * 필드가 많은 툴바(빅버드 머니 사용 내역: 검색 + 필드 4개)용. PC에서 필드를 178px(검색 204px)까지 늘어나게 하되
    * 옆 패널이 열려 좁아지면 한 줄을 유지하도록 줄어듦. 기본은 고정 폭이고 모자라면 줄을 바꿈.
@@ -61,6 +58,11 @@ interface FilterToolbarProps {
   };
 }
 
+// 필드 폭(시안 값)을 CSS 변수로 넘겨 PC 인라인 툴바의 `desktop:w-(--field-width)`가 읽게 함.
+function getFieldWidthStyle(field: FilterField): CssVariableStyle {
+  return { "--field-width": `${field.width ?? DEFAULT_FIELD_WIDTH}px` };
+}
+
 // PC·TAB: 검색(있으면)·필터 필드·새로고침을 인라인으로. 검색은 PC에서는 맨 앞, TAB에서는 필터 줄 아래 둘째 줄.
 // MO: 검색(있으면) + "필터" 버튼 → 전체 화면 모달(`?panel=filter`, 뒤로 가기로 닫힘).
 export function FilterToolbar({
@@ -71,7 +73,6 @@ export function FilterToolbar({
   onRefresh,
   inlineFrom = "tablet",
   pageSize,
-  isNarrowSelect = false,
   isCompact = false,
   shouldFillFields = false,
   search,
@@ -122,7 +123,7 @@ export function FilterToolbar({
           {searchNode}
           <Button
             type="button"
-            variant={hasActiveFilter(values) ? "outline" : "outline-foreground"}
+            variant="outline"
             size={isIconOnlyFilter ? "icon" : "default"}
             aria-label={isIconOnlyFilter ? filterLabel : undefined}
             className={cn(!isIconOnlyFilter && "min-w-20", !search && "flex-1")}
@@ -168,15 +169,12 @@ export function FilterToolbar({
           className={cn(
             "min-w-0 flex-1",
             isCompact && "desktop:max-w-44.5",
+            // 폭은 필드가 정함. 옆 패널이 열려 채우는 모드에서는 남은 폭을 나눠 가짐.
             !isCompact &&
               !shouldFillFields &&
-              cn(
-                "desktop:flex-none",
-                isNarrowSelect && field.type !== "date"
-                  ? "desktop:w-35"
-                  : "desktop:w-55.5",
-              ),
+              "desktop:w-(--field-width) desktop:flex-none",
           )}
+          style={getFieldWidthStyle(field)}
         >
           {field.type === "date" ? (
             <InlineDateField
@@ -226,26 +224,34 @@ interface PageSizePickerProps {
   className?: string;
 }
 
-// 시안 Combobox("10개 보기", MO "10개"). 선택지가 몇 개뿐이라 검색 입력은 두지 않음.
+// 시안 Combobox 모양("10개 보기", MO "10개")이되, 누를 때마다 선택지를 순서대로 돌고 끝에서 처음으로 돌아감(10 → 20 → 30 → 10).
 function PageSizePicker({ pageSize, isShort, className }: PageSizePickerProps) {
   const { t } = useTranslation();
   const labelKey = isShort ? "list.pageSize.labelShort" : "list.pageSize.label";
+  const label = t(labelKey, { size: pageSize.value });
+
+  function handleClick() {
+    const index = pageSize.options.indexOf(pageSize.value);
+    // 선택지에 없는 값이면 index 가 -1 이라 맨 앞 값으로 시작함.
+    const next = pageSize.options[(index + 1) % pageSize.options.length];
+    if (next !== undefined) pageSize.onChange(next);
+  }
 
   return (
-    <Combobox
-      className={className}
-      aria-label={t("list.pageSize.aria")}
+    <button
+      type="button"
+      // 누를 때마다 값이 바뀌므로 공용 Button 과 같은 눌림 효과(1px 내려감)로 반응을 보임.
+      className={cn(
+        comboboxTriggerVariants(),
+        "transition-[color,background-color,border-color,transform] active:translate-y-px",
+        className,
+      )}
+      aria-label={`${t("list.pageSize.aria")}, ${label}`}
       disabled={pageSize.isDisabled}
-      isSearchable={false}
-      options={pageSize.options.map((size) => ({
-        value: String(size),
-        label: t(labelKey, { size }),
-      }))}
-      value={String(pageSize.value)}
-      onValueChange={(value) => pageSize.onChange(Number(value))}
-      placeholder={t(labelKey, { size: pageSize.value })}
-      searchPlaceholder=""
-      emptyText=""
-    />
+      onClick={handleClick}
+    >
+      <span className="min-w-0 flex-1 truncate">{label}</span>
+      <ChevronsUpDown className="ml-4 size-4 shrink-0" />
+    </button>
   );
 }

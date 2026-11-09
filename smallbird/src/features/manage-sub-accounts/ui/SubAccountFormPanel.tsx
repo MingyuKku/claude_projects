@@ -10,6 +10,7 @@ import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
+import { ScrollArea } from "@/shared/ui/scroll-area";
 
 import { createSubAccount, updateSubAccount } from "../api/create-api";
 import { useRefreshSubAccounts } from "../api/use-sub-accounts";
@@ -180,126 +181,133 @@ export function SubAccountFormPanel({
           </Button>
         }
       />
-      <div className="flex flex-1 flex-col gap-2 p-4 tablet:gap-3 tablet:p-5 desktop:min-h-0 desktop:overflow-y-auto">
-        <ProfileImageField
-          image={pickedImage}
-          onChange={setPickedImage}
-          currentImageUrl={account?.profileImageUrl}
-        />
+      {/* PC는 패널 안에서 스크롤함. 스크롤바는 시안의 Scroll-area라 `ScrollArea`로 그림(겹쳐서 자리를 차지하지 않음). Radix 안쪽 래퍼(display: table)는 block으로 되돌림. */}
+      <ScrollArea
+        type="auto"
+        className="flex-1 desktop:min-h-0 [&_[data-slot=scroll-area-viewport]>div]:block!"
+      >
+        <div className="flex flex-col gap-2 p-4 tablet:gap-3 tablet:p-5">
+          <ProfileImageField
+            image={pickedImage}
+            onChange={setPickedImage}
+            currentImageUrl={account?.profileImageUrl}
+          />
 
-        <FormField label={t("create.field.name.label")} isRequired>
-          {(control) => (
-            <Input
-              {...control}
-              autoComplete="off"
-              placeholder={t("create.field.name.placeholder")}
-              value={values.name}
-              onChange={handleChangeField("name")}
-            />
-          )}
-        </FormField>
-
-        <FormField
-          label={t("create.field.identifier.label")}
-          isRequired
-          errorText={getIdErrorText()}
-          helpText={
-            idCheck.status === "available"
-              ? t("create.status.identifier.available")
-              : undefined
-          }
-        >
-          {(control) => (
-            <div className="flex items-center gap-2">
+          <FormField label={t("create.field.name.label")} isRequired>
+            {(control) => (
               <Input
                 {...control}
                 autoComplete="off"
-                maxLength={ID_MAX_LENGTH}
-                placeholder={t("create.field.identifier.placeholder")}
-                value={values.identifier}
-                onChange={handleChangeField("identifier")}
-                onBlur={() => setIsIdTouched(true)}
+                placeholder={t("create.field.name.placeholder")}
+                value={values.name}
+                onChange={handleChangeField("name")}
               />
-              <Button
-                type="button"
-                variant="outline"
-                disabled={idCheck.isChecking}
-                onClick={() => void handleClickCheckId()}
-              >
-                {t("create.field.identifier.check")}
-              </Button>
-            </div>
-          )}
-        </FormField>
+            )}
+          </FormField>
 
-        {/* 수정에서는 바꿀 때만 입력하므로 필수 표시를 뺌(시안은 `*`, 2026-10-27 사용자 결정으로 동작과 맞춤). */}
-        <FormField
-          label={passwordLabel}
-          isRequired={!isEdit}
-          errorText={
-            errors.password
-              ? t(`create.error.password.${errors.password}`)
-              : undefined
-          }
-        >
-          {(control) => (
-            <PasswordInput
-              {...control}
-              autoComplete="new-password"
-              maxLength={PASSWORD_MAX_LENGTH}
-              placeholder={t("create.field.password.placeholder")}
-              value={values.password}
-              onChange={handleChangeField("password")}
-              showLabel={tCommon("password.show", { label: passwordLabel })}
-              hideLabel={tCommon("password.hide", { label: passwordLabel })}
-            />
-          )}
-        </FormField>
+          <FormField
+            label={t("create.field.identifier.label")}
+            isRequired
+            errorText={getIdErrorText()}
+            helpText={
+              idCheck.status === "available"
+                ? t("create.status.identifier.available")
+                : undefined
+            }
+          >
+            {(control) => (
+              <div className="flex items-center gap-2">
+                <Input
+                  {...control}
+                  autoComplete="off"
+                  maxLength={ID_MAX_LENGTH}
+                  placeholder={t("create.field.identifier.placeholder")}
+                  value={values.identifier}
+                  onChange={handleChangeField("identifier")}
+                  onBlur={() => setIsIdTouched(true)}
+                />
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={idCheck.isChecking}
+                  onClick={() => void handleClickCheckId()}
+                >
+                  {t("create.field.identifier.check")}
+                </Button>
+              </div>
+            )}
+          </FormField>
 
-        <FormField
-          label={passwordCheckLabel}
-          isRequired={!isEdit}
-          errorText={
-            errors.passwordCheck
-              ? t("create.error.passwordCheck.mismatch")
-              : undefined
-          }
-        >
-          {(control) => (
-            <PasswordInput
-              {...control}
-              autoComplete="new-password"
-              maxLength={PASSWORD_MAX_LENGTH}
-              placeholder={t("create.field.passwordCheck.placeholder")}
-              value={values.passwordCheck}
-              onChange={handleChangeField("passwordCheck")}
-              showLabel={tCommon("password.show", {
-                label: passwordCheckLabel,
-              })}
-              hideLabel={tCommon("password.hide", {
-                label: passwordCheckLabel,
-              })}
-            />
-          )}
-        </FormField>
+          <FormField
+            label={passwordLabel}
+            isRequired
+            errorText={
+              errors.password
+                ? t(`create.error.password.${errors.password}`)
+                : undefined
+            }
+          >
+            {(control) => (
+              <PasswordInput
+                {...control}
+                autoComplete="new-password"
+                maxLength={PASSWORD_MAX_LENGTH}
+                placeholder={t("create.field.password.placeholder")}
+                value={values.password}
+                onChange={handleChangeField("password")}
+                showLabel={tCommon("password.show", { label: passwordLabel })}
+                hideLabel={tCommon("password.hide", { label: passwordLabel })}
+              />
+            )}
+          </FormField>
 
-        <FormField
-          label={t("create.field.email.label")}
-          isRequired
-          errorText={errors.email ? t("create.error.email.format") : undefined}
-        >
-          {(control) => (
-            <Input
-              {...control}
-              type="email"
-              autoComplete="off"
-              placeholder={t("create.field.email.placeholder")}
-              value={values.email}
-              onChange={handleChangeField("email")}
-            />
-          )}
-        </FormField>
-      </div>
+          <FormField
+            label={passwordCheckLabel}
+            isRequired
+            errorText={
+              errors.passwordCheck
+                ? t("create.error.passwordCheck.mismatch")
+                : undefined
+            }
+          >
+            {(control) => (
+              <PasswordInput
+                {...control}
+                autoComplete="new-password"
+                maxLength={PASSWORD_MAX_LENGTH}
+                placeholder={t("create.field.passwordCheck.placeholder")}
+                value={values.passwordCheck}
+                onChange={handleChangeField("passwordCheck")}
+                showLabel={tCommon("password.show", {
+                  label: passwordCheckLabel,
+                })}
+                hideLabel={tCommon("password.hide", {
+                  label: passwordCheckLabel,
+                })}
+              />
+            )}
+          </FormField>
+
+          <FormField
+            label={t("create.field.email.label")}
+            isRequired
+            errorText={
+              errors.email ? t("create.error.email.format") : undefined
+            }
+          >
+            {(control) => (
+              <Input
+                {...control}
+                type="email"
+                autoComplete="off"
+                placeholder={t("create.field.email.placeholder")}
+                value={values.email}
+                onChange={handleChangeField("email")}
+              />
+            )}
+          </FormField>
+        </div>
+      </ScrollArea>
       <div className="sticky bottom-0 border-t bg-background p-4 tablet:p-5">
         <Button type="submit" className="w-full" disabled={!canSubmit}>
           {isEdit ? t("edit.submit") : t("create.submit")}

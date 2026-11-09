@@ -71,6 +71,14 @@ describe("BankAccountForm", () => {
     expect(screen.getByRole("button", { name: "저장" })).toBeDisabled();
   });
 
+  it("계좌번호는 20자까지만 입력된다", async () => {
+    const { user } = setup();
+    const input = screen.getByRole("textbox", { name: /계좌번호/ });
+    await user.clear(input);
+    await user.type(input, "1".repeat(25));
+    expect(input).toHaveValue("1".repeat(20));
+  });
+
   it("미등록 계좌는 은행을 고르고 통장사본을 올리기 전까지 저장할 수 없다", async () => {
     const { user, container } = setup({ account: null });
     await user.type(screen.getByRole("textbox", { name: /계좌번호/ }), "123");

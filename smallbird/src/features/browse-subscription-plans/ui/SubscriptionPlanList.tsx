@@ -56,22 +56,27 @@ export function SubscriptionPlanList({
   return (
     <section className="flex flex-col gap-4">
       <h2 className="text-base leading-none font-semibold">{t("title")}</h2>
-      <ToggleTab
-        aria-label={t("title")}
-        className="w-full tablet:w-fit [&>*]:flex-1 tablet:[&>*]:flex-none"
-        value={period}
-        onValueChange={handleChangePeriod}
-        options={[
-          { value: "monthly", label: t("billing.monthly") },
-          {
-            value: "yearly",
-            label: t("billing.yearly"),
-            description: t("billing.discount", {
-              rate: catalog.yearlyDiscountRate,
-            }),
-          },
-        ]}
-      />
+      {/* 스크롤해도 페이지의 고정 탭 줄(--sticky-tab-bar-height) 아래에 붙음. 토글 위에만 8px 여백이 있고(-mt-2가 pt-2를 되돌려 평상시 간격은 그대로),
+          아래 띠는 두지 않음. 양옆은 화면 여백(--mypage-gutter) 끝까지 배경으로 덮음: 카드의 테두리·링(구독 중 카드의 box-shadow 1px)이
+          카드 바깥으로 나와 토글 양끝에 비치지 않게 함. z-10은 탭 본문(isolate) 안에서 카드보다 위에 그리기 위함. */}
+      <div className="sticky top-(--sticky-tab-bar-height) z-10 -mx-(--mypage-gutter) -mt-2 bg-background px-(--mypage-gutter) pt-2">
+        <ToggleTab
+          aria-label={t("title")}
+          className="w-full *:flex-1 tablet:w-fit tablet:*:flex-none"
+          value={period}
+          onValueChange={handleChangePeriod}
+          options={[
+            { value: "monthly", label: t("billing.monthly") },
+            {
+              value: "yearly",
+              label: t("billing.yearly"),
+              description: t("billing.discount", {
+                rate: catalog.yearlyDiscountRate,
+              }),
+            },
+          ]}
+        />
+      </div>
       <div
         ref={cardListRef}
         className="grid grid-cols-1 items-start gap-5 tablet:grid-cols-2 desktop:grid-cols-4"
@@ -86,7 +91,7 @@ export function SubscriptionPlanList({
             yearlyPrice={plan.yearlyPrice}
             isSubscribed={subscribedTypes.has(plan.type)}
             isExpanded={expanded.has(plan.type)}
-            className="tablet:min-h-[var(--plan-card-min-height,24rem)]"
+            className="tablet:min-h-(--plan-card-min-height,24rem)"
             onToggleDetail={() => toggleDetail(plan.type)}
             onSubscribe={(activeType) => onSubscribe(activeType, period)}
           />

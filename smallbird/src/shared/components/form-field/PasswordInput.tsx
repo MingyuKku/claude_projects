@@ -23,7 +23,8 @@ export function PasswordInput({
   ...props
 }: PasswordInputProps) {
   const [isVisible, setIsVisible] = useState(false);
-  const Icon = isVisible ? EyeOff : Eye;
+
+  const Icon = isVisible ? Eye : EyeOff;
 
   return (
     <div className="relative w-full">

@@ -38,7 +38,7 @@ const CUSTOMER_CENTER_MAIN_CLASS =
 // 본문을 스크롤하면 내용이 그 끝에서 잘린 듯 끊겨 보이므로 아래를 흐리게 함. 흐리는 길이는 키보드가 열릴 때 입력 영역을 띄우는
 // 아래 여백(--keyboard-anchor-gap)과 같아 스크롤하지 않은 상태의 입력 영역은 흐려지지 않음.
 const KEYBOARD_FITTED_MAIN_CLASS =
-  "[mask-image:linear-gradient(to_bottom,black_calc(100%-var(--keyboard-anchor-gap)),transparent)]";
+  "mask-[linear-gradient(to_bottom,black_calc(100%-var(--keyboard-anchor-gap)),transparent)]";
 
 interface AppShellProps {
   session: SessionViewModel | null;
@@ -94,8 +94,12 @@ export function AppShell({
   const mainRef = useRef<HTMLElement>(null);
   useScrollRestoration(mainRef);
   const [isLoginAlertOpen, setIsLoginAlertOpen] = useState(false);
-  const { items, activeNavItem, currentNavItem, currentSubItem } =
-    useShellNavItems(activeNavId);
+  const {
+    items: shellItems,
+    activeNavItem,
+    currentNavItem,
+    currentSubItem,
+  } = useShellNavItems(activeNavId);
   const {
     isMenuOpen,
     setIsMenuOpen,
@@ -105,6 +109,13 @@ export function AppShell({
   } = useMobileMenu();
   const isCollapsed = useSidebarStore((state) => state.isCollapsed);
   const toggleCollapsed = useSidebarStore((state) => state.toggleCollapsed);
+  const expandSidebar = useSidebarStore((state) => state.expand);
+  // 레일에서 눌러 사이드바를 펼칠 때 함께 열 그룹. 펼친 메뉴는 그룹을 처음 그릴 때 이 값을 보므로,
+  // 사이드바를 여는 모든 경로(아래 핸들러)가 이 값을 정하거나 비움.
+  const [expandedNavId, setExpandedNavId] = useState<ShellNavId | null>(null);
+  const items = shellItems.map((item) =>
+    item.id === expandedNavId ? { ...item, isDefaultOpen: true } : item,
+  );
 
   const isAdmin = session?.authority === "ADMIN";
   const isCustomerCenterPath = CUSTOMER_CENTER_PATH_PREFIXES.some((prefix) =>
@@ -114,6 +125,32 @@ export function AppShell({
     ? t(`nav.${activeNavItem.id}`)
     : (currentSubItem?.label ?? t("nav.home"));
   const headerTitle = title ?? activeNavTitle;
+
+  // 하위 메뉴가 있는 레일 항목은 이동하지 않고 사이드바를 펼친 뒤 그 그룹을 엶(디자인팀 QA 2026-11-06).
+  function findNavId(itemId: string) {
+    return shellItems.find((item) => item.id === itemId)?.id ?? null;
+  }
+
+  function handleClickDesktopRailGroup(itemId: string) {
+    setExpandedNavId(findNavId(itemId));
+    expandSidebar();
+  }
+
+  function handleClickTabletRailGroup(itemId: string) {
+    setExpandedNavId(findNavId(itemId));
+    openMenu();
+  }
+
+  function handleToggleDesktopSidebar() {
+    setExpandedNavId(null);
+    toggleCollapsed();
+  }
+
+  function handleOpenFullMenu() {
+    setExpandedNavId(null);
+    openMenu();
+  }
+
   const sidebarProps = {
     items,
     logoAlt: t("logo.alt"),
@@ -166,7 +203,8 @@ export function AppShell({
             navLabel={t("menu.main")}
             isCollapsed={isCollapsed}
             toggleLabel={isCollapsed ? t("menu.expand") : t("menu.collapse")}
-            onClickToggle={toggleCollapsed}
+            onClickRailGroup={handleClickDesktopRailGroup}
+            onClickToggle={handleToggleDesktopSidebar}
           />
         </div>
         <div className="hidden shrink-0 tablet:block desktop:hidden">
@@ -175,7 +213,8 @@ export function AppShell({
             navLabel={t("menu.collapsed")}
             isCollapsed
             toggleLabel={t("menu.openFull")}
-            onClickToggle={openMenu}
+            onClickRailGroup={handleClickTabletRailGroup}
+            onClickToggle={handleOpenFullMenu}
           />
         </div>
         <div className="flex min-w-0 flex-1 flex-col">
@@ -184,7 +223,7 @@ export function AppShell({
             icon={icon ?? <currentNavItem.icon />}
             isTitleVisibleOnMobile={isTitleVisibleOnMobile}
             menuLabel={t("menu.open")}
-            onClickMenu={openMenu}
+            onClickMenu={handleOpenFullMenu}
           >
             <ShellHeaderActions
               session={session}

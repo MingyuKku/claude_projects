@@ -1,4 +1,5 @@
 import { ChargeStatusText } from "@/entities/bigbird-money";
+import { FullTextHint } from "@/shared/components/full-text-hint";
 import { useTranslation } from "@/shared/i18n";
 
 import { useMoneyFormat } from "../lib/use-money-format";
@@ -17,9 +18,6 @@ interface ChargeDetailProps {
   hasBackButton?: boolean;
 }
 
-// 거래 상세 보기. 충전 건(PC 시안 11224:104140)·출금 건(11224:105015) 모두 9행 + 하단 "거래명세서 받기"이고 라벨만 다름.
-// 모든 기기 같은 행(TAB·MO 시안은 3.0.8 순서로 남아 있어 스펙 §7 D-1로 확인 중, PC 기준으로 통일).
-// 승인 일자 행은 쓰지 않음: 충전은 요청 일자와 같은 값이고 출금은 항상 "-"라 정보가 없음(사용자 결정 2026-10-30).
 export function ChargeDetail({
   record,
   onClose,
@@ -86,7 +84,10 @@ export function ChargeDetail({
         {
           key: "account",
           label: t("charge.detail.account"),
-          value: record.accountNumber,
+          // 값 칸이 좁은 PC 패널에서 긴 계좌번호가 두 줄이 되지 않게 한 줄로 두고, 잘리면 전체를 보여 줌.
+          value: (
+            <FullTextHint text={record.accountNumber} className="text-right" />
+          ),
         },
         {
           key: "holder",

@@ -19,10 +19,14 @@
       "size": "最大 10MB。",
       "download": "无法下载文件，请重试。"
     },
+    "none": "无文件",
     "download": "下载{{name}}"
   },
   "inform": {
     "required": "需填写所有必填项才能保存。",
     "file": "文件仅支持 JPG、PNG、PDF 格式，最大 10MB。"
+  },
+  "view": {
+    "register": "登记"
   }
 }

@@ -8,7 +8,7 @@ import { cn } from "@/shared/lib/utils"
 // 근거·한계는 shared/components/text-field/styles.ts 주석과 같음(공식 문서 근거 없음, 실기기 동작과 개발 자료에 의존).
 // HTML input의 size 속성과 겹치지 않게 inputSize로 둠.
 const inputVariants = cva(
-  "w-full min-w-0 rounded-md border border-input bg-background px-3 text-sm leading-5 text-foreground supports-[-webkit-touch-callout:none]:text-base transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 aria-invalid:focus-visible:ring-destructive disabled:pointer-events-none disabled:cursor-not-allowed file:mr-2 file:border-0 file:bg-transparent file:p-0 file:text-sm file:leading-5 file:font-medium file:text-foreground",
+  "w-full min-w-0 rounded-md text-ellipsis border border-input bg-background px-3 text-sm leading-5 text-foreground supports-[-webkit-touch-callout:none]:text-base transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 aria-invalid:focus-visible:ring-destructive disabled:pointer-events-none disabled:cursor-not-allowed file:mr-2 file:border-0 file:bg-transparent file:p-0 file:text-sm file:leading-5 file:font-medium file:text-foreground",
   {
     variants: {
       inputSize: {

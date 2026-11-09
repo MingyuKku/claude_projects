@@ -1,6 +1,10 @@
 import { ChevronRight } from "lucide-react";
 
-import { checkUploadFile, DOCUMENT_EXTENSIONS } from "@/entities/account";
+import {
+  ACCOUNT_NUMBER_MAX_LENGTH,
+  checkUploadFile,
+  DOCUMENT_EXTENSIONS,
+} from "@/entities/account";
 import { BalanceCard } from "@/entities/bigbird-money";
 import { FileUploadInput } from "@/shared/components/file-upload-input";
 import { FormField } from "@/shared/components/form-field";
@@ -131,6 +135,7 @@ export function WithdrawInputStep({
                   {...control}
                   inputMode="numeric"
                   autoComplete="off"
+                  maxLength={ACCOUNT_NUMBER_MAX_LENGTH}
                   placeholder={t("field.accountNumber.placeholder")}
                   value={values.accountNumber}
                   onChange={(event) => {

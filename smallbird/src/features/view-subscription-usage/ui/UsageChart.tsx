@@ -34,6 +34,9 @@ const CHART_CONFIG = {
 // Recharts의 barCategoryGap은 묶음 양쪽에 각각 적용되므로 절반을 넘기고, 양 끝에 생기는 여백은 x축 padding으로 상쇄해 시안처럼 가장자리에 붙임. y축 라벨과 차트 사이 간격은 PC 24·TAB 20·MO 16px.
 const CATEGORY_GAP = { desktop: 40, tablet: 20, mobile: 16 } as const;
 const AXIS_GAP = { desktop: 24, tablet: 20, mobile: 16 } as const;
+// 시안(11755:96300): x축 라벨 행은 높이 20px이고 막대 영역과 2px 떨어짐. Recharts가 tickMargin에 3px를 더 얹어 그리므로 라벨(12px)이 행 가운데 오도록 2를 둠.
+const X_AXIS_HEIGHT = 22;
+const X_AXIS_TICK_MARGIN = 2;
 // 툴팁은 마우스를 올린 막대 위(시안: 막대 위 8px, 높이 32px, 폭 60px 이상)에 뜸.
 const TOOLTIP_HEIGHT = 32;
 const TOOLTIP_MIN_WIDTH = 60;
@@ -145,71 +148,78 @@ export function UsageChart({
         )}
       </div>
       <div className="px-6 pt-6 pb-6 tablet:pt-7 desktop:pt-8">
-        <ChartContainer
-          config={CHART_CONFIG}
-          className="aspect-auto h-57 w-full justify-start tablet:h-56 desktop:h-55 [&_.recharts-xAxis-tick-labels_text]:fill-muted-foreground [&_.recharts-yAxis-tick-labels_text]:fill-muted-foreground"
+        {/* y축 라벨은 x축 라벨 행까지 포함한 차트 전체 높이에 같은 간격으로 늘어서고, 맨 아래 "0 건"이 x축 라벨과 같은 줄임.
+            Recharts의 y축은 값 위치에 눈금을 두고 맨 위 라벨을 영역 안으로 밀어 간격이 달라지므로 라벨은 직접 그림. */}
+        <div
+          className="flex h-57 tablet:h-56 desktop:h-55"
+          style={{ columnGap: AXIS_GAP[layout] }}
         >
-          <BarChart
-            data={data}
-            accessibilityLayer
-            barGap={4}
-            barCategoryGap={categoryGap / 2}
-            margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+          <div
+            aria-hidden
+            className="flex shrink-0 flex-col items-end justify-between text-xs leading-5 whitespace-nowrap text-muted-foreground"
           >
-            <YAxis
-              width="auto"
-              ticks={ticks}
-              domain={[0, ticks[ticks.length - 1] ?? 0]}
-              axisLine={false}
-              tickLine={false}
-              tickSize={0}
-              tickMargin={AXIS_GAP[layout]}
-              tickFormatter={(value: number) =>
-                t("count.value", { value: formatNumber(value) })
-              }
-            />
-            <XAxis
-              dataKey="label"
-              axisLine={false}
-              tickLine={false}
-              tickMargin={8}
-              interval={0}
-              padding={{ left: -categoryGap / 2, right: -categoryGap / 2 }}
-            />
-            {/* 마우스를 올린(MO는 터치한) 막대 하나의 값만 보임. */}
-            <ChartTooltip
-              cursor={false}
-              shared={false}
-              position={tooltipAnchor ?? undefined}
-              isAnimationActive={false}
-              content={({ active, payload }) => {
-                const value = payload?.[0]?.value;
-                if (!active || typeof value !== "number") return null;
-                return (
-                  <div className="flex h-8 min-w-15 items-center justify-center rounded-md border bg-popover px-3 text-center text-sm leading-5 text-popover-foreground shadow-md">
-                    {t("count.tooltip", { value: formatNumber(value) })}
-                  </div>
-                );
-              }}
-            />
-            <Bar
-              dataKey="brand"
-              fill="var(--color-brand)"
-              radius={4}
-              minPointSize={1}
-              onMouseEnter={anchorTooltip}
-              onClick={anchorTooltip}
-            />
-            <Bar
-              dataKey="groupBuy"
-              fill="var(--color-groupBuy)"
-              radius={4}
-              minPointSize={1}
-              onMouseEnter={anchorTooltip}
-              onClick={anchorTooltip}
-            />
-          </BarChart>
-        </ChartContainer>
+            {[...ticks].reverse().map((tick) => (
+              <span key={tick}>
+                {t("count.value", { value: formatNumber(tick) })}
+              </span>
+            ))}
+          </div>
+          <ChartContainer
+            config={CHART_CONFIG}
+            className="aspect-auto h-full min-w-0 flex-1 justify-start [&_.recharts-xAxis-tick-labels_text]:fill-muted-foreground"
+          >
+            <BarChart
+              data={data}
+              accessibilityLayer
+              barGap={4}
+              barCategoryGap={categoryGap / 2}
+              margin={{ top: 0, right: 0, bottom: 0, left: 0 }}
+            >
+              <YAxis hide domain={[0, ticks[ticks.length - 1] ?? 0]} />
+              <XAxis
+                dataKey="label"
+                axisLine={false}
+                tickLine={false}
+                height={X_AXIS_HEIGHT}
+                tickMargin={X_AXIS_TICK_MARGIN}
+                interval={0}
+                padding={{ left: -categoryGap / 2, right: -categoryGap / 2 }}
+              />
+              {/* 마우스를 올린(MO는 터치한) 막대 하나의 값만 보임. */}
+              <ChartTooltip
+                cursor={false}
+                shared={false}
+                position={tooltipAnchor ?? undefined}
+                isAnimationActive={false}
+                content={({ active, payload }) => {
+                  const value = payload?.[0]?.value;
+                  if (!active || typeof value !== "number") return null;
+                  return (
+                    <div className="flex h-8 min-w-15 items-center justify-center rounded-md border bg-popover px-3 text-center text-sm leading-5 text-popover-foreground shadow-md">
+                      {t("count.tooltip", { value: formatNumber(value) })}
+                    </div>
+                  );
+                }}
+              />
+              <Bar
+                dataKey="brand"
+                fill="var(--color-brand)"
+                radius={4}
+                minPointSize={1}
+                onMouseEnter={anchorTooltip}
+                onClick={anchorTooltip}
+              />
+              <Bar
+                dataKey="groupBuy"
+                fill="var(--color-groupBuy)"
+                radius={4}
+                minPointSize={1}
+                onMouseEnter={anchorTooltip}
+                onClick={anchorTooltip}
+              />
+            </BarChart>
+          </ChartContainer>
+        </div>
       </div>
     </div>
   );

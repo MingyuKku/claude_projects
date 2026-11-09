@@ -7,6 +7,11 @@ interface FilterFieldBase {
   label: string;
   /** MO 필터 모달에서 입력칸 안에 보이는 안내(예: "날짜를 선택하세요."). */
   placeholder: string;
+  /**
+   * PC 인라인 툴바에서 이 필드의 폭(px, 시안 값). 없으면 `DEFAULT_FIELD_WIDTH`. TAB 필터 화면·MO 모달은 폭 전체를 쓰므로 적용하지 않음.
+   * 선택 필드의 팝업 목록은 트리거 폭 이상으로 열림.
+   */
+  width?: number;
 }
 
 export interface DateFilterField extends FilterFieldBase {

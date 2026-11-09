@@ -3,6 +3,7 @@ import i18next from "i18next";
 import { DEFAULT_LANGUAGE, type Language } from "./config";
 import {
   formatDate,
+  formatListDate,
   formatNumber,
   formatNumericDate,
   formatNumericDateTime,
@@ -59,6 +60,19 @@ describe("formatNumericDate·formatNumericDateTime", () => {
       await i18next.changeLanguage(language);
       expect(formatNumericDate(DATE_TIME)).toBe(expectedDate);
       expect(formatNumericDateTime(DATE_TIME)).toBe(expectedDateTime);
+    },
+  );
+
+  it.each<[Language, string]>([
+    ["ko", "2025-05-31"],
+    ["en", "05/31/2025"],
+    ["ja", "2025/05/31"],
+    ["zh-CN", "2025/05/31"],
+  ])(
+    "%s 의 목록 날짜는 일시의 날짜 부분과 같다",
+    async (language, expected) => {
+      await i18next.changeLanguage(language);
+      expect(formatListDate(DATE_TIME)).toBe(expected);
     },
   );
 

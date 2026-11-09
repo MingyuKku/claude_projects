@@ -42,6 +42,7 @@ export function ProfilePasswordFields({
             {...control}
             autoComplete="new-password"
             maxLength={PASSWORD_MAX_LENGTH}
+            placeholder={t("form.password.placeholder")}
             value={values.password}
             onChange={onChangeField("password")}
             showLabel={tCommon("password.show", { label: passwordLabel })}
@@ -60,6 +61,7 @@ export function ProfilePasswordFields({
             {...control}
             autoComplete="new-password"
             maxLength={PASSWORD_MAX_LENGTH}
+            placeholder={t("form.passwordCheck.placeholder")}
             value={values.passwordCheck}
             onChange={onChangeField("passwordCheck")}
             showLabel={tCommon("password.show", { label: passwordCheckLabel })}

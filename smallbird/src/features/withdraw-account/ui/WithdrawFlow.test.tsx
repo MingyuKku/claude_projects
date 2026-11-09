@@ -30,6 +30,15 @@ vi.mock("@/shared/lib", async (importOriginal) => ({
 }));
 vi.mock("../api/withdraw-api");
 
+// Radix ScrollArea(패널·약관 본문 스크롤)가 쓰는 브라우저 API가 jsdom에 없어 이 파일에서만 채움.
+beforeAll(() => {
+  globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+});
+
 beforeEach(() => {
   vi.mocked(toast.error).mockReset();
   vi.mocked(hardNavigate).mockReset();

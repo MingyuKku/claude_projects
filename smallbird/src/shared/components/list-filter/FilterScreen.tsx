@@ -29,11 +29,11 @@ export function FilterScreen({
   return (
     <section
       aria-labelledby="filter-screen-title"
-      // 헤더(64px)와 아래 여백(20px)을 뺀 높이를 채워 하단 버튼이 화면 맨 아래에 붙음(시안).
-      className="flex min-h-[calc(100dvh-5.25rem)] flex-1 flex-col"
+      // 헤더와 아래 여백(20px)을 뺀 높이를 채워 하단 버튼이 화면 맨 아래에 붙음(시안).
+      className="flex min-h-[calc(100dvh-var(--app-header-height)-var(--spacing)*5)] flex-1 flex-col"
     >
-      {/* 서브헤더는 페이지 여백을 벗어나 본문 폭 전체에 구분선을 그림(시안 60px). */}
-      <header className="-mx-(--mypage-gutter) flex h-15 items-center justify-between border-b border-border px-(--mypage-gutter)">
+      {/* 서브헤더 구분선은 요약 카드·탭 줄과 같은 본문 칼럼 폭에 맞춤(칼럼 밖으로 나가면 최대 폭이 걸린 화면에서 혼자 튀어나옴). */}
+      <header className="flex h-15 items-center justify-between border-b border-border">
         <h2 id="filter-screen-title" className="text-base font-semibold">
           {t("list.filter.title")}
         </h2>

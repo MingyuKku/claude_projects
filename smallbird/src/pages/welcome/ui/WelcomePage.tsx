@@ -1,16 +1,18 @@
+import { useNavigate } from "react-router";
+
 import bigbirdLogo from "@/shared/assets/img/auth/bigbird-logo.svg";
 import chevronRightWhite from "@/shared/assets/img/system/chevron-right-white.svg";
 import { AuthButton, AuthHeading, AuthText } from "@/shared/components/auth";
+import { ROUTES } from "@/shared/config";
 import { Trans, useTranslation } from "@/shared/i18n";
-
-const BIGBIRD_SITE_URL = "https://bigbird.co.kr/";
 
 /** 가입의 마지막 화면. 승인 대기 중이라는 안내만 함. */
 export function WelcomePage() {
   const { t } = useTranslation("pages/welcome");
+  const navigate = useNavigate();
 
   function handleClickBrowse() {
-    window.open(BIGBIRD_SITE_URL, "_blank", "noopener,noreferrer");
+    navigate(ROUTES.home);
   }
 
   return (

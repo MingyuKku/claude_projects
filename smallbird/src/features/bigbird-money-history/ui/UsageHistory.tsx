@@ -13,6 +13,7 @@ import { useMediaQuery } from "@/shared/lib";
 import { useUsageHistory, useUsageScrollList } from "../api/use-usage-history";
 import { useUsageListParams } from "../lib/use-usage-list-params";
 import {
+  EMPTY_LIST_MAX_HEIGHT_CLASS,
   LIST_PAGE_SIZE_OPTIONS,
   USAGE_KEYWORD_MAX_LENGTH,
 } from "../model/constants";
@@ -31,7 +32,7 @@ interface UsageHistoryProps {
 }
 
 // 사용 내역. PC는 표 + 인라인 툴바, TAB은 2열 카드 + "필터" 화면(`?panel=filter`), MO는 1열 카드 + 스크롤로 이어 읽기(맨 위로 버튼) + 필터 모달.
-// 필터(구분·사용 일자·캠페인 명·사용 내역)와 "N개 보기"(10·20·50)는 주소 쿼리가 소유하고 서버에 함께 보냄. 검색어(`keyword`)는 캠페인 명·코드·사용 내역 문구를 부분 일치로 찾음(Q-8).
+// 필터(구분·사용 일자·캠페인 명·사용 내역)와 "N개 보기"(10·20·30)는 주소 쿼리가 소유하고 서버에 함께 보냄. 검색어(`keyword`)는 캠페인 명·코드·사용 내역 문구를 부분 일치로 찾음(Q-8).
 export function UsageHistory({
   activeId,
   isPanelOpen,
@@ -59,6 +60,7 @@ export function UsageHistory({
       kind={resolveEmptyKind(params.keyword, hasActiveFilter(params.filters))}
       keyword={params.keyword}
       noneTitle={t("usage.empty.none")}
+      height="fill"
     />
   );
   const skeleton = <UsageListSkeleton isTable={isDesktop} />;
@@ -79,7 +81,10 @@ export function UsageHistory({
   }
 
   return (
-    <section className="flex flex-col gap-4" aria-labelledby="usage-title">
+    <section
+      className="flex flex-1 flex-col gap-4"
+      aria-labelledby="usage-title"
+    >
       <h2 id="usage-title" className="text-base font-semibold text-foreground">
         {t("usage.title")}
       </h2>
@@ -117,6 +122,7 @@ export function UsageHistory({
           buildPageHref={params.buildPageHref}
           skeleton={skeleton}
           emptyContent={emptyContent}
+          emptyClassName={EMPTY_LIST_MAX_HEIGHT_CLASS}
           isTable={isDesktop}
           renderTable={(records, empty) => (
             <UsageTable
@@ -147,6 +153,7 @@ export function UsageHistory({
           onRetry={() => void scroll.reload()}
           skeleton={skeleton}
           emptyContent={emptyContent}
+          emptyClassName={EMPTY_LIST_MAX_HEIGHT_CLASS}
           renderCards={(records) => (
             <UsageCardList
               records={records}

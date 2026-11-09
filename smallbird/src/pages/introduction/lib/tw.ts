@@ -18,4 +18,4 @@ export const CONTAINER =
  * 이동 거리도 함께 늘림.
  */
 export const REVEAL =
-  "translate-y-8 opacity-0 transition-[opacity,translate] duration-[1100ms] ease-[cubic-bezier(0.16,1,0.3,1)] data-[revealed]:translate-y-0 data-[revealed]:opacity-100";
+  "translate-y-8 opacity-0 transition-[opacity,translate] duration-1100 ease-[cubic-bezier(0.16,1,0.3,1)] data-revealed:translate-y-0 data-revealed:opacity-100";

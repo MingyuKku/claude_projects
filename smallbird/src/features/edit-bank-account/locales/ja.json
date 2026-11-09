@@ -4,9 +4,15 @@
     "bank": "銀行",
     "accountNumber": "口座番号",
     "accountHolder": "口座名義",
-    "bankBook": "通帳コピー"
+    "bankBook": "通帳コピー",
+    "placeholder": {
+      "bank": "銀行名を入力",
+      "accountNumber": "口座番号を入力",
+      "accountHolder": "口座名義を入力"
+    }
   },
   "file": {
+    "placeholder": "ファイルをアップロード",
     "upload": "アップロード",
     "uploadFor": "{{label}}をアップロード",
     "registered": "登録済み",

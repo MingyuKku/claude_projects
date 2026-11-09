@@ -35,7 +35,7 @@ export function IntroSection1Card({ card, classes }: Props) {
       {/* 호버하면 글자는 사라지고 목업이 카드를 채움. */}
       <h3
         className={cn(
-          "relative z-[1] m-0 text-2xl leading-[1.4] font-bold text-[#222] max-mo:text-lg",
+          "relative z-1 m-0 text-2xl leading-[1.4] font-bold text-[#222] max-mo:text-lg",
           `transition-opacity ${HOVER}`,
           "introtab:group-hover:opacity-0",
         )}
@@ -45,7 +45,7 @@ export function IntroSection1Card({ card, classes }: Props) {
       {/* 제목과 설명 사이 간격은 PC·TAB 18px, MO 8px. */}
       <p
         className={cn(
-          "relative z-[1] mt-[18px] mb-0 text-lg leading-[1.4] font-medium whitespace-pre-line text-[#868e96] max-mo:mt-2 max-mo:text-sm ko:break-keep",
+          "relative z-1 mt-[18px] mb-0 text-lg leading-[1.4] font-medium whitespace-pre-line text-[#868e96] max-mo:mt-2 max-mo:text-sm ko:break-keep",
           `transition-opacity ${HOVER}`,
           "introtab:group-hover:opacity-0",
         )}
@@ -117,7 +117,7 @@ export function IntroSection1Card({ card, classes }: Props) {
             {/* 상태바 + 앱 헤더: 디자인에서는 이미지 프레임 위에 고정된 레이어.
                 900x226 원본(450x113 의 2배)은 화면 폭 245 에서 61.5px. */}
             <img
-              className="absolute top-0 left-0 z-[1] w-full"
+              className="absolute top-0 left-0 z-1 w-full"
               src={card.screenHead}
               alt=""
               loading="lazy"

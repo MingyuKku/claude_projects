@@ -62,7 +62,7 @@ export function IntroContact({ className }: Props) {
     <section
       id="contact"
       className={cn(
-        "flex min-h-[846px] flex-col items-center gap-9 [background-size:100%_846px] bg-top bg-no-repeat px-5 pt-25 max-introtab:[background-size:1440px_846px] max-introtab:px-10 max-introtab:pt-20 max-mo:min-h-[991px] max-mo:gap-6 max-mo:[background-size:1746.64px_1026.15px] max-mo:px-5 max-mo:pt-20",
+        "flex min-h-[846px] flex-col items-center gap-9 bg-size-[100%_846px] bg-top bg-no-repeat px-5 pt-25 max-introtab:bg-size-[1440px_846px] max-introtab:px-10 max-introtab:pt-20 max-mo:min-h-[991px] max-mo:gap-6 max-mo:bg-size-[1746.64px_1026.15px] max-mo:px-5 max-mo:pt-20",
         className,
       )}
       style={{ backgroundImage: `url(${CONTACT_BG})` }}

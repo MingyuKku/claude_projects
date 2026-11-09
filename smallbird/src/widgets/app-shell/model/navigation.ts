@@ -79,8 +79,6 @@ export const SHELL_NAV_ITEMS: ShellNavItem[] = [
   {
     id: "mypage",
     icon: UserCog,
-    // 접힌 레일의 마이페이지 아이콘은 하위 메뉴 첫 항목(구독)이 아니라 계정 설정으로 이동함. 구독은 Sub ID가 들어갈 수 없어 모든 권한이 열 수 있는 계정 설정을 씀.
-    href: ROUTES.mypageAccount,
     subItems: [
       { id: "subscribe", href: ROUTES.mypageSubscribe },
       { id: "money", href: ROUTES.mypageMoney },

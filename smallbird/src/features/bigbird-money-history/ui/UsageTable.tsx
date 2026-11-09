@@ -1,6 +1,7 @@
 import { EllipsisVertical } from "lucide-react";
 
 import { FullTextHint } from "@/shared/components/full-text-hint";
+import { EmptyTableFrame } from "@/shared/components/list-filter";
 import { useTranslation } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
 import {
@@ -45,91 +46,98 @@ export function UsageTable({
   const { t } = useTranslation("features/bigbird-money-history");
   const { formatDateTime, formatWon } = useMoneyFormat();
   const labels = useUsageLabels();
-  const columnCount = isPanelOpen ? 5 : 7;
+
+  const header = (
+    <TableHeader>
+      <TableRow>
+        <TableHead className="w-20">{t("usage.column.type")}</TableHead>
+        <TableHead className="w-45">{t("usage.column.date")}</TableHead>
+        {!isPanelOpen && (
+          <TableHead className="w-66.5">
+            {t("usage.column.campaignName")}
+          </TableHead>
+        )}
+        <TableHead className="w-50">{t("usage.column.usage")}</TableHead>
+        <TableHead className="w-36">{t("usage.column.amount")}</TableHead>
+        {!isPanelOpen && (
+          <TableHead className="w-36">{t("usage.column.remaining")}</TableHead>
+        )}
+        <TableHead className="w-24 text-center">
+          {t("usage.column.detail")}
+        </TableHead>
+      </TableRow>
+    </TableHeader>
+  );
+
+  if (emptyContent) {
+    return (
+      <EmptyTableFrame
+        table={
+          <Table
+            headerTone="gray"
+            aria-label={t("usage.list.label")}
+            containerClassName="rounded-none border-0"
+          >
+            {header}
+          </Table>
+        }
+      >
+        {emptyContent}
+      </EmptyTableFrame>
+    );
+  }
 
   return (
     <Table headerTone="gray" aria-label={t("usage.list.label")}>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-20">{t("usage.column.type")}</TableHead>
-          <TableHead className="w-45">{t("usage.column.date")}</TableHead>
-          {!isPanelOpen && (
-            <TableHead className="w-66.5">
-              {t("usage.column.campaignName")}
-            </TableHead>
-          )}
-          <TableHead className="w-50">{t("usage.column.usage")}</TableHead>
-          <TableHead className="w-36">{t("usage.column.amount")}</TableHead>
-          {!isPanelOpen && (
-            <TableHead className="w-36">
-              {t("usage.column.remaining")}
-            </TableHead>
-          )}
-          <TableHead className="w-24 text-center">
-            {t("usage.column.detail")}
-          </TableHead>
-        </TableRow>
-      </TableHeader>
+      {header}
       <TableBody>
-        {emptyContent ? (
-          // 빈 상태 안내 행은 누를 대상이 아니라 호버 색을 없앰.
-          <TableRow className="[--table-row-hover:transparent]">
-            <TableCell
-              colSpan={columnCount}
-              className="h-auto p-0 whitespace-normal"
-            >
-              {emptyContent}
+        {records.map((record) => (
+          <TableRow
+            key={record.id}
+            data-state={record.id === activeId ? "selected" : undefined}
+          >
+            <TableCell className="h-14">
+              <UsageTypeBadge record={record} />
+            </TableCell>
+            <TableCell className="h-14">
+              {formatDateTime(record.usedAt, record.usedAtText)}
+            </TableCell>
+            {!isPanelOpen && (
+              <TableCell className="h-14 whitespace-normal">
+                <div className="flex items-center gap-3">
+                  <CampaignThumbnail record={record} />
+                  <FullTextHint
+                    text={record.campaignName}
+                    lines={2}
+                    className="min-w-0 flex-1"
+                  />
+                </div>
+              </TableCell>
+            )}
+            <TableCell className="h-14 whitespace-normal">
+              <FullTextHint text={labels.usageDetail(record)} lines={2} />
+            </TableCell>
+            <TableCell className="h-14">
+              <UsageAmount amount={record.amount} />
+            </TableCell>
+            {!isPanelOpen && (
+              <TableCell className="h-14">
+                {formatWon(record.remainingAmount)}
+              </TableCell>
+            )}
+            <TableCell className="h-14 text-center">
+              <Button
+                variant="outline-foreground"
+                size="icon-sm"
+                className="min-w-0"
+                aria-label={t("usage.action.detail")}
+                onClick={() => onClickDetail(record)}
+              >
+                <EllipsisVertical />
+              </Button>
             </TableCell>
           </TableRow>
-        ) : (
-          records.map((record) => (
-            <TableRow
-              key={record.id}
-              data-state={record.id === activeId ? "selected" : undefined}
-            >
-              <TableCell className="h-14">
-                <UsageTypeBadge record={record} />
-              </TableCell>
-              <TableCell className="h-14">
-                {formatDateTime(record.usedAt, record.usedAtText)}
-              </TableCell>
-              {!isPanelOpen && (
-                <TableCell className="h-14 whitespace-normal">
-                  <div className="flex items-center gap-3">
-                    <CampaignThumbnail record={record} />
-                    <FullTextHint
-                      text={record.campaignName}
-                      lines={2}
-                      className="min-w-0 flex-1"
-                    />
-                  </div>
-                </TableCell>
-              )}
-              <TableCell className="h-14 whitespace-normal">
-                <FullTextHint text={labels.usageDetail(record)} lines={2} />
-              </TableCell>
-              <TableCell className="h-14">
-                <UsageAmount amount={record.amount} />
-              </TableCell>
-              {!isPanelOpen && (
-                <TableCell className="h-14">
-                  {formatWon(record.remainingAmount)}
-                </TableCell>
-              )}
-              <TableCell className="h-14 text-center">
-                <Button
-                  variant="outline-foreground"
-                  size="icon-sm"
-                  className="min-w-0"
-                  aria-label={t("usage.action.detail")}
-                  onClick={() => onClickDetail(record)}
-                >
-                  <EllipsisVertical />
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))
-        )}
+        ))}
       </TableBody>
     </Table>
   );

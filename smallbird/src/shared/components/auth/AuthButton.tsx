@@ -13,7 +13,7 @@ import type { ComponentProps } from "react";
 const authButtonVariants = cva(
   [
     "flex h-full w-full cursor-pointer items-center justify-center rounded-auth-lg font-normal transition-all duration-300 outline-none",
-    "disabled:bg-disabled! disabled:text-light! disabled:[&_*]:text-light! disabled:cursor-default",
+    "disabled:bg-disabled! disabled:text-light! disabled:**:text-light! disabled:cursor-default",
   ],
   {
     variants: {

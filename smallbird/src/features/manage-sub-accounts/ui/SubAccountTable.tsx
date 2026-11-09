@@ -1,4 +1,5 @@
-import { formatDate, useTranslation } from "@/shared/i18n";
+import { EmptyTableFrame } from "@/shared/components/list-filter";
+import { formatListDate, useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
 import { Avatar, AvatarImage, AvatarPlaceholder } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
@@ -11,7 +12,6 @@ import {
   TableRow,
 } from "@/shared/ui/table";
 
-import { DATE_FORMAT } from "../model/constants";
 import { DeleteButton } from "./DeleteButton";
 import { EditButton } from "./EditButton";
 
@@ -47,78 +47,89 @@ export function SubAccountTable({
 }: SubAccountTableProps) {
   const { t } = useTranslation("features/manage-sub-accounts");
 
+  const header = (
+    <TableHeader>
+      <TableRow>
+        <TableHead>{t("list.column.identifier")}</TableHead>
+        <TableHead className="w-1/8">{t("list.column.name")}</TableHead>
+        <TableHead>{t("list.column.email")}</TableHead>
+        <TableHead className="w-30">{t("list.column.createdAt")}</TableHead>
+        <TableHead className="w-46">{t("list.column.manage")}</TableHead>
+      </TableRow>
+    </TableHeader>
+  );
+
+  if (emptyContent) {
+    return (
+      <EmptyTableFrame
+        table={
+          <Table
+            headerTone="gray"
+            aria-label={t("list.label")}
+            containerClassName="rounded-none border-0"
+          >
+            {header}
+          </Table>
+        }
+      >
+        {emptyContent}
+      </EmptyTableFrame>
+    );
+  }
+
   return (
     <Table headerTone="gray" aria-label={t("list.label")}>
-      <TableHeader>
-        <TableRow>
-          <TableHead>{t("list.column.identifier")}</TableHead>
-          <TableHead className="w-1/8">{t("list.column.name")}</TableHead>
-          <TableHead>{t("list.column.email")}</TableHead>
-          <TableHead className="w-30">{t("list.column.createdAt")}</TableHead>
-          <TableHead className="w-46">{t("list.column.manage")}</TableHead>
-        </TableRow>
-      </TableHeader>
+      {header}
       <TableBody>
-        {emptyContent ? (
-          // 빈 상태 안내 행은 누를 대상이 아니라 호버 색을 없앰.
-          <TableRow className="[--table-row-hover:transparent]">
-            <TableCell colSpan={5} className="h-auto p-0 whitespace-normal">
-              {emptyContent}
+        {accounts.map((account) => (
+          <TableRow
+            key={account.accountIdx}
+            data-state={
+              account.accountIdx === activeAccountIdx ? "selected" : undefined
+            }
+          >
+            <TableCell className="whitespace-normal">
+              <div className="flex items-center gap-3">
+                <Avatar size="md">
+                  {account.profileImageUrl && (
+                    <AvatarImage src={account.profileImageUrl} alt="" />
+                  )}
+                  <AvatarPlaceholder />
+                </Avatar>
+                <span className={cn(CELL_TEXT_CLASS_NAME, "min-w-0 flex-1")}>
+                  {account.identifier}
+                </span>
+              </div>
+            </TableCell>
+            <TableCell className="whitespace-normal">
+              <span className={CELL_TEXT_CLASS_NAME}>{account.name}</span>
+            </TableCell>
+            <TableCell className="whitespace-normal">
+              <span className={CELL_TEXT_CLASS_NAME}>{account.email}</span>
+            </TableCell>
+            <TableCell className="truncate">
+              {account.createdAt ? formatListDate(account.createdAt) : ""}
+            </TableCell>
+            <TableCell>
+              <div className="flex items-center gap-6">
+                <Button
+                  variant="outline"
+                  onClick={() => onClickPermission(account)}
+                >
+                  {t("list.action.permission")}
+                </Button>
+                <EditButton
+                  label={t("list.action.edit")}
+                  onClick={() => onClickEdit(account)}
+                />
+                <DeleteButton
+                  label={t("list.action.delete")}
+                  onClick={() => onClickDelete(account)}
+                />
+              </div>
             </TableCell>
           </TableRow>
-        ) : (
-          accounts.map((account) => (
-            <TableRow
-              key={account.accountIdx}
-              data-state={
-                account.accountIdx === activeAccountIdx ? "selected" : undefined
-              }
-            >
-              <TableCell className="whitespace-normal">
-                <div className="flex items-center gap-3">
-                  <Avatar size="md">
-                    {account.profileImageUrl && (
-                      <AvatarImage src={account.profileImageUrl} alt="" />
-                    )}
-                    <AvatarPlaceholder />
-                  </Avatar>
-                  <span className={cn(CELL_TEXT_CLASS_NAME, "min-w-0 flex-1")}>
-                    {account.identifier}
-                  </span>
-                </div>
-              </TableCell>
-              <TableCell className="whitespace-normal">
-                <span className={CELL_TEXT_CLASS_NAME}>{account.name}</span>
-              </TableCell>
-              <TableCell className="whitespace-normal">
-                <span className={CELL_TEXT_CLASS_NAME}>{account.email}</span>
-              </TableCell>
-              <TableCell className="truncate">
-                {account.createdAt
-                  ? formatDate(account.createdAt, DATE_FORMAT)
-                  : ""}
-              </TableCell>
-              <TableCell>
-                <div className="flex items-center gap-6">
-                  <Button
-                    variant="outline"
-                    onClick={() => onClickPermission(account)}
-                  >
-                    {t("list.action.permission")}
-                  </Button>
-                  <EditButton
-                    label={t("list.action.edit")}
-                    onClick={() => onClickEdit(account)}
-                  />
-                  <DeleteButton
-                    label={t("list.action.delete")}
-                    onClick={() => onClickDelete(account)}
-                  />
-                </div>
-              </TableCell>
-            </TableRow>
-          ))
-        )}
+        ))}
       </TableBody>
     </Table>
   );

@@ -39,7 +39,7 @@ export function WithdrawTermsScreen({
         }
       />
       <div className="flex-1 p-4">
-        <WithdrawTermsBox className="overflow-visible" />
+        <WithdrawTermsBox />
       </div>
       <WithdrawActions
         className="sticky bottom-0 border-t bg-background p-4"

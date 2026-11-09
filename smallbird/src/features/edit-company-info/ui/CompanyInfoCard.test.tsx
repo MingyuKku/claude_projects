@@ -170,9 +170,26 @@ describe("CompanyInfoCard", () => {
     await waitFor(() => expect(screen.queryByRole("textbox")).toBeNull());
   });
 
-  it("등록된 회사정보가 없으면 비밀번호 확인 없이 입력 모드로 열린다", () => {
-    setup({ company: null });
-    expect(screen.getByRole("textbox", { name: /회사명/ })).toBeInTheDocument();
+  it("등록된 회사정보가 없으면 빈 보기와 등록 버튼으로 열리고, 비밀번호가 맞아야 입력 모드가 된다", async () => {
+    vi.mocked(serverApiV3.post).mockResolvedValue({ result: true });
+    const { user } = setup({ company: null });
+
+    expect(screen.queryByRole("textbox")).toBeNull();
     expect(screen.queryByRole("button", { name: "수정" })).toBeNull();
+    expect(screen.getAllByText("등록된 파일이 없습니다")).toHaveLength(2);
+
+    await user.click(screen.getByRole("button", { name: "등록" }));
+    const dialog = await screen.findByRole("dialog", {
+      name: "관리자 비밀번호 입력",
+    });
+    await user.type(
+      within(dialog).getByPlaceholderText("비밀번호를 입력해주세요"),
+      "right",
+    );
+    await user.click(within(dialog).getByRole("button", { name: "확인" }));
+
+    expect(
+      await screen.findByRole("textbox", { name: /회사명/ }),
+    ).toBeInTheDocument();
   });
 });

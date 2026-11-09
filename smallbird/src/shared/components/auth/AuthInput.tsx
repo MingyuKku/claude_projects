@@ -12,7 +12,7 @@ import type { ComponentProps } from "react";
 
 const authInputVariants = cva(
   [
-    "bg-light caret-brand h-11 w-full shrink-0 rounded-auth-lg border px-3 text-sm font-normal text-gray-700 outline-none",
+    "bg-light caret-brand h-11 w-full shrink-0 rounded-auth-lg border px-3 text-sm text-ellipsis font-normal text-gray-700 outline-none",
     "placeholder:text-disabled placeholder:font-normal",
     "disabled:bg-hover disabled:border-line1! disabled:cursor-not-allowed disabled:text-gray-500 disabled:placeholder:text-gray-500",
   ],

@@ -1,7 +1,9 @@
-import { useRef, useState } from "react";
+import { useState } from "react";
 
 import { cn } from "@/shared/lib/utils";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
+
+import { useIsTruncated } from "./use-is-truncated";
 
 import type { PointerEvent } from "react";
 
@@ -18,27 +20,32 @@ interface FullTextHintProps {
 // 긴 이름은 `lines`줄(기본 한 줄)까지 보이고 넘치면 말줄임. 글자 단위로 줄바꿈한 뒤 한 줄만 보여 표·카드 칸이 얼마든 좁아질 수 있음
 // (한 줄 고정(nowrap)이면 자동 표 배치에서 열이 이름 길이만큼 늘어남). 잘린 이름만 마우스를 올리거나(PC) 눌러서(MO·TAB 터치) 전체 이름을 보여 줌.
 // 호버는 마우스 포인터만 반응해 터치 스크롤 중에 열리지 않고, 터치는 눌러서 여닫으며 바깥을 누르면 닫힘.
+// 다 보이는 이름은 그냥 글자로 그려 버튼·포커스·손가락 커서를 두지 않음(눌러도 아무 일이 없는 버튼이 되므로).
 export function FullTextHint({
   text,
   lines = 1,
   className,
 }: FullTextHintProps) {
   const [open, setOpen] = useState(false);
-  const textRef = useRef<HTMLButtonElement>(null);
+  // 잘렸는지 재려면 그려진 요소가 필요해 ref 대신 state로 잡음(요소가 바뀌어도 다시 구독함).
+  const [element, setElement] = useState<HTMLElement | null>(null);
+  const isTruncated = useIsTruncated(element);
+  const textClassName = cn(
+    LINE_CLAMP_CLASS_NAME[lines],
+    "w-full min-w-0 text-left break-all",
+    className,
+  );
 
-  // 실제로 잘렸는지는 그려진 크기로만 알 수 있어 열 때마다 잼. 넘친 줄은 아래로 숨으므로 높이를 비교함.
-  function isTruncated() {
-    const element = textRef.current;
-    return element !== null && element.scrollHeight > element.clientHeight;
-  }
-
-  function handleOpenChange(next: boolean) {
-    if (next && !isTruncated()) return;
-    setOpen(next);
+  if (!isTruncated) {
+    return (
+      <span ref={setElement} className={textClassName}>
+        {text}
+      </span>
+    );
   }
 
   function handlePointerEnter(event: PointerEvent) {
-    if (event.pointerType === "mouse") handleOpenChange(true);
+    if (event.pointerType === "mouse") setOpen(true);
   }
 
   function handlePointerLeave(event: PointerEvent) {
@@ -46,17 +53,17 @@ export function FullTextHint({
   }
 
   return (
-    <Popover open={open} onOpenChange={handleOpenChange}>
+    <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <button
-          ref={textRef}
+          ref={setElement}
           type="button"
           onPointerEnter={handlePointerEnter}
           onPointerLeave={handlePointerLeave}
+          // 전역 CSS가 button에 주는 손가락 커서를 끔: PC는 올려서 보는 안내라 누르는 동작이 아님.
           className={cn(
-            LINE_CLAMP_CLASS_NAME[lines],
-            "w-full min-w-0 text-left break-all outline-none focus-visible:underline",
-            className,
+            textClassName,
+            "cursor-default outline-none focus-visible:underline",
           )}
         >
           {text}

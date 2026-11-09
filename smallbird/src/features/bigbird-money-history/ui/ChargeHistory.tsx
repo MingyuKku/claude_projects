@@ -15,7 +15,10 @@ import {
 } from "../api/use-charge-history";
 import { useChargeAutoRefresh } from "../lib/use-charge-auto-refresh";
 import { useChargeListParams } from "../lib/use-charge-list-params";
-import { LIST_PAGE_SIZE_OPTIONS } from "../model/constants";
+import {
+  EMPTY_LIST_MAX_HEIGHT_CLASS,
+  LIST_PAGE_SIZE_OPTIONS,
+} from "../model/constants";
 import { ChargeCardList } from "./ChargeCardList";
 import { ChargeListSkeleton } from "./ChargeListSkeleton";
 import { ChargeTable } from "./ChargeTable";
@@ -31,7 +34,7 @@ interface ChargeHistoryProps {
 }
 
 // 충전/출금 내역. PC는 표, TAB은 2열 카드 + 쪽 이동, MO는 1열 카드 + 스크롤로 이어 읽기(맨 위로 버튼). 툴바는 PC·TAB 인라인, MO "필터" 모달. 검색창은 없음(스펙 §3).
-// 필터(구분·충전 일자·입금 상태)와 "N개 보기"(10·20·50)는 주소 쿼리가 소유하고 서버에 함께 보냄.
+// 필터(구분·충전 일자·입금 상태)와 "N개 보기"(10·20·30)는 주소 쿼리가 소유하고 서버에 함께 보냄.
 export function ChargeHistory({
   activeId,
   isPanelOpen,
@@ -56,12 +59,16 @@ export function ChargeHistory({
       kind={resolveEmptyKind("", hasActiveFilter(params.filters))}
       keyword=""
       noneTitle={t("charge.empty.none")}
+      height="fill"
     />
   );
   const skeleton = <ChargeListSkeleton isTable={isDesktop} />;
 
   return (
-    <section className="flex flex-col gap-4" aria-labelledby="charge-title">
+    <section
+      className="flex flex-1 flex-col gap-4"
+      aria-labelledby="charge-title"
+    >
       <h2 id="charge-title" className="text-base font-semibold text-foreground">
         {t("charge.title")}
       </h2>
@@ -74,7 +81,6 @@ export function ChargeHistory({
           params.reset();
           void reload();
         }}
-        isNarrowSelect
         shouldFillFields={isPanelOpen}
         pageSize={{
           value: params.pageSize,
@@ -95,6 +101,7 @@ export function ChargeHistory({
           buildPageHref={params.buildPageHref}
           skeleton={skeleton}
           emptyContent={emptyContent}
+          emptyClassName={EMPTY_LIST_MAX_HEIGHT_CLASS}
           isTable={isDesktop}
           renderTable={(records, empty) => (
             <ChargeTable
@@ -125,6 +132,7 @@ export function ChargeHistory({
           onRetry={() => void scroll.reload()}
           skeleton={skeleton}
           emptyContent={emptyContent}
+          emptyClassName={EMPTY_LIST_MAX_HEIGHT_CLASS}
           renderCards={(records) => (
             <ChargeCardList
               records={records}

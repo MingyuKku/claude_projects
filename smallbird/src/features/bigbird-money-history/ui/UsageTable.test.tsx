@@ -29,7 +29,7 @@ const refund: UsageRecord = {
   id: "1",
   type: "refund",
   typeText: "환급",
-  campaignCode: "-",
+  campaignCode: "",
   amount: 30000,
   remainingAmount: null,
 };
@@ -173,13 +173,13 @@ describe("UsageTable", () => {
 });
 
 describe("UsageCardList", () => {
-  it("구분·일자·캠페인 명·내역·금액·잔액 6행이고 값이 없는 항목도 -로 둔다", () => {
+  it("구분·일자·캠페인 명·내역·금액·잔액 6행이고 값이 없는 항목도 행은 두고 값만 비운다", () => {
     render(<UsageCardList records={[refund]} onClickDetail={vi.fn()} />);
 
     expect(screen.getAllByRole("term").map((term) => term.textContent)).toEqual(
       ["구분", "일자", "캠페인 명", "내역", "금액", "잔액"],
     );
-    expect(screen.getByText("잔액").nextElementSibling).toHaveTextContent("-");
+    expect(screen.getByText("잔액").nextElementSibling?.textContent).toBe("");
   });
 
   it("상세 보기 버튼을 누르면 그 카드로 알린다", async () => {
@@ -228,7 +228,7 @@ describe("UsageDetail", () => {
     expect(screen.getByText("@haru_beauty")).toBeInTheDocument();
   });
 
-  it("모르는 코드는 서버 값을 그대로 보이고 계약 대상이 없으면 대시다", () => {
+  it("모르는 코드는 서버 값을 그대로 보이고 계약 대상이 없으면 빈칸이다", () => {
     render(
       <UsageDetail
         record={{
@@ -245,8 +245,8 @@ describe("UsageDetail", () => {
 
     expect(screen.getByText("live")).toBeInTheDocument();
     expect(screen.getByText("매칭거절")).toBeInTheDocument();
-    expect(screen.getByText("계약 대상").nextElementSibling).toHaveTextContent(
-      "-",
+    expect(screen.getByText("계약 대상").nextElementSibling?.textContent).toBe(
+      "",
     );
   });
 

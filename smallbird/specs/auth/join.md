@@ -112,7 +112,7 @@
 - **회사 URL**: blur 시 형식 실패면 "올바른 URL 형식이 아닙니다."(제출은 막지 않고 payload에서 `null`). 허용 TLD 목록이 제한적(`asia|biz|cc|cn|com|de|eu|in|info|jobs|jp|kr|mobi|mx|name|net|nz|org|travel|tv|tw|uk|us`)이라 `.io`, `.co.kr` 등은 통과하지 못할 수 있다.
 - **약관**: 전체 동의는 두 항목을 함께 토글한다. "보기" → 본문 → "동의하기"로 해당 항목이 `true`가 된다. 본문은 `entities/terms`를 쓴다(`specs/auth/terms.md` 참조).
 - **카테고리**: 목록 로드 실패해도 가입 가능. 한 번 고르면 선택을 해제할 방법이 없다.
-- **`/welcome`**: "BIGBIRD 둘러보기"는 `https://bigbird.co.kr/`을 새 창으로 연다.
+- **`/welcome`**: "BIGBIRD 둘러보기"는 외부 브랜드 사이트가 아니라 앱 안의 공개 홈(`/`)으로 이동한다(같은 창).
 
 ## v2 대비 변경
 

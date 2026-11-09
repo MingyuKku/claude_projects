@@ -148,27 +148,54 @@ export function SidebarNavItem({
   );
 }
 
-// 레일(접힌 사이드바)의 아이콘 버튼. 하위 메뉴가 있는 항목은 대표 href로 이동함.
+interface SidebarRailItemProps extends SidebarNavItemProps {
+  /**
+   * 있으면 하위 메뉴가 있는 항목은 이동하지 않고 이 함수를 부름(사이드바를 펼치고 그 그룹을 열 때 씀).
+   * 없으면 대표 href로 이동함. 하위 메뉴가 없는 항목은 항상 이동함.
+   */
+  onClickGroup?: (itemId: string) => void;
+}
+
+const railItemClass = cn(
+  "flex size-10 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-accent aria-[current=page]:bg-accent aria-[current=page]:text-primary",
+  FOCUS_RING,
+);
+
+// 레일(접힌 사이드바)의 아이콘 버튼. 하위 메뉴가 있는 항목은 `onClickGroup`이 있으면 그것을, 없으면 대표 href로 이동함.
 export function SidebarRailItem({
   item,
   linkAs: Link = DefaultLink,
+  onClickGroup,
   className,
   ...props
-}: SidebarNavItemProps) {
+}: SidebarRailItemProps) {
   const Icon = item.icon;
   const isActive =
     item.isActive || item.subItems?.some((subItem) => subItem.isActive);
+
+  if (onClickGroup && item.subItems?.length) {
+    return (
+      <button
+        type="button"
+        aria-label={item.label}
+        aria-expanded={false}
+        aria-current={isActive ? "page" : undefined}
+        className={cn(railItemClass, "cursor-pointer", className)}
+        onClick={() => onClickGroup(item.id)}
+        {...props}
+      >
+        <Icon className="size-4 shrink-0" />
+      </button>
+    );
+  }
+
   return (
     <Link
       href={item.href ?? item.subItems?.[0]?.href ?? FALLBACK_HREF}
       navId={item.id}
       aria-label={item.label}
       aria-current={isActive ? "page" : undefined}
-      className={cn(
-        "flex size-10 items-center justify-center rounded-lg text-foreground transition-colors hover:bg-accent aria-[current=page]:bg-accent aria-[current=page]:text-primary",
-        FOCUS_RING,
-        className,
-      )}
+      className={cn(railItemClass, className)}
       {...props}
     >
       <NavIcon icon={Icon} />

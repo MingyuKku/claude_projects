@@ -2,6 +2,7 @@ import { useState } from "react";
 
 import { usePaymentMethodLabel } from "@/entities/subscription";
 import { EmptyState } from "@/shared/components/empty-state";
+import { emptyHeightVariants } from "@/shared/components/list-filter";
 import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery } from "@/shared/lib";
@@ -44,7 +45,11 @@ export function SubscribedProductTable({
   const paymentMethodLabel = usePaymentMethodLabel();
 
   const emptyState = (
-    <EmptyState type="no-list" title={t("empty.title")} className="py-10" />
+    <EmptyState
+      type="no-list"
+      title={t("empty.title")}
+      className={emptyHeightVariants({ height: "compact" })}
+    />
   );
 
   return (

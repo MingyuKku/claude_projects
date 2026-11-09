@@ -18,12 +18,13 @@ function stubHeights(scrollHeight: number, clientHeight: number) {
 afterEach(() => vi.restoreAllMocks());
 
 describe("FullTextHint", () => {
-  it("한 줄에 다 보이는 이름은 올려도 전체 이름을 띄우지 않는다", async () => {
+  it("한 줄에 다 보이는 이름은 버튼 없이 글자로만 그리고 올려도 전체 이름을 띄우지 않는다", async () => {
     stubHeights(20, 20);
     const user = userEvent.setup();
     render(<FullTextHint text={NAME} />);
 
-    await user.hover(screen.getByRole("button", { name: NAME }));
+    expect(screen.queryByRole("button")).not.toBeInTheDocument();
+    await user.hover(screen.getByText(NAME));
 
     expect(screen.getAllByText(NAME)).toHaveLength(1);
   });

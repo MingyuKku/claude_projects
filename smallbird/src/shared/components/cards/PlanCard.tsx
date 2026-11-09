@@ -104,7 +104,9 @@ export function PlanCard({
       {isDisabled ? (
         <div className="flex flex-1 flex-col items-center justify-center gap-1.5 p-4 text-center text-sm leading-4 text-muted-foreground tablet:p-5 tablet:leading-5">
           <EmptyIllustration type="construction" className="size-5" />
-          {comingSoonText}
+          {comingSoonText && (
+            <div className="flex flex-col items-center">{comingSoonText}</div>
+          )}
         </div>
       ) : (
         <ul

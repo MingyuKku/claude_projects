@@ -56,7 +56,7 @@ describe("ChargePanel", () => {
       name: "광고주 결제 정보 수집 및 약관",
     });
     expect(dialog).toHaveTextContent(
-      "제 1 조 (비즈 머니의 충전, 환불, 소멸 등)",
+      "제 1 조 (빅버드 머니의 충전, 환불, 소멸 등)",
     );
     expect(requestCharge).not.toHaveBeenCalled();
   });

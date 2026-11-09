@@ -104,7 +104,7 @@ const HEADER_TEXT = "Header";
 
 // 단독 셀 미리보기: 표 바깥 테두리를 빼고 Figma처럼 아래 구분선만 남김.
 const BARE_TABLE =
-  "[&_[data-slot=table-container]]:rounded-none [&_[data-slot=table-container]]:border-0 [&_tr]:border-b!";
+  "**:data-[slot=table-container]:rounded-none **:data-[slot=table-container]:border-0 [&_tr]:border-b!";
 
 // Figma Table Base / Cell(2770:31005) 행 순서·라벨
 const LEFT_CELL_TYPES = [

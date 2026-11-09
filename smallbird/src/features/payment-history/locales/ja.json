@@ -25,6 +25,16 @@
       "label": "決済日",
       "placeholder": "日付を選択してください。"
     },
+    "item": {
+      "label": "決済内容",
+      "placeholder": "決済内容を選択してください。",
+      "option": {
+        "monthly_pick": "月額プラン_PICK型",
+        "monthly_recruit": "月額プラン_募集型",
+        "yearly_pick": "年額プラン_PICK型",
+        "yearly_recruit": "年額プラン_募集型"
+      }
+    },
     "method": {
       "label": "決済方法",
       "placeholder": "決済方法を選択してください。"

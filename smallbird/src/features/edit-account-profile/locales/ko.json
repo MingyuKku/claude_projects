@@ -27,6 +27,7 @@
     },
     "password": {
       "label": "비밀번호 변경",
+      "placeholder": "비밀번호를 입력해주세요.",
       "error": {
         "format": "영문, 숫자, 특수문자를 조합 8-20자로 입력해주세요.",
         "containsId": "아이디를 포함한 비밀번호 불가",
@@ -35,6 +36,7 @@
     },
     "passwordCheck": {
       "label": "비밀번호 확인",
+      "placeholder": "비밀번호를 입력해주세요.",
       "mismatch": "비밀번호가 일치하지 않습니다."
     },
     "phone": {

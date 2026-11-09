@@ -3,13 +3,6 @@ import type { SubAccountAuthorization } from "./schema";
 /** PC 시안의 한 쪽 행 수. TAB·MO도 같은 값을 씀. */
 export const SUB_ACCOUNT_PAGE_SIZE = 8;
 
-/** 생성일 표시. 현재 언어로 같은 형식을 씀(스펙 §3). */
-export const DATE_FORMAT = {
-  year: "numeric",
-  month: "2-digit",
-  day: "2-digit",
-} as const;
-
 /** Sub ID 생성(`POST /sub`)에서 이미 있는 아이디. */
 export const EXISTING_ID_REASON = "existing id";
 
@@ -46,3 +39,10 @@ export const PERMISSION_FIELDS = {
   PermissionKey,
   Exclude<keyof SubAccountAuthorization, "accountIdx">
 >;
+
+/**
+ * 빈 목록 묶음의 최대 높이(시안의 빈 표 높이). 이보다 큰 화면에서는 더 늘어나지 않고 위에 붙음.
+ * MO 346(`10724:187941`)·TAB 496(`10724:187234`, 테두리 박스)·PC 580(`10724:186107`, 머리글 48 + 본문 530 + 테두리 2).
+ */
+export const EMPTY_LIST_MAX_HEIGHT_CLASS =
+  "max-h-86.5 tablet:max-h-124 desktop:max-h-145";

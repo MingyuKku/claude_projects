@@ -112,9 +112,9 @@ export function SubAccountTab({
   const isPanelBeside = layout === "desktop" && openedPanel !== null;
 
   return (
-    // MO는 목록이 짧아도 생성 버튼이 화면 맨 아래에 붙도록 탭 본문 높이를 채움(MyPageAccountPage의 min-h-full 체인).
-    <div className="flex flex-1 items-stretch gap-5 tablet:items-start">
-      <div className="flex min-w-0 flex-1 flex-col gap-4 self-stretch tablet:gap-6 tablet:self-auto">
+    // 목록이 짧아도 MO는 생성 버튼이 화면 맨 아래에 붙고, 빈 상태는 남은 높이를 채우도록 탭 본문 높이를 채움(MyPageAccountPage의 min-h-full 체인).
+    <div className="flex flex-1 items-stretch gap-5">
+      <div className="flex min-w-0 flex-1 flex-col gap-4 tablet:gap-6">
         <SubAccountList
           activeAccountIdx={openedAccountIdx}
           onClickCreate={onOpenCreate}
@@ -139,7 +139,9 @@ export function SubAccountTab({
       />
       {isPanelBeside && (
         // 고객센터 상세 패널과 같은 인라인 패널(시안 377×640, 딤 없음). 생성·수정·권한 부여가 같은 자리를 씀.
-        <aside className="flex h-160 w-94.25 shrink-0 flex-col overflow-hidden rounded-lg border">
+        // 높이는 640이되 낮은 창에서는 헤더·탭 줄 아래 간격(--account-tabs-offset)·아래 여백(20)을 뺀 남은 높이로 줄어들고(안쪽은 스크롤),
+        // 목록보다 낮아진 패널은 스크롤해도 탭 줄 아래에 고정되어 위로 밀려 올라가지 않음.
+        <aside className="sticky top-(--account-tabs-offset) flex h-160 max-h-[calc(100dvh-var(--app-header-height)-var(--account-tabs-offset)-var(--spacing)*5)] w-94.25 shrink-0 flex-col self-start overflow-hidden rounded-lg border">
           {openedPanel === "permission" && openedAccount ? (
             <SubAccountPermissionPanel
               key={openedAccount.accountIdx}

@@ -3,7 +3,7 @@ import { useRef } from "react";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 
-import type { ChangeEvent } from "react";
+import type { ChangeEvent, KeyboardEvent } from "react";
 
 // Figma 마이페이지 파일 행(6964:89534): 파일명을 보여 주는 읽기 전용 Input과 outline "업로드" 버튼.
 // 형식·용량 검사는 도메인 규칙이라 호출하는 쪽이 하고, 이 컴포넌트는 고른 파일만 넘김.
@@ -36,6 +36,17 @@ export function FileUploadInput({
 }: FileUploadInputProps) {
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  function openFilePicker() {
+    fileInputRef.current?.click();
+  }
+
+  // 읽기 전용 칸은 글자를 받지 않으므로 Enter·Space는 선택창 열기에 씀(버튼과 같은 키).
+  function handleKeyDownField(event: KeyboardEvent<HTMLInputElement>) {
+    if (event.key !== "Enter" && event.key !== " ") return;
+    event.preventDefault();
+    openFilePicker();
+  }
+
   function handleChangeFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0];
     // 같은 파일을 다시 골라도 change가 일어나도록 비움.
@@ -51,13 +62,16 @@ export function FileUploadInput({
         disabled={disabled}
         placeholder={placeholder}
         value={fileName}
+        className="cursor-pointer"
+        onClick={openFilePicker}
+        onKeyDown={handleKeyDownField}
       />
       <Button
         type="button"
         variant="outline"
         disabled={disabled}
         aria-label={buttonAriaLabel}
-        onClick={() => fileInputRef.current?.click()}
+        onClick={openFilePicker}
       >
         {buttonLabel}
       </Button>

@@ -25,6 +25,16 @@
       "label": "支付日期",
       "placeholder": "请选择日期。"
     },
+    "item": {
+      "label": "支付内容",
+      "placeholder": "请选择支付内容。",
+      "option": {
+        "monthly_pick": "月度套餐_PICK型",
+        "monthly_recruit": "月度套餐_招募型",
+        "yearly_pick": "年度套餐_PICK型",
+        "yearly_recruit": "年度套餐_招募型"
+      }
+    },
     "method": {
       "label": "支付方式",
       "placeholder": "请选择支付方式。"

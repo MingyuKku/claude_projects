@@ -27,6 +27,7 @@
     },
     "password": {
       "label": "修改密码",
+      "placeholder": "输入密码",
       "error": {
         "format": "8-20 位字母、数字、特殊字符组合",
         "containsId": "密码不能包含账号",
@@ -35,6 +36,7 @@
     },
     "passwordCheck": {
       "label": "确认密码",
+      "placeholder": "输入密码",
       "mismatch": "密码不一致。"
     },
     "phone": {

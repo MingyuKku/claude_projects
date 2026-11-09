@@ -37,7 +37,7 @@ interface SubscriptionPlanCardProps {
   onSubscribe: (type: ActiveProductType) => void;
 }
 
-// 구독 탭의 상품 카드. 카드 자체는 클릭 동작이 없고, 강조 링(Focused)은 키보드 포커스·호버·상세보기 펼침에 씀(스펙 §3).
+// 구독 탭의 상품 카드. 카드 자체는 클릭 동작이 없고, 호버는 연한 회색 배경으로 보이고 카드 단위 강조 링(포커스·펼침)은 쓰지 않음(스펙 §3).
 export function SubscriptionPlanCard({
   type,
   period,
@@ -58,14 +58,6 @@ export function SubscriptionPlanCard({
       : isSubscribed
         ? "subscribed"
         : "default";
-
-  const focusClassName = cn(
-    // 클릭 동작이 없는 카드라 포인터 커서와 호버 배경 대신 Focused 링을 씀.
-    // 링은 box-shadow라 그 속성만 전환함(동작 줄이기 설정이면 바로 바뀜).
-    "transition-[background-color,box-shadow] duration-200 motion-reduce:transition-none",
-    "cursor-default hover:bg-card hover:ring-2 hover:ring-primary hover:ring-offset-2 focus-within:ring-2 focus-within:ring-primary focus-within:ring-offset-2",
-    isExpanded && "ring-2 ring-primary ring-offset-2",
-  );
 
   if (activeType === null || !isAvailable) {
     return (
@@ -94,7 +86,8 @@ export function SubscriptionPlanCard({
   return (
     <PlanCard
       type={cardType}
-      className={cn(className, focusClassName)}
+      // 클릭 동작이 없는 카드라 포인터 커서는 쓰지 않음. 호버는 공용 Card의 연한 회색 배경(accent/50)을 그대로 씀.
+      className={cn(className, "cursor-default")}
       title={t(`productType.${activeType}`)}
       price={t(`plan.price.${period}`, { price: formatNumber(price) })}
       originalPrice={

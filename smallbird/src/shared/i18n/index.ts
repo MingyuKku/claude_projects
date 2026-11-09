@@ -10,6 +10,7 @@ export {
 } from "./config";
 export {
   formatDate,
+  formatListDate,
   formatNumber,
   formatNumericDate,
   formatNumericDateTime,

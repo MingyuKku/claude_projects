@@ -7,7 +7,7 @@ interface UsageAmountProps {
   className?: string;
 }
 
-// 사용 금액은 w600. 차감(음수)은 검정 "-{n}원", 환급(양수)은 파랑 "+{n}원"(스펙 §3). 값이 없으면 "-"를 기본색으로 보임.
+// 사용 금액은 w600. 차감(음수)은 검정 "-{n}원", 환급(양수)은 파랑 "+{n}원"(스펙 §3). 값이 없으면 빈칸.
 export function UsageAmount({ amount, className }: UsageAmountProps) {
   const { formatSignedWon } = useMoneyFormat();
 

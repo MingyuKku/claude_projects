@@ -11,12 +11,12 @@ interface ChargeAmountProps {
 }
 
 // 목록 금액(시안): 충전 "+{n}원" 파랑 w600(0원도 "+0원"), 출금 "-{n}원" 검정 w600. 서버 금액은 부호 없는 양수.
-// 모르는 구분은 부호 없이, 값이 없으면 "-"를 기본색으로 보임.
+// 모르는 구분은 부호 없이, 값이 없으면 아무것도 그리지 않음.
 export function ChargeAmount({ record, className }: ChargeAmountProps) {
   const { t } = useTranslation("features/bigbird-money-history");
   const { type, amount } = record;
 
-  if (amount === null) return <span className={className}>-</span>;
+  if (amount === null) return null;
   const sign = type ? SIGN_BY_TYPE[type] : "";
   return (
     <span

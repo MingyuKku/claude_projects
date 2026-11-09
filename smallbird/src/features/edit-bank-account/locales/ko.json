@@ -4,9 +4,15 @@
     "bank": "은행",
     "accountNumber": "계좌번호",
     "accountHolder": "예금주",
-    "bankBook": "통장 사본"
+    "bankBook": "통장 사본",
+    "placeholder": {
+      "bank": "은행 명을 입력해 주세요.",
+      "accountNumber": "계좌 번호를 입력해 주세요.",
+      "accountHolder": "예금주 명을 입력해 주세요."
+    }
   },
   "file": {
+    "placeholder": "파일을 업로드해 주세요.",
     "upload": "업로드",
     "uploadFor": "{{label}} 업로드",
     "registered": "등록됨",

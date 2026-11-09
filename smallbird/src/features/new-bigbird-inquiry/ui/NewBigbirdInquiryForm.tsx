@@ -116,7 +116,7 @@ export function NewBigbirdInquiryForm({
             </legend>
             {/* 머리글은 고정하고 본문만 스크롤함. 스크롤바도 머리글 아래부터 시작함. */}
             <ScrollArea
-              className="rounded-lg border border-border [&>[data-slot=scroll-area-viewport]]:max-h-(--campaign-table-max-height)"
+              className="rounded-lg border border-border *:data-[slot=scroll-area-viewport]:max-h-(--campaign-table-max-height)"
               style={
                 {
                   "--campaign-table-max-height": CAMPAIGN_TABLE_MAX_HEIGHT,

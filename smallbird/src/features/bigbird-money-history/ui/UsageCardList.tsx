@@ -15,9 +15,8 @@ interface UsageCardListProps {
   onClickDetail: (record: UsageRecord) => void;
 }
 
-// Figma 건별 카드(TAB 2열 11224:104580, MO 1열 11224:105677): 위쪽 오른쪽 정렬 "상세 보기" 버튼, 아래 라벨 열(회색)·값 열 6행 표.
 // 캠페인 유형·캠페인 코드는 상세 보기에만 있음. 캠페인 명 옆에 40px 썸네일(`mainImageUrl`, 없으면 기본 이미지).
-// 값이 없는 항목도 행을 숨기지 않고 "-"로 둠(스펙 §3). TAB은 카드 사이 12px로 2열이고 같은 줄 카드는 높이를 맞춤.
+// 값이 없는 항목도 행을 숨기지 않고 값만 비워 둠(스펙 §3). TAB은 카드 사이 12px로 2열이고 같은 줄 카드는 높이를 맞춤.
 export function UsageCardList({ records, onClickDetail }: UsageCardListProps) {
   const { t } = useTranslation("features/bigbird-money-history");
   const { formatDateTime, formatWon } = useMoneyFormat();

@@ -93,7 +93,7 @@ export function IntroSection6({ className }: Props) {
                       TAB·MO 는 이미지를 334x236 으로 재배치해 PC 스프라이트를 쓸 수 없음.
                       배경 #f1f3f5 = bigbird/forms (S1/S4 카드와 다름). */}
                     <div
-                      className="h-[236px] w-full rounded-[4px] bg-[#f1f3f5] [background-image:var(--s6-pc-img)] [background-size:var(--s6-pc-size)] [background-position:var(--s6-pc-pos)] bg-no-repeat max-introtab:[background-image:var(--s6-mo-img)] max-introtab:[background-size:var(--s6-mo-size)] max-introtab:[background-position:var(--s6-mo-pos)]"
+                      className="h-[236px] w-full rounded-[4px] bg-[#f1f3f5] [background-image:var(--s6-pc-img)] bg-size-(--s6-pc-size) bg-position-(--s6-pc-pos) bg-no-repeat max-introtab:[background-image:var(--s6-mo-img)] max-introtab:bg-size-(--s6-mo-size) max-introtab:bg-position-(--s6-mo-pos)"
                       style={spriteStyle(group, mobileSprite, cardIndex)}
                     />
                     {/* 설명이 1줄인 카드와 2줄인 카드의 아래 여백이 같도록 높이를 158px 로 고정함

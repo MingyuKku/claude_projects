@@ -1,7 +1,11 @@
 import { useState } from "react";
 import { toast } from "sonner";
 
-import { checkUploadFile, DOCUMENT_EXTENSIONS } from "@/entities/account";
+import {
+  ACCOUNT_NUMBER_MAX_LENGTH,
+  checkUploadFile,
+  DOCUMENT_EXTENSIONS,
+} from "@/entities/account";
 import { FileUploadInput } from "@/shared/components/file-upload-input";
 import { FormRow } from "@/shared/components/form-field";
 import { OptionSelect } from "@/shared/components/option-select";
@@ -118,6 +122,7 @@ export function BankAccountForm({
                   <OptionSelect
                     {...control}
                     value={values.bankIdx}
+                    placeholder={t("form.placeholder.bank")}
                     options={banks.map((bank) => ({
                       value: String(bank.idx),
                       label: bank.name,
@@ -133,6 +138,8 @@ export function BankAccountForm({
                   <Input
                     {...control}
                     inputMode="numeric"
+                    maxLength={ACCOUNT_NUMBER_MAX_LENGTH}
+                    placeholder={t("form.placeholder.accountNumber")}
                     value={values.accountNumber}
                     onChange={handleChangeText("accountNumber")}
                   />
@@ -142,6 +149,7 @@ export function BankAccountForm({
                 {(control) => (
                   <Input
                     {...control}
+                    placeholder={t("form.placeholder.accountHolder")}
                     value={values.accountHolder}
                     onChange={handleChangeText("accountHolder")}
                   />
@@ -156,6 +164,7 @@ export function BankAccountForm({
                   <FileUploadInput
                     {...control}
                     fileName={bankFileName}
+                    placeholder={t("file.placeholder")}
                     buttonLabel={t("file.upload")}
                     buttonAriaLabel={t("file.uploadFor", {
                       label: bankBookLabel,

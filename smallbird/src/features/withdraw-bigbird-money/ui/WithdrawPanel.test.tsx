@@ -122,6 +122,13 @@ describe("WithdrawPanel 1단계", () => {
     expect(input).toHaveValue("110123");
   });
 
+  it("계좌번호는 20자까지만 입력된다", async () => {
+    const { user } = setup();
+    const input = screen.getByRole("textbox", { name: /출금 계좌번호/ });
+    await user.type(input, "1".repeat(25));
+    expect(input).toHaveValue("1".repeat(20));
+  });
+
   it("통장 사본까지 모두 채워야 다음이 활성이고, 공백만의 예금주 명은 빈 값이다", async () => {
     const { user, next, bankBook, pickFile } = setup();
     await user.click(screen.getByRole("combobox", { name: /출금 은행/ }));

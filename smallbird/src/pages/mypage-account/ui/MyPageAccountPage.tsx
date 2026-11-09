@@ -66,6 +66,9 @@ export function MyPageAccountPage() {
       : null;
   // 수정 대상은 지금 보이는 목록에 있는 Sub ID만 엶(지워졌거나 주소를 고친 subId는 열지 않음).
   const editAccount = useSubAccount(panel === "edit" ? panelAccountIdx : null);
+  const permissionAccount = useSubAccount(
+    panel === "permission" ? panelAccountIdx : null,
+  );
   const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
   const isTabletUp = useMediaQuery(MEDIA_QUERY.tabletUp);
   const subLayout: SubAccountLayout = isDesktop
@@ -78,6 +81,11 @@ export function MyPageAccountPage() {
     (panel === "create" || panel === "permission" || panel === "edit")
       ? panel
       : null;
+  // TAB의 권한 부여 카드는 모달처럼 상단 탭 줄 없이 본문만 그림(시안 10724:187291, 디자인 QA TAB 해상도 모달 상단 탭 삭제).
+  const hidesTabBar =
+    subLayout === "tablet" &&
+    subPanel === "permission" &&
+    permissionAccount !== null;
   const isWithdrawOpen = tab === "master" && panel === "withdraw";
   const comingSoon = (
     <EmptyState
@@ -123,19 +131,21 @@ export function MyPageAccountPage() {
       <Tabs
         value={tab}
         onValueChange={setTab}
-        className="min-h-full gap-4 [--account-tabs-offset:calc(var(--spacing)*16)] tablet:gap-5 desktop:gap-6 desktop:[--account-tabs-offset:calc(var(--spacing)*20)]"
+        className="min-h-full gap-4 [--account-tabs-offset:--spacing(16)] tablet:gap-5 desktop:gap-6 desktop:[--account-tabs-offset:--spacing(20)]"
       >
         {/* 탭 줄은 스크롤해도 화면 위에 고정함. 위 여백(MO·TAB 8px, PC 20px)은 고정 영역이 직접 가져 스크롤 내용이
             그 위로 비치지 않게 함. 모바일은 탭이 넘치면 가로로 스크롤하는데, 잘리는 위치가 콘텐츠 여백이 아니라
             화면 가장자리가 되도록 스크롤 영역을 레이아웃 좌우 여백(--mypage-gutter)만큼 넓히고 첫 탭을 콘텐츠 선에 맞추는 여백은 목록이 가짐. */}
-        <StickyTabBar
-          scrollable
-          className="desktop:pt-5"
-          tabs={tabs.map((accountTab) => ({
-            value: accountTab,
-            label: t(`tabs.${accountTab}`),
-          }))}
-        />
+        {!hidesTabBar && (
+          <StickyTabBar
+            scrollable
+            className="desktop:pt-5"
+            tabs={tabs.map((accountTab) => ({
+              value: accountTab,
+              label: t(`tabs.${accountTab}`),
+            }))}
+          />
+        )}
         {tabs.map((accountTab) => (
           <TabsContent
             key={accountTab}
@@ -148,6 +158,8 @@ export function MyPageAccountPage() {
               accountTab === "sub"
                 ? "data-[state=active]:flex data-[state=active]:flex-col tablet:pb-5"
                 : "pb-4 tablet:pb-5",
+              // 탭 줄이 없는 권한 부여 카드는 탭 줄이 가지던 위 여백 8을 이어받음(시안).
+              hidesTabBar && "tablet:pt-2",
             )}
           >
             {accountTab === "master" && (

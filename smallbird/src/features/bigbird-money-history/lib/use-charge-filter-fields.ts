@@ -1,4 +1,5 @@
 import { CHARGE_STATUSES } from "@/entities/bigbird-money";
+import { NARROW_FIELD_WIDTH } from "@/shared/components/list-filter";
 import { useTranslation } from "@/shared/i18n";
 
 import type { FilterField } from "@/shared/components/list-filter";
@@ -17,6 +18,7 @@ export function useChargeFilterFields(): FilterField[] {
     {
       type: "select",
       id: "type",
+      width: NARROW_FIELD_WIDTH,
       label: t("charge.filter.type.label"),
       placeholder: t("charge.filter.type.placeholder"),
       options: CHARGE_TYPE_OPTIONS.map((type) => ({
@@ -33,6 +35,7 @@ export function useChargeFilterFields(): FilterField[] {
     {
       type: "select",
       id: "status",
+      width: NARROW_FIELD_WIDTH,
       label: t("charge.filter.status.label"),
       placeholder: t("charge.filter.status.placeholder"),
       options: CHARGE_STATUSES.map((status) => ({

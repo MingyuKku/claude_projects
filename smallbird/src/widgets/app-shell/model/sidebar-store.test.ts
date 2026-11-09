@@ -18,6 +18,17 @@ describe("useSidebarStore", () => {
     );
   });
 
+  it("expand는 접힌 사이드바를 펼치고 저장하며, 이미 펼쳐져 있으면 그대로 둔다", () => {
+    useSidebarStore.setState({ isCollapsed: true });
+    useSidebarStore.getState().expand();
+    expect(useSidebarStore.getState().isCollapsed).toBe(false);
+    expect(JSON.parse(localStorage.getItem("bigbird:sidebar") ?? "{}")).toEqual(
+      { state: { isCollapsed: false }, version: 0 },
+    );
+    useSidebarStore.getState().expand();
+    expect(useSidebarStore.getState().isCollapsed).toBe(false);
+  });
+
   it("새로고침 후에도 저장된 접힘 상태를 복원한다", async () => {
     localStorage.setItem(
       "bigbird:sidebar",

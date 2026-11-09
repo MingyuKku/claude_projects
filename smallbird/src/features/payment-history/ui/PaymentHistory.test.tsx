@@ -103,9 +103,9 @@ describe("PaymentHistory", () => {
   });
 
   it("주소의 개수(size)를 서버 요청에 쓰고, 선택지에 없는 값은 10으로 본다", () => {
-    setup([record(1)], "/?size=50");
+    setup([record(1)], "/?size=30");
     expect(usePaymentRecords).toHaveBeenLastCalledWith(
-      expect.objectContaining({ size: 50 }),
+      expect.objectContaining({ size: 30 }),
     );
     setup([record(1)], "/?size=7");
     expect(usePaymentRecords).toHaveBeenLastCalledWith(
@@ -113,33 +113,38 @@ describe("PaymentHistory", () => {
     );
   });
 
-  it("개수를 바꾸면 그 개수로 다시 요청하고 1쪽으로 돌아간다", async () => {
-    // 콤보박스(cmdk)가 쓰는 브라우저 API와 화면 폭이 jsdom에 없어 이 테스트에서만 채움. 폭은 PC(전부 일치)로 둠.
-    vi.stubGlobal(
-      "matchMedia",
-      vi.fn().mockImplementation(() => ({
-        matches: true,
-        addEventListener: vi.fn(),
-        removeEventListener: vi.fn(),
-      })),
+  it("결제 내역 필터를 결제 주기와 상품 유형 조건으로 나눠 요청하고, 선택지에 없는 값은 거르지 않는다", () => {
+    setup([record(1)], "/?item=yearly_pick");
+    expect(usePaymentRecords).toHaveBeenLastCalledWith(
+      expect.objectContaining({ billingPeriod: "yearly", productType: "pick" }),
     );
-    vi.stubGlobal(
-      "ResizeObserver",
-      class {
-        observe() {}
-        unobserve() {}
-        disconnect() {}
-      },
+    setup([record(1)], "/?item=unknown");
+    expect(usePaymentRecords).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        billingPeriod: undefined,
+        productType: undefined,
+      }),
     );
-    Element.prototype.scrollIntoView = () => {};
-    const user = setup([record(1)], "/?page=2", 30);
-    await user.click(screen.getByRole("combobox", { name: "한 번에 볼 개수" }));
-    await user.click(await screen.findByRole("option", { name: /^20개/ }));
+  });
 
+  it("개수 버튼을 누를 때마다 10 → 20 → 30 → 10으로 돌며 그 개수로 다시 요청하고 1쪽으로 돌아간다", async () => {
+    const user = setup([record(1)], "/?page=2", 30);
+    const button = () =>
+      screen.getByRole("button", { name: /^한 번에 볼 개수/ });
+
+    expect(button()).toHaveAccessibleName("한 번에 볼 개수, 10개");
+    await user.click(button());
     expect(usePaymentRecords).toHaveBeenLastCalledWith(
       expect.objectContaining({ page: 1, size: 20 }),
     );
-    vi.unstubAllGlobals();
+    await user.click(button());
+    expect(usePaymentRecords).toHaveBeenLastCalledWith(
+      expect.objectContaining({ page: 1, size: 30 }),
+    );
+    await user.click(button());
+    expect(usePaymentRecords).toHaveBeenLastCalledWith(
+      expect.objectContaining({ page: 1, size: 10 }),
+    );
   });
 
   it("거래명세서는 서버가 준 주소를 새 창으로 연다", async () => {

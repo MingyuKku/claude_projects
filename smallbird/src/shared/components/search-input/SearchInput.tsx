@@ -37,7 +37,7 @@ export function SearchInput({
       <input
         {...props}
         type="search"
-        className="h-5 min-w-0 flex-1 bg-transparent text-sm leading-5 outline-none placeholder:text-foreground/50 disabled:cursor-not-allowed supports-[-webkit-touch-callout:none]:text-base [&::-webkit-search-cancel-button]:hidden"
+        className="h-5 min-w-0 flex-1 bg-transparent text-sm leading-5 text-ellipsis outline-none placeholder:text-foreground/50 disabled:cursor-not-allowed supports-[-webkit-touch-callout:none]:text-base [&::-webkit-search-cancel-button]:hidden"
       />
     </div>
   );

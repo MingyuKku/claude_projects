@@ -3,6 +3,7 @@ import { useEffect } from "react";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ListPagination } from "@/shared/components/list-filter";
 import { useTranslation } from "@/shared/i18n";
+import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 
 import type { ReactNode } from "react";
@@ -26,6 +27,8 @@ interface HistoryPagedListProps<T> {
   skeleton: ReactNode;
   /** 0건일 때 목록 자리에 그릴 안내. */
   emptyContent: ReactNode;
+  /** 0건일 때 목록 묶음에 더할 클래스(최대 높이). */
+  emptyClassName?: string;
   /** PC는 표, TAB은 2열 카드. */
   isTable: boolean;
   renderTable: (records: T[], emptyContent: ReactNode | undefined) => ReactNode;
@@ -44,6 +47,7 @@ export function HistoryPagedList<T>({
   buildPageHref,
   skeleton,
   emptyContent,
+  emptyClassName,
   isTable,
   renderTable,
   renderCards,
@@ -76,8 +80,8 @@ export function HistoryPagedList<T>({
   const empty = list.totalCount === 0 ? emptyContent : undefined;
 
   return (
-    // 표(또는 카드)와 쪽 이동은 12px 간격으로 한 묶음(시안).
-    <div className="flex flex-col gap-3">
+    // 표(또는 카드)와 쪽 이동은 12px 간격으로 한 묶음(시안). 빈 상태가 남은 높이를 채우도록 늘어남.
+    <div className={cn("flex flex-1 flex-col gap-3", empty && emptyClassName)}>
       {isTable
         ? renderTable(list.records, empty)
         : (empty ?? renderCards(list.records))}

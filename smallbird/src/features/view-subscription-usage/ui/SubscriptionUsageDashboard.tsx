@@ -32,7 +32,7 @@ export function SubscriptionUsageDashboard({
     <div className="flex flex-col gap-4 tablet:gap-5 desktop:gap-6">
       <ToggleTab
         aria-label={t("segment.label")}
-        className="self-start max-tablet:[&>[role=radio]]:py-1"
+        className="self-start max-tablet:*:[[role=radio]]:py-1"
         value={type}
         options={ACTIVE_PRODUCT_TYPES.map((value) => ({
           value,

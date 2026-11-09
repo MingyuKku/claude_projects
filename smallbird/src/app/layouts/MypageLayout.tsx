@@ -14,7 +14,7 @@ import type { sessionLoader } from "../router/session-middleware";
 // 스크롤바 자리를 미리 비우지 않음(scrollbar-gutter 미사용). 비워 두면 스크롤바가 보이는 환경(Windows, macOS "항상 보기")에서 내용이 짧은 탭도
 // 오른쪽 여백이 스크롤바 폭(약 15px)만큼 더 커져 시안의 좌우 여백(MO 16·TAB 20·PC 20)과 달라짐. 대신 긴 탭만 스크롤바 폭만큼 본문이 좁아짐.
 const MAIN_CLASS_NAME =
-  "px-(--mypage-gutter) [--mypage-gutter:calc(var(--spacing)*4)] tablet:[--mypage-gutter:calc(var(--spacing)*5)]";
+  "px-(--mypage-gutter) [--mypage-gutter:--spacing(4)] tablet:[--mypage-gutter:--spacing(5)]";
 
 // 로그인 확인과 Sub ID의 구독 진입 차단은 라우트의 세션 middleware가 화면을 그리기 전에 끝냄(app/router/session-middleware.ts).
 export function MypageLayout() {

@@ -191,7 +191,7 @@ function CarouselSample({
     <div className={isVertical ? "py-12" : "px-12"}>
       <Carousel
         orientation={isVertical ? "vertical" : "horizontal"}
-        className={size === "sm" && !isVertical ? "w-128" : "w-80"}
+        className={size === "sm" && !isVertical ? "w-lg" : "w-80"}
       >
         <CarouselContent
           className={cn(isVertical && (size === "md" ? "h-84" : "h-102"))}

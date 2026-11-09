@@ -38,6 +38,7 @@ export type {
   DuplicateCheckType,
 } from "./api/mypage-api";
 export { useBankList } from "./api/use-bank-list";
+export { ACCOUNT_NUMBER_MAX_LENGTH } from "./model/bank-schema";
 export type { BankOption } from "./model/bank-schema";
 export { useMasterAccount } from "./api/use-master-account";
 export { useSocialLinks } from "./api/use-social-links";

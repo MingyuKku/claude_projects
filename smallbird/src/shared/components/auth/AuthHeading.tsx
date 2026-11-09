@@ -74,7 +74,7 @@ export function AuthHeading({
       className={cn(
         authHeadingVariants({ type, tone }),
         // 행간은 크기 클래스 뒤에 와야 함. 이유는 AuthText와 같음.
-        "leading-[1.5]",
+        "leading-normal",
         className,
       )}
       {...props}

@@ -56,7 +56,7 @@ function ProgressBar({ progress }: ProgressBarProps) {
     <div className="flex w-full flex-col items-start">
       {/* 렌더마다 바뀌는 런타임 값이라 클래스로 만들 수 없음. */}
       <div
-        className="h-[3px] bg-gradient-to-r from-[#4B80C2] to-[#805AB1]"
+        className="h-[3px] bg-linear-to-r from-[#4B80C2] to-[#805AB1]"
         style={{ width: `${progress * PERCENT}%` }}
       />
       <div className="h-px w-full bg-gray-200" />

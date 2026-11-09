@@ -58,7 +58,7 @@ describe("transformUsageList", () => {
     expect(result.records[0]?.usedAt).toEqual(new Date("2026-10-23T14:23:18"));
   });
 
-  it("값이 없는 항목은 대시로 두고 금액은 null로 둔다", () => {
+  it("값이 없는 항목은 빈 문자열로 두고 금액은 null로 둔다", () => {
     const { records } = transformUsageList(
       listOf({
         usageDate: null,
@@ -75,14 +75,14 @@ describe("transformUsageList", () => {
     );
     expect(records[0]).toMatchObject({
       usedAt: null,
-      usedAtText: "-",
-      campaignName: "-",
-      campaignCode: "-",
+      usedAtText: "",
+      campaignName: "",
+      campaignCode: "",
       campaignImageUrl: null,
       campaignType: null,
-      campaignTypeText: "-",
+      campaignTypeText: "",
       usageDetail: null,
-      usageDetailText: "-",
+      usageDetailText: "",
       amount: null,
       remainingAmount: null,
       contractTarget: null,

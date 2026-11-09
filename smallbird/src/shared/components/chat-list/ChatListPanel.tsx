@@ -79,7 +79,7 @@ export function ChatListPanel({
       )}
       {/* MO는 Figma 변수 leading-5=16이라 탭 글자 줄이 16, 탭 묶음 36(TAB·PC는 20, 40). */}
       {tabs && (
-        <div className="shrink-0 px-4 py-2 tablet:pt-3 [&_[data-slot=tabs-trigger]]:leading-4 tablet:[&_[data-slot=tabs-trigger]]:leading-5">
+        <div className="shrink-0 px-4 py-2 **:data-[slot=tabs-trigger]:leading-4 tablet:pt-3 tablet:**:data-[slot=tabs-trigger]:leading-5">
           {tabs}
         </div>
       )}

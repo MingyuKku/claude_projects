@@ -59,7 +59,7 @@ function pageOf(page: number, count: number, totalCount: number) {
       accountNumber: "1234567890123456",
       holderName: "밍구스",
       completedAt: null,
-      completedAtText: "-",
+      completedAtText: "",
       receiptUrl: null,
     })),
     totalCount,
@@ -127,7 +127,7 @@ describe("ChargeHistory (MO)", () => {
     await screen.findByRole("list", { name: "충전/출금 상세 내역" });
     expect(screen.getByRole("button", { name: "필터" })).toBeInTheDocument();
     expect(
-      screen.getByRole("combobox", { name: "한 번에 볼 개수" }),
+      screen.getByRole("button", { name: /^한 번에 볼 개수/ }),
     ).toBeEnabled();
     expect(screen.queryByRole("search")).not.toBeInTheDocument();
   });

@@ -1,6 +1,7 @@
 import { EllipsisVertical } from "lucide-react";
 
 import { ChargeStatusText } from "@/entities/bigbird-money";
+import { EmptyTableFrame } from "@/shared/components/list-filter";
 import { useTranslation } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
 import {
@@ -43,91 +44,97 @@ export function ChargeTable({
 }: ChargeTableProps) {
   const { t } = useTranslation("features/bigbird-money-history");
   const { formatDateTime } = useMoneyFormat();
-  const columnCount = isPanelOpen ? 6 : 9;
+
+  const header = (
+    <TableHeader>
+      <TableRow>
+        <TableHead className="w-18">{t("charge.column.type")}</TableHead>
+        <TableHead className="w-45">{t("charge.column.date")}</TableHead>
+        <TableHead className="w-36">{t("charge.column.amount")}</TableHead>
+        {!isPanelOpen && (
+          <>
+            <TableHead className="w-34">{t("charge.column.bank")}</TableHead>
+            <TableHead className="w-44">{t("charge.column.account")}</TableHead>
+            <TableHead className="w-44">{t("charge.column.holder")}</TableHead>
+          </>
+        )}
+        <TableHead className="w-28">{t("charge.column.status")}</TableHead>
+        <TableHead className="w-28 text-center">
+          {t("charge.column.receipt")}
+        </TableHead>
+        <TableHead className="w-24 text-center">
+          {t("charge.column.detail")}
+        </TableHead>
+      </TableRow>
+    </TableHeader>
+  );
+
+  if (emptyContent) {
+    return (
+      <EmptyTableFrame
+        table={
+          <Table
+            headerTone="gray"
+            size="xs"
+            aria-label={t("charge.list.label")}
+            containerClassName="rounded-none border-0"
+          >
+            {header}
+          </Table>
+        }
+      >
+        {emptyContent}
+      </EmptyTableFrame>
+    );
+  }
 
   return (
     <Table headerTone="gray" size="xs" aria-label={t("charge.list.label")}>
-      <TableHeader>
-        <TableRow>
-          <TableHead className="w-18">{t("charge.column.type")}</TableHead>
-          <TableHead className="w-45">{t("charge.column.date")}</TableHead>
-          <TableHead className="w-36">{t("charge.column.amount")}</TableHead>
-          {!isPanelOpen && (
-            <>
-              <TableHead className="w-34">{t("charge.column.bank")}</TableHead>
-              <TableHead className="w-44">
-                {t("charge.column.account")}
-              </TableHead>
-              <TableHead className="w-44">
-                {t("charge.column.holder")}
-              </TableHead>
-            </>
-          )}
-          <TableHead className="w-28">{t("charge.column.status")}</TableHead>
-          <TableHead className="w-28 text-center">
-            {t("charge.column.receipt")}
-          </TableHead>
-          <TableHead className="w-24 text-center">
-            {t("charge.column.detail")}
-          </TableHead>
-        </TableRow>
-      </TableHeader>
+      {header}
       <TableBody>
-        {emptyContent ? (
-          // 빈 상태 안내 행은 누를 대상이 아니라 호버 색을 없앰.
-          <TableRow className="[--table-row-hover:transparent]">
-            <TableCell
-              colSpan={columnCount}
-              className="h-auto p-0 whitespace-normal"
-            >
-              {emptyContent}
+        {records.map((record) => (
+          <TableRow
+            key={record.id}
+            data-state={record.id === activeId ? "selected" : undefined}
+          >
+            <TableCell>
+              <ChargeTypeBadge record={record} />
+            </TableCell>
+            <TableCell>
+              {formatDateTime(record.requestedAt, record.requestedAtText)}
+            </TableCell>
+            <TableCell>
+              <ChargeAmount record={record} />
+            </TableCell>
+            {!isPanelOpen && (
+              <>
+                <TableCell>{record.bankName}</TableCell>
+                <TableCell>{record.accountNumber}</TableCell>
+                <TableCell>{record.holderName}</TableCell>
+              </>
+            )}
+            <TableCell>
+              <ChargeStatusText
+                serverValue={record.statusText}
+                status={record.status}
+              />
+            </TableCell>
+            <TableCell className="text-center">
+              <ReceiptButton record={record} variant="table" />
+            </TableCell>
+            <TableCell className="text-center">
+              <Button
+                variant="outline-foreground"
+                size="icon-sm"
+                className="min-w-0"
+                aria-label={t("charge.action.detail")}
+                onClick={() => onClickDetail(record)}
+              >
+                <EllipsisVertical />
+              </Button>
             </TableCell>
           </TableRow>
-        ) : (
-          records.map((record) => (
-            <TableRow
-              key={record.id}
-              data-state={record.id === activeId ? "selected" : undefined}
-            >
-              <TableCell>
-                <ChargeTypeBadge record={record} />
-              </TableCell>
-              <TableCell>
-                {formatDateTime(record.requestedAt, record.requestedAtText)}
-              </TableCell>
-              <TableCell>
-                <ChargeAmount record={record} />
-              </TableCell>
-              {!isPanelOpen && (
-                <>
-                  <TableCell>{record.bankName}</TableCell>
-                  <TableCell>{record.accountNumber}</TableCell>
-                  <TableCell>{record.holderName}</TableCell>
-                </>
-              )}
-              <TableCell>
-                <ChargeStatusText
-                  serverValue={record.statusText}
-                  status={record.status}
-                />
-              </TableCell>
-              <TableCell className="text-center">
-                <ReceiptButton record={record} variant="table" />
-              </TableCell>
-              <TableCell className="text-center">
-                <Button
-                  variant="outline-foreground"
-                  size="icon-sm"
-                  className="min-w-0"
-                  aria-label={t("charge.action.detail")}
-                  onClick={() => onClickDetail(record)}
-                >
-                  <EllipsisVertical />
-                </Button>
-              </TableCell>
-            </TableRow>
-          ))
-        )}
+        ))}
       </TableBody>
     </Table>
   );

@@ -53,11 +53,11 @@ export interface UsageRecord {
   campaignImageUrl: string | null;
   /** 캠페인 유형 코드. 모르는 서버 값이면 null이라 `campaignTypeText`를 그대로 보임. */
   campaignType: CampaignType | null;
-  /** 코드로 바꾸지 못할 때 보일 서버 값. 값이 없으면 "-", 충전·출금은 빈 문자열. */
+  /** 코드로 바꾸지 못할 때 보일 서버 값. 값이 없거나 충전·출금이면 빈 문자열. */
   campaignTypeText: string;
   /** 사용 내역 코드. 모르는 서버 값이나 코드가 없는 옛 건은 null이라 `usageDetailText`를 그대로 보임. */
   usageDetail: UsageDetail | null;
-  /** 코드로 바꾸지 못할 때 보일 서버 문구. 값이 없으면 "-", 충전·출금은 빈 문자열. */
+  /** 코드로 바꾸지 못할 때 보일 서버 문구. 값이 없거나 충전·출금이면 빈 문자열. */
   usageDetailText: string;
   /** 사용 금액(서버 부호 그대로: 차감은 음수, 반환·충전은 양수). 값이 없으면 null. */
   amount: number | null;

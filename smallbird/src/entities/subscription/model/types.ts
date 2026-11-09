@@ -124,6 +124,10 @@ export interface PaymentQuery {
   size: number;
   from?: string;
   to?: string;
+  /** 결제 내역 필터의 상품 유형 코드(`recruit`·`pick`). 없으면 전체(Swagger `getPayments`). */
+  productType?: string;
+  /** 결제 내역 필터의 결제 주기(`monthly`·`yearly`). 서버 파라미터가 아직 없어 백엔드 반영 전에는 걸러지지 않음(스펙 §7 B-6). */
+  billingPeriod?: string;
   method?: string;
   status?: string;
 }

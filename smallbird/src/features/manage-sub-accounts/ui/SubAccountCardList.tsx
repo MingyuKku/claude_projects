@@ -1,9 +1,8 @@
-import { formatDate, useTranslation } from "@/shared/i18n";
+import { formatListDate, useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
 import { Avatar, AvatarImage, AvatarPlaceholder } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
 
-import { DATE_FORMAT } from "../model/constants";
 import { DeleteButton } from "./DeleteButton";
 import { EditButton } from "./EditButton";
 
@@ -39,9 +38,7 @@ export function SubAccountCardList({
           { key: "email", value: account.email },
           {
             key: "createdAt",
-            value: account.createdAt
-              ? formatDate(account.createdAt, DATE_FORMAT)
-              : "",
+            value: account.createdAt ? formatListDate(account.createdAt) : "",
           },
         ] as const;
         const isActive = account.accountIdx === activeAccountIdx;

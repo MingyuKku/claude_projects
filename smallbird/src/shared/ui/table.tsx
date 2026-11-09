@@ -148,7 +148,7 @@ function TableCell({ className, colSpan, ...props }: React.ComponentProps<"td">)
       data-slot="table-cell"
       colSpan={colSpan}
       className={cn(
-        "h-14 px-4 align-middle text-sm leading-5 whitespace-nowrap text-foreground group-data-[size=lg]/table:h-24 group-data-[size=md]/table:h-19 group-data-[size=xs]/table:h-12 [tfoot_&]:font-medium",
+        "h-14 px-4 align-middle text-sm leading-5 whitespace-nowrap text-foreground group-data-[size=lg]/table:h-24 group-data-[size=md]/table:h-19 group-data-[size=xs]/table:h-12 in-[tfoot]:font-medium",
         !isSpanning && [
           STICKY_FIRST_CELL,
           // 고정 칸은 행 배경 대신 자기 배경을 칠하므로 행(TableRow)과 같은 전환을 둬 호버 색이 함께 바뀜.

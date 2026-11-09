@@ -4,9 +4,15 @@
     "bank": "银行",
     "accountNumber": "账户号码",
     "accountHolder": "户名",
-    "bankBook": "存折复印件"
+    "bankBook": "存折复印件",
+    "placeholder": {
+      "bank": "输入银行名称",
+      "accountNumber": "输入账号",
+      "accountHolder": "输入户名"
+    }
   },
   "file": {
+    "placeholder": "上传文件",
     "upload": "上传",
     "uploadFor": "上传{{label}}",
     "registered": "已登记",

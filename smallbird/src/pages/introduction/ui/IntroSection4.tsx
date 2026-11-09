@@ -60,11 +60,10 @@ export function IntroSection4({ className }: Props) {
               <div
                 className={cn(
                   "relative h-[400px] w-[794px] flex-none overflow-hidden rounded-[4px] bg-[#fafafa] bg-no-repeat",
-                  "[background-image:var(--s4-pc-img)] [background-size:var(--s4-pc-size)] [background-position:var(--s4-pc-pos)]",
-                  "max-introtab:aspect-[456/232] max-introtab:h-auto max-introtab:w-[66.279%] max-introtab:[background-image:var(--s4-tab-img)] max-introtab:[background-size:var(--s4-tab-size)] max-introtab:[background-position:var(--s4-tab-pos)]",
-                  "max-mo:h-[232px] max-mo:w-full max-mo:[background-image:var(--s4-mo-img)] max-mo:[background-size:var(--s4-mo-size)] max-mo:[background-position:var(--s4-mo-pos)]",
-                  card.video &&
-                    "[background-image:none] max-introtab:[background-image:none] max-mo:[background-image:none]",
+                  "[background-image:var(--s4-pc-img)] bg-size-(--s4-pc-size) bg-position-(--s4-pc-pos)",
+                  "max-introtab:aspect-456/232 max-introtab:h-auto max-introtab:w-[66.279%] max-introtab:[background-image:var(--s4-tab-img)] max-introtab:bg-size-(--s4-tab-size) max-introtab:bg-position-(--s4-tab-pos)",
+                  "max-mo:h-[232px] max-mo:w-full max-mo:[background-image:var(--s4-mo-img)] max-mo:bg-size-(--s4-mo-size) max-mo:bg-position-(--s4-mo-pos)",
+                  card.video && "bg-none max-introtab:bg-none max-mo:bg-none",
                 )}
                 role="img"
                 aria-label={t(`section4.cards.${card.key}.label`)}

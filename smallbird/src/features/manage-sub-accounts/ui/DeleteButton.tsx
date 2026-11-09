@@ -1,5 +1,4 @@
-import { Trash2 } from "lucide-react";
-
+import { TrashIcon } from "@/shared/components/icons";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 
@@ -19,7 +18,7 @@ export function DeleteButton({ label, onClick, className }: DeleteButtonProps) {
       onClick={onClick}
       className={cn("rounded-md", className)}
     >
-      <Trash2 />
+      <TrashIcon />
     </Button>
   );
 }

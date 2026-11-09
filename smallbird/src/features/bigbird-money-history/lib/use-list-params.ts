@@ -38,10 +38,17 @@ export function useListParams(
   );
   const filters = readFilterValues(searchParams, fields);
 
+  // 목록 조건(검색어·필터·쪽·개수)이 바뀌면 열어 둔 상세 보기를 닫음. 상세의 대상이 새 목록에 없을 수 있고, 닫지 않으면
+  // 결과가 비어 화면에서만 닫힌 상세가 주소에 남아 있다가 조건을 되돌릴 때 다시 열림.
+  function closeDetail(params: URLSearchParams) {
+    for (const key of DETAIL_QUERY_PARAMS) params.delete(key);
+  }
+
   function update(change: (params: URLSearchParams) => void) {
     setSearchParams((prev) => {
       const params = new URLSearchParams(prev);
       change(params);
+      closeDetail(params);
       return params;
     });
   }
@@ -68,6 +75,7 @@ export function useListParams(
         (prev) => {
           const params = new URLSearchParams(prev);
           applyFilterValues(params, fields, next, PAGE_PARAM);
+          closeDetail(params);
           params.delete(FILTER_PANEL_PARAM);
           return params;
         },
@@ -79,17 +87,15 @@ export function useListParams(
         applyFilterValues(params, fields, {}, PAGE_PARAM);
         params.delete(KEYWORD_PARAM);
       }),
-    /** "N개 보기" 변경. 개수가 바뀌면 보던 쪽이 의미가 없어져 처음 쪽으로 돌아가고 열린 상세를 닫음. */
+    /** "N개 보기" 변경. 개수가 바뀌면 보던 쪽이 의미가 없어져 처음 쪽으로 돌아감. */
     setPageSize: (next: number) =>
       update((params) => {
         params.set(SIZE_PARAM, String(next));
         params.delete(PAGE_PARAM);
-        for (const key of DETAIL_QUERY_PARAMS) params.delete(key);
       }),
     setPage: (next: number) =>
       update((params) => {
         params.set(PAGE_PARAM, String(next));
-        for (const key of DETAIL_QUERY_PARAMS) params.delete(key);
       }),
     /** 마지막 쪽의 항목을 지웠거나 주소를 직접 고쳐 범위를 벗어난 쪽을 마지막 쪽으로 당김(기록은 쌓지 않음). */
     clampPage: (lastPage: number) =>
@@ -104,7 +110,7 @@ export function useListParams(
     buildPageHref: (target: number) => {
       const params = new URLSearchParams(searchParams);
       params.set(PAGE_PARAM, String(target));
-      for (const key of DETAIL_QUERY_PARAMS) params.delete(key);
+      closeDetail(params);
       return `?${params.toString()}`;
     },
   };

@@ -1,2 +1,2 @@
-export { Combobox } from "./Combobox";
+export { Combobox, comboboxTriggerVariants } from "./Combobox";
 export type { ComboboxOption } from "./Combobox";

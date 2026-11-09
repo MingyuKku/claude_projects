@@ -78,7 +78,7 @@ const PLAN_COLUMNS = {
 } as const satisfies Record<string, PlanCardType>;
 // ToggleTab의 Hover는 선택된 항목에 걸리므로, 미리보기에서는 같은 색을 그 항목에 고정함.
 const SELECTED_HOVER_CLASS =
-  "[&_[aria-checked=true]]:bg-[color-mix(in_srgb,var(--color-accent)_50%,var(--color-background))]";
+  "**:aria-checked:bg-[color-mix(in_srgb,var(--color-accent)_50%,var(--color-background))]";
 const PAYMENT_OPTIONS = [
   { value: "monthly", label: "월간 결제" },
   { value: "yearly", label: "연간 결제", description: "00%할인" },

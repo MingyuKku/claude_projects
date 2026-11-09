@@ -60,9 +60,14 @@ export function formatNumericDate(value: Date): string {
   return formatCompactDate(value);
 }
 
+/** 목록 표의 날짜만 보이는 칸용. 일시(`formatNumericDateTime`)의 날짜 부분과 같은 구분자라 한 표에서 표기가 어긋나지 않음(ko `2025-05-31`). */
+export function formatListDate(value: Date): string {
+  return formatCompactDate(value, DATE_TIME_SEPARATOR[getLanguage()]);
+}
+
 /** 공백 없는 숫자 날짜 + 24시간제 시각(초 포함). 결제 일시처럼 시각까지 보여 줄 때 씀. */
 export function formatNumericDateTime(value: Date): string {
-  const date = formatCompactDate(value, DATE_TIME_SEPARATOR[getLanguage()]);
+  const date = formatListDate(value);
   const time = new Intl.DateTimeFormat(getLanguage(), NUMERIC_TIME).format(
     value,
   );

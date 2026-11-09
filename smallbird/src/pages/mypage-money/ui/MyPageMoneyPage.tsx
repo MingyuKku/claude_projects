@@ -5,6 +5,7 @@ import {
   LIST_QUERY_PARAMS,
   UsageHistory,
 } from "@/features/bigbird-money-history";
+import { useFilterScreen } from "@/shared/components/list-filter";
 import { StickyTabBar } from "@/shared/components/sticky-tab-bar";
 import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
@@ -89,6 +90,10 @@ export function MyPageMoneyPage() {
     onWithdrawn: withdrawn.onWithdrawn,
   });
   const isPanelOpen = sidePanel !== null;
+  // TAB 사용 내역의 "필터 검색 설정"은 모달처럼 헤더·LNB만 두고 본문 전체(요약 카드·탭 줄 포함)를 덮음(디자인 QA 26/11/05 - TAB - 26).
+  // 충전/출금 내역은 TAB에서 필터가 인라인이라 화면이 없음.
+  const filterScreen = useFilterScreen("desktop");
+  const isTabletFilter = tab === "usage" && filterScreen.isOpen;
 
   // 충전/출금 탭 이름은 PC "충전/출금 내역", TAB·MO "충전 내역"(시안 그대로, 스펙 §3).
   function tabLabel(moneyTab: MoneyTab) {
@@ -154,7 +159,7 @@ export function MyPageMoneyPage() {
     }
     if (layout !== "mobile") return lists[moneyTab];
     return (
-      <Tabs value={view} onValueChange={setView} className="gap-4">
+      <Tabs value={view} onValueChange={setView} className="flex-1 gap-4">
         <TabsList className="w-full">
           {CHARGE_VIEWS.map((chargeView) => (
             <TabsTrigger key={chargeView} value={chargeView} className="flex-1">
@@ -163,42 +168,54 @@ export function MyPageMoneyPage() {
           ))}
         </TabsList>
         <TabsContent value="balance">{summary}</TabsContent>
-        <TabsContent value="history">{lists[moneyTab]}</TabsContent>
+        <TabsContent value="history" className="flex flex-col">
+          {lists[moneyTab]}
+        </TabsContent>
       </Tabs>
     );
   }
 
   // PC·TAB은 카드를 탭 위에 둠. TAB에서 하위 화면이 열리면 카드를 숨김(시안 `11224:104787`).
   const showsSummaryAboveTabs =
-    layout === "desktop" || (layout === "tablet" && !isPanelOpen);
+    layout === "desktop" ||
+    (layout === "tablet" && !isPanelOpen && !isTabletFilter);
+  // TAB의 풀페이지 화면(거래·사용 상세, 충전, 출금, 필터)은 모달처럼 상단 탭 줄 없이 본문만 그림.
+  // MO는 탭 줄을 그대로 둠(시안 확인 전).
+  const hidesTabBar = layout === "tablet" && (isScreenPanel || isTabletFilter);
   const tabs = (
     <Tabs
       value={tab}
       onValueChange={setTab}
+      // flex-1: 내역이 비면 안내가 화면 안의 남은 높이를 채움(페이지 전체 스크롤 방지).
+      // 하위 화면 카드가 열리면 화면 높이를 넘지 않도록 min-h-0으로 줄어들 수 있게 함.
       className={cn(
-        "gap-4 tablet:gap-5 desktop:gap-6",
-        isScreenPanel && "flex-1",
+        "flex-1 gap-4 tablet:gap-5 desktop:gap-6",
+        isScreenPanel && "min-h-0",
       )}
     >
       {/* 탭 줄은 스크롤해도 화면 위에 고정함. 위 여백은 고정 영역이 직접 가져 스크롤 내용이 그 위로 비치지 않게 함. */}
-      <StickyTabBar
-        // 카드 아래에서는 카드와 간격(TAB 16, PC 20), TAB에서 하위 화면이 열려 카드가 없으면 화면 위 8.
-        className={
-          showsSummaryAboveTabs ? "tablet:pt-4 desktop:pt-5" : undefined
-        }
-        tabs={MONEY_TABS.map((moneyTab) => ({
-          value: moneyTab,
-          label: tabLabel(moneyTab),
-        }))}
-      />
+      {!hidesTabBar && (
+        <StickyTabBar
+          // 카드 아래에서는 카드와 간격(TAB 16, PC 20), MO에서 하위 화면이 열려 카드가 없으면 화면 위 8.
+          className={
+            showsSummaryAboveTabs ? "tablet:pt-4 desktop:pt-5" : undefined
+          }
+          tabs={MONEY_TABS.map((moneyTab) => ({
+            value: moneyTab,
+            label: tabLabel(moneyTab),
+          }))}
+        />
+      )}
       {MONEY_TABS.map((moneyTab) => (
         <TabsContent
           key={moneyTab}
           value={moneyTab}
           // isolate: 본문 안의 z-index(MO 세그먼트 토글의 z-10 등)를 본문에 가둬 고정 탭 줄(z-10) 아래에 그림.
           className={cn(
-            "isolate pb-4 tablet:pb-5",
-            isScreenPanel && "flex flex-col",
+            "isolate flex flex-col pb-4 tablet:pb-5",
+            isScreenPanel && "min-h-0",
+            // 탭 줄이 없는 하위 화면 카드는 탭 줄이 가지던 위 여백 8을 이어받음. 필터 화면은 헤더 바로 아래에서 시작함(시안).
+            hidesTabBar && !isTabletFilter && "tablet:pt-2",
           )}
         >
           {tabBody(moneyTab)}
@@ -212,19 +229,21 @@ export function MyPageMoneyPage() {
       <title>{t("title")}</title>
       <div
         className={cn(
-          "flex min-h-full gap-6",
+          "flex gap-6",
+          // 하위 화면 카드(TAB·MO)는 화면 높이에서 멈추고 안쪽만 스크롤해, 하단 버튼이 늘 보이게 함. 그 밖에는 내용만큼 늘어남.
+          isScreenPanel ? "h-full" : "min-h-full",
           layout !== "mobile" && CONTENT_WIDTH_CLASS_NAME,
         )}
       >
-        <div className="flex min-w-0 flex-1 flex-col">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col">
           {showsSummaryAboveTabs && (
             <div className="pt-2 desktop:pt-5">{summary}</div>
           )}
           {tabs}
         </div>
         {layout === "desktop" && isPanelOpen && (
-          // 패널은 스크롤해도 화면에 붙어 있고 높이는 화면에 맞춤(하단 버튼이 늘 보이게). 화면에서 헤더 64를 뺀 높이(위아래 여백 20 포함).
-          <div className="sticky top-0 flex h-[calc(100dvh-var(--spacing)*16)] shrink-0 self-start py-5">
+          // 패널은 스크롤해도 화면에 붙어 있고 높이는 화면에 맞춤(하단 버튼이 늘 보이게). 화면에서 헤더를 뺀 높이(위아래 여백 20 포함).
+          <div className="sticky top-0 flex h-[calc(100dvh-var(--app-header-height))] shrink-0 self-start py-5">
             <PanelFrame variant="aside">{sidePanel}</PanelFrame>
           </div>
         )}

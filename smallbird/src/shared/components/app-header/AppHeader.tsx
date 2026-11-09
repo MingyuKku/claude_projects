@@ -40,7 +40,7 @@ export function AppHeader({
   return (
     <header
       className={cn(
-        "flex h-13 items-center justify-between gap-2 bg-background py-1 pr-4 pl-1.5 tablet:h-16 tablet:p-5",
+        "flex h-(--app-header-height) items-center justify-between gap-2 bg-background py-1 pr-4 pl-1.5 tablet:p-5",
         className,
       )}
     >
