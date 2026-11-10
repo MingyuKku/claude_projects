@@ -28,6 +28,7 @@ export type { RealtimeAlarm } from "./model/schema";
 export type {
   BuyerInquiryFilters,
   BuyerInquiryStatusFilter,
+  InquiryFilterSourceType,
 } from "./api/inquiry-api";
 export {
   ATTACHMENT_LIMITS,

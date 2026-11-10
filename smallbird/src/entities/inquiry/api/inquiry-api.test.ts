@@ -548,6 +548,19 @@ describe("fetchInquiryCampaigns", () => {
     ]);
     expect(campaigns[1]?.name).toBe("");
   });
+
+  it("출처를 주면 sourceType으로 보내 그 문의가 있는 캠페인만 받는다", async () => {
+    vi.mocked(serverApiV3.get).mockResolvedValueOnce({
+      result: true,
+      list: [],
+    });
+
+    await fetchInquiryCampaigns("INFLUENCER_QUESTION");
+
+    expect(serverApiV3.get).toHaveBeenCalledWith("/help/c-client-campaign", {
+      params: { sourceType: "INFLUENCER_QUESTION" },
+    });
+  });
 });
 
 describe("fetchThreadConversation", () => {

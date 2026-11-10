@@ -57,8 +57,12 @@ export function BuyerInquiryFilterDialog({
   ] as const;
   const dateLabelId = useId();
   const [draft, setDraft] = useState<BuyerInquiryFilters>(value);
-  const { campaigns } = useInquiryCampaigns(threadUserIdx);
-  const { options } = useBuyerInfluencerOptions(draft.campaignIdx);
+  const { filterSourceType } = INQUIRY_MENU[menu];
+  const { campaigns } = useInquiryCampaigns(threadUserIdx, filterSourceType);
+  const { options } = useBuyerInfluencerOptions(
+    draft.campaignIdx,
+    filterSourceType,
+  );
   const hasChanges =
     draft.sourceType !== value.sourceType ||
     draft.campaignIdx !== value.campaignIdx ||

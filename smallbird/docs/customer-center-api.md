@@ -23,12 +23,12 @@
 | 화면 동작 | V3 API | v2 대응 | 백엔드 분류·상태 |
 | --- | --- | --- | --- |
 | 빅버드 문의 목록·대화, 구매자 문의 대화 | `GET /v3/help/thread?threadUserIdx&campaignIdx&type&status` | `GET /help/thread` | 구매자 대화는 `type=client`; 스레드별 `status`와 상태 필터 제공 |
-| 새 문의 캠페인 선택 | `GET /v3/help/c-client-campaign` | `GET /service/client-question` | 수정 필요(로직은 v2 그대로) |
+| 새 문의 캠페인 선택·목록 필터 캠페인 | `GET /v3/help/c-client-campaign[?sourceType]` | `GET /service/client-question` | 수정 필요(로직은 v2 그대로) |
 | 문의 생성 | `POST /v3/help/thread {campaignIdx, isBoardType}` | `POST /help/thread` | 수정 필요(로직은 v2 그대로) |
 | 메시지 전송 | `POST /v3/help/thread/message {threadIdx, body, attachmentIdx, isAuto}` | 같음 | 수정 필요(로직은 v2 그대로) |
 | 문의 종료 | `PUT /v3/help/thread/{threadIdx}` | 같음 | 수정 필요(로직은 v2 그대로) |
 | 구매자 문의 + 상품 Q&A 통합 목록 | `GET /v3/help/inquiry?status&sourceType&campaignIdx&influencerThreadUserIdx&searchType&keyword&page&entrySize` | 없음(`c-purchaser-question`·`board` 개별) | Stage 실호출 HTTP 200, 두 출처와 상세 진입 식별자 확인 |
-| 인플루언서 필터 옵션 | `GET /v3/help/influencer-filter?campaignIdx` | 없음 | 신규 |
+| 인플루언서 필터 옵션 | `GET /v3/help/influencer-filter?campaignIdx&sourceType` | 없음 | 신규 |
 | 구매자 상세 — 주문·상품 | `GET /v3/help/c-purchaser-questionInfo/{orderNumber}` | 같음 | 재사용 |
 | 구매자·Q&A 상세 패널 | `GET /v3/help/inquiry/{inquiryIdx}?sourceType` | 없음(`c-purchaser-questionInfo`·`c-campaign-question` 조합) | 신규. 문의자·주문(결제 금액 포함)·캠페인 정보를 한 번에 제공 |
 | 캠페인별 미확인 문의 집계 | `GET /v3/help/c-campaign-question?filterType&searchType&keyword&page&entrySize` | 같음 | 재사용. 구매자 상세용이 아니라 캠페인별 `purchaserCnt`·`qnaCnt` 집계입니다. 백엔드 확인(2026-10-23): 쓰일 일이 없어 v3에서 연결하지 않음 |

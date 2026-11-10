@@ -273,30 +273,52 @@ export function useInquiryCampaignDetail(campaignIdx: number | null) {
   return { detail: data, isLoading, isError: Boolean(error) };
 }
 
-export async function fetchInquiryCampaigns() {
-  const response = await serverApiV3.get("/help/c-client-campaign");
+/**
+ * 필터용 출처(구매자 문의·인플루언서 문의 화면). 주면 그 유형 문의가 실제로 있는 캠페인·인플루언서만 오고,
+ * 생략하면 전체(Swagger 2.2.4.12 `c-client-campaign`·`influencer-filter`).
+ */
+export type InquiryFilterSourceType =
+  typeof INQUIRY_SOURCE_TYPE.purchaser | typeof INQUIRY_SOURCE_TYPE.influencer;
+
+export async function fetchInquiryCampaigns(
+  sourceType?: InquiryFilterSourceType,
+) {
+  const response = await serverApiV3.get("/help/c-client-campaign", {
+    params: { sourceType },
+  });
   const { list } = ensureSucceeded(inquiryCampaignListSchema.parse(response));
   return list.map(transformInquiryCampaignToViewModel);
 }
 
-/** 새 문의에서 고를 수 있는 캠페인 목록. 계정이 바뀌면 다른 목록이라 세션 값을 키에 넣음. */
-export function useInquiryCampaigns(threadUserIdx: number | undefined) {
+/**
+ * 새 문의에서 고를 수 있는 캠페인 목록. 계정이 바뀌면 다른 목록이라 세션 값을 키에 넣음.
+ * 목록 필터는 `sourceType`을 줘 해당 문의가 있는 캠페인만 받고, 이름 찾기 등은 생략해 전체를 받음.
+ */
+export function useInquiryCampaigns(
+  threadUserIdx: number | undefined,
+  sourceType?: InquiryFilterSourceType,
+) {
   const { data, isLoading, error, mutate } = useSWR(
-    threadUserIdx === undefined ? null : ["inquiry-campaigns", threadUserIdx],
-    fetchInquiryCampaigns,
+    threadUserIdx === undefined
+      ? null
+      : ["inquiry-campaigns", threadUserIdx, sourceType],
+    () => fetchInquiryCampaigns(sourceType),
   );
   return { campaigns: data, isLoading, isError: Boolean(error), mutate };
 }
 
-/** 선택한 캠페인에 참여한 인플루언서 옵션. */
-export function useBuyerInfluencerOptions(campaignIdx: number | undefined) {
+/** 선택한 캠페인에 참여한 인플루언서 옵션. `sourceType`은 캠페인 목록과 같은 뜻. */
+export function useBuyerInfluencerOptions(
+  campaignIdx: number | undefined,
+  sourceType?: InquiryFilterSourceType,
+) {
   const { data, isLoading, error } = useSWR(
     campaignIdx === undefined
       ? null
-      : ["buyer-influencer-options", campaignIdx],
+      : ["buyer-influencer-options", campaignIdx, sourceType],
     async ([, idx]) => {
       const response = await serverApiV3.get("/help/influencer-filter", {
-        params: { campaignIdx: idx },
+        params: { campaignIdx: idx, sourceType },
       });
       return ensureSucceeded(buyerInfluencerOptionsSchema.parse(response)).list;
     },

@@ -249,7 +249,8 @@ function useBuyerInquiryList(params: { tab; keyword; searchType }): {
 - **문의 종료(기존 계약 참고·실시간 상담용)**: `PUT /v3/help/thread/{threadIdx}`. v3 일반 문의에서는 호출하지 않는다.
 - **구매자 문의·상품 Q&A**
   - 통합 목록: `GET /v3/help/inquiry?status&sourceType&campaignIdx&influencerThreadUserIdx&searchType&keyword&page&entrySize`. `status`는 `ALL | WAITING | ANSWERED`, `sourceType`은 `ALL | PURCHASER_QUESTION | PRODUCT_QNA`, `searchType`은 `name | orderNumber`다. Stage 실호출에서 두 출처와 계산된 상태를 확인했다.
-  - 인플루언서 필터: `GET /v3/help/influencer-filter?campaignIdx` → `list[]: {threadUserIdx, displayName}`.
+  - 인플루언서 필터: `GET /v3/help/influencer-filter?campaignIdx&sourceType` → `list[]: {threadUserIdx, displayName}`.
+  - **필터의 캠페인·인플루언서 목록은 메뉴별 `sourceType`으로 받는다(백엔드 안내, Swagger 2.2.4.12 확인 2026-11-10)**: 구매자 문의 화면 `PURCHASER_QUESTION`, 인플루언서 문의·캠페인 Q&A 화면 `INFLUENCER_QUESTION`을 `c-client-campaign`·`influencer-filter` 모두에 보내 그 유형 문의가 있는 캠페인·인플루언서만 받는다(`INQUIRY_MENU[menu].filterSourceType`, 필터 대화상자만). 캠페인명 찾기(목록 카드·상세·칩)는 종료·무문의 캠페인도 필요해 `sourceType` 없이 전체를 받는다.
   - 구매자 대화: 통합 목록의 `threadUserIdx`로 `GET /v3/help/thread?threadUserIdx&campaignIdx&type=client`를 호출한다. `type=admin`은 구매자↔운영 대화다.
   - 상세: `GET /v3/help/inquiry/{inquiryIdx}?sourceType`이 문의자·주문(주문일·결제 금액)·캠페인 정보(유형·진행 상태·기간·코드·인플루언서)·대표 이미지·브랜드·상품명을 줍니다. 상품 썸네일·이름은 `GET /v3/help/c-purchaser-questionInfo/{orderNumber}`, 캠페인 배너·이름은 `GET /v3/help/c-client-campaign`을 먼저 쓰고 못 찾으면 상세 응답 값으로 채웁니다. `GET /v3/help/c-campaign-question`(캠페인별 미확인 문의 집계)은 백엔드 확인(2026-10-23)으로 쓰지 않습니다.
   - Q&A 상세: `POST /v3/help/qna`. 답변이 없으면 `replyInfo`가 `{}`다.

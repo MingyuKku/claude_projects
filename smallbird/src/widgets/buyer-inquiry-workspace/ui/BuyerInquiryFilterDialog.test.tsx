@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SWRConfig } from "swr";
 
@@ -76,4 +76,32 @@ describe("BuyerInquiryFilterDialog", () => {
     expect(screen.getAllByRole("option")).toHaveLength(1);
     expect(screen.getByRole("option", { name: /헤어/ })).toBeInTheDocument();
   });
+
+  it.each([
+    ["buyer", "PURCHASER_QUESTION"],
+    ["influencer", "INFLUENCER_QUESTION"],
+  ] as const)(
+    "%s 메뉴는 캠페인·인플루언서 목록을 %s로 받는다",
+    async (menu, sourceType) => {
+      render(
+        <SWRConfig value={{ provider: () => new Map() }}>
+          <BuyerInquiryFilterDialog
+            menu={menu}
+            value={{ sourceType: "ALL", campaignIdx: 1 }}
+            threadUserIdx={5971}
+            onApply={() => {}}
+          />
+        </SWRConfig>,
+      );
+
+      await waitFor(() => {
+        expect(get).toHaveBeenCalledWith("/help/c-client-campaign", {
+          params: { sourceType },
+        });
+        expect(get).toHaveBeenCalledWith("/help/influencer-filter", {
+          params: { campaignIdx: 1, sourceType },
+        });
+      });
+    },
+  );
 });
