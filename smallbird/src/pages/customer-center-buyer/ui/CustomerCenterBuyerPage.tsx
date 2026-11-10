@@ -116,6 +116,7 @@ function InquiryMenuPage({ menu }: { menu: InquiryMenu }) {
             inquiry={openedInquiry}
             threadUserIdx={session.threadUserIdx}
             onChangeStatus={() => void mutate()}
+            onRead={() => void mutate()}
           />
         ) : (
           !isLoading && (

@@ -78,10 +78,11 @@ export function TextField({
   onChange,
   ...props
 }: TextFieldProps) {
-  const { length, handleChange } = useTextLength({
+  const { length, handleChange, handleCompositionEnd } = useTextLength({
     value,
     defaultValue,
     onChange,
+    maxLength,
   });
 
   if (isDragging) {
@@ -108,6 +109,10 @@ export function TextField({
       defaultValue={defaultValue}
       maxLength={maxLength}
       onChange={handleChange}
+      onCompositionEnd={(event) => {
+        props.onCompositionEnd?.(event);
+        handleCompositionEnd(event);
+      }}
       rows={1}
       className={cn(
         fieldTextareaClassName,

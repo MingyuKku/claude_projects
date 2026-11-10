@@ -57,6 +57,8 @@ export {
 export type { HelpdeskAccountFields } from "./api/realtime-consultation-write";
 export { useConsultationSync } from "./api/use-consultation-sync";
 export type { ConsultationConnection } from "./api/use-consultation-sync";
+export { useRealtimeSessionLines } from "./api/use-realtime-session-lines";
+export { insertRealtimeLines } from "./lib/realtime-session-lines";
 export {
   createRealtimeThread,
   startThreadRealtime,

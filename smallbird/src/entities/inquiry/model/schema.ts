@@ -387,6 +387,16 @@ export const buyerInquiryListSchema = z.object({
   }),
 });
 
+/**
+ * `GET /v3/help/inquiry/has-updates`·`/influencer-inquiry/has-updates` 목록 변경 확인(폴링용).
+ * `checkedAt`은 서버 시각(KST, `yyyy-MM-dd HH:mm:ss`, 초 단위 2026-11-09 stage 확인)이고 다음 호출의 `since`로 그대로 씀.
+ */
+export const inquiryHasUpdatesSchema = z.object({
+  result: z.boolean(),
+  hasUpdates: z.boolean(),
+  checkedAt: z.string(),
+});
+
 export const buyerInfluencerOptionsSchema = z.object({
   result: z.boolean(),
   list: z.array(

@@ -20,6 +20,7 @@ import { Button } from "@/shared/ui/button";
 
 import type { InquiryMessageViewModel } from "@/entities/inquiry";
 import type { MessageSize } from "@/shared/components/chat-message";
+import type { ReactNode } from "react";
 
 const MAX_LENGTH = 3000;
 
@@ -33,6 +34,8 @@ interface EditableChatMessageProps {
   size?: MessageSize;
   /** ChatMessage의 rowClassName(아바타 간격). */
   rowClassName?: string;
+  /** 말풍선 아래에 붙는 첨부 묶음(텍스트와 함께 보낸 파일). 수정·삭제는 텍스트 메시지에만 적용되고 첨부는 그대로 둡니다. */
+  attachments?: ReactNode;
   /** 이 대화에서 메시지 수정·삭제를 허용하는지(REST 대화만. 실시간 상담은 Firestore라 허용하지 않습니다). */
   canModify: boolean;
   /** 수정·삭제가 끝나거나 서버 상태와 어긋났을 때 대화를 다시 받습니다. */
@@ -64,6 +67,7 @@ export function EditableChatMessage({
   time,
   size,
   rowClassName,
+  attachments,
   canModify,
   onChanged,
   onSubmitEdit = (body) => editInquiryMessage(message.id, body),
@@ -119,12 +123,13 @@ export function EditableChatMessage({
         size={size}
         rowClassName={rowClassName}
         editedLabel={editedLabel}
+        attachments={attachments}
       />
     );
   }
 
   if (isEditing) {
-    return (
+    const editor = (
       <MessageEditor
         name={name}
         avatarSrc={avatarSrc}
@@ -138,6 +143,15 @@ export function EditableChatMessage({
         onClickSubmit={handleSubmitEdit}
         className="w-full self-end"
       />
+    );
+    // 첨부는 수정 대상이 아니라 편집 말풍선 아래에 그대로 보임.
+    return attachments ? (
+      <div className="flex w-full flex-col items-end gap-1">
+        {editor}
+        {attachments}
+      </div>
+    ) : (
+      editor
     );
   }
 
@@ -153,6 +167,7 @@ export function EditableChatMessage({
         size={size}
         rowClassName={rowClassName}
         editedLabel={editedLabel}
+        attachments={attachments}
         toolbar={
           <>
             <Button

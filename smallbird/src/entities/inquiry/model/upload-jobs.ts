@@ -88,6 +88,7 @@ export const useInquiryUploadStore = create<UploadJobsState>()(
               revalidateInquiries();
               return;
             }
+            // 덧붙이기는 files만 늘리고 보낸 수는 run만 올림
             patch(threadIdx, {
               sentCount: job.sentCount + 1,
               targetThreadIdx: target,
@@ -108,12 +109,21 @@ export const useInquiryUploadStore = create<UploadJobsState>()(
         jobs: {},
         start: (threadIdx, files) => {
           if (files.length === 0) return;
-          set((state) => ({
-            jobs: {
-              ...state.jobs,
-              [threadIdx]: { files, sentCount: 0, status: "uploading" },
-            },
-          }));
+          // 같은 문의에 올리는 중인 작업이 있으면(연달아 보냄) 덮어쓰지 않고 뒤에 덧붙임. 이미 보낸 수는 그대로라
+          // 같은 파일을 다시 올리지 않고 순서대로 이어서 보냄. 문의마다 작업이 따로임.
+          // 실패로 멈춘 작업에는 덧붙이지 않고 새로 시작함. 계속 실패하는 파일 뒤에 새 첨부가 막혀 나가지 못하기 때문.
+          set((state) => {
+            const job = state.jobs[threadIdx];
+            return {
+              jobs: {
+                ...state.jobs,
+                [threadIdx]:
+                  job?.status === "uploading"
+                    ? { ...job, files: [...job.files, ...files] }
+                    : { files, sentCount: 0, status: "uploading" },
+              },
+            };
+          });
           void run(threadIdx);
         },
         retry: (threadIdx) => void run(threadIdx),

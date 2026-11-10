@@ -8,6 +8,7 @@ import { useTranslation } from "@/shared/i18n";
 
 import { formatDividerDate, formatMessageTime } from "../lib/format";
 import { IS_BUYER_WRITE_ENABLED } from "../model/constants";
+import { useRefreshListOnRead } from "../model/useRefreshListOnRead";
 
 import type {
   BuyerInquiryViewModel,
@@ -17,13 +18,21 @@ import type {
 
 interface QnaConversationProps {
   inquiry: BuyerInquiryViewModel;
+  /** 안 읽은 문의의 상세를 받아 읽음 처리된 뒤 목록을 다시 받을 때 부름(파란 점 갱신). */
+  onRead?: () => void;
 }
 
 /** 상품 Q&A: 질문마다 광고주 답변 하나. 답변 입력은 구매자 문의처럼 하단 고정 입력창(QnaReplyComposer), 수정·삭제는 호버 버튼. */
-export function QnaConversation({ inquiry }: QnaConversationProps) {
+export function QnaConversation({ inquiry, onRead }: QnaConversationProps) {
   const { t } = useTranslation("widgets/buyer-inquiry-workspace");
   const { t: tCommon } = useTranslation();
   const { items, isLoading, isError, mutate } = useQnaDetail(inquiry);
+  useRefreshListOnRead(
+    inquiry.key,
+    inquiry.hasUnread,
+    items !== undefined,
+    onRead,
+  );
   const writerName = inquiry.writerName ?? t("unknownWriter");
 
   if (isLoading) {

@@ -109,11 +109,12 @@ function SelectItem({
     <SelectPrimitive.Item
       data-slot="select-item"
       className={cn(
-        "relative flex w-full cursor-default items-center gap-2 rounded-sm p-2 text-sm leading-5 wrap-anywhere outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground *:[span]:last:flex *:[span]:last:items-center *:[span]:last:gap-2",
+        "relative flex w-full cursor-default items-center gap-2 rounded-sm p-2 text-sm leading-5 wrap-anywhere outline-hidden select-none focus:bg-accent focus:text-accent-foreground data-disabled:pointer-events-none data-disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4 [&_svg:not([class*='text-'])]:text-muted-foreground *:[span]:first:flex *:[span]:first:items-center *:[span]:first:gap-2",
         className
       )}
       {...props}
     >
+      {/* 항목 글자(ItemText)는 첫 번째 span이라 :first로 잡음. 선택된 항목은 뒤에 체크 span이 붙어 :last로는 글자 span이 빠짐. */}
       <SelectPrimitive.ItemText>{children}</SelectPrimitive.ItemText>
       {/* 시안: 체크는 선택된 항목에서만 오른쪽 끝에 자리를 차지함. */}
       <SelectPrimitive.ItemIndicator

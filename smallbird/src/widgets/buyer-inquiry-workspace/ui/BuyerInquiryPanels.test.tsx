@@ -138,6 +138,7 @@ function renderPanels(
   target: BuyerInquiryViewModel = inquiry,
   onChangeStatus?: () => void,
   state?: unknown,
+  onRead?: () => void,
 ) {
   const router = createMemoryRouter(
     [
@@ -148,6 +149,7 @@ function renderPanels(
             inquiry={target}
             threadUserIdx={threadUserIdx}
             onChangeStatus={onChangeStatus}
+            onRead={onRead}
           />
         ),
       },
@@ -267,6 +269,37 @@ describe("인플루언서 문의 상담 종료", () => {
 });
 
 describe("구매자 문의 오른쪽 패널", () => {
+  it("안 읽은 문의를 열어 대화를 받으면 읽음 처리된 뒤 목록을 한 번 다시 받게 한다", async () => {
+    const onRead = vi.fn();
+    renderPanels(
+      77,
+      { ...inquiry, hasUnread: true },
+      undefined,
+      undefined,
+      onRead,
+    );
+    // 대화를 받기 전에는 목록을 다시 받지 않음(읽기 전 값이 남기 때문)
+    expect(onRead).not.toHaveBeenCalled();
+    expect(await screen.findByText("배송이 언제 되나요?")).toBeInTheDocument();
+    await waitFor(() => expect(onRead).toHaveBeenCalledOnce());
+    expect(
+      vi.mocked(serverApiV3.get).mock.calls.map(([path]) => path),
+    ).toContain("/help/thread");
+  });
+
+  it("이미 읽은 문의를 열 때는 목록을 다시 받지 않는다", async () => {
+    const onRead = vi.fn();
+    renderPanels(
+      77,
+      { ...inquiry, hasUnread: false },
+      undefined,
+      undefined,
+      onRead,
+    );
+    expect(await screen.findByText("배송이 언제 되나요?")).toBeInTheDocument();
+    expect(onRead).not.toHaveBeenCalled();
+  });
+
   it("구매자↔광고주 대화를 시간순으로 보여 주고 type=client로 조회한다", async () => {
     renderPanels();
     expect(await screen.findByText("배송이 언제 되나요?")).toBeInTheDocument();

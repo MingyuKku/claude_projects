@@ -419,6 +419,26 @@ describe("isMatchFailureShown", () => {
     ).toBe(true);
   });
 
+  it("실패 시각 뒤에 광고주가 보낸 일반 문의가 있으면 걷는다", () => {
+    const sent = (createdAt: string, overrides = {}) => ({
+      isMine: true,
+      campaign: null,
+      createdAt: new Date(createdAt),
+      ...overrides,
+    });
+    expect(isMatchFailureShown(failed, [sent("2026-11-04T10:04:00")])).toBe(
+      false,
+    );
+    // 실패 전 메시지, 캠페인 카드, 상대(운영) 메시지는 일반 문의로 치지 않는다.
+    expect(
+      isMatchFailureShown(failed, [
+        sent("2026-11-04T10:02:00"),
+        sent("2026-11-04T10:04:00", { campaign: {} }),
+        sent("2026-11-04T10:04:00", { isMine: false }),
+      ]),
+    ).toBe(true);
+  });
+
   it("마감 시각이 없으면 마지막 자동 안내 시각을 기준으로 한다", () => {
     const withoutDeadline = { ...failed, waitDeadline: null };
     expect(isMatchFailureShown(withoutDeadline)).toBe(true);

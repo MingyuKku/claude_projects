@@ -41,6 +41,8 @@ export function BuyerReplyComposer({
   async function submit() {
     if (threadIdx === null || !canSend) return;
     setIsSending(true);
+    // 전송을 시작한 파일만 보내고 지움. 텍스트를 보내는 동안 새로 고른 파일은 다음 전송을 위해 남겨 둠.
+    const files = [...attachments.files];
     try {
       // 종료된 스레드에 보내면 서버가 새 스레드를 만들어 그 번호를 돌려줌. 첨부도 그 스레드로 보냄.
       // 실시간 상담 중에도 같은 API로 보내고 Firestore 반영은 서버가 함(백엔드 흐름도 프론트팀 가이드 2026-11-03).
@@ -65,9 +67,9 @@ export function BuyerReplyComposer({
         target = savedThreadIdx;
         setText("");
       }
-      if (attachments.files.length > 0) {
-        startInquiryUploads(target, [...attachments.files]);
-        attachments.reset();
+      if (files.length > 0) {
+        startInquiryUploads(target, files);
+        files.forEach(attachments.removeSent);
       }
       // 전송은 이미 끝났으니 재조회 실패는 전송 실패로 알리지 않고 로그만 남김.
       const [refreshError] = await tryit(mutate)();

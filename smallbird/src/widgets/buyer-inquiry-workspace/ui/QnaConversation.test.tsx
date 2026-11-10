@@ -109,6 +109,37 @@ beforeEach(() => {
 });
 afterEach(() => vi.unstubAllGlobals());
 
+describe("상품 Q&A 읽음 처리 뒤 목록 갱신", () => {
+  it("안 읽은 Q&A 상세를 받으면 목록을 한 번 다시 받게 하고, 읽은 Q&A는 부르지 않는다", async () => {
+    vi.mocked(serverApiV3.post).mockResolvedValue(qna({}));
+    const onRead = vi.fn();
+    const { unmount } = render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <QnaConversation
+          inquiry={{ ...inquiry, hasUnread: true }}
+          onRead={onRead}
+        />
+      </SWRConfig>,
+    );
+    expect(onRead).not.toHaveBeenCalled();
+    expect(await screen.findByText("언제 입고되나요?")).toBeInTheDocument();
+    await waitFor(() => expect(onRead).toHaveBeenCalledOnce());
+    unmount();
+
+    const onReadAgain = vi.fn();
+    render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <QnaConversation
+          inquiry={{ ...inquiry, hasUnread: false }}
+          onRead={onReadAgain}
+        />
+      </SWRConfig>,
+    );
+    expect(await screen.findByText("언제 입고되나요?")).toBeInTheDocument();
+    expect(onReadAgain).not.toHaveBeenCalled();
+  });
+});
+
 describe("상품 Q&A 대화", () => {
   it("답변이 없으면 입력창을 보여 주고 등록하면 최신 상태를 다시 받는다", async () => {
     const user = userEvent.setup();

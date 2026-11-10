@@ -42,6 +42,7 @@ import {
   useInquirySummaryChanges,
 } from "./helpdesk-changes";
 import { useCoalescedRefresh } from "./use-coalesced-refresh";
+import { useInquiryUpdatePolling } from "./use-inquiry-updates";
 import { useLiveInquiries } from "./use-live-inquiries";
 
 import type {
@@ -547,6 +548,29 @@ export function useBuyerInquiries(
     await mutate();
   }, [mutate, mutateGlobal]);
   const refresh = useCoalescedRefresh(refreshAll);
+  // Firestore 신호가 없는 행(Q&A, 새 상대)의 변경은 10초마다 변경 여부만 확인해 받음. 탭·필터·검색이 바뀌면 다시 시작하고,
+  // Firestore 신호와 겹친 재조회는 같은 `refresh`(0.3초 합침)로 한 번에 처리함.
+  useInquiryUpdatePolling(
+    [
+      sources.join(),
+      status,
+      filters.sourceType,
+      filters.campaignIdx,
+      filters.influencerThreadUserIdx,
+      filters.keyword,
+      filters.startDate,
+      filters.endDate,
+    ].join("|"),
+    data !== undefined,
+    {
+      isInfluencerMenu: sources.includes("influencer"),
+      status: BUYER_STATUS_PARAM[status],
+      sourceType: filters.sourceType,
+      campaignIdx: filters.campaignIdx,
+      influencerThreadUserIdx: filters.influencerThreadUserIdx,
+    },
+    refresh,
+  );
   // 구매자 메시지·상태 변경은 구매자 계정 Firestore 문서에 반영되므로 목록의 구매자들을 구독함.
   useBuyerAccountChanges(
     (inquiries ?? []).flatMap((inquiry) =>

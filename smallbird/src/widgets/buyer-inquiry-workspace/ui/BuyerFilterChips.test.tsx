@@ -57,14 +57,17 @@ beforeEach(() => {
   });
 });
 
-function renderWorkspace(search: string) {
+function renderWorkspace(
+  search: string,
+  menu: "buyer" | "influencer" = "buyer",
+) {
   const router = createMemoryRouter(
     [
       {
         path: ROUTES.customerCenterBuyerThread,
         element: (
           <BuyerInquiryWorkspace
-            menu="buyer"
+            menu={menu}
             inquiries={[]}
             isLoading={false}
             isError={false}
@@ -105,6 +108,48 @@ describe("구매자 목록 적용된 필터 칩", () => {
     expect(screen.getByRole("button", { name: "필터" })).toHaveClass(
       "text-primary",
     );
+  });
+
+  it("문의 유형을 고르면 유형 이름이 칩으로 뜨고, ×는 그 조건만 푼다", async () => {
+    const user = userEvent.setup();
+    const router = renderWorkspace("?source=qna&campaignIdx=10");
+    expect(
+      await screen.findByRole("button", { name: "상품 Q&A 조건 해제" }),
+    ).toBeInTheDocument();
+    expect(
+      await screen.findByRole("button", {
+        name: "빅버드 스킨케어 캠페인 조건 해제",
+      }),
+    ).toBeInTheDocument();
+    await user.click(
+      screen.getByRole("button", { name: "상품 Q&A 조건 해제" }),
+    );
+    await waitFor(() =>
+      expect(router.state.location.search).toBe("?campaignIdx=10"),
+    );
+    expect(
+      screen.queryByRole("button", { name: "상품 Q&A 조건 해제" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("캠페인 없이 문의 유형만 골라도 칩이 보이고, 인플루언서 문의 메뉴는 캠페인 Q&A 칩도 보인다", async () => {
+    const user = userEvent.setup();
+    const router = renderWorkspace("?source=campaignQna", "influencer");
+    expect(
+      await screen.findByRole("button", { name: "캠페인 Q&A 조건 해제" }),
+    ).toBeInTheDocument();
+    await user.click(
+      screen.getByRole("button", { name: "캠페인 Q&A 조건 해제" }),
+    );
+    await waitFor(() => expect(router.state.location.search).toBe(""));
+    expect(screen.queryByText(/조건 해제/)).not.toBeInTheDocument();
+  });
+
+  it("문의 유형이 전체이면 유형 칩이 없다", () => {
+    renderWorkspace("?campaignIdx=10");
+    expect(
+      screen.queryByRole("button", { name: /Q&A 조건 해제|문의 조건 해제/ }),
+    ).not.toBeInTheDocument();
   });
 
   it("조건이 없으면 칩이 없다", () => {

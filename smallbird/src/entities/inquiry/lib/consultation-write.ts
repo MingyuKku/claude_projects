@@ -7,6 +7,9 @@ export const LOCK_REFRESH_MS = 15_000;
 
 export type Fields = Record<string, unknown>;
 
+/** 실시간 상담을 요청하면 서버가 상담 문서에 남기는 auto 안내. 상담 문서 하나에 쌓인 상담을 나누는 데 씀. */
+export const REALTIME_REQUEST_MESSAGE = "실시간 상담을 요청했습니다.";
+
 /** 실시간 상담이 끝날 때 대화에 남는 안내. 서버·운영 앱·v2가 같은 문구를 보내므로 화면이 알아보는 데 씀. */
 export const REALTIME_CLOSED_MESSAGE = "실시간 상담이 종료되었습니다.";
 

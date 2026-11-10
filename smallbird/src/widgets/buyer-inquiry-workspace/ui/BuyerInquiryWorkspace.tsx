@@ -132,6 +132,13 @@ export function BuyerInquiryWorkspace({
     );
   }
 
+  function handleRemoveSource() {
+    setSearchParams((params) => {
+      params.delete("source");
+      return params;
+    });
+  }
+
   function handleRemoveCampaign() {
     setSearchParams((params) => {
       params.delete("campaignIdx");
@@ -239,10 +246,12 @@ export function BuyerInquiryWorkspace({
           </>
         }
         filters={
+          filters.sourceType === "ALL" &&
           filters.campaignIdx === undefined ? undefined : (
             <BuyerFilterChips
               filters={filters}
               threadUserIdx={threadUserIdx}
+              onRemoveSource={handleRemoveSource}
               onRemoveCampaign={handleRemoveCampaign}
               onRemoveInfluencer={handleRemoveInfluencer}
             />

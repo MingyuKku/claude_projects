@@ -18,6 +18,10 @@ interface Layout {
   paddingBottom?: number;
   // 셸의 키보드 열림 표식.
   isKeyboardOpen?: boolean;
+  // 펼치기 직전 접힌 입력창 박스 높이. 없으면 기본 142.
+  boxHeight?: number;
+  // 스크롤 영역(main)의 화면 위 끝. 헤더 높이에 해당. 없으면 0.
+  scrollportTop?: number;
 }
 
 function rect(box: { top?: number; bottom?: number }) {
@@ -55,13 +59,17 @@ function setup(layout: Layout) {
   vi.spyOn(form, "getBoundingClientRect").mockImplementation(() =>
     rect({ bottom: state.formBottom }),
   );
+  vi.spyOn(scrollport, "getBoundingClientRect").mockImplementation(() =>
+    rect({ top: state.scrollportTop ?? 0 }),
+  );
   Object.defineProperty(scrollport, "clientHeight", {
     get: () => state.scrollportHeight,
   });
   Object.defineProperty(form, "offsetHeight", { value: SLOT_HEIGHT });
-  Object.defineProperty(box, "offsetHeight", { value: SLOT_HEIGHT });
+  const boxHeight = layout.boxHeight ?? SLOT_HEIGHT;
+  Object.defineProperty(box, "offsetHeight", { value: boxHeight });
   Object.defineProperty(textarea, "offsetHeight", {
-    value: SLOT_HEIGHT - CHROME_HEIGHT,
+    value: boxHeight - CHROME_HEIGHT,
   });
 
   const { result, unmount } = renderHook(() =>
@@ -182,6 +190,56 @@ describe("useInlineExpand", () => {
         CHROME_HEIGHT + LINE_HEIGHT,
       );
       expect(result.current.limit?.maxTextareaHeight).toBe(LINE_HEIGHT);
+    });
+
+    describe("펼쳐도 거의 커지지 않는 낮은 화면(가로 모드)", () => {
+      // 보이는 영역 150 − 위 40 − 아래 16 = 94 < 접힌 박스 142라 펼쳐도 커질 여지가 없음.
+      const lowScreen = {
+        boundaryTop: 0,
+        scrollportHeight: 150,
+        paddingTop: 40,
+        paddingBottom: 16,
+        isKeyboardOpen: true,
+      };
+
+      it("위쪽 본문 여백을 빼지 않고 스크롤 영역 위 끝(헤더 아래)까지 키운다", () => {
+        // 폼 아래 끝 190 − 스크롤 영역 위 끝(헤더 높이) 56 = 134. 여백을 뺀 값은 94.
+        const { result } = setup({
+          ...lowScreen,
+          scrollportTop: 56,
+          formBottom: 190,
+        });
+        act(() => result.current.expand());
+        expect(result.current.metrics?.overlayHeight).toBe(134);
+        // 접힌 상태의 입력 영역 한도는 그대로 여백을 뺀 값.
+        expect(result.current.limit?.maxFieldHeight).toBe(94);
+      });
+
+      it("커질 여지가 한 줄 높이보다 작아도 같은 방식이다", () => {
+        // 보이는 영역 368이고 접힌 박스 360이면 8px(< 한 줄 20) 커질 뿐.
+        const { result } = setup({
+          boundaryTop: 0,
+          formBottom: 384,
+          scrollportHeight: 400,
+          isKeyboardOpen: true,
+          boxHeight: 360,
+        });
+        act(() => result.current.expand());
+        expect(result.current.metrics?.overlayHeight).toBe(384);
+      });
+
+      it("커질 여지가 한 줄 높이 이상이면 위쪽 여백을 그대로 둔다", () => {
+        // 368 − 340 = 28 ≥ 한 줄 20.
+        const { result } = setup({
+          boundaryTop: 0,
+          formBottom: 384,
+          scrollportHeight: 400,
+          isKeyboardOpen: true,
+          boxHeight: 340,
+        });
+        act(() => result.current.expand());
+        expect(result.current.metrics?.overlayHeight).toBe(368);
+      });
     });
 
     it("키보드 열림 배치로 바뀌면 다시 잰다", async () => {

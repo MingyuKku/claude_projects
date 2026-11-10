@@ -1,4 +1,4 @@
-import { render, screen, waitFor } from "@testing-library/react";
+import { fireEvent, render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { SWRConfig } from "swr";
 
@@ -137,6 +137,49 @@ describe("구매자 문의 답장 입력창", () => {
     );
   });
 
+  it("텍스트를 보내는 동안 새로 고른 파일은 지우지 않고 보낸 파일만 지운다", async () => {
+    const user = userEvent.setup();
+    mockTimeline();
+    let finishText: (value: unknown) => void = () => {};
+    let isTextPending = true;
+    vi.mocked(serverApiV3.post).mockImplementation((path: string) => {
+      if (path !== "/help/thread/message") {
+        return Promise.resolve({
+          result: true,
+          url: "u",
+          attachmentIdx: 1,
+          fileName: "a.png",
+          fileSize: 1,
+        });
+      }
+      // 첫 메시지(텍스트)만 보류하고, 첨부를 알리는 이후 호출은 바로 끝내 업로드 작업이 남지 않게 함
+      if (!isTextPending) {
+        return Promise.resolve({ result: true, threadIdx: 501 });
+      }
+      isTextPending = false;
+      return new Promise((resolve) => (finishText = resolve));
+    });
+    renderComposer();
+    await waitFor(() => expect(screen.getByRole("textbox")).toBeEnabled());
+    const input = () =>
+      document.querySelector<HTMLInputElement>("input[type=file]")!;
+    await user.type(screen.getByRole("textbox"), "첨부 드립니다");
+    await user.upload(input(), new File(["x"], "a.png", { type: "image/png" }));
+    await user.click(screen.getByRole("button", { name: "전송" }));
+    // 텍스트 전송이 끝나기 전에 다음 파일을 고름
+    await user.upload(input(), new File(["y"], "b.png", { type: "image/png" }));
+    finishText({ result: true, threadIdx: 501 });
+    // 보낸 a.png는 입력창에서 빠지고 b.png만 남음
+    await waitFor(() =>
+      expect(screen.queryByAltText("a.png")).not.toBeInTheDocument(),
+    );
+    expect(screen.getByAltText("b.png")).toBeInTheDocument();
+    // 올리던 첨부 작업이 끝날 때까지 기다려 다음 테스트에 남기지 않음
+    await waitFor(() =>
+      expect(useInquiryUploadStore.getState().jobs).toEqual({}),
+    );
+  });
+
   it("전송이 실패하면 입력을 지우지 않고 안내한다", async () => {
     const user = userEvent.setup();
     mockTimeline();
@@ -151,6 +194,30 @@ describe("구매자 문의 답장 입력창", () => {
       ),
     );
     expect(screen.getByRole("textbox")).toHaveValue("실패할 글");
+  });
+
+  it("3000자를 넘겨 들어온 입력은 3000자까지만 받고 그만큼만 보낸다", async () => {
+    mockTimeline();
+    vi.mocked(serverApiV3.post).mockResolvedValue({
+      result: true,
+      threadIdx: 501,
+    });
+    renderComposer();
+    await waitFor(() => expect(screen.getByRole("textbox")).toBeEnabled());
+    // 브라우저가 maxLength를 건너뛰는 입력(한글 조합 확정 등)을 흉내 냄.
+    fireEvent.change(screen.getByRole("textbox"), {
+      target: { value: "가".repeat(3010) },
+    });
+    expect(screen.getByRole("textbox")).toHaveValue("가".repeat(3000));
+    expect(screen.queryByText("3010")).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole("button", { name: "전송" }));
+    await waitFor(() =>
+      expect(serverApiV3.post).toHaveBeenCalledWith(
+        "/help/thread/message",
+        expect.objectContaining({ body: "가".repeat(3000) }),
+        expect.anything(),
+      ),
+    );
   });
 
   it("쓰기를 꺼 두면 입력창은 보이지만 비활성이라 보낼 수 없다", async () => {

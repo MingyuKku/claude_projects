@@ -83,6 +83,8 @@
     "unread": "Unread message"
   },
   "realtime": {
+    "started": "Live chat started.",
+    "ended": "Live chat ended.",
     "end": "End chat",
     "endFailed": "Couldn't end the chat. Please try again.",
     "otherDevice": "Another agent is handling this inquiry. Please try again after it ends."

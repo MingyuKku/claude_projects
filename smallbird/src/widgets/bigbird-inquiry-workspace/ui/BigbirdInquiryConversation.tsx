@@ -160,8 +160,8 @@ export function BigbirdInquiryConversation({
     inquiry.threadIdx,
   );
   // endReason은 종료·전환 때마다 덮어써지고 새 요청 뒤에도 남을 수 있어(마켓 실측 2026-11-04) 요청 시각이 비었을 때만 인정하고,
-  // 실패 뒤에 상담원이 일반 메시지를 보내면 걷음. 규칙은 isMatchFailureShown.
-  const isMatchFailed = isMatchFailureShown(endedConsultation);
+  // 실패 뒤에 상담원이 일반 메시지를 보내거나 광고주가 일반 문의를 보내면 걷음. 규칙은 isMatchFailureShown.
+  const isMatchFailed = isMatchFailureShown(endedConsultation, messages);
   const isFailedCardVisible =
     (isFailed && !isFailedCardHidden) || isMatchFailed;
   // "완료된 상담" 안내는 마지막 상담이 실시간이었고 그게 끝난 경우에만 보임: 실시간이 끝난 스레드이거나, 서버가 실시간을 끝내며
@@ -225,7 +225,11 @@ export function BigbirdInquiryConversation({
     toast.success(t("copied"));
   }
 
-  function renderMessage(message: InquiryMessageViewModel) {
+  // `attachments`는 텍스트와 함께 보낸 파일 묶음(말풍선 아래에 붙음). 텍스트 메시지의 수정·삭제 툴바를 그대로 씀.
+  function renderMessage(
+    message: InquiryMessageViewModel,
+    attachments?: ReactNode,
+  ) {
     const side = message.isMine ? "me" : "other";
     const name = message.isMine ? myName : t("bigbirdManager");
     // 서버의 상담 종료 안내는 말풍선이 아니라 가운데 구분선(마켓·인플루언서 시안과 같음).
@@ -278,6 +282,7 @@ export function BigbirdInquiryConversation({
           !inquiry.isFinished
         }
         onChanged={() => onChangedMessage?.()}
+        attachments={attachments}
       />
     );
   }
@@ -437,6 +442,9 @@ export function BigbirdInquiryConversation({
                 const isNewDay =
                   !previousCreatedAt ||
                   formatDividerDate(previousCreatedAt) !== day;
+                // 내 텍스트+첨부 묶음의 앞 텍스트. 텍스트만 있는 메시지와 같은 수정·삭제 툴바를 붙임(첨부는 그대로).
+                const groupedText =
+                  row.type === "files" && row.isMine ? row.text : null;
                 return (
                   <li
                     key={row.id}
@@ -458,6 +466,12 @@ export function BigbirdInquiryConversation({
                         time={
                           row.text
                             ? formatMessageTime(row.text.createdAt)
+                            : undefined
+                        }
+                        renderText={
+                          groupedText
+                            ? (attachments) =>
+                                renderMessage(groupedText, attachments)
                             : undefined
                         }
                       />

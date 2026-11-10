@@ -16,6 +16,8 @@ interface ExpandMetrics {
   slotHeight: number;
   /** 펼친 입력창 높이. 입력창 아래 끝에서 위로, 사용자에게 보이는 영역 안쪽 위까지. */
   overlayHeight: number;
+  /** 펼치기 직전 접힌 입력창 박스 높이. 펼쳐도 더 커질 수 있는지 가르는 기준. 펼친 동안에도 접힌 때의 값을 유지함. */
+  collapsedFieldHeight: number;
   /** 접는 중. 전환이 끝날 때까지 입력창은 덮은 채로 아래 끝을 고정하고 줄어듦. */
   isClosing: boolean;
 }
@@ -86,14 +88,34 @@ function measureOverlayHeight(
   return Math.max(available, slotHeight);
 }
 
+// 키보드가 열린 동안 접힌 입력창이 이미 보이는 영역을 거의 채워 펼쳐도 한 줄 높이 미만만 커질 때(가로 모드처럼 보이는 영역이 낮을 때)는
+// 펼친 모습이 접힌 모습과 거의 같아 의미가 없으므로, 본문 위쪽 여백(시안의 펼친 입력창 위 여백)을 빼지 않고 헤더 아래 끝까지 키움(2026-11-10 사용자 결정).
+// 키보드가 열린 동안 폼은 본문 아래에 sticky로 고정되어 아래 끝이 늘 같은 선이므로 스크롤 영역 위 끝까지의 거리가 스크롤과 무관하게 일정함.
+// 키보드가 없을 때는 폼 위치가 스크롤에 따라 달라 이 높이가 어긋나므로 적용하지 않음.
+function measureKeyboardExpandedHeight(
+  form: HTMLElement,
+  scrollport: HTMLElement | null,
+  maxFieldHeight: number,
+  collapsedFieldHeight: number,
+  lineHeight: number,
+) {
+  if (maxFieldHeight - collapsedFieldHeight >= lineHeight)
+    return maxFieldHeight;
+  const flushHeight =
+    form.getBoundingClientRect().bottom -
+    (scrollport?.getBoundingClientRect().top ?? 0);
+  return Math.max(maxFieldHeight, flushHeight);
+}
+
 // 키보드가 열린 동안 입력창은 본문 아래에 고정되고 본문만 스크롤되므로(HomeContent), 접혔든 펼쳤든 보이는 영역 안에 들어와야 함.
-// 펼친 높이는 보이는 영역 전체. 가로 모드처럼 보이는 영역이 낮아도 입력 1줄은 남김(그때만 보이는 영역을 넘음, 2026-11-02 사용자 결정).
+// 펼친 높이는 보이는 영역 전체(위쪽 여백 제외). 가로 모드처럼 보이는 영역이 낮아도 입력 1줄은 남김(그때만 보이는 영역을 넘음, 2026-11-02 사용자 결정).
 // 버튼 줄·패딩 높이는 고정값 대신 입력창 박스와 입력 영역의 높이 차로 잼.
 function measureFieldLimit(
   form: HTMLFormElement,
   boundary: HTMLElement | null,
   scrollport: HTMLElement | null,
   slotHeight: number,
+  collapsedFieldHeight: number,
 ) {
   const [, box, textarea] = findHeightTargets(form);
   if (!box || !textarea) return undefined;
@@ -106,7 +128,13 @@ function measureFieldLimit(
     chromeHeight + lineHeight,
   );
   const expandedHeight = form.closest(KEYBOARD_OPEN_SELECTOR)
-    ? maxFieldHeight
+    ? measureKeyboardExpandedHeight(
+        form,
+        scrollport,
+        maxFieldHeight,
+        collapsedFieldHeight,
+        lineHeight,
+      )
     : measureOverlayHeight(form, boundary, scrollport, slotHeight);
   const limit: FieldLimit = {
     maxFieldHeight,
@@ -137,6 +165,7 @@ export function useInlineExpand({ formRef }: UseInlineExpandOptions) {
   const isExpanded = phase === "open";
 
   const slotHeight = metrics?.slotHeight;
+  const collapsedFieldHeight = metrics?.collapsedFieldHeight;
 
   useEffect(() => {
     const form = formRef.current;
@@ -153,6 +182,7 @@ export function useInlineExpand({ formRef }: UseInlineExpandOptions) {
         boundary,
         scrollport,
         slotHeight ?? form.offsetHeight,
+        collapsedFieldHeight ?? box?.offsetHeight ?? 0,
       );
       if (!measured) return;
       const { limit: nextLimit, expandedHeight } = measured;
@@ -184,7 +214,7 @@ export function useInlineExpand({ formRef }: UseInlineExpandOptions) {
       resizeObserver?.disconnect();
       mutationObserver.disconnect();
     };
-  }, [formRef, slotHeight]);
+  }, [formRef, slotHeight, collapsedFieldHeight]);
 
   function expand() {
     // 접는 중에 다시 펼치면 자리 높이를 새로 재지 않고(폼이 줄어드는 중) 그대로 이어 감.
@@ -197,15 +227,19 @@ export function useInlineExpand({ formRef }: UseInlineExpandOptions) {
     if (!form) return;
     captureExpandHeights(form);
     const nextSlotHeight = form.offsetHeight;
+    const nextCollapsedFieldHeight =
+      findHeightTargets(form)[1]?.offsetHeight ?? nextSlotHeight;
     const measured = measureFieldLimit(
       form,
       findBoundary(form),
       findScrollport(form),
       nextSlotHeight,
+      nextCollapsedFieldHeight,
     );
     setMetrics({
       slotHeight: nextSlotHeight,
       overlayHeight: measured?.expandedHeight ?? nextSlotHeight,
+      collapsedFieldHeight: nextCollapsedFieldHeight,
       isClosing: false,
     });
   }

@@ -1,4 +1,4 @@
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter } from "react-router";
 import { SWRConfig } from "swr";
@@ -11,9 +11,10 @@ import type { BigbirdInquiryViewModel } from "@/entities/inquiry";
 
 // 상담 문서 구독은 네트워크 경계라 응답을 주지 않는 것으로 대신함(대화 목록은 로딩 상태).
 const get = vi.hoisted(() => vi.fn());
+const del = vi.hoisted(() => vi.fn());
 vi.mock("@/shared/api", () => ({
   getFirestoreDb: async () => ({}),
-  serverApiV3: { get },
+  serverApiV3: { get, delete: del },
   isApiError: () => false,
 }));
 vi.mock("firebase/firestore", () => ({
@@ -55,6 +56,7 @@ function inquiry(
 function renderConversation(
   value: BigbirdInquiryViewModel,
   onClickRealtime?: () => void,
+  onChangedMessage?: () => void,
 ) {
   render(
     <SWRConfig value={{ provider: () => new Map() }}>
@@ -64,6 +66,7 @@ function renderConversation(
           myName="김빅링크"
           threadUserIdx={5971}
           onClickRealtime={onClickRealtime}
+          onChangedMessage={onChangedMessage}
         />
       </MemoryRouter>
     </SWRConfig>,
@@ -305,6 +308,98 @@ describe("첨부 메시지", () => {
     );
     await user.click(screen.getByRole("button", { name: "닫기" }));
     expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+});
+
+describe("텍스트+첨부 묶음의 수정·삭제", () => {
+  const base = {
+    isMine: true,
+    isDeleted: false,
+    isRead: false,
+    isEdited: false,
+    senderId: null,
+    campaign: null,
+  };
+  const messages = [
+    {
+      ...base,
+      id: 10,
+      kind: "text" as const,
+      body: "첨부 드립니다",
+      createdAt: new Date("2026-10-19T10:00:00"),
+      attachment: null,
+    },
+    ...[11, 12].map((id) => ({
+      ...base,
+      id,
+      kind: "image" as const,
+      body: `https://cdn/${id}.png`,
+      createdAt: new Date("2026-10-19T10:00:03"),
+      attachment: {
+        attachmentIdx: id,
+        fileName: `${id}.png`,
+        fileSize: 1,
+        fileType: "image",
+      },
+    })),
+  ];
+
+  beforeEach(() => {
+    // jsdom에는 matchMedia가 없어 터치 기기(hover 없음)로 흉내 냄. 툴바가 말풍선 탭으로 열림.
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn().mockImplementation((query: string) => ({
+        matches: query === "(hover: none)",
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
+    );
+    get.mockReturnValue(new Promise(() => {}));
+    del.mockReset();
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("묶인 내 텍스트에 수정·삭제 툴바가 뜨고 삭제하면 그 텍스트 메시지만 삭제를 요청한다", async () => {
+    const user = userEvent.setup();
+    del.mockResolvedValue({ result: true });
+    const onChangedMessage = vi.fn();
+    renderConversation(
+      inquiry({ isRealtime: false, realtimePhase: null, messages }),
+      undefined,
+      onChangedMessage,
+    );
+    await user.click(screen.getByText("첨부 드립니다"));
+    expect(await screen.findByRole("button", { name: "수정" })).toBeVisible();
+    await user.click(screen.getByRole("button", { name: "삭제" }));
+    await user.click(
+      within(screen.getByRole("alertdialog")).getByRole("button", {
+        name: "삭제",
+      }),
+    );
+    await waitFor(() =>
+      expect(del).toHaveBeenCalledWith("/help/thread/message/10"),
+    );
+    expect(del).toHaveBeenCalledOnce();
+    expect(onChangedMessage).toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "11.png" })).toBeInTheDocument();
+  });
+
+  it("종료된 문의에서는 툴바가 없다", async () => {
+    const user = userEvent.setup();
+    renderConversation(
+      inquiry({
+        isRealtime: false,
+        isFinished: true,
+        realtimePhase: null,
+        messages,
+      }),
+      undefined,
+      vi.fn(),
+    );
+    await user.click(screen.getByText("첨부 드립니다"));
+    expect(
+      screen.queryByRole("button", { name: "삭제" }),
+    ).not.toBeInTheDocument();
   });
 });
 

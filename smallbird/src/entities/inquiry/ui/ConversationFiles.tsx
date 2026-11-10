@@ -10,6 +10,7 @@ import { getAttachmentDownloadUrl } from "../api/inquiry-api";
 import { formatFileSize } from "../lib/attachment-rules";
 
 import type { ConversationRow } from "../lib/group-attachments";
+import type { ReactNode } from "react";
 
 type FilesRow = Extract<ConversationRow, { type: "files" }>;
 
@@ -23,6 +24,11 @@ interface ConversationFilesProps {
   time?: string;
   /** 말풍선 크기. TAB은 작은 형태(아바타 32·이름 한 줄)를 씀(Figma 11315:50501). 기본 md. */
   size?: "sm" | "md";
+  /**
+   * 앞 텍스트 말풍선을 바깥에서 그릴 때(수정·삭제 툴바 등) 첨부 묶음을 받아 메시지 전체를 돌려줌.
+   * 없거나 앞 텍스트가 없으면 툴바 없는 일반 말풍선으로 그림.
+   */
+  renderText?: (attachments: ReactNode) => ReactNode;
 }
 
 /**
@@ -36,6 +42,7 @@ export function ConversationFiles({
   avatarClassName,
   time,
   size,
+  renderText,
 }: ConversationFilesProps) {
   const { t: tCommon } = useTranslation();
   const [viewerIndex, setViewerIndex] = useState<number | null>(null);
@@ -63,86 +70,90 @@ export function ConversationFiles({
       : [],
   );
 
+  const attachments = (
+    <div
+      className={cn(
+        "flex w-full flex-col gap-1",
+        row.isMine ? "items-end" : "items-start",
+      )}
+    >
+      {media.length > 0 && (
+        <ul
+          className={cn(
+            "grid w-full grid-cols-[repeat(auto-fit,80px)] gap-1",
+            row.isMine ? "justify-end" : "justify-start",
+          )}
+        >
+          {media.map((message, index) => {
+            const fileName = message.attachment?.fileName ?? "";
+            return (
+              <li key={message.id}>
+                <button
+                  type="button"
+                  aria-label={fileName}
+                  onClick={() => setViewerIndex(index)}
+                  className="block rounded-md outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
+                >
+                  <FileThumbnail
+                    type={message.kind === "video" ? "video" : "image"}
+                    src={message.kind === "video" ? undefined : message.body}
+                    videoSrc={
+                      message.kind === "video" ? message.body : undefined
+                    }
+                    alt={fileName}
+                  />
+                </button>
+              </li>
+            );
+          })}
+        </ul>
+      )}
+      {documents.length > 0 && (
+        <ul className="flex flex-col gap-1">
+          {documents.map(({ id, attachment }) => {
+            if (!attachment) return null;
+            const fileName = attachment.fileName ?? "";
+            return (
+              <li key={id}>
+                {/* 문서는 받기 경로가 이미지와 같고(type=image), 이 경로만 파일 이름을 붙여 내려줌 */}
+                <FileItem
+                  className="w-47.5"
+                  name={fileName}
+                  sizeLabel={
+                    attachment.fileSize === null
+                      ? ""
+                      : formatFileSize(attachment.fileSize)
+                  }
+                  downloadLabel={tCommon("attachment.download")}
+                  downloadHref={getAttachmentDownloadUrl(
+                    "image",
+                    attachment.attachmentIdx,
+                  )}
+                />
+              </li>
+            );
+          })}
+        </ul>
+      )}
+    </div>
+  );
+
   return (
     <>
-      <ChatMessage
-        name={name}
-        avatarSrc={avatarSrc}
-        avatarClassName={avatarClassName}
-        size={size}
-        side={row.isMine ? "me" : "other"}
-        message={row.text?.body}
-        time={time}
-        attachments={
-          <div
-            className={cn(
-              "flex w-full flex-col gap-1",
-              row.isMine ? "items-end" : "items-start",
-            )}
-          >
-            {media.length > 0 && (
-              <ul
-                className={cn(
-                  "grid w-full grid-cols-[repeat(auto-fit,80px)] gap-1",
-                  row.isMine ? "justify-end" : "justify-start",
-                )}
-              >
-                {media.map((message, index) => {
-                  const fileName = message.attachment?.fileName ?? "";
-                  return (
-                    <li key={message.id}>
-                      <button
-                        type="button"
-                        aria-label={fileName}
-                        onClick={() => setViewerIndex(index)}
-                        className="block rounded-md outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2"
-                      >
-                        <FileThumbnail
-                          type={message.kind === "video" ? "video" : "image"}
-                          src={
-                            message.kind === "video" ? undefined : message.body
-                          }
-                          videoSrc={
-                            message.kind === "video" ? message.body : undefined
-                          }
-                          alt={fileName}
-                        />
-                      </button>
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-            {documents.length > 0 && (
-              <ul className="flex flex-col gap-1">
-                {documents.map(({ id, attachment }) => {
-                  if (!attachment) return null;
-                  const fileName = attachment.fileName ?? "";
-                  return (
-                    <li key={id}>
-                      {/* 문서는 받기 경로가 이미지와 같고(type=image), 이 경로만 파일 이름을 붙여 내려줌 */}
-                      <FileItem
-                        className="w-47.5"
-                        name={fileName}
-                        sizeLabel={
-                          attachment.fileSize === null
-                            ? ""
-                            : formatFileSize(attachment.fileSize)
-                        }
-                        downloadLabel={tCommon("attachment.download")}
-                        downloadHref={getAttachmentDownloadUrl(
-                          "image",
-                          attachment.attachmentIdx,
-                        )}
-                      />
-                    </li>
-                  );
-                })}
-              </ul>
-            )}
-          </div>
-        }
-      />
+      {renderText && row.text ? (
+        renderText(attachments)
+      ) : (
+        <ChatMessage
+          name={name}
+          avatarSrc={avatarSrc}
+          avatarClassName={avatarClassName}
+          size={size}
+          side={row.isMine ? "me" : "other"}
+          message={row.text?.body}
+          time={time}
+          attachments={attachments}
+        />
+      )}
       <MediaViewer
         items={items}
         index={viewerIndex !== null && items.length > 0 ? viewerIndex : null}

@@ -71,8 +71,8 @@ export function useInquirySummaryChanges(
  * 구매자 문의는 Firestore 문서가 구매자 계정(`threadUserIdx/{구매자}`)마다 있어 광고주 summary로는 변경을 알 수 없음.
  * 목록에 보이는 구매자 계정 문서를 하나씩 구독하고, 메시지가 오가며 문서가 바뀌면 `onChange`를 부름(REST 재조회 신호).
  * 목록이 바뀌어도 이미 구독한 계정은 다시 구독하지 않아 읽기는 계정당 처음 1회 + 변경 때만 듦.
- * ponytail: 목록에 아직 없는 새 구매자의 첫 문의는 신호가 없어 화면 포커스·새로고침 때 보임. 바로 보여야 하면
- * 백엔드가 광고주 계정 아래(summary 등)에 신호를 써야 함.
+ * ponytail: 목록에 아직 없는 새 구매자의 첫 문의는 이 구독으로는 신호가 없어 목록 변경 확인(use-inquiry-updates 폴링,
+ * 10초 주기)으로 보임. 바로 보여야 하면 백엔드가 광고주 계정 아래(summary 등)에 신호를 써야 함.
  */
 export function useBuyerAccountChanges(
   threadUserIdxs: readonly number[],

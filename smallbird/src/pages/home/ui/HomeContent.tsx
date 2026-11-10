@@ -1,5 +1,6 @@
 import { InfluencerSearchForm } from "@/features/search-influencer";
 import heroBackground from "@/shared/assets/img/home/hero-bg.jpg";
+import { WavyBackground } from "@/shared/components/wavy-background";
 import { useTranslation } from "@/shared/i18n";
 
 import { FeatureCards } from "./FeatureCards";
@@ -48,6 +49,7 @@ export function HomeContent({ session }: HomeContentProps) {
           alt=""
           className="hidden size-full object-cover opacity-30 tablet:block"
         />
+        <WavyBackground />
       </div>
       <section className="relative flex w-full max-w-158 flex-col items-center gap-5 in-data-[keyboard=open]:mt-auto desktop:max-w-174.5">
         <HeroAvatars className="hidden tablet:block" />

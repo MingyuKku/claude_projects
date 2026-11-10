@@ -43,6 +43,8 @@ interface BuyerInquiryPanelsProps {
   threadUserIdx?: number;
   /** 상담 종료처럼 목록의 상태가 바뀐 뒤 목록을 다시 받을 때 부름. */
   onChangeStatus?: () => void;
+  /** 안 읽은 문의를 열어 읽음 처리된 뒤 목록을 다시 받을 때 부름(목록의 파란 점 갱신). */
+  onRead?: () => void;
 }
 
 /** 문의 대화(구매자·인플루언서 문의 스레드, 상품·캠페인 Q&A)와 상세 정보 패널. */
@@ -50,6 +52,7 @@ export function BuyerInquiryPanels({
   inquiry,
   threadUserIdx,
   onChangeStatus,
+  onRead,
 }: BuyerInquiryPanelsProps) {
   const { t } = useTranslation("widgets/buyer-inquiry-workspace");
   const navigate = useNavigate();
@@ -144,7 +147,11 @@ export function BuyerInquiryPanels({
         className={cn("min-h-0 flex-1 bg-muted", SCROLL_VIEWPORT_FIX)}
       >
         <div className="flex min-h-full flex-col p-4 tablet:p-5">
-          <BuyerConversation inquiry={inquiry} isOtherDevice={isOtherDevice} />
+          <BuyerConversation
+            inquiry={inquiry}
+            isOtherDevice={isOtherDevice}
+            onRead={onRead}
+          />
         </div>
       </ScrollArea>
       {/* key로 문의마다 입력 중인 글·첨부를 분리함. 없으면 A에 쓰던 내용이 B로 오발송될 수 있음. */}

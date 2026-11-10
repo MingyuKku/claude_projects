@@ -1,4 +1,4 @@
-import { renderHook, waitFor } from "@testing-library/react";
+import { act, renderHook, waitFor } from "@testing-library/react";
 import { SWRConfig } from "swr";
 
 import { serverApiV3 } from "@/shared/api";
@@ -89,5 +89,59 @@ describe("useBuyerInquiries", () => {
         params: expect.objectContaining({ sourceType: "ALL" }),
       }),
     );
+  });
+  it("변경 확인에서 바뀐 게 있다고 하면 목록을 한 번 다시 받고, 없다고 하면 받지 않는다", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    try {
+      const hasUpdatesAnswers = [false, true, false];
+      vi.mocked(serverApiV3.get).mockImplementation((url) =>
+        Promise.resolve(
+          url === "/help/influencer-inquiry/has-updates"
+            ? {
+                result: true,
+                hasUpdates: hasUpdatesAnswers.shift() ?? false,
+                checkedAt: "2026-11-09 14:00:10",
+              }
+            : {
+                result: true,
+                list: [row(4, "INFLUENCER_QUESTION")],
+                pagingInfo: { page: 1, size: 20, totalCount: 1, totalPage: 1 },
+              },
+        ),
+      );
+      const listCalls = () =>
+        vi
+          .mocked(serverApiV3.get)
+          .mock.calls.filter(([url]) => url === "/help/influencer-inquiry")
+          .length;
+      const checkCalls = () =>
+        vi
+          .mocked(serverApiV3.get)
+          .mock.calls.filter(
+            ([url]) => url === "/help/influencer-inquiry/has-updates",
+          ).length;
+      const { result } = renderHook(
+        () => useBuyerInquiries("all", { sourceType: "ALL" }, ["influencer"]),
+        { wrapper },
+      );
+      await waitFor(() => expect(result.current.inquiries).toHaveLength(1));
+      expect(listCalls()).toBe(1);
+
+      // 첫 확인: 바뀐 게 없음 → 목록을 다시 받지 않음
+      await act(() => vi.advanceTimersByTimeAsync(10_000));
+      expect(checkCalls()).toBe(1);
+      expect(listCalls()).toBe(1);
+      // 두 번째 확인: 바뀐 게 있음 → 합침 0.3초 뒤 목록을 한 번 다시 받음
+      await act(() => vi.advanceTimersByTimeAsync(10_000));
+      expect(checkCalls()).toBe(2);
+      await act(() => vi.advanceTimersByTimeAsync(300));
+      await waitFor(() => expect(listCalls()).toBe(2));
+      // 세 번째 확인: 바뀐 게 없음 → 그대로
+      await act(() => vi.advanceTimersByTimeAsync(10_000));
+      expect(checkCalls()).toBe(3);
+      expect(listCalls()).toBe(2);
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

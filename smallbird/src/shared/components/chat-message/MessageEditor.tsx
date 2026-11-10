@@ -1,6 +1,7 @@
 import { cva } from "class-variance-authority";
 import { Paperclip } from "lucide-react";
 
+import { clampToMaxLength } from "@/shared/components/text-field";
 import { cn } from "@/shared/lib/utils";
 import { Avatar, AvatarImage, AvatarPlaceholder } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
@@ -67,7 +68,19 @@ export function MessageEditor({
               aria-label={inputLabel}
               value={value}
               maxLength={maxLength}
-              onChange={(event) => onChangeValue(event.target.value)}
+              // 브라우저의 maxLength가 건너뛰는 입력도 넘지 못하게 함. 한글 조합 중에는 조합이 끝날 때 자름.
+              onChange={(event) =>
+                onChangeValue(
+                  (event.nativeEvent as InputEvent).isComposing
+                    ? event.target.value
+                    : clampToMaxLength(event.target.value, maxLength),
+                )
+              }
+              onCompositionEnd={(event) =>
+                onChangeValue(
+                  clampToMaxLength(event.currentTarget.value, maxLength),
+                )
+              }
               className="field-sizing-content resize-none bg-transparent text-sm leading-5 text-foreground outline-none"
             />
           </div>

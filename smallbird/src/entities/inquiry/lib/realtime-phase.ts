@@ -48,6 +48,9 @@ export function isConsultationConnected(
  * 시각 뒤에 운영 상담원이 보낸 일반 메시지(auto·광고주 메시지 아님)가 아직 없을 때. 실패 시각은 `waitDeadline`, 없으면 서버
  * 자동 안내(auto) 중 마지막 메시지의 시각. 둘 다 없으면 시각을 알 수 없어 박스를 유지함. 상담 문서 메시지에는 삭제 표시가 없어
  * 삭제 여부는 보지 못함.
+ *
+ * 일반 문의로 이어진 뒤 광고주가 보낸 메시지는 상담 문서가 아니라 REST 대화에 있어 `conversation`으로 받음. 실패 시각 뒤에
+ * 광고주가 직접 보낸 메시지(캠페인 카드 제외)가 있으면 이미 일반 문의가 시작된 것이라 박스를 걷음.
  */
 export function isMatchFailureShown(
   consultation:
@@ -56,6 +59,10 @@ export function isMatchFailureShown(
         "endReason" | "matchRequestedAt" | "waitDeadline" | "messages"
       >
     | undefined,
+  conversation: Pick<
+    BigbirdInquiryViewModel["messages"][number],
+    "isMine" | "campaign" | "createdAt"
+  >[] = [],
 ): boolean {
   if (
     !consultation ||
@@ -67,6 +74,16 @@ export function isMatchFailureShown(
     consultation.waitDeadline ??
     consultation.messages.filter((message) => message.auto).at(-1)?.created;
   if (!failedAt) return true;
+  const failedAtTime = parseWriteTime(failedAt);
+  const hasAdvertiserMessage =
+    failedAtTime !== null &&
+    conversation.some(
+      (message) =>
+        message.isMine &&
+        !message.campaign &&
+        message.createdAt.getTime() > failedAtTime,
+    );
+  if (hasAdvertiserMessage) return false;
   return !consultation.messages.some(
     (message) =>
       !message.auto &&
