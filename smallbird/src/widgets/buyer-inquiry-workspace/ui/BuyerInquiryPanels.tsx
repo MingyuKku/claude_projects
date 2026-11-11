@@ -144,6 +144,7 @@ export function BuyerInquiryPanels({
       </header>
       {/* Figma Conversation Area: MO 16px(7817:143173), TAB·PC 20px. */}
       <ScrollArea
+        type="auto"
         className={cn("min-h-0 flex-1 bg-muted", SCROLL_VIEWPORT_FIX)}
       >
         <div className="flex min-h-full flex-col p-4 tablet:p-5">
@@ -187,7 +188,10 @@ export function BuyerInquiryPanels({
           </Button>
         )}
       </header>
-      <ScrollArea className={cn("min-h-0 flex-1", SCROLL_VIEWPORT_FIX)}>
+      <ScrollArea
+        type="auto"
+        className={cn("min-h-0 flex-1", SCROLL_VIEWPORT_FIX)}
+      >
         <div className="flex min-h-full flex-col">
           <BuyerInquiryDetailPanel
             inquiry={inquiry}

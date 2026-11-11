@@ -158,6 +158,17 @@ describe("UsageTable", () => {
     expect(onClickDetail).toHaveBeenCalledWith(refund);
   });
 
+  it('값이 없는 셀은 빈칸 대신 "-"로 보인다', () => {
+    render(
+      <UsageTable records={[refund]} activeId={null} onClickDetail={vi.fn()} />,
+    );
+
+    const row = screen.getAllByRole("row")[1];
+    if (!row) throw new Error("행이 없다");
+    // 구분·일자·캠페인 명·내역·금액·잔액·상세 보기 중 잔액이 null인 환급 건.
+    expect(within(row).getAllByRole("cell")[5]?.textContent).toBe("-");
+  });
+
   it("emptyContent가 있으면 행 대신 그린다", () => {
     render(
       <UsageTable
@@ -173,13 +184,13 @@ describe("UsageTable", () => {
 });
 
 describe("UsageCardList", () => {
-  it("구분·일자·캠페인 명·내역·금액·잔액 6행이고 값이 없는 항목도 행은 두고 값만 비운다", () => {
+  it('구분·일자·캠페인 명·내역·금액·잔액 6행이고 값이 없는 항목도 행은 두고 값은 "-"로 보인다', () => {
     render(<UsageCardList records={[refund]} onClickDetail={vi.fn()} />);
 
     expect(screen.getAllByRole("term").map((term) => term.textContent)).toEqual(
       ["구분", "일자", "캠페인 명", "내역", "금액", "잔액"],
     );
-    expect(screen.getByText("잔액").nextElementSibling?.textContent).toBe("");
+    expect(screen.getByText("잔액").nextElementSibling?.textContent).toBe("-");
   });
 
   it("상세 보기 버튼을 누르면 그 카드로 알린다", async () => {

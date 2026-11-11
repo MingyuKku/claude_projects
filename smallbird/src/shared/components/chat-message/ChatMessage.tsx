@@ -155,8 +155,9 @@ export function ChatMessage({
             {nameText}
           </div>
           {bubbleWithToolbar}
+          {/* 첨부는 말풍선과 같은 묶음 안에 둠. 바깥 gap-3 에 두면 시안(8)보다 4px 벌어짐. */}
+          {attachments}
         </div>
-        {attachments}
       </div>
     );
   }

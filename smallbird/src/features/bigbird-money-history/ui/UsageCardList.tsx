@@ -1,5 +1,6 @@
 import { FullTextHint } from "@/shared/components/full-text-hint";
 import { useTranslation } from "@/shared/i18n";
+import { EMPTY_VALUE, orEmptyValue } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 
 import { useMoneyFormat } from "../lib/use-money-format";
@@ -16,7 +17,7 @@ interface UsageCardListProps {
 }
 
 // 캠페인 유형·캠페인 코드는 상세 보기에만 있음. 캠페인 명 옆에 40px 썸네일(`mainImageUrl`, 없으면 기본 이미지).
-// 값이 없는 항목도 행을 숨기지 않고 값만 비워 둠(스펙 §3). TAB은 카드 사이 12px로 2열이고 같은 줄 카드는 높이를 맞춤.
+// 값이 없는 항목도 행을 숨기지 않고 값은 "-"로 보임(스펙 §3). TAB은 카드 사이 12px로 2열이고 같은 줄 카드는 높이를 맞춤.
 export function UsageCardList({ records, onClickDetail }: UsageCardListProps) {
   const { t } = useTranslation("features/bigbird-money-history");
   const { formatDateTime, formatWon } = useMoneyFormat();
@@ -29,10 +30,20 @@ export function UsageCardList({ records, onClickDetail }: UsageCardListProps) {
     >
       {records.map((record) => {
         const rows = [
-          { key: "type", value: <UsageTypeBadge record={record} /> },
+          {
+            key: "type",
+            value:
+              record.type || record.typeText ? (
+                <UsageTypeBadge record={record} />
+              ) : (
+                EMPTY_VALUE
+              ),
+          },
           {
             key: "date",
-            value: formatDateTime(record.usedAt, record.usedAtText),
+            value: orEmptyValue(
+              formatDateTime(record.usedAt, record.usedAtText),
+            ),
           },
           {
             key: "campaignName",
@@ -40,16 +51,27 @@ export function UsageCardList({ records, onClickDetail }: UsageCardListProps) {
               <div className="flex min-w-0 items-center gap-3">
                 <CampaignThumbnail record={record} />
                 <FullTextHint
-                  text={record.campaignName}
+                  text={orEmptyValue(record.campaignName)}
                   lines={2}
                   className="min-w-0 flex-1"
                 />
               </div>
             ),
           },
-          { key: "usage", value: labels.usageDetail(record) },
-          { key: "amount", value: <UsageAmount amount={record.amount} /> },
-          { key: "remaining", value: formatWon(record.remainingAmount) },
+          { key: "usage", value: orEmptyValue(labels.usageDetail(record)) },
+          {
+            key: "amount",
+            value:
+              record.amount === null ? (
+                EMPTY_VALUE
+              ) : (
+                <UsageAmount amount={record.amount} />
+              ),
+          },
+          {
+            key: "remaining",
+            value: orEmptyValue(formatWon(record.remainingAmount)),
+          },
         ] as const;
 
         return (

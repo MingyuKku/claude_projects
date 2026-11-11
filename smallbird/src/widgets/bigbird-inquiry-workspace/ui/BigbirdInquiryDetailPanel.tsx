@@ -69,7 +69,10 @@ export function BigbirdInquiryDetailPanel({
           className="flex-1"
         />
       )}
-      <ScrollArea className="min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:block!">
+      <ScrollArea
+        type="auto"
+        className="min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:block!"
+      >
         {campaign && (
           <section className="flex flex-col gap-3 p-4 tablet:p-5">
             <h3 className="text-sm leading-none font-semibold">

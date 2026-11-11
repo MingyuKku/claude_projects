@@ -95,10 +95,8 @@ export function MyPageMoneyPage() {
   const filterScreen = useFilterScreen("desktop");
   const isTabletFilter = tab === "usage" && filterScreen.isOpen;
 
-  // 충전/출금 탭 이름은 PC "충전/출금 내역", TAB·MO "충전 내역"(시안 그대로, 스펙 §3).
   function tabLabel(moneyTab: MoneyTab) {
-    if (moneyTab === "usage") return t("tabs.usage");
-    return layout === "desktop" ? t("tabs.charge") : t("tabs.chargeShort");
+    return moneyTab === "usage" ? t("tabs.usage") : t("tabs.charge");
   }
 
   // 충전·출금 접수 뒤 확인: 새 건이 있는 충전/출금 내역(MO 세그먼트 "상세 내역")으로 보냄.
@@ -179,9 +177,8 @@ export function MyPageMoneyPage() {
   const showsSummaryAboveTabs =
     layout === "desktop" ||
     (layout === "tablet" && !isPanelOpen && !isTabletFilter);
-  // TAB의 풀페이지 화면(거래·사용 상세, 충전, 출금, 필터)은 모달처럼 상단 탭 줄 없이 본문만 그림.
-  // MO는 탭 줄을 그대로 둠(시안 확인 전).
-  const hidesTabBar = layout === "tablet" && (isScreenPanel || isTabletFilter);
+  // TAB·MO의 풀페이지 화면(거래·사용 상세, 충전, 출금, TAB 필터)은 모달처럼 상단 탭 줄 없이 본문만 그림(QA 2026-11-10).
+  const hidesTabBar = isScreenPanel || isTabletFilter;
   const tabs = (
     <Tabs
       value={tab}
@@ -196,7 +193,7 @@ export function MyPageMoneyPage() {
       {/* 탭 줄은 스크롤해도 화면 위에 고정함. 위 여백은 고정 영역이 직접 가져 스크롤 내용이 그 위로 비치지 않게 함. */}
       {!hidesTabBar && (
         <StickyTabBar
-          // 카드 아래에서는 카드와 간격(TAB 16, PC 20), MO에서 하위 화면이 열려 카드가 없으면 화면 위 8.
+          // 카드 아래에서는 카드와 간격(TAB 16, PC 20).
           className={
             showsSummaryAboveTabs ? "tablet:pt-4 desktop:pt-5" : undefined
           }
@@ -215,7 +212,7 @@ export function MyPageMoneyPage() {
             "isolate flex flex-col pb-4 tablet:pb-5",
             isScreenPanel && "min-h-0",
             // 탭 줄이 없는 하위 화면 카드는 탭 줄이 가지던 위 여백 8을 이어받음. 필터 화면은 헤더 바로 아래에서 시작함(시안).
-            hidesTabBar && !isTabletFilter && "tablet:pt-2",
+            hidesTabBar && !isTabletFilter && "pt-2",
           )}
         >
           {tabBody(moneyTab)}

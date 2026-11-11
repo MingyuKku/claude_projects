@@ -2,10 +2,13 @@ import { useState } from "react";
 
 import { usePaymentMethodLabel } from "@/entities/subscription";
 import { EmptyState } from "@/shared/components/empty-state";
-import { emptyHeightVariants } from "@/shared/components/list-filter";
+import {
+  EmptyTableFrame,
+  emptyHeightVariants,
+} from "@/shared/components/list-filter";
 import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
-import { useMediaQuery } from "@/shared/lib";
+import { orEmptyValue, useMediaQuery } from "@/shared/lib";
 import { useDialogTarget } from "@/shared/lib/useDialogTarget";
 import {
   Table,
@@ -38,6 +41,7 @@ export function SubscribedProductTable({
 }: SubscribedProductTableProps) {
   const { t } = useTranslation("features/manage-subscription");
   const isTabletUp = useMediaQuery(MEDIA_QUERY.tabletUp);
+  const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
   const cancelDialog = useDialogTarget<Subscription>();
   const { cancel } = useCancelSubscription();
   const [isCompletedOpen, setIsCompletedOpen] = useState(false);
@@ -52,6 +56,9 @@ export function SubscribedProductTable({
     />
   );
 
+  // TAB의 빈 상태는 표 머리글 없이 테두리 박스 안에 안내만 둠(시안 11755:97419). PC는 머리글을 두고 MO는 테두리가 없음.
+  const isTabletEmpty = isTabletUp && !isDesktop && subscriptions.length === 0;
+
   return (
     <section
       className="flex flex-col gap-3 tablet:gap-4"
@@ -63,7 +70,9 @@ export function SubscribedProductTable({
       >
         {t("title")}
       </h2>
-      {isTabletUp ? (
+      {isTabletEmpty ? (
+        <EmptyTableFrame>{emptyState}</EmptyTableFrame>
+      ) : isTabletUp ? (
         // 시안은 6열이 같은 폭이고 "구독해지"가 마지막 열의 왼쪽에 놓임.
         <Table
           headerTone="gray"
@@ -97,19 +106,21 @@ export function SubscribedProductTable({
               subscriptions.map((subscription) => (
                 <TableRow key={subscription.id}>
                   <TableCell className="whitespace-normal">
-                    {subscription.productName}
+                    {orEmptyValue(subscription.productName)}
                   </TableCell>
                   <TableCell>
-                    {formatMembershipDate(subscription.startedAt)}
+                    {orEmptyValue(formatMembershipDate(subscription.startedAt))}
                   </TableCell>
                   <TableCell>
-                    {formatMembershipDate(subscription.endsAt)}
+                    {orEmptyValue(formatMembershipDate(subscription.endsAt))}
                   </TableCell>
                   <TableCell>{formatWon(subscription.amount)}</TableCell>
                   <TableCell className="whitespace-normal">
-                    {paymentMethodLabel(
-                      subscription.paymentMethod,
-                      subscription.cardKind,
+                    {orEmptyValue(
+                      paymentMethodLabel(
+                        subscription.paymentMethod,
+                        subscription.cardKind,
+                      ),
                     )}
                   </TableCell>
                   <TableCell>

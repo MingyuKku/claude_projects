@@ -331,12 +331,6 @@ describe("SubAccountTab 수정", () => {
     expect(screen.getByText("sub02")).toBeInTheDocument();
   });
 
-  it("MO는 목록을 덮는 서브 화면으로 보인다", async () => {
-    setup({ layout: "mobile", panel: "edit", panelAccountIdx: 9000 });
-    expect(await screen.findByText("Sub ID 수정")).toBeInTheDocument();
-    expect(screen.queryByText("sub02")).toBeNull();
-  });
-
   it("목록에 없는 Sub ID는 열지 않는다", async () => {
     setup({ panel: "edit", panelAccountIdx: 1234 });
     await screen.findByText("sub01");

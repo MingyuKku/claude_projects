@@ -3,6 +3,7 @@ import { EllipsisVertical } from "lucide-react";
 import { ChargeStatusText } from "@/entities/bigbird-money";
 import { EmptyTableFrame } from "@/shared/components/list-filter";
 import { useTranslation } from "@/shared/i18n";
+import { EMPTY_VALUE, orEmptyValue } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import {
   Table,
@@ -98,26 +99,40 @@ export function ChargeTable({
             data-state={record.id === activeId ? "selected" : undefined}
           >
             <TableCell>
-              <ChargeTypeBadge record={record} />
+              {record.type || record.typeText ? (
+                <ChargeTypeBadge record={record} />
+              ) : (
+                EMPTY_VALUE
+              )}
             </TableCell>
             <TableCell>
-              {formatDateTime(record.requestedAt, record.requestedAtText)}
+              {orEmptyValue(
+                formatDateTime(record.requestedAt, record.requestedAtText),
+              )}
             </TableCell>
             <TableCell>
-              <ChargeAmount record={record} />
+              {record.amount === null ? (
+                EMPTY_VALUE
+              ) : (
+                <ChargeAmount record={record} />
+              )}
             </TableCell>
             {!isPanelOpen && (
               <>
-                <TableCell>{record.bankName}</TableCell>
-                <TableCell>{record.accountNumber}</TableCell>
-                <TableCell>{record.holderName}</TableCell>
+                <TableCell>{orEmptyValue(record.bankName)}</TableCell>
+                <TableCell>{orEmptyValue(record.accountNumber)}</TableCell>
+                <TableCell>{orEmptyValue(record.holderName)}</TableCell>
               </>
             )}
             <TableCell>
-              <ChargeStatusText
-                serverValue={record.statusText}
-                status={record.status}
-              />
+              {record.status || record.statusText ? (
+                <ChargeStatusText
+                  serverValue={record.statusText}
+                  status={record.status}
+                />
+              ) : (
+                EMPTY_VALUE
+              )}
             </TableCell>
             <TableCell className="text-center">
               <ReceiptButton record={record} variant="table" />

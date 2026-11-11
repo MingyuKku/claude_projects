@@ -46,7 +46,7 @@ import type { ActiveProductType, Subscription } from "@/entities/subscription";
 
 // 탭 본문의 최대 폭(시안 PC 1440 화면의 본문 폭 1170). 더 넓은 화면에서는 가운데 정렬함.
 const CONTENT_WIDTH_CLASS_NAME = "mx-auto w-full max-w-292.5";
-// 고정 탭 줄(sticky z-10)은 같은 층의 본문과 z-index로 겨루므로, 본문 안의 z-index(고정 제목줄·토글 등)가 탭 줄 위로 올라오지 않게
+// 고정 탭 줄(sticky z-10)은 같은 층의 본문과 z-index로 겨루므로, 본문 안의 z-index(고정 제목줄 등)가 탭 줄 위로 올라오지 않게
 // 탭 본문을 isolate로 가둠. 본문 안에서 z-index가 커져도 탭 줄 아래에 그려짐.
 const TAB_CONTENT_CLASS_NAME = `isolate ${CONTENT_WIDTH_CLASS_NAME}`;
 // 탭을 바꾸면 하위 화면·상품 세그먼트·결제 내역 목록 쿼리(검색·필터·쪽)를 지움.
@@ -173,8 +173,7 @@ export function MyPageSubscribePage() {
       <Tabs
         value={tab}
         onValueChange={setTab}
-        // --sticky-tab-bar-height: 고정된 탭 줄 높이(위 여백 + 탭 36: MO·TAB 44, PC 56). 탭 본문 안에서 탭 줄 아래에 고정하는 요소(월간·연간 결제 토글)가 읽음.
-        className="gap-4 [--sticky-tab-bar-height:--spacing(11)] tablet:gap-5 desktop:gap-6 desktop:[--sticky-tab-bar-height:--spacing(14)]"
+        className="gap-4 tablet:gap-5 desktop:gap-6"
       >
         {!isTabletFilter && (
           // 탭 줄은 스크롤해도 화면 위에 고정함. 위 여백은 고정 영역이 직접 가져 스크롤 내용이 그 위로 비치지 않게 함.

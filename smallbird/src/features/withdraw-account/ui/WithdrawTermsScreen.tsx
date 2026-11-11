@@ -12,8 +12,8 @@ interface WithdrawTermsScreenProps {
   onAgree: () => void;
 }
 
-// Figma MO 회원 탈퇴 약관(스펙 §2·§3 회원 탈퇴): 다이얼로그가 아니라 헤더 아래 전체 화면. 서브헤더(제목 + X) · 약관 박스(여백 16) · 하단 고정 버튼 한 쌍.
-// 레이아웃 여백(--mypage-gutter)만큼 나가 가장자리까지 채우고, 버튼 줄은 스크롤 컨테이너(<main>) 안에서 sticky로 바닥에 붙임(키보드 대응 JS 없음).
+// Figma MO 회원 탈퇴 약관(스펙 §2·§3 회원 탈퇴): 다이얼로그가 아니라 헤더 아래 전체 화면. 서브헤더(제목 + X) · 약관 박스(여백 16) · 하단 버튼 한 쌍.
+// 레이아웃 여백(--mypage-gutter)만큼 나가 가장자리까지 채우고, 화면 높이에서 멈춰 약관 박스 안쪽만 스크롤함(시안 10724:188183, 페이지는 스크롤하지 않음).
 export function WithdrawTermsScreen({
   onClose,
   onAgree,
@@ -22,9 +22,9 @@ export function WithdrawTermsScreen({
   const { t: tCommon } = useTranslation();
 
   return (
-    <div className="-mx-(--mypage-gutter) flex min-h-full flex-col">
+    <div className="-mx-(--mypage-gutter) flex h-full flex-col">
       <SubHeader
-        className="sticky top-0 z-10"
+        className="shrink-0"
         title={<h1>{t("title")}</h1>}
         actions={
           <Button
@@ -38,11 +38,11 @@ export function WithdrawTermsScreen({
           </Button>
         }
       />
-      <div className="flex-1 p-4">
-        <WithdrawTermsBox />
+      <div className="flex min-h-0 flex-1 flex-col p-4">
+        <WithdrawTermsBox className="min-h-0 flex-1" />
       </div>
       <WithdrawActions
-        className="sticky bottom-0 border-t bg-background p-4"
+        className="shrink-0 border-t bg-background p-4"
         onClickCancel={onClose}
         onClickAgree={onAgree}
       />

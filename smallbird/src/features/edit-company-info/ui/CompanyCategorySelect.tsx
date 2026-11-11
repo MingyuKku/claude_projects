@@ -4,6 +4,8 @@ interface CompanyCategorySelectProps {
   /** 선택한 분류 인덱스(문자열). 없으면 빈 문자열. */
   value: string;
   categories: { idx: number; name: string }[];
+  /** 고른 분류가 없을 때 흐리게 보일 안내. */
+  placeholder?: string;
   /** 저장된 분류 이름. 최상위 목록에 없는 분류(하위 분류 등)여도 선택값으로 보이게 함. */
   savedName: string | null;
   onChangeValue: (value: string) => void;
@@ -17,6 +19,7 @@ interface CompanyCategorySelectProps {
 export function CompanyCategorySelect({
   value,
   categories,
+  placeholder,
   savedName,
   onChangeValue,
   ...controlProps
@@ -36,6 +39,7 @@ export function CompanyCategorySelect({
       {...controlProps}
       value={value}
       options={options}
+      placeholder={placeholder}
       onChangeValue={onChangeValue}
     />
   );

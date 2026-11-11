@@ -82,8 +82,8 @@ export function BuyerInquiryDetailPanel({
       : null;
 
   return (
-    // Figma MO 변수(6791:67084): p-5·gap-6·gap-5 = 16, gap-4 = 12, gap-3 = 8, leading-5 = 16. TAB·PC는 20·24·16·12·20.
-    <div className="flex flex-col gap-4 p-4 tablet:gap-6 tablet:p-5">
+    // Figma MO 변수(6791:67084): p-5·gap-6·gap-5 = 16, gap-4 = 12, gap-3 = 8, leading-5 = 16. TAB은 섹션 간격 20(11315:50452), PC는 24.
+    <div className="flex flex-col gap-4 p-4 tablet:gap-5 tablet:p-5 desktop:gap-6">
       <div className="flex items-center gap-3 py-2 tablet:gap-4">
         <Avatar size="2xl">
           {avatarSrc && <AvatarImage src={avatarSrc} alt="" />}
@@ -110,18 +110,18 @@ export function BuyerInquiryDetailPanel({
       {isBuyerMenu && detail.orderNumber && (
         <Section title={t("orderInfo")}>
           <div className="flex items-start gap-2 tablet:gap-3">
-            {/* Figma: 썸네일이 남는 폭을 채우는 정사각형이고 글은 140px 고정, 위쪽 정렬. */}
+            {/* Figma: 글은 140px 고정, 위쪽 정렬. 썸네일은 MO에서 83 고정(11315:49694), TAB·PC는 235 폭에서 남는 폭을 채워 83이 됨. */}
             {productImageUrl ? (
               <img
                 src={productImageUrl}
                 alt={productName ?? ""}
                 loading="lazy"
-                className="aspect-square min-w-0 flex-1 rounded-md border border-border object-cover"
+                className="size-20.75 shrink-0 rounded-md border border-border object-cover tablet:aspect-square tablet:size-auto tablet:min-w-0 tablet:flex-1"
               />
             ) : (
               <div
                 aria-hidden
-                className="aspect-square min-w-0 flex-1 rounded-md border border-border bg-muted"
+                className="size-20.75 shrink-0 rounded-md border border-border bg-muted tablet:aspect-square tablet:size-auto tablet:min-w-0 tablet:flex-1"
               />
             )}
             <div className="flex w-35 shrink-0 flex-col justify-center gap-1.5">

@@ -3,6 +3,7 @@ import {
   usePaymentMethodLabel,
 } from "@/entities/subscription";
 import { useTranslation } from "@/shared/i18n";
+import { orEmptyValue } from "@/shared/lib";
 
 import { usePaymentFormat } from "../lib/use-payment-format";
 import { ReceiptButton } from "./ReceiptButton";
@@ -27,12 +28,14 @@ export function PaymentCardList({ records }: PaymentCardListProps) {
     >
       {records.map((record) => {
         const rows = [
-          { key: "paidAt", value: formatDateTime(record.paidAt) },
-          { key: "name", value: record.name },
+          { key: "paidAt", value: orEmptyValue(formatDateTime(record.paidAt)) },
+          { key: "name", value: orEmptyValue(record.name) },
           { key: "amount", value: formatWon(record.amount) },
           {
             key: "method",
-            value: paymentMethodLabel(record.method, record.cardKind),
+            value: orEmptyValue(
+              paymentMethodLabel(record.method, record.cardKind),
+            ),
           },
           {
             key: "status",

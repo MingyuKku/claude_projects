@@ -6,3 +6,11 @@ import { configure } from "@testing-library/react";
 // vitest의 테스트별 제한(기본 5초)보다 짧게 둬서 진짜 실패는 Testing Library의 읽기 쉬운 오류로 나옴.
 // 조건이 만족되면 바로 반환하므로 정상 동작의 테스트 시간은 늘지 않음.
 configure({ asyncUtilTimeout: 4000 });
+
+// Radix ScrollArea 의 type="auto" 스크롤바는 마운트 때 ResizeObserver 를 쓰는데 jsdom 에는 없음.
+// 고객센터 스크롤 영역이 상시 표시로 바뀌어 그 화면을 그리는 모든 테스트에 필요해 한 곳에서 채움.
+globalThis.ResizeObserver ??= class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+};

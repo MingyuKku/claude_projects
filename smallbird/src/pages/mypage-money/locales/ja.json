@@ -2,7 +2,6 @@
   "title": "ビッグバードマネー",
   "tabs": {
     "charge": "チャージ/出金履歴",
-    "chargeShort": "チャージ履歴",
     "usage": "利用履歴"
   },
   "views": {

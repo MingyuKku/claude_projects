@@ -166,8 +166,8 @@ export function SubAccountFormPanel({
       className={cn("flex min-h-0 flex-1 flex-col bg-background", className)}
     >
       <SubHeader
-        // TAB은 제목줄을 위에 고정(시안). MO는 탭 줄이 이미 고정돼 있어 뒤로 보내 겹치지 않게 하고, PC는 패널 안 고정 높이라 그대로 둠.
-        className="sticky top-0 z-0 tablet:z-10 desktop:static"
+        // TAB·MO는 탭 줄 없이 제목줄을 위에 고정(시안). PC는 패널 안 고정 높이라 그대로 둠.
+        className="sticky top-0 z-10 desktop:static"
         title={isEdit ? t("edit.title") : t("create.title")}
         actions={
           <Button

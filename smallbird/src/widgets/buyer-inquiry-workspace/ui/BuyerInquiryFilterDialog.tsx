@@ -1,4 +1,4 @@
-import { RefreshCcw, Settings2, X } from "lucide-react";
+import { ChevronDown, RefreshCcw, Settings2, X } from "lucide-react";
 import { useId, useState } from "react";
 
 import {
@@ -122,10 +122,12 @@ export function BuyerInquiryFilterDialog({
             ))}
           </div>
         </fieldset>
-        {/* 캠페인명·캠페인 코드로 검색해 고름(REQ-24-0006). Figma는 Select지만 인플루언서와 같은 콤보박스를 씀 */}
+        {/* Figma Select(6964:73045): 아래 화살표, 검색 없이 목록에서 고름. MO는 하단 시트(11315:50994). */}
         <Combobox
           size="sm"
           label={t("filter.campaign")}
+          isSearchable={false}
+          triggerIcon={<ChevronDown className="ml-4 size-4 shrink-0" />}
           value={draft.campaignIdx?.toString() ?? ""}
           onValueChange={(selected) =>
             setDraft((current) => ({
@@ -140,12 +142,11 @@ export function BuyerInquiryFilterDialog({
               value: campaign.campaignIdx.toString(),
               // 상품명·브랜드명이 비어 있는 캠페인(stage 데이터 누락)은 캠페인 코드로 대신 보임.
               label: campaign.name || campaign.campaignCode,
-              keywords: [campaign.campaignCode],
             })),
           ]}
           placeholder={t("filter.campaignPlaceholder")}
-          searchPlaceholder={t("filter.campaignSearchPlaceholder")}
-          // 검색 결과 없음 문구는 시안에 없어 비워 둠(문구 확정 대기)
+          // 검색 입력과 검색 결과 없음 문구가 없어 빈 값(Combobox 필수 props)
+          searchPlaceholder=""
           emptyText=""
         />
         {/* 인플루언서는 검색되는 콤보박스(Figma Combobox 6777:61876) */}

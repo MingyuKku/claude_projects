@@ -10,8 +10,9 @@ const bubbleVariants = cva("rounded-lg text-foreground", {
       other: "bg-background",
     },
     size: {
-      lg: "max-w-125 px-4 py-2.5 text-base leading-6",
-      md: "max-w-85 px-4 py-2.5 text-base leading-6",
+      // Figma 말풍선 글줄: PC 24, TAB·MO 22(Subtitle fs16 lh22)
+      lg: "max-w-125 px-4 py-2.5 text-base leading-5.5 desktop:leading-6",
+      md: "max-w-85 px-4 py-2.5 text-base leading-5.5 desktop:leading-6",
       sm: "max-w-50 px-3.5 py-2 text-sm leading-4 tablet:leading-5",
     },
   },

@@ -68,14 +68,14 @@ export function MediaViewer({
               target="_blank"
               rel="noreferrer"
               aria-label={downloadLabel}
-              className="flex size-10 items-center justify-center rounded-md hover:bg-white/10 tablet:size-12"
+              className="flex size-10 items-center justify-center rounded-lg hover:bg-white/10 tablet:size-12"
             >
               <Download className="size-4 tablet:size-6" />
             </a>
           )}
           <DialogPrimitive.Close
             aria-label={closeLabel}
-            className="ml-auto flex size-10 items-center justify-center rounded-md hover:bg-white/10 tablet:size-12"
+            className="ml-auto flex size-10 items-center justify-center rounded-lg hover:bg-white/10 tablet:size-12"
           >
             <X className="size-4 tablet:size-6" />
           </DialogPrimitive.Close>

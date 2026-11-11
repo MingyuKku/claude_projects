@@ -1,4 +1,5 @@
 import { formatListDate, useTranslation } from "@/shared/i18n";
+import { EMPTY_VALUE, orEmptyValue } from "@/shared/lib";
 import { cn } from "@/shared/lib/utils";
 import { Avatar, AvatarImage, AvatarPlaceholder } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
@@ -34,11 +35,13 @@ export function SubAccountCardList({
     >
       {accounts.map((account) => {
         const rows = [
-          { key: "name", value: account.name },
-          { key: "email", value: account.email },
+          { key: "name", value: orEmptyValue(account.name) },
+          { key: "email", value: orEmptyValue(account.email) },
           {
             key: "createdAt",
-            value: account.createdAt ? formatListDate(account.createdAt) : "",
+            value: account.createdAt
+              ? formatListDate(account.createdAt)
+              : EMPTY_VALUE,
           },
         ] as const;
         const isActive = account.accountIdx === activeAccountIdx;
@@ -59,7 +62,7 @@ export function SubAccountCardList({
                 <AvatarPlaceholder />
               </Avatar>
               <span className="min-w-0 truncate text-base leading-6 font-medium text-foreground">
-                {account.identifier}
+                {orEmptyValue(account.identifier)}
               </span>
             </div>
             <div className="flex items-center gap-2">

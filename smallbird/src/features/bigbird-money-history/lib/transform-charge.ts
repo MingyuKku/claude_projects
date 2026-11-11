@@ -11,7 +11,7 @@ const CHARGE_TYPE_BY_SERVER_VALUE = new Map<string, ChargeType>([
   ["WITHDRAWAL", "withdraw"],
 ]);
 
-// 값이 없으면 빈 문자열(표 UI는 빈 값을 "-" 없이 비워 둠).
+// 값이 없으면 빈 문자열. 표 셀은 그릴 때 `orEmptyValue`로 "-"를 보임(카드·상세는 빈칸 그대로).
 function textOrEmpty(value: string | null | undefined) {
   return value?.trim() ? value : "";
 }

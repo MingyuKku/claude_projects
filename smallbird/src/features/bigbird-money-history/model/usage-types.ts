@@ -10,7 +10,7 @@ export const SERVER_USAGE_TYPE = {
   withdraw: "WITHDRAWAL",
 } as const satisfies Record<UsageType, string>;
 
-/** 캠페인과 무관한 사용 유형. 캠페인 명·유형·코드·사용 내역·계약 대상 칸을 빈칸으로 둠(시안 `11290:161266`·`11290:161503`). */
+/** 캠페인과 무관한 사용 유형. 캠페인 명·유형·코드·사용 내역·계약 대상 값을 비움(시안 `11290:161266`·`11290:161503`). 표 셀은 빈 값을 "-"로 그림. */
 export const NON_CAMPAIGN_USAGE_TYPES: readonly UsageType[] = [
   "charge",
   "withdraw",

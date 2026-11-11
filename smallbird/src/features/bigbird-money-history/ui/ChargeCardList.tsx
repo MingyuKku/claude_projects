@@ -1,5 +1,6 @@
 import { ChargeStatusText } from "@/entities/bigbird-money";
 import { useTranslation } from "@/shared/i18n";
+import { EMPTY_VALUE, orEmptyValue } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 
 import { useMoneyFormat } from "../lib/use-money-format";
@@ -30,23 +31,44 @@ export function ChargeCardList({
     >
       {records.map((record) => {
         const rows = [
-          { key: "type", value: <ChargeTypeBadge record={record} /> },
+          {
+            key: "type",
+            value:
+              record.type || record.typeText ? (
+                <ChargeTypeBadge record={record} />
+              ) : (
+                EMPTY_VALUE
+              ),
+          },
           {
             key: "date",
-            value: formatDateTime(record.requestedAt, record.requestedAtText),
+            value: orEmptyValue(
+              formatDateTime(record.requestedAt, record.requestedAtText),
+            ),
           },
-          { key: "amount", value: <ChargeAmount record={record} /> },
-          { key: "bank", value: record.bankName },
-          { key: "account", value: record.accountNumber },
-          { key: "holder", value: record.holderName },
+          {
+            key: "amount",
+            value:
+              record.amount === null ? (
+                EMPTY_VALUE
+              ) : (
+                <ChargeAmount record={record} />
+              ),
+          },
+          { key: "bank", value: orEmptyValue(record.bankName) },
+          { key: "account", value: orEmptyValue(record.accountNumber) },
+          { key: "holder", value: orEmptyValue(record.holderName) },
           {
             key: "status",
-            value: (
-              <ChargeStatusText
-                serverValue={record.statusText}
-                status={record.status}
-              />
-            ),
+            value:
+              record.status || record.statusText ? (
+                <ChargeStatusText
+                  serverValue={record.statusText}
+                  status={record.status}
+                />
+              ) : (
+                EMPTY_VALUE
+              ),
           },
         ] as const;
 

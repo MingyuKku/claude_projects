@@ -15,8 +15,6 @@ export const KEYWORD_PARAM = "keyword";
 
 /** 사용 내역 검색어 최대 길이. 넘으면 서버가 `400 INVALID_FILTER`로 거절함(API 명세 A-4). */
 export const USAGE_KEYWORD_MAX_LENGTH = 100;
-/** 상세 보기(`?panel=…&id=…`) 쿼리. 쪽을 옮기면 열린 상세를 닫음. */
-export const DETAIL_QUERY_PARAMS = ["panel", "id"] as const;
 
 /** 필터·검색·쪽 쿼리. 탭이나 세그먼트를 바꾸면 페이지가 지움. */
 export const LIST_QUERY_PARAMS = [

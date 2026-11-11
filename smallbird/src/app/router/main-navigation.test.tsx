@@ -15,15 +15,6 @@ import {
   resetSession,
 } from "./test-utils";
 
-// 이 파일은 펼친 PC LNB에서 셸 동작을 검증함. LNB 기본은 접힘이고(sidebar-store), 저장된 상태는 스토어를 불러올 때
-// localStorage에서 복원되므로 모듈을 불러오기 전에 "펼쳐 둔 사용자" 상태를 저장해 둠.
-vi.hoisted(() => {
-  localStorage.setItem(
-    "bigbird:sidebar",
-    JSON.stringify({ state: { isCollapsed: false }, version: 0 }),
-  );
-});
-
 vi.mock("@/shared/api", async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   serverApi: { get: vi.fn(), post: vi.fn() },

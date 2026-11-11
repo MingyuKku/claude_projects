@@ -1,5 +1,6 @@
 import { usePaymentMethodLabel } from "@/entities/subscription";
 import { useTranslation } from "@/shared/i18n";
+import { orEmptyValue } from "@/shared/lib";
 
 import { useSubscriptionFormat } from "../lib/use-subscription-format";
 import { CancelSubscriptionButton } from "./CancelSubscriptionButton";
@@ -26,15 +27,20 @@ export function SubscribedProductCards({
         const rows = [
           {
             key: "startedAt",
-            value: formatMembershipDate(subscription.startedAt),
+            value: orEmptyValue(formatMembershipDate(subscription.startedAt)),
           },
-          { key: "endsAt", value: formatMembershipDate(subscription.endsAt) },
+          {
+            key: "endsAt",
+            value: orEmptyValue(formatMembershipDate(subscription.endsAt)),
+          },
           { key: "amount", value: formatWon(subscription.amount) },
           {
             key: "method",
-            value: paymentMethodLabel(
-              subscription.paymentMethod,
-              subscription.cardKind,
+            value: orEmptyValue(
+              paymentMethodLabel(
+                subscription.paymentMethod,
+                subscription.cardKind,
+              ),
             ),
           },
         ] as const;
@@ -47,7 +53,7 @@ export function SubscribedProductCards({
               </dt>
               <dd className="flex min-h-12 min-w-0 items-center justify-between gap-2 border-b px-4 py-2 text-sm leading-5 text-foreground">
                 <span className="min-w-0 break-all">
-                  {subscription.productName}
+                  {orEmptyValue(subscription.productName)}
                 </span>
                 <CancelSubscriptionButton
                   subscription={subscription}

@@ -3,6 +3,7 @@ import {
   usePaymentMethodLabel,
 } from "@/entities/subscription";
 import { useTranslation } from "@/shared/i18n";
+import { orEmptyValue } from "@/shared/lib";
 import {
   Table,
   TableBody,
@@ -62,12 +63,16 @@ export function PaymentTable({ records, emptyContent }: PaymentTableProps) {
           records.map((record) => (
             <TableRow key={record.id}>
               <TableCell className="whitespace-normal">
-                {formatDateTime(record.paidAt)}
+                {orEmptyValue(formatDateTime(record.paidAt))}
               </TableCell>
-              <TableCell className="whitespace-normal">{record.name}</TableCell>
+              <TableCell className="whitespace-normal">
+                {orEmptyValue(record.name)}
+              </TableCell>
               <TableCell>{formatWon(record.amount)}</TableCell>
               <TableCell className="whitespace-normal">
-                {paymentMethodLabel(record.method, record.cardKind)}
+                {orEmptyValue(
+                  paymentMethodLabel(record.method, record.cardKind),
+                )}
               </TableCell>
               <TableCell>
                 <PaymentStatusBadge serverValue={record.status} size="sm" />

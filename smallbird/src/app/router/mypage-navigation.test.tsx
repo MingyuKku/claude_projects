@@ -20,15 +20,6 @@ import {
 
 import type * as SharedApi from "@/shared/api";
 
-// 이 파일은 펼친 PC LNB에서 셸 동작을 검증함. LNB 기본은 접힘이고(sidebar-store), 저장된 상태는 스토어를 불러올 때
-// localStorage에서 복원되므로 모듈을 불러오기 전에 "펼쳐 둔 사용자" 상태를 저장해 둠.
-vi.hoisted(() => {
-  localStorage.setItem(
-    "bigbird:sidebar",
-    JSON.stringify({ state: { isCollapsed: false }, version: 0 }),
-  );
-});
-
 vi.mock("@/shared/api", async (importOriginal) => ({
   ...(await importOriginal<typeof SharedApi>()),
   serverApi: { get: vi.fn(), post: vi.fn() },
@@ -444,7 +435,7 @@ describe("마이페이지 · 계정 설정 셸", () => {
     ]);
   });
 
-  it("MO에서 ?tab=sub&panel=create는 탭 줄 아래 생성 화면을 열고 X로 닫으면 목록으로 돌아온다", async () => {
+  it("MO에서 ?tab=sub&panel=create는 탭 줄까지 덮는 생성 화면을 열고 X로 닫으면 목록으로 돌아온다", async () => {
     const user = userEvent.setup();
     const router = await renderRoute(
       `${ROUTES.mypageAccount}?tab=sub&panel=create`,
@@ -452,12 +443,27 @@ describe("마이페이지 · 계정 설정 셸", () => {
     expect(
       await screen.findByRole("button", { name: "Sub ID 생성하기" }),
     ).toBeInTheDocument();
-    // 탭은 유지되고 목록은 가려진다.
-    expect(screen.getAllByRole("tab")).toHaveLength(5);
+    // 탭 줄도 목록도 가려진다.
+    expect(screen.queryAllByRole("tab")).toHaveLength(0);
     expect(screen.queryByText("sub01")).toBeNull();
 
     await user.click(screen.getByRole("button", { name: "닫기" }));
     expect(await screen.findByText("sub01")).toBeInTheDocument();
+    expect(screen.getAllByRole("tab")).toHaveLength(5);
+    expect(router.state.location.search).not.toContain("panel=");
+  });
+
+  it("MO에서 ?tab=sub&panel=permission은 탭 줄까지 덮는 권한 부여 화면이고 X로 닫으면 탭이 돌아온다", async () => {
+    const user = userEvent.setup();
+    const router = await renderRoute(
+      `${ROUTES.mypageAccount}?tab=sub&panel=permission&subId=9000`,
+    );
+    expect(await screen.findByText("Sub ID 권한부여")).toBeInTheDocument();
+    expect(screen.queryAllByRole("tab", { name: "회사정보" })).toHaveLength(0);
+
+    await user.click(screen.getByRole("button", { name: "닫기" }));
+    expect(await screen.findByText("sub01")).toBeInTheDocument();
+    expect(screen.getAllByRole("tab", { name: "회사정보" })).toHaveLength(1);
     expect(router.state.location.search).not.toContain("panel=");
   });
 
@@ -859,7 +865,7 @@ describe("마이페이지 · 빅버드 머니", () => {
     expect(
       await screen.findByRole("heading", { name: "빅버드 머니" }),
     ).toBeInTheDocument();
-    expect(screen.getByRole("tab", { name: "충전 내역" })).toHaveAttribute(
+    expect(screen.getByRole("tab", { name: "충전/출금 내역" })).toHaveAttribute(
       "aria-selected",
       "true",
     );

@@ -252,6 +252,41 @@ describe("실시간 상담 대화", () => {
       );
       expect(screen.queryByText("완료된 상담")).not.toBeInTheDocument();
     });
+
+    it("완료 카드의 닫기를 누르면 그 카드가 사라진다", async () => {
+      renderConversation(
+        inquiry({
+          isFinished: true,
+          status: "done",
+          realtimePhase: "finished",
+        }),
+      );
+      expect(screen.getByText("완료된 상담")).toBeInTheDocument();
+
+      await userEvent.click(screen.getByRole("button", { name: "닫기" }));
+
+      expect(screen.queryByText("완료된 상담")).not.toBeInTheDocument();
+    });
+
+    it("요청 중 카드에는 닫기 버튼이 없다", () => {
+      renderConversation(
+        inquiry({ status: "waiting", realtimePhase: "requesting" }),
+      );
+      expect(screen.getByText("상담 요청 중")).toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "닫기" }),
+      ).not.toBeInTheDocument();
+    });
+
+    it("연결 실패 카드에는 닫기 버튼이 없다", () => {
+      renderConversation(
+        inquiry({ status: "failed", realtimePhase: "failed" }),
+      );
+      expect(screen.getByText("실시간 상담 불가")).toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "닫기" }),
+      ).not.toBeInTheDocument();
+    });
   });
 });
 

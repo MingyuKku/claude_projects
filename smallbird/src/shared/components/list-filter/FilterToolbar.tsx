@@ -117,9 +117,11 @@ export function FilterToolbar({
         className={cn("min-w-0", pageSize && isTabletUp ? "w-71.75" : "flex-1")}
       />
     );
+    // 간격은 TAB부터 12px이고, MO는 검색이 있으면 8px(검색 172·아이콘 40·개수 100), 검색이 없으면 12px(필터 216·개수 100, 시안 11755:99514).
+    const hasWideGap = Boolean(pageSize && (isTabletUp || !search));
     return (
       <>
-        <div className={cn("flex", pageSize && isTabletUp ? "gap-3" : "gap-2")}>
+        <div className={cn("flex", hasWideGap ? "gap-3" : "gap-2")}>
           {searchNode}
           <Button
             type="button"

@@ -161,6 +161,7 @@ export function CompanyInfoForm({
                 {(control) => (
                   <Input
                     {...control}
+                    placeholder={t("form.placeholder.companyName")}
                     value={values.companyName}
                     onChange={handleChangeText("companyName")}
                   />
@@ -171,6 +172,7 @@ export function CompanyInfoForm({
                   <Input
                     {...control}
                     type="tel"
+                    placeholder={t("form.placeholder.contact")}
                     value={values.contact}
                     onChange={handleChangeText("contact")}
                   />
@@ -180,6 +182,7 @@ export function CompanyInfoForm({
                 {(control) => (
                   <Input
                     {...control}
+                    placeholder={t("form.placeholder.businessNumber")}
                     value={values.businessNumber}
                     onChange={handleChangeText("businessNumber")}
                   />
@@ -197,6 +200,7 @@ export function CompanyInfoForm({
                       exists: Boolean(company?.hasBusinessRegistrationFile),
                       name: company?.businessRegistrationFileName ?? null,
                     })}
+                    placeholder={t("file.placeholder")}
                     buttonLabel={t("file.upload")}
                     buttonAriaLabel={t("file.uploadFor", {
                       label: businessFileLabel,
@@ -210,6 +214,7 @@ export function CompanyInfoForm({
                 {(control) => (
                   <Input
                     {...control}
+                    placeholder={t("form.placeholder.mailorderNumber")}
                     value={values.mailorderNumber}
                     onChange={handleChangeText("mailorderNumber")}
                   />
@@ -227,6 +232,7 @@ export function CompanyInfoForm({
                       exists: Boolean(company?.hasMailorderFile),
                       name: company?.mailorderFileName ?? null,
                     })}
+                    placeholder={t("file.placeholder")}
                     buttonLabel={t("file.upload")}
                     buttonAriaLabel={t("file.uploadFor", {
                       label: mailorderFileLabel,
@@ -242,6 +248,7 @@ export function CompanyInfoForm({
                     {...control}
                     value={values.categoryIdx}
                     categories={categories}
+                    placeholder={t("form.placeholder.category")}
                     savedName={company?.categoryName ?? null}
                     onChangeValue={(categoryIdx) =>
                       setValues((prev) => ({ ...prev, categoryIdx }))
@@ -254,6 +261,7 @@ export function CompanyInfoForm({
                   <Input
                     {...control}
                     type="url"
+                    placeholder={t("form.placeholder.url")}
                     value={values.companyUrl}
                     onChange={handleChangeText("companyUrl")}
                   />

@@ -57,8 +57,8 @@ export function SubAccountPermissionPanel({
       className={cn("flex min-h-0 flex-1 flex-col bg-background", className)}
     >
       <SubHeader
-        // TAB은 제목줄을 위에 고정(생성·수정 화면과 같음). MO는 탭 줄이 이미 고정돼 있어 뒤로 보내 겹치지 않게 하고, PC는 패널 안 고정 높이라 그대로 둠.
-        className="sticky top-0 z-0 tablet:z-10 desktop:static"
+        // TAB·MO는 탭 줄 없이 제목줄을 위에 고정(생성·수정 화면과 같음). PC는 패널 안 고정 높이라 그대로 둠.
+        className="sticky top-0 z-10 desktop:static"
         title={
           <>
             {onBack && (
@@ -87,10 +87,11 @@ export function SubAccountPermissionPanel({
           </Button>
         }
       />
-      {/* PC는 패널 안에서 스크롤함. 스크롤바는 시안의 Scroll-area라 `ScrollArea`로 그림(겹쳐서 자리를 차지하지 않음). Radix 안쪽 래퍼(display: table)는 block으로 되돌림. */}
+      {/* PC는 패널 안에서 스크롤함. 스크롤바는 시안의 Scroll-area라 `ScrollArea`로 그림(겹쳐서 자리를 차지하지 않음). Radix 안쪽 래퍼(display: table)는 block으로 되돌림.
+          isolate: 탭 토글의 z-10이 고정 제목줄(z-10) 위로 올라와 스크롤할 때 겹쳐 보이지 않게 본문 안에 가둠. */}
       <ScrollArea
         type="auto"
-        className="desktop:min-h-0 desktop:flex-1 [&_[data-slot=scroll-area-viewport]>div]:block!"
+        className="isolate desktop:min-h-0 desktop:flex-1 [&_[data-slot=scroll-area-viewport]>div]:block!"
       >
         <Tabs defaultValue="service" className="gap-4 p-4 tablet:p-5">
           <TabsList className="w-full">

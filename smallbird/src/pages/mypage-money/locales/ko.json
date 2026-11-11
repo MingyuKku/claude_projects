@@ -2,7 +2,6 @@
   "title": "빅버드 머니",
   "tabs": {
     "charge": "충전/출금 내역",
-    "chargeShort": "충전 내역",
     "usage": "사용 내역"
   },
   "views": {

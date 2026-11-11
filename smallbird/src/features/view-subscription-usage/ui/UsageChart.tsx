@@ -37,6 +37,8 @@ const AXIS_GAP = { desktop: 24, tablet: 20, mobile: 16 } as const;
 // 시안(11755:96300): x축 라벨 행은 높이 20px이고 막대 영역과 2px 떨어짐. Recharts가 tickMargin에 3px를 더 얹어 그리므로 라벨(12px)이 행 가운데 오도록 2를 둠.
 const X_AXIS_HEIGHT = 22;
 const X_AXIS_TICK_MARGIN = 2;
+// y축 라벨(text-xs leading-5)의 높이. 라벨 가운데가 눈금 위치에 오도록 열을 이 절반만큼 위아래로 내어 그림.
+const Y_AXIS_LABEL_HEIGHT = 20;
 // 툴팁은 마우스를 올린 막대 위(시안: 막대 위 8px, 높이 32px, 폭 60px 이상)에 뜸.
 const TOOLTIP_HEIGHT = 32;
 const TOOLTIP_MIN_WIDTH = 60;
@@ -148,7 +150,7 @@ export function UsageChart({
         )}
       </div>
       <div className="px-6 pt-6 pb-6 tablet:pt-7 desktop:pt-8">
-        {/* y축 라벨은 x축 라벨 행까지 포함한 차트 전체 높이에 같은 간격으로 늘어서고, 맨 아래 "0 건"이 x축 라벨과 같은 줄임.
+        {/* y축 라벨은 막대 영역(x축 라벨 행 제외)에 같은 간격으로 늘어서고, 라벨 가운데가 눈금 위치에 오므로 맨 아래 "0 건"이 막대 바닥선과 같은 줄임(디자인 QA 26/11/10 - PC - 42).
             Recharts의 y축은 값 위치에 눈금을 두고 맨 위 라벨을 영역 안으로 밀어 간격이 달라지므로 라벨은 직접 그림. */}
         <div
           className="flex h-57 tablet:h-56 desktop:h-55"
@@ -157,6 +159,10 @@ export function UsageChart({
           <div
             aria-hidden
             className="flex shrink-0 flex-col items-end justify-between text-xs leading-5 whitespace-nowrap text-muted-foreground"
+            style={{
+              marginTop: -Y_AXIS_LABEL_HEIGHT / 2,
+              height: `calc(100% - ${X_AXIS_HEIGHT - Y_AXIS_LABEL_HEIGHT}px)`,
+            }}
           >
             {[...ticks].reverse().map((tick) => (
               <span key={tick}>

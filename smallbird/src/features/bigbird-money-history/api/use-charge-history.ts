@@ -9,6 +9,7 @@ import {
 } from "@/shared/lib";
 
 import { useChargeListParams } from "../lib/use-charge-list-params";
+import { useKeepDetail } from "../lib/use-keep-detail";
 import { fetchChargeList } from "./charge-api";
 
 import type { ChargeQuery } from "../model/charge-types";
@@ -60,9 +61,10 @@ export function useChargeRecord(id: string | null) {
   const scroll = useChargeScrollList(baseQuery, id !== null && !isTabletUp, {
     revalidateIfStale: false,
   });
-  if (id === null) return null;
   const records = isTabletUp ? (paged.list?.records ?? []) : scroll.records;
-  return records.find((record) => record.id === id) ?? null;
+  const found =
+    id === null ? null : (records.find((record) => record.id === id) ?? null);
+  return useKeepDetail(id, found);
 }
 
 /**

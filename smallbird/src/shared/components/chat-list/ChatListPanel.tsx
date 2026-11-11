@@ -89,7 +89,10 @@ export function ChatListPanel({
         </div>
       ) : (
         // 세로 목록에서 Radix 내부 table이 긴 문장에 맞춰 가로 폭을 늘리지 않도록 함.
-        <ScrollArea className="min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:block!">
+        <ScrollArea
+          type="auto"
+          className="min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:block!"
+        >
           <ul className="flex flex-col">{children}</ul>
         </ScrollArea>
       )}

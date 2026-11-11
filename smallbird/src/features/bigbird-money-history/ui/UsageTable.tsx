@@ -3,6 +3,7 @@ import { EllipsisVertical } from "lucide-react";
 import { FullTextHint } from "@/shared/components/full-text-hint";
 import { EmptyTableFrame } from "@/shared/components/list-filter";
 import { useTranslation } from "@/shared/i18n";
+import { EMPTY_VALUE, orEmptyValue } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 import {
   Table,
@@ -97,17 +98,21 @@ export function UsageTable({
             data-state={record.id === activeId ? "selected" : undefined}
           >
             <TableCell className="h-14">
-              <UsageTypeBadge record={record} />
+              {record.type || record.typeText ? (
+                <UsageTypeBadge record={record} />
+              ) : (
+                EMPTY_VALUE
+              )}
             </TableCell>
             <TableCell className="h-14">
-              {formatDateTime(record.usedAt, record.usedAtText)}
+              {orEmptyValue(formatDateTime(record.usedAt, record.usedAtText))}
             </TableCell>
             {!isPanelOpen && (
               <TableCell className="h-14 whitespace-normal">
                 <div className="flex items-center gap-3">
                   <CampaignThumbnail record={record} />
                   <FullTextHint
-                    text={record.campaignName}
+                    text={orEmptyValue(record.campaignName)}
                     lines={2}
                     className="min-w-0 flex-1"
                   />
@@ -115,14 +120,21 @@ export function UsageTable({
               </TableCell>
             )}
             <TableCell className="h-14 whitespace-normal">
-              <FullTextHint text={labels.usageDetail(record)} lines={2} />
+              <FullTextHint
+                text={orEmptyValue(labels.usageDetail(record))}
+                lines={2}
+              />
             </TableCell>
             <TableCell className="h-14">
-              <UsageAmount amount={record.amount} />
+              {record.amount === null ? (
+                EMPTY_VALUE
+              ) : (
+                <UsageAmount amount={record.amount} />
+              )}
             </TableCell>
             {!isPanelOpen && (
               <TableCell className="h-14">
-                {formatWon(record.remainingAmount)}
+                {orEmptyValue(formatWon(record.remainingAmount))}
               </TableCell>
             )}
             <TableCell className="h-14 text-center">

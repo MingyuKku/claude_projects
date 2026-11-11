@@ -8,7 +8,15 @@
     "mailorderNumber": "Mail-order number",
     "mailorderFile": "Mail-order business report",
     "category": "Company category",
-    "url": "Company URL"
+    "url": "Company URL",
+    "placeholder": {
+      "companyName": "Enter company name",
+      "contact": "Enter contact number",
+      "businessNumber": "Enter business registration number",
+      "mailorderNumber": "Enter mail-order number",
+      "category": "Select",
+      "url": "Enter URL"
+    }
   },
   "file": {
     "upload": "Upload",
@@ -20,7 +28,8 @@
       "download": "Couldn't download the file. Please try again."
     },
     "none": "No file",
-    "download": "Download {{name}}"
+    "download": "Download {{name}}",
+    "placeholder": "Upload a file"
   },
   "inform": {
     "required": "Fill in all required fields to save.",

@@ -3,10 +3,7 @@ import {
   PAYMENT_STATUSES,
   usePaymentMethodLabel,
 } from "@/entities/subscription";
-import {
-  DEFAULT_FIELD_WIDTH,
-  NARROW_FIELD_WIDTH,
-} from "@/shared/components/list-filter";
+import { NARROW_FIELD_WIDTH } from "@/shared/components/list-filter";
 import { useTranslation } from "@/shared/i18n";
 
 import { PAYMENT_ITEMS } from "../model/constants";
@@ -34,8 +31,8 @@ export function usePaymentFilterFields(): FilterField[] {
       id: "item",
       label: t("filter.item.label"),
       placeholder: t("filter.item.placeholder"),
-      // 시안(11755:97590): 결제 내역만 222px(기본 폭)이고 다른 선택은 140px.
-      width: DEFAULT_FIELD_WIDTH,
+      // 시안(11755:96965): 세 선택(결제 내역·결제 수단·결제 상태)이 모두 140px. 팝업은 트리거 폭 이상으로 내용만큼 늘어남.
+      width: NARROW_FIELD_WIDTH,
       options: PAYMENT_ITEMS.map((item) => ({
         value: item.value,
         label: t(`filter.item.option.${item.value}`),

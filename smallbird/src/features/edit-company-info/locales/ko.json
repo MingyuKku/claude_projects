@@ -8,7 +8,15 @@
     "mailorderNumber": "통신판매번호",
     "mailorderFile": "통신판매업 신고증",
     "category": "회사 분류",
-    "url": "회사 URL"
+    "url": "회사 URL",
+    "placeholder": {
+      "companyName": "회사명을 입력해 주세요.",
+      "contact": "연락처를 입력해 주세요.",
+      "businessNumber": "사업자 등록 번호를 입력해 주세요.",
+      "mailorderNumber": "통신 판매 번호를 입력해 주세요.",
+      "category": "선택",
+      "url": "URL을 입력해 주세요."
+    }
   },
   "file": {
     "upload": "업로드",
@@ -20,7 +28,8 @@
       "download": "파일을 내려받지 못했습니다. 다시 시도해 주세요."
     },
     "none": "등록된 파일이 없습니다",
-    "download": "{{name}} 다운로드"
+    "download": "{{name}} 다운로드",
+    "placeholder": "파일을 업로드해 주세요."
   },
   "inform": {
     "required": "필수 항목을 모두 입력해야 수정할 수 있습니다.",

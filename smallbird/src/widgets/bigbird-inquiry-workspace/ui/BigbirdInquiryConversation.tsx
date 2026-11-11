@@ -148,6 +148,8 @@ export function BigbirdInquiryConversation({
   const isFailed = phase === "failed";
   // 연결 실패 카드는 잠깐만 보여 줌. 대화가 바뀌면 컴포넌트가 새로 그려져(key) 다시 셈.
   const [isFailedCardHidden, setIsFailedCardHidden] = useState(false);
+  // 완료 카드를 X로 닫음. 화면에서만 걷으므로 대화가 바뀌거나 새로 들어오면 다시 보임.
+  const [isCompletedCardClosed, setIsCompletedCardClosed] = useState(false);
   useEffect(() => {
     if (!isFailed) return;
     const timer = setTimeout(() => setIsFailedCardHidden(true), FAILED_CARD_MS);
@@ -172,18 +174,21 @@ export function BigbirdInquiryConversation({
     ? inquiry.isFinished
     : messages.at(-1)?.kind === "notice";
   // 대화 위에 고정되는 안내 카드(완료·요청 중·요청 실패). 첫 메시지가 가리지 않게 높이만큼 띄움.
+  const isCompletedCardVisible = isRealtimeEnded && !isCompletedCardClosed;
   const hasTopCard =
-    isRealtimeEnded || phase === "requesting" || isFailedCardVisible;
+    isCompletedCardVisible || phase === "requesting" || isFailedCardVisible;
 
   function renderTopCard() {
     const className = "absolute inset-x-4 top-4 z-10";
-    if (isRealtimeEnded) {
+    if (isCompletedCardVisible) {
       return (
         <MessageAlert
           status="completed"
           title={t("completed.title")}
           description={t("completed.description")}
           caption={t("completed.caption")}
+          closeLabel={tCommon("action.close")}
+          onClickClose={() => setIsCompletedCardClosed(true)}
           className={className}
         />
       );
@@ -423,7 +428,10 @@ export function BigbirdInquiryConversation({
         ) : (
           // Radix 스크롤 영역은 안쪽을 display:table로 감싸 내용 폭(긴 캠페인 카드 380px)만큼 늘어나고,
           // MO(360)에서 대화가 화면 밖으로 밀립니다. 세로 스크롤만 쓰므로 안쪽을 block으로 둡니다.
-          <ScrollArea className="min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:block!">
+          <ScrollArea
+            type="auto"
+            className="min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:block!"
+          >
             <ol
               className={cn(
                 "flex flex-col gap-3 px-5 py-4 tablet:gap-4 tablet:pt-5",

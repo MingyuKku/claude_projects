@@ -1,5 +1,6 @@
 import { EmptyTableFrame } from "@/shared/components/list-filter";
 import { formatListDate, useTranslation } from "@/shared/i18n";
+import { EMPTY_VALUE, orEmptyValue } from "@/shared/lib";
 import { cn } from "@/shared/lib/utils";
 import { Avatar, AvatarImage, AvatarPlaceholder } from "@/shared/ui/avatar";
 import { Button } from "@/shared/ui/button";
@@ -97,18 +98,24 @@ export function SubAccountTable({
                   <AvatarPlaceholder />
                 </Avatar>
                 <span className={cn(CELL_TEXT_CLASS_NAME, "min-w-0 flex-1")}>
-                  {account.identifier}
+                  {orEmptyValue(account.identifier)}
                 </span>
               </div>
             </TableCell>
             <TableCell className="whitespace-normal">
-              <span className={CELL_TEXT_CLASS_NAME}>{account.name}</span>
+              <span className={CELL_TEXT_CLASS_NAME}>
+                {orEmptyValue(account.name)}
+              </span>
             </TableCell>
             <TableCell className="whitespace-normal">
-              <span className={CELL_TEXT_CLASS_NAME}>{account.email}</span>
+              <span className={CELL_TEXT_CLASS_NAME}>
+                {orEmptyValue(account.email)}
+              </span>
             </TableCell>
             <TableCell className="truncate">
-              {account.createdAt ? formatListDate(account.createdAt) : ""}
+              {account.createdAt
+                ? formatListDate(account.createdAt)
+                : EMPTY_VALUE}
             </TableCell>
             <TableCell>
               <div className="flex items-center gap-6">

@@ -67,6 +67,16 @@ describe("usePanelParam", () => {
     expect(result.current.location.pathname).toBe("/prev");
   });
 
+  it("패널을 연 뒤 앱 밖에서 기록이 쌓였어도(결제창 iframe 등) X 한 번에 닫힌다", () => {
+    const { result } = setup("/a");
+    act(() => result.current.panelParam.openPanel("create"));
+    // 결제창 iframe 안의 이동처럼 앱이 모르는 기록이 쌓임: 뒤로 가면 화면이 그대로인 항목.
+    window.history.pushState(null, "", "/outside");
+    act(() => result.current.panelParam.closePanel());
+    expect(result.current.panelParam.panel).toBeNull();
+    expect(result.current.location.pathname).toBe("/a");
+  });
+
   it("열린 채 다른 패널·연결 값으로 바꿔도 기록이 늘지 않는다", () => {
     const { result } = setup("/a");
     act(() =>

@@ -16,6 +16,7 @@ import { BankAccountTab } from "./BankAccountTab";
 import { CompanyInfoTab } from "./CompanyInfoTab";
 import { MasterAccountTab } from "./MasterAccountTab";
 import { SubAccountFormScreen } from "./SubAccountFormScreen";
+import { SubAccountPermissionScreen } from "./SubAccountPermissionScreen";
 import { SubAccountTab } from "./SubAccountTab";
 import { SubSelfTab } from "./SubSelfTab";
 
@@ -105,19 +106,35 @@ export function MyPageAccountPage() {
     );
   }
 
-  // TAB의 Sub ID 생성·수정은 탭 줄까지 덮는 본문 전체 화면(시안).
+  // TAB·MO의 Sub ID 생성·수정은 탭 줄까지 덮는 본문 전체 화면(시안, QA 2026-11-10: MO도 탭 줄 없음).
   if (
-    subLayout === "tablet" &&
+    subLayout !== "desktop" &&
     (subPanel === "create" || (subPanel === "edit" && editAccount))
   ) {
     return (
       <>
         <title>{t("title")}</title>
         <SubAccountFormScreen
-          variant="tablet"
           account={editAccount ?? undefined}
           onClose={closePanel}
           onSaved={closePanel}
+        />
+      </>
+    );
+  }
+
+  // MO의 권한 부여도 탭 줄까지 덮는 전체 화면. TAB은 탭 줄만 숨긴 본문 카드(아래 hidesTabBar).
+  if (
+    subLayout === "mobile" &&
+    subPanel === "permission" &&
+    permissionAccount
+  ) {
+    return (
+      <>
+        <title>{t("title")}</title>
+        <SubAccountPermissionScreen
+          accountIdx={permissionAccount.accountIdx}
+          onClose={closePanel}
         />
       </>
     );

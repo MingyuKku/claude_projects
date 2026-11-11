@@ -5,6 +5,8 @@ import {
   FILTER_PANEL,
   FILTER_PANEL_PARAM,
 } from "@/shared/components/list-filter";
+import { MEDIA_QUERY } from "@/shared/config";
+import { useMediaQuery } from "@/shared/lib";
 
 import type { RefObject } from "react";
 
@@ -25,6 +27,8 @@ const positions = new Map<string, number>();
  * `<main>`이 유지되어 이전 화면의 스크롤 위치가 그대로 남기 때문.
  * - 화면이 바뀐 것은 경로, 하위 화면(`?panel=`), 탭·세그먼트가 바뀐 때임. 새로 이동하면 맨 위로 보냄.
  * - 뒤로/앞으로 가기는 그 기록 항목을 떠날 때의 위치로 되돌림. 내용이 아직 없으면 잠시 기다려 맞춤.
+ * - PC(≥1440)는 하위 화면이 목록 옆 인라인 패널·드로어로 열려 본문이 그대로 남으므로 하위 화면으로 보지 않고 보던 위치를 유지함.
+ *   TAB·MO는 하위 화면이 본문을 대체하므로 새 화면으로 보고 맨 위로 보냄.
  * - 필터는 MO에서 목록 위에 모달로 열려(`?panel=filter`) 목록을 되돌리면 안 되므로 하위 화면으로 보지 않음.
  */
 export function useScrollRestoration(
@@ -34,9 +38,11 @@ export function useScrollRestoration(
   const navigationType = useNavigationType();
   const params = new URLSearchParams(search);
   const panel = params.get(FILTER_PANEL_PARAM);
+  const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
+  const isSubScreen = !isDesktop && panel !== FILTER_PANEL;
   const screenKey = [
     pathname,
-    panel === FILTER_PANEL ? null : panel,
+    isSubScreen ? panel : null,
     ...CONTENT_PARAMS.map((name) => params.get(name)),
   ].join("|");
 

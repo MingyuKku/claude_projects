@@ -83,16 +83,25 @@ function HighlightedText({
   text: string;
   keyword?: string;
 }) {
-  return splitByKeyword(text, keyword).map((segment, index) =>
-    segment.isMatch ? (
-      // 조각은 원문 위치 순서가 고정이라 인덱스 key로 충분함.
-      <mark key={index} className="bg-blue-50 font-semibold text-primary">
-        {segment.text}
-      </mark>
-    ) : (
-      segment.text
-    ),
-  );
+  const segments = splitByKeyword(text, keyword);
+  // 굵기는 부모를 따름(제목 600, 캡션·미리보기 400). 계정명 앞 @ 는 시안처럼 강조 덩어리에 포함함.
+  return segments.map((segment, index) => {
+    if (segment.isMatch) {
+      const previous = segments[index - 1];
+      const hasHandlePrefix =
+        !previous?.isMatch && previous?.text.endsWith("@");
+      return (
+        // 조각은 원문 위치 순서가 고정이라 인덱스 key로 충분함.
+        <mark key={index} className="bg-blue-50 text-primary">
+          {hasHandlePrefix ? "@" : ""}
+          {segment.text}
+        </mark>
+      );
+    }
+    const isHandlePrefix =
+      segments[index + 1]?.isMatch && segment.text.endsWith("@");
+    return isHandlePrefix ? segment.text.slice(0, -1) : segment.text;
+  });
 }
 
 function AlertDot({

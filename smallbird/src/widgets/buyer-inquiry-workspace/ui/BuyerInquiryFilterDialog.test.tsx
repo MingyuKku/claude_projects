@@ -50,7 +50,7 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("BuyerInquiryFilterDialog", () => {
-  it("캠페인을 캠페인 코드로도 검색한다(REQ-24-0006)", async () => {
+  it("캠페인은 검색 입력 없이 목록에서 고른다(Figma Select)", async () => {
     const user = userEvent.setup();
     render(
       <SWRConfig value={{ provider: () => new Map() }}>
@@ -64,17 +64,18 @@ describe("BuyerInquiryFilterDialog", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "필터" }));
-    const [campaignBox] = screen.getAllByRole("combobox");
+    const [campaignBox, influencerBox] = screen.getAllByRole("combobox");
     await user.click(campaignBox!);
-    await user.type(
-      await screen.findByPlaceholderText(
-        "캠페인명 또는 캠페인 코드를 검색하세요.",
-      ),
-      "Q-5678",
-    );
 
-    expect(screen.getAllByRole("option")).toHaveLength(1);
-    expect(screen.getByRole("option", { name: /헤어/ })).toBeInTheDocument();
+    // 검색 입력(cmdk 입력도 combobox 역할)이 없어 트리거 둘만 남고, 전체 + 캠페인 2개가 모두 보임.
+    expect(screen.getAllByRole("combobox")).toEqual([
+      campaignBox,
+      influencerBox,
+    ]);
+    expect(await screen.findAllByRole("option")).toHaveLength(3);
+
+    await user.click(screen.getByRole("option", { name: /헤어/ }));
+    expect(campaignBox).toHaveTextContent(/헤어/);
   });
 
   it.each([

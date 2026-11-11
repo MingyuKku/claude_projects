@@ -1,3 +1,4 @@
+import { useEffect, useRef } from "react";
 import { useLocation, useNavigate, useSearchParams } from "react-router";
 
 interface UsePanelParamOptions<T extends string> {
@@ -27,6 +28,7 @@ function isPanelState(state: unknown): state is PanelState {
  * - 열기: 기록을 쌓고(push) 앱 안에서 열었다는 표시를 state에 남김.
  * - 열린 채 다른 패널·연결 값으로 바꾸기: 기록을 쌓지 않음(replace).
  * - 닫기: 앱 안에서 연 패널이면 뒤로 가서 기록이 늘지 않게 하고, 주소로 바로 들어온 패널이면 쿼리만 지움(replace).
+ *   패널을 연 뒤 앱 밖에서 기록이 쌓였으면(결제창 iframe 안의 이동 등) 뒤로 가도 화면이 그대로라 쿼리만 지움.
  */
 export function usePanelParam<T extends string>({
   panels,
@@ -39,6 +41,18 @@ export function usePanelParam<T extends string>({
   const requested = searchParams.get(param);
   const panel = panels.find((candidate) => candidate === requested) ?? null;
   const isOpenedInApp = isPanelState(state);
+  // 패널을 앱 안에서 열었을 때의 브라우저 기록 길이. 그 뒤 길이가 달라졌으면 사이에 앱이 모르는 기록이 끼어 있음.
+  const openedHistoryLengthRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    if (panel === null) {
+      openedHistoryLengthRef.current = null;
+      return;
+    }
+    if (isOpenedInApp && openedHistoryLengthRef.current === null) {
+      openedHistoryLengthRef.current = window.history.length;
+    }
+  }, [panel, isOpenedInApp]);
 
   function openPanel(next: T, linked: Record<string, string> = {}) {
     const isSwitching = panel !== null;
@@ -74,7 +88,10 @@ export function usePanelParam<T extends string>({
 
   function closePanel() {
     if (panel === null) return;
-    if (isOpenedInApp) {
+    if (
+      isOpenedInApp &&
+      window.history.length === openedHistoryLengthRef.current
+    ) {
       void navigate(-1);
       return;
     }

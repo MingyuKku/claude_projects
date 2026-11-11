@@ -6,12 +6,7 @@ import {
   readFilterValues,
 } from "@/shared/components/list-filter";
 
-import {
-  DETAIL_QUERY_PARAMS,
-  KEYWORD_PARAM,
-  PAGE_PARAM,
-  SIZE_PARAM,
-} from "../model/constants";
+import { KEYWORD_PARAM, PAGE_PARAM, SIZE_PARAM } from "../model/constants";
 import { parsePageParam, parsePageSizeParam } from "./page-param";
 
 import type {
@@ -38,17 +33,12 @@ export function useListParams(
   );
   const filters = readFilterValues(searchParams, fields);
 
-  // 목록 조건(검색어·필터·쪽·개수)이 바뀌면 열어 둔 상세 보기를 닫음. 상세의 대상이 새 목록에 없을 수 있고, 닫지 않으면
-  // 결과가 비어 화면에서만 닫힌 상세가 주소에 남아 있다가 조건을 되돌릴 때 다시 열림.
-  function closeDetail(params: URLSearchParams) {
-    for (const key of DETAIL_QUERY_PARAMS) params.delete(key);
-  }
-
+  // 목록 조건(검색어·필터·쪽·개수)이 바뀌어도 열어 둔 상세 보기(`panel`·`id`)는 그대로 둠. PC에서는 상세가 목록 옆에 떠 있어
+  // 조건을 바꿔 가며 볼 수 있어야 하고, 대상이 새 목록에 없어도 상세는 열 때의 내용을 유지함(`useKeepDetail`).
   function update(change: (params: URLSearchParams) => void) {
     setSearchParams((prev) => {
       const params = new URLSearchParams(prev);
       change(params);
-      closeDetail(params);
       return params;
     });
   }
@@ -75,7 +65,6 @@ export function useListParams(
         (prev) => {
           const params = new URLSearchParams(prev);
           applyFilterValues(params, fields, next, PAGE_PARAM);
-          closeDetail(params);
           params.delete(FILTER_PANEL_PARAM);
           return params;
         },
@@ -110,7 +99,6 @@ export function useListParams(
     buildPageHref: (target: number) => {
       const params = new URLSearchParams(searchParams);
       params.set(PAGE_PARAM, String(target));
-      closeDetail(params);
       return `?${params.toString()}`;
     },
   };

@@ -14,9 +14,6 @@ import {
 import { useTranslation } from "@/shared/i18n";
 import { useDialogTarget } from "@/shared/lib";
 
-import { SubAccountFormScreen } from "./SubAccountFormScreen";
-import { SubAccountPermissionScreen } from "./SubAccountPermissionScreen";
-
 import type { SubAccountViewModel } from "@/features/manage-sub-accounts";
 
 export type SubAccountLayout = "desktop" | "tablet" | "mobile";
@@ -25,7 +22,7 @@ export type SubAccountLayout = "desktop" | "tablet" | "mobile";
 export type SubAccountPanelName = "create" | "permission" | "edit";
 
 interface SubAccountTabProps {
-  /** 화면 크기에 따른 하위 화면 배치. PC는 오른쪽 패널, TAB은 생성·수정을 페이지가 본문 전체로 그리고 권한 부여는 목록 자리의 카드, MO는 탭 아래 화면. */
+  /** 화면 크기에 따른 하위 화면 배치. PC는 오른쪽 패널, TAB은 권한 부여를 목록 자리의 카드로 그림. TAB의 생성·수정과 MO의 모든 하위 화면은 페이지가 탭 줄까지 덮는 전체 화면으로 그려 이 컴포넌트는 목록만 그림. */
   layout: SubAccountLayout;
   /** 열려 있는 하위 화면. 없으면 목록만. */
   panel: SubAccountPanelName | null;
@@ -71,29 +68,6 @@ export function SubAccountTab({
     if (account.accountIdx === openedAccountIdx) onClosePanel();
   }
 
-  if (layout === "mobile" && openedPanel === "permission" && openedAccount) {
-    return (
-      <SubAccountPermissionScreen
-        accountIdx={openedAccount.accountIdx}
-        onClose={onClosePanel}
-      />
-    );
-  }
-
-  if (
-    layout === "mobile" &&
-    (openedPanel === "create" || openedPanel === "edit")
-  ) {
-    return (
-      <SubAccountFormScreen
-        variant="mobile"
-        account={openedAccount ?? undefined}
-        onClose={onClosePanel}
-        onSaved={onClosePanel}
-      />
-    );
-  }
-
   // TAB의 권한 부여는 목록 자리를 덮는 본문 전체 카드(시안 10724:187263). 탭 줄은 그대로 보임.
   if (layout === "tablet" && openedPanel === "permission" && openedAccount) {
     return (
@@ -122,9 +96,9 @@ export function SubAccountTab({
           onClickEdit={onOpenEdit}
           onClickDelete={deleteDialog.open}
         />
-        {/* MO는 생성 버튼을 화면 아래에 고정함(시안 Footer). 스크롤 컨테이너(<main>) 안에서 sticky로 붙여 키보드 대응 JS 없이
-            처리하고, 목록 끝이 버튼에 가리지 않게 함. 화면 좌우 끝까지 채우도록 레이아웃 여백(--mypage-gutter)만큼 나감. */}
-        <div className="sticky bottom-0 -mx-(--mypage-gutter) mt-auto border-t bg-background px-(--mypage-gutter) py-4 tablet:hidden">
+        {/* MO는 생성 버튼을 화면 아래에 고정함(시안 Footer 10724:187939, 버튼 위 경계선 없음). 스크롤 컨테이너(<main>) 안에서 sticky로 붙여
+            키보드 대응 JS 없이 처리하고, 목록 끝이 버튼에 가리지 않게 함. 화면 좌우 끝까지 채우도록 레이아웃 여백(--mypage-gutter)만큼 나감. */}
+        <div className="sticky bottom-0 -mx-(--mypage-gutter) mt-auto bg-background px-(--mypage-gutter) py-4 tablet:hidden">
           <CreateSubAccountButton className="w-full" onClick={onOpenCreate} />
         </div>
       </div>

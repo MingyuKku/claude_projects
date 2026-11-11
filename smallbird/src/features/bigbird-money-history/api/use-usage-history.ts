@@ -3,6 +3,7 @@ import useSWR from "swr";
 import { MEDIA_QUERY } from "@/shared/config";
 import { useInfinitePages, useMediaQuery } from "@/shared/lib";
 
+import { useKeepDetail } from "../lib/use-keep-detail";
 import { useUsageListParams } from "../lib/use-usage-list-params";
 import { fetchUsageList } from "./usage-api";
 
@@ -56,7 +57,8 @@ export function useUsageRecord(id: string | null) {
   const scroll = useUsageScrollList(baseQuery, isReady && !isTabletUp, {
     revalidateIfStale: false,
   });
-  if (id === null) return null;
   const records = isTabletUp ? (paged.list?.records ?? []) : scroll.records;
-  return records.find((record) => record.id === id) ?? null;
+  const found =
+    id === null ? null : (records.find((record) => record.id === id) ?? null);
+  return useKeepDetail(id, found);
 }

@@ -33,7 +33,7 @@ export function toUsageDetail(serverValue: string | null | undefined) {
   return USAGE_DETAIL_BY_SERVER_VALUE.get(serverValue ?? "") ?? null;
 }
 
-// 값이 없으면 빈 문자열(표 UI는 빈 값을 "-" 없이 비워 둠).
+// 값이 없으면 빈 문자열. 표 셀은 그릴 때 `orEmptyValue`로 "-"를 보임(카드·상세는 빈칸 그대로).
 function textOrEmpty(value: string | null | undefined) {
   return value?.trim() ? value : "";
 }
@@ -42,7 +42,7 @@ export function transformUsageList(list: UsageList): UsageListViewModel {
   return {
     records: list.list.map((item) => {
       const type = USAGE_TYPE_BY_SERVER_VALUE.get(item.type) ?? null;
-      // 충전·출금은 캠페인과 무관해 서버 "-"도 빈칸으로 둠(시안).
+      // 충전·출금은 캠페인과 무관해 서버 "-"도 빈 값으로 정규화함(표 셀은 "-"로 그림).
       const isCampaignFree =
         type !== null && NON_CAMPAIGN_USAGE_TYPES.includes(type);
       const campaignText = (value: string | null | undefined) =>

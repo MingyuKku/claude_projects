@@ -2,7 +2,6 @@
   "title": "Bigbird 余额",
   "tabs": {
     "charge": "充值/提现记录",
-    "chargeShort": "充值记录",
     "usage": "使用记录"
   },
   "views": {
