@@ -321,7 +321,7 @@ ${body}
 ---
 이 리뷰가 도움이 됐으면 👍, 틀렸거나 불필요했으면 👎 를 이 노트에 남겨 주세요. 반응 수를 모아 리뷰 기준을 조정합니다.
 
-<sub>비교 범위: ${BASE_SHA} → ${HEAD_SHA} · 판정: ${result} · 필수 수정 스레드는 해결 처리해야 병합할 수 있으며(AI 지적이 틀렸다면 사유를 남기고 해결), 권장 수정은 병합을 막지 않습니다. 리뷰 기준은 MR 브랜치 버전(내부 팀 신뢰 전제)입니다.</sub>"
+<sub>비교 범위: ${BASE_SHA} → ${HEAD_SHA} · 판정: ${result} · 필수 수정 스레드는 해결 처리해야 병합할 수 있으며(AI 지적이 틀렸다면 사유를 남기고 해결), 권장 수정은 병합을 막지 않습니다. 지적에 대한 답글은 해당 인라인 스레드에 달아 주세요(이 노트에 단 답글은 다음 리뷰 때 자동 해결되며, 그 전에 병합하려면 답글을 달 때 해결 처리를 함께 선택). 리뷰 기준은 MR 브랜치 버전(내부 팀 신뢰 전제)입니다.</sub>"
   fi
 
   if [ "$DRY_RUN" = "1" ]; then
@@ -342,6 +342,46 @@ ${body}
     exit 1
   fi
   log "노트를 ${method} 했습니다 (커밋 ${HEAD_SHA}, 판정: ${result})."
+  [ "$method" = "PUT" ] && resolve_summary_thread
+  return 0
+}
+
+# auto_resolve_thread <discussion id> <안내 문구> : 이유를 표식(AUTO_RESOLVE_MARK) 답글로 남기고 스레드를 해결 처리한다.
+# 표식은 "이미 자동 해결했으니 다시 닫지 않는다"는 뜻이라, 해결에 실패했으면 표식 답글을 지워 다음 리뷰가 다시 시도하게 한다.
+auto_resolve_thread() {
+  local did="$1" msg="$2" reply_id
+  api POST "${DISCUSSIONS_URL}/${did}/notes" "$(jq -n --arg b "${msg}
+${AUTO_RESOLVE_MARK}" '{body: $b}')" || return 1
+  reply_id="$(jq -r '.id' <<<"$API_BODY")"
+  if ! api PUT "${DISCUSSIONS_URL}/${did}" '{"resolved": true}'; then
+    api DELETE "${NOTES_URL}/${reply_id}" || true
+    return 1
+  fi
+}
+
+# resolve_summary_thread : 요약 노트에 누가 답글을 달면 GitLab 이 노트를 스레드로 바꿔 "All threads must be resolved" 에 걸린다.
+# 요약 노트는 병합을 막지 않는 안내이므로 해결 처리하고, 이유를 답글로 남긴다. 실패해도 리뷰 결과에는 영향을 주지 않는다.
+# 한 번 자동 해결한 뒤 사람이 다시 연 스레드는 사람의 판단으로 보고 다시 닫지 않는다.
+resolve_summary_thread() {
+  local page=1 count disc="" did
+  while [ "$page" -le 20 ]; do
+    api GET "${DISCUSSIONS_URL}?per_page=100&page=${page}" || return 0
+    disc="$(jq -c --argjson nid "$EXISTING_NOTE_ID" '[.[] | select(.notes[0].id == $nid)] | first // empty' <<<"$API_BODY")"
+    count="$(jq 'length' <<<"$API_BODY")"
+    if [ -n "$disc" ] || [ "$count" -lt 100 ]; then
+      break
+    fi
+    page=$((page + 1))
+  done
+  [ -n "$disc" ] || return 0
+  jq -e '.notes[0].resolvable == true and (.notes[0].resolved | not)' <<<"$disc" >/dev/null || return 0
+  if jq -e --argjson uid "$BOT_USER_ID" --arg auto "$AUTO_RESOLVE_MARK" \
+    'any(.notes[]; .author.id == $uid and (.body | contains($auto)))' <<<"$disc" >/dev/null; then
+    return 0
+  fi
+  did="$(jq -r '.id' <<<"$disc")"
+  auto_resolve_thread "$did" "요약 노트는 병합을 막지 않는 안내라서, 답글로 생긴 스레드를 자동으로 해결 처리했습니다. 논의가 필요하면 다시 열어 주세요(다시 연 스레드는 닫지 않습니다)." || return 0
+  log "요약 노트 스레드를 해결 처리했습니다."
 }
 
 load_existing_note
@@ -785,10 +825,7 @@ post_inline() {
     while IFS=$'\t' read -r k did resolved nid auto <&4; do
       [ "$resolved" = "false" ] && [ "$auto" = "false" ] || continue
       grep -qxF "$k" "$WORK/current-keys" && continue
-      api POST "${DISCUSSIONS_URL}/${did}/notes" \
-        "$(jq -n --arg b "이번 리뷰에서는 이 지적이 더 이상 확인되지 않아 자동으로 해결 처리했습니다. 아직 남아 있다면 다시 열어 주세요.
-${AUTO_RESOLVE_MARK}" '{body: $b}')" || true
-      api PUT "${DISCUSSIONS_URL}/${did}" '{"resolved": true}' || true
+      auto_resolve_thread "$did" "이번 리뷰에서는 이 지적이 더 이상 확인되지 않아 자동으로 해결 처리했습니다. 아직 남아 있다면 다시 열어 주세요." || true
     done 4<"$WORK/existing-inline.tsv"
   fi
 }
