@@ -51,7 +51,7 @@ cmd_rm() {
   local extras=() p skip l
   while IFS= read -r p; do
     p="${p#!! }"; p="${p%/}"
-    [[ "$p" =~ ^(node_modules|\.vite|\.playwright-mcp|dist|coverage|\.pnpm-store)$ ]] && continue
+    [[ "$p" =~ ^(node_modules|\.vite|\.playwright-mcp|e2e/\.output|dist|coverage|\.pnpm-store)$ ]] && continue
     [[ "$p" =~ \.tsbuildinfo$ ]] && continue
     [[ "$p" =~ ^\.claude/(\.last-|\.stop-attempts|\.unverified-edits|hook-log\.tsv) ]] && continue
     skip=0; for l in "${LINKS[@]}"; do [[ "$p" == "$l" ]] && skip=1; done

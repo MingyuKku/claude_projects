@@ -15,6 +15,7 @@ CLAUDE.local.md
 .claude/.unverified-edits
 .claude/.last-deleted
 .playwright-mcp/
+e2e/.output/
 .DS_Store
 .pnpm-store/
 .claude/figma-cache/

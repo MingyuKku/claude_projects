@@ -96,6 +96,28 @@ build:
       when: never
     - when: on_success
 
+# E2E 스모크(시범 운영): 빌드한 번들을 실제 브라우저(Chromium)로 열어 여러 화면을 잇는 흐름을 확인한다.
+# stage 병합 후에는 자동으로, MR 에서는 필요할 때 수동으로 실행한다. 안정성과 소요 시간을 지켜본 뒤 필수 검사로 올릴지 정하므로,
+# 그 전까지는 실패해도 병합·배포를 막지 않는다.
+# Playwright 공식 이미지는 Node 26 이라 engines(>=24 <25)와 맞지 않아, 기본 이미지에 브라우저만 설치한다.
+e2e:
+  extends: .verify
+  script:
+    - pnpm exec playwright install --with-deps chromium
+    - pnpm test:e2e
+  artifacts:
+    when: always
+    expire_in: 1 week
+    paths: [e2e/.output/report]
+    reports:
+      junit: e2e/.output/junit.xml
+  rules:
+    - if: $CI_COMMIT_BRANCH == "stage"
+      allow_failure: true
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+      when: manual
+      allow_failure: true
+
 # [stage 배포 1/3] stage 환경 값으로 번들을 만들어 이미지 job 에 넘긴다.
 # 필요한 CI 변수: STAGE_ENV_FILE(File 타입). .env.example 의 키를 stage 값으로 채운다.
 # VITE_* 는 번들에 그대로 들어가 공개되므로 비밀 값은 넣지 않는다. VITE_API_*_URL 은 백엔드 절대 주소이고, VITE_PROXY_* 는 개발 서버 전용이라 넣지 않는다.

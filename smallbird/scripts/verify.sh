@@ -7,7 +7,7 @@
 # - `--fingerprint`: 검사 없이 지문만 출력한다. Stop 훅이 같은 계산을 쓰도록 여기 한 곳에 둔다.
 
 # 검증 입력이 되는 파일. lockfile 도 포함한다(의존성만 바뀌어도 이전 성공을 재사용하지 않기 위해).
-WATCH="src scripts/i18n.mjs scripts/design tsconfig.json vite.config.ts vitest.config.ts eslint.config.js package.json pnpm-lock.yaml"
+WATCH="src scripts/i18n.mjs scripts/design tsconfig.json vite.config.ts vitest.config.ts playwright.config.ts e2e eslint.config.js package.json pnpm-lock.yaml"
 VERIFIED=".claude/.last-verified"
 
 # 커밋(HEAD)이 아니라 검증 입력의 내용으로 지문을 만든다. 미커밋 변경이 그대로면 같은 지문이다.

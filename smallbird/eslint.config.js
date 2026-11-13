@@ -72,6 +72,8 @@ export default defineConfig([
     "coverage",
     "node_modules",
     "src/shared/api/generated",
+    // E2E 빌드 번들·리포트
+    "e2e/.output",
   ]),
 
   js.configs.recommended,
