@@ -144,7 +144,10 @@ export function ChatMessage({
     return (
       <div className={cn("flex flex-col gap-3", align, className)}>
         {card}
-        <div className={cn("flex flex-col gap-2", align)}>
+        {/* 첨부가 있으면 묶음 폭을 행 폭까지 늘려 썸네일 격자가 말풍선 폭(최대 200)에 갇히지 않게 함(Figma 11315:50501 3열 248). */}
+        <div
+          className={cn("flex flex-col gap-2", align, attachments && "w-full")}
+        >
           <div
             className={cn(
               "flex items-center gap-2",

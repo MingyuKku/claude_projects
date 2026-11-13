@@ -65,6 +65,7 @@
   "progressStatus": "進行状況",
   "shopCode": "ショップコード",
   "otherTag": "その他",
+  "campaignTag": "キャンペーン",
   "withdrawal": {
     "title": "ビッグバードマネー出金申請",
     "status": {

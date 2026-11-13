@@ -65,6 +65,7 @@
   "progressStatus": "进行状态",
   "shopCode": "店铺代码",
   "otherTag": "其他",
+  "campaignTag": "活动",
   "withdrawal": {
     "title": "Bigbird 余额提现申请",
     "status": {

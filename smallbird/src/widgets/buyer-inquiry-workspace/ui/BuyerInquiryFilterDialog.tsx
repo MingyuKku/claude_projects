@@ -8,6 +8,7 @@ import {
 } from "@/entities/inquiry";
 import { Combobox } from "@/shared/components/combobox";
 import { DateRangePicker } from "@/shared/components/date-picker";
+import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { toDateRange, toIsoDate } from "@/shared/lib/date-range";
 import { useMediaQuery } from "@/shared/lib/useMediaQuery";
@@ -48,6 +49,7 @@ export function BuyerInquiryFilterDialog({
   const { t } = useTranslation("widgets/buyer-inquiry-workspace");
   const { t: tCommon } = useTranslation("common");
   const isTabletUp = useMediaQuery("(min-width: 768px)");
+  const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
   const [open, setOpen] = useState(false);
   const titleId = useId();
   // Figma 인플루언서 필터(10819:41465): 전체 · 인플루언서 문의 · 캠페인 Q&A.
@@ -122,12 +124,14 @@ export function BuyerInquiryFilterDialog({
             ))}
           </div>
         </fieldset>
-        {/* Figma Select(6964:73045): 아래 화살표, 검색 없이 목록에서 고름. MO는 하단 시트(11315:50994). */}
+        {/* Figma Select(6964:73045): 아래 화살표, 검색 없이 목록에서 고름. MO는 하단 시트(11315:50994). 필드 높이는 40(등록일과 같음). */}
         <Combobox
-          size="sm"
           label={t("filter.campaign")}
           isSearchable={false}
-          triggerIcon={<ChevronDown className="ml-4 size-4 shrink-0" />}
+          // 화살표 오른쪽 여백은 MO 8, TAB·PC 12(Figma Select Field pad 8/12, 테두리 포함)라 MO만 5px 당김.
+          triggerIcon={
+            <ChevronDown className="-mr-1.25 ml-4 size-4 shrink-0 tablet:mr-0" />
+          }
           value={draft.campaignIdx?.toString() ?? ""}
           onValueChange={(selected) =>
             setDraft((current) => ({
@@ -151,7 +155,6 @@ export function BuyerInquiryFilterDialog({
         />
         {/* 인플루언서는 검색되는 콤보박스(Figma Combobox 6777:61876) */}
         <Combobox
-          size="sm"
           label={t("filter.influencer")}
           disabled={draft.campaignIdx === undefined}
           value={draft.influencerThreadUserIdx?.toString() ?? ""}
@@ -234,7 +237,7 @@ export function BuyerInquiryFilterDialog({
     );
   }
 
-  // PC·TAB은 필터 버튼 아래에 붙는 팝오버(Figma 6782:68709·6791:45353: 버튼 아래 2, 오른쪽 끝 4 바깥),
+  // PC·TAB은 필터 버튼 아래에 붙는 팝오버(Figma 버튼 아래 2, 오른쪽 끝은 PC 6782:68709가 4 바깥, TAB 11315:50604는 버튼과 정렬),
   // MO는 헤더 아래 전체 화면(6790:130769).
   if (isTabletUp) {
     return (
@@ -243,7 +246,7 @@ export function BuyerInquiryFilterDialog({
         <PopoverContent
           align="end"
           sideOffset={2}
-          alignOffset={-4}
+          alignOffset={isDesktop ? -4 : 0}
           aria-labelledby={titleId}
           // 시안 테두리는 안쪽에 그려져 배치에 영향이 없으므로 테두리 대신 안쪽 링으로 그림
           className="flex w-85 flex-col rounded-md border-0 bg-card p-0 shadow-lg ring-1 ring-border ring-inset"

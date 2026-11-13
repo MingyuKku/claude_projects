@@ -232,6 +232,8 @@ export const realtimeConsultationSchema = z.object({
       created: z.string(),
       /** 재시도 중복 방지용 식별자. 과거 메시지에는 없음. */
       messageId: z.string().nullish(),
+      /** 실제 실시간 상담 중에 쓴 글이면 `realtime`, 일반 문의로 쓴 글이면 `general`. 과거 메시지에는 없음. */
+      mode: z.string().nullish(),
     }),
   ),
 });

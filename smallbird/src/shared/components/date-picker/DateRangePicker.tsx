@@ -67,9 +67,13 @@ export function DateRangePicker({
   const calendar = (
     <Calendar
       mode="range"
-      // MO 시트(Figma 6790:138595)는 날짜 칸이 46px로 시트 폭을 채움. 기본 36px은 PC 팝오버용.
+      // MO 시트(Figma Calendar 6790:136510)는 패딩 12·날짜 칸 36×36이고 7칸이 시트 폭에 고르게 벌어짐(가로 피치 약 46, 행 간격 8).
+      // Calendar는 격자가 내용 폭이라 그대로는 36 간격으로 모이므로, 이 시트에서만 격자를 폭에 채움(칸은 flex-1로 나눠 가짐).
+      // 범위 띠는 36폭 버튼이 아니라 칸(td)에 칠해야 칸 사이가 비지 않음(시작·끝은 안쪽 절반만).
       className={
-        hasTwoMonths ? undefined : "w-full p-2 [--cell-size:--spacing(11.5)]"
+        hasTwoMonths
+          ? undefined
+          : String.raw`w-full [&_.rdp-month\_grid]:w-full [&_.rdp-range\_end:not(.rdp-range\_start)]:rounded-l-none [&_.rdp-range\_end:not(.rdp-range\_start)]:bg-[linear-gradient(to_right,var(--color-muted)_50%,transparent_50%)] [&_.rdp-range\_middle]:rounded-none [&_.rdp-range\_middle]:bg-muted [&_.rdp-range\_start:not(.rdp-range\_end)]:rounded-r-none [&_.rdp-range\_start:not(.rdp-range\_end)]:bg-[linear-gradient(to_right,transparent_50%,var(--color-muted)_50%)]`
       }
       numberOfMonths={hasTwoMonths ? 2 : 1}
       defaultMonth={value?.from}

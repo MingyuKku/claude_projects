@@ -74,7 +74,8 @@ export function BigbirdInquiryDetailPanel({
         className="min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:block!"
       >
         {campaign && (
-          <section className="flex flex-col gap-3 p-4 tablet:p-5">
+          // Figma MO 상세 정보(Chat Details Base / List): 라벨·이미지·묶음 간격 8, TAB·PC는 12.
+          <section className="flex flex-col gap-2 p-4 tablet:gap-3 tablet:p-5">
             <h3 className="text-sm leading-none font-semibold">
               {t("campaignInfo")}
             </h3>
@@ -89,7 +90,7 @@ export function BigbirdInquiryDetailPanel({
               <div aria-hidden className="h-18.25 w-full rounded-sm bg-muted" />
             )}
             <div className="flex flex-col gap-1.5">
-              <strong className="text-sm leading-5 font-semibold">
+              <strong className="text-sm leading-4 font-semibold tablet:leading-5">
                 {campaign.name}
               </strong>
               <Row label={t("campaignType")} value={typeName} />
@@ -117,17 +118,17 @@ export function BigbirdInquiryDetailPanel({
                   onCopyError={() => toast.error(t("copyFailed"))}
                 />
               )}
+              {/* Figma 캠페인 바로가기: px-8 py-6, sm Medium, 글자색 foreground, 아이콘은 글자 바로 옆. 공구샵 행과 6px 간격(묶음 안) */}
+              <Button
+                variant="outline-foreground"
+                size="sm"
+                className="w-full"
+                disabled
+              >
+                {t("campaignShortcut")}
+                <ChevronRight className="size-4" />
+              </Button>
             </div>
-            {/* Figma 캠페인 바로가기: px-8 py-6, sm Medium, 글자색 foreground, 아이콘은 글자 바로 옆 */}
-            <Button
-              variant="outline-foreground"
-              size="sm"
-              className="w-full"
-              disabled
-            >
-              {t("campaignShortcut")}
-              <ChevronRight className="size-4" />
-            </Button>
           </section>
         )}
       </ScrollArea>

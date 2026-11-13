@@ -109,7 +109,8 @@ export function BuyerInquiryPanels({
           <Button
             variant="outline-foreground"
             size="icon-sm"
-            className="desktop:hidden"
+            // Figma TAB 헤더 Title Group: 뒤로가기–배지 12(MO는 8). PC는 버튼이 없음.
+            className="tablet:mr-1 desktop:hidden"
             aria-label={t("backToList")}
             onClick={goToList}
           >
@@ -142,12 +143,12 @@ export function BuyerInquiryPanels({
           {t("detail")} <ChevronRight className="size-4" />
         </Button>
       </header>
-      {/* Figma Conversation Area: MO 16px(7817:143173), TAB·PC 20px. */}
+      {/* Figma Conversation Area(MO 11315:51058·51062): 모든 기기 20px. */}
       <ScrollArea
         type="auto"
         className={cn("min-h-0 flex-1 bg-muted", SCROLL_VIEWPORT_FIX)}
       >
-        <div className="flex min-h-full flex-col p-4 tablet:p-5">
+        <div className="flex min-h-full flex-col p-5">
           <BuyerConversation
             inquiry={inquiry}
             isOtherDevice={isOtherDevice}

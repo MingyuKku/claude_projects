@@ -14,7 +14,6 @@ import { Tabs, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 import {
   formatListDate,
   getInquiryTitleKey,
-  getOtherInquiryPreview,
   getLastActivity,
   STATUS_BADGE_VARIANT,
 } from "../lib/format";
@@ -174,19 +173,14 @@ export function BigbirdInquiryWorkspace({
           const brandName = inquiry.brandName || campaign?.brandName;
           const title = getInquiryTitleKey(inquiry, campaign?.productName);
           const isOther = title.key === "inquiryTitle.other";
-          // Figma 26/10/29 카드(11315:49602·49659): 1행은 상태 배지 + 기타 문의일 때만 "기타문의" 태그,
-          // 2행은 캠페인 문의면 회색 브랜드명 + 제목, 기타 문의는 캠페인이 없어 최근 글 메시지 20자만(REQ-23-0002).
-          // 최근 메시지는 목록 API에 아직 없어 값이 없으면 그리지 않음(백엔드 요청 중).
-          const otherPreview = isOther ? getOtherInquiryPreview(inquiry) : null;
+          // Figma 26/10/29 카드(11315:49602·49659): 1행은 상태 배지 + 유형 태그, 2행은 캠페인 문의면 회색 브랜드명 + 제목.
+          // 태그는 기타 문의면 "기타문의", 캠페인 문의면 "캠페인 문의"(사용자 확인 2026-11-12, 시안은 모든 카드에 "기타문의").
+          // 2행은 최근 메시지가 아니라 "캠페인명 + 문의" 형식이고, 기타 문의는 캠페인이 없어 브랜드명 없이 제목 "기타 문의"만 보임.
           return (
             <ChatListItem
               key={inquiry.threadIdx}
               titlePrefix={isOther ? undefined : brandName}
-              title={
-                isOther
-                  ? (otherPreview ?? "")
-                  : t(title.key, { name: "name" in title ? title.name : "" })
-              }
+              title={t(title.key, { name: "name" in title ? title.name : "" })}
               badges={[
                 {
                   label: t(
@@ -196,9 +190,10 @@ export function BigbirdInquiryWorkspace({
                   ),
                   variant: STATUS_BADGE_VARIANT[inquiry.status],
                 },
-                ...(isOther
-                  ? [{ label: t("otherTag"), variant: "outline" as const }]
-                  : []),
+                {
+                  label: t(isOther ? "otherTag" : "campaignTag"),
+                  variant: "outline" as const,
+                },
               ]}
               date={formatListDate(getLastActivity(inquiry))}
               isSelected={inquiry.threadIdx === selectedThreadIdx}

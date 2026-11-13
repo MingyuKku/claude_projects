@@ -92,6 +92,23 @@ export function isMatchFailureShown(
   );
 }
 
+// 시간 초과로 끝난 사유: 연결 대기 3분(MATCH_TIMEOUT)과 연결 뒤 무응답 5·10분(INACTIVITY_TIMEOUT). 그 밖의 종료는 정상 종료임(사용자 결정 2026-11-12).
+const TIMEOUT_END_REASONS = ["MATCH_TIMEOUT", "INACTIVITY_TIMEOUT"];
+
+/**
+ * "완료된 상담" 카드를 상담 문서의 종료 사유로 보일지. 운영이 직접 종료한 상담은 서버가 종료 안내(notice) 메시지를 남기지 않고
+ * 상담 문서의 `finishTime`도 비운 채 `endReason`(RESPONDER_FINISHED 등)만 써서 대화만으로는 알 수 없음(2026-11-12 실제 흐름 확인).
+ * 스레드가 종료됐고(REST) 종료 사유가 시간 초과가 아니면 정상 종료로 봄. 종료된 스레드에는 메시지가 더 붙지 않아(새 스레드가 생김)
+ * 종료 뒤 메시지는 따로 보지 않음.
+ */
+export function isConsultationCompletedShown(
+  consultation: Pick<RealtimeConsultation, "endReason"> | undefined,
+  isThreadFinished: boolean,
+): boolean {
+  if (!isThreadFinished || !consultation?.endReason) return false;
+  return !TIMEOUT_END_REASONS.includes(consultation.endReason);
+}
+
 const PHASE_STATUS: Record<RealtimePhase, BigbirdInquiryStatus> = {
   requesting: "waiting",
   connected: "consulting",

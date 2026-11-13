@@ -7,12 +7,12 @@ import { EmptyIllustration } from "./EmptyIllustration";
 import type { EmptyIllustrationType } from "./EmptyIllustration";
 import type { ReactNode } from "react";
 
-// Figma: No Message만 일러스트와 문구 간격이 20px.
+// Figma: TAB·PC는 No Message만 일러스트와 문구 간격이 20px(그 밖 16). MO(Empty 6782:97861)는 No Message 16·그 밖 12.
 const illustrationGroupVariants = cva("flex flex-col items-center", {
   variants: {
     isNoMessage: {
-      true: "gap-5",
-      false: "gap-4",
+      true: "gap-4 tablet:gap-5",
+      false: "gap-3 tablet:gap-4",
     },
   },
   defaultVariants: { isNoMessage: false },
@@ -49,7 +49,8 @@ export function EmptyState({
       >
         <EmptyIllustration type={type} />
         <div className="flex flex-col items-center gap-0.5 text-center">
-          <p className="text-sm leading-5 font-medium text-muted-foreground">
+          {/* 제목 줄 높이: MO 16, TAB·PC 20 */}
+          <p className="text-sm leading-4 font-medium text-muted-foreground tablet:leading-5">
             {title}
           </p>
           {description && (

@@ -115,6 +115,8 @@ build:image:
   stage: package
   image: docker:29.9.3-cli
   cache: []
+  # 평소 30초 안에 끝난다. Registry 가 멈췄을 때 기본값(60분)까지 러너를 붙잡지 않게 한다.
+  timeout: 10m
   dependencies: [build:dist]
   before_script:
     - echo "$CI_REGISTRY_PASSWORD" | docker login -u "$CI_REGISTRY_USER" --password-stdin "$CI_REGISTRY"
@@ -132,6 +134,8 @@ deploy:stage:
   stage: deploy
   image: alpine:3.24
   cache: []
+  # 평소 30초 안에 끝나고 헬스체크 대기(--wait-timeout 120)보다 넉넉하다. 멈추면 resource_group 때문에 다음 배포까지 막히므로 일찍 실패시킨다.
+  timeout: 10m
   dependencies: []
   # 배포 도중 취소되면 서버가 중간 상태로 남고, 두 배포가 겹치면 늦게 시작한 쪽이 먼저 끝나 옛 이미지로 덮일 수 있다.
   interruptible: false

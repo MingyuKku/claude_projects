@@ -111,13 +111,13 @@ export function NewBigbirdInquiryForm({
 
         {type === "campaign" && (
           <fieldset className="min-w-0">
-            <legend className="mb-3 text-sm leading-none font-semibold desktop:mb-4">
+            <legend className="mb-3 text-sm leading-none font-semibold tablet:mb-4">
               {t("campaignListLabel")}
             </legend>
             {/* 머리글은 고정하고 본문만 스크롤함. 스크롤바도 머리글 아래부터 시작함. */}
             <ScrollArea
               type="auto"
-              className="rounded-lg border border-border *:data-[slot=scroll-area-viewport]:max-h-(--campaign-table-max-height)"
+              className="rounded-lg border border-border [--campaign-row-height:3.5rem] *:data-[slot=scroll-area-viewport]:max-h-(--campaign-table-max-height) tablet:[--campaign-row-height:3rem]"
               style={
                 {
                   "--campaign-table-max-height": CAMPAIGN_TABLE_MAX_HEIGHT,
@@ -125,16 +125,16 @@ export function NewBigbirdInquiryForm({
               }
               scrollBarStyle={{ top: CAMPAIGN_TABLE_HEADER_HEIGHT }}
             >
-              {/* Figma 새 문의 캠페인 표(11315:50062): 행 48, 머리글 배경 muted(#F1F5F9). */}
+              {/* Figma 새 문의 캠페인 표(11315:50062): 행 MO 56·TAB 이상 48, 머리글 배경 muted 40%(headerTone="gray" 기본값). */}
               <Table
                 className="table-fixed"
-                size="xs"
+                size="sm"
                 headerTone="gray"
                 containerClassName="overflow-visible rounded-none border-0"
                 aria-label={t("campaignListLabel")}
               >
                 {/* sticky 머리글은 border-collapse에서 테두리가 따라오지 않아 그림자로 아래 선을 그림. */}
-                <TableHeader className="sticky top-0 z-10 [--table-header-bg:var(--color-muted)] [&_th]:shadow-[inset_0_-1px_0_var(--color-border)] [&_tr]:border-b-0">
+                <TableHeader className="sticky top-0 z-10 [&_th]:shadow-[inset_0_-1px_0_var(--color-border)] [&_tr]:border-b-0">
                   <TableRow>
                     <TableHead className="w-12">
                       <span className="sr-only">{t("select")}</span>
@@ -143,7 +143,7 @@ export function NewBigbirdInquiryForm({
                     <TableHead>{t("campaignPeriod")}</TableHead>
                   </TableRow>
                 </TableHeader>
-                <TableBody>
+                <TableBody className="tablet:[&_td]:h-12">
                   {campaigns.map((campaign) => (
                     <TableRow key={campaign.id}>
                       <TableCell>

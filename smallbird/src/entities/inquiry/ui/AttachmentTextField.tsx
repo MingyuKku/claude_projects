@@ -4,6 +4,7 @@ import { useRef, useState } from "react";
 import { FileItem, FileThumbnail } from "@/shared/components/file-list";
 import { TextField } from "@/shared/components/text-field";
 import { useTranslation } from "@/shared/i18n";
+import { cn } from "@/shared/lib/utils";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -53,6 +54,8 @@ export function AttachmentTextField({
   isAttachDisabled = false,
   disabled,
   onPaste,
+  className,
+  textareaClassName,
   ...props
 }: AttachmentTextFieldProps) {
   const { t } = useTranslation();
@@ -83,6 +86,10 @@ export function AttachmentTextField({
         {...props}
         variant="count"
         isWide
+        // Figma MO 텍스트 필드(8284:82094): 오른쪽 안쪽 여백 8(테두리 보정 7), TAB·PC는 12. 공용 TextField는 캠페인 등록 등 다른 화면도 써서 여기서만 맞춤.
+        // 입력 글줄 높이는 MO만 16(Figma MO Placeholder 14/16).
+        className={cn("pr-1.75 tablet:pr-2.75", className)}
+        textareaClassName={cn("max-tablet:leading-4", textareaClassName)}
         disabled={disabled}
         isDragging={isDragging}
         dropTitle={t("attachment.dropTitle")}

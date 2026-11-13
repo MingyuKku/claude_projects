@@ -1,0 +1,382 @@
+/* 생성 파일입니다. 직접 수정하지 않습니다.
+   원본: scripts/design-tokens/figma-tokens.json (Figma a4XCjbdpUcHsm71V1ZucPb, 2026-11-13)
+   생성: pnpm ds:tokens */
+
+@theme static {
+  --ds-gap-0: 0;
+  --ds-gap-1: 0.25rem;
+  --ds-gap-2: 0.5rem;
+  --ds-gap-3: 0.5rem;
+  --ds-gap-4: 0.75rem;
+  --ds-gap-5: 1rem;
+  --ds-gap-6: 1rem;
+  --ds-gap-7: 1.25rem;
+  --ds-gap-8: 1.5rem;
+  --ds-gap-9: 1.75rem;
+  --ds-gap-10: 1.75rem;
+  --ds-gap-11: 2rem;
+  --ds-gap-12: 2rem;
+  --ds-gap-14: 2.5rem;
+  --ds-gap-16: 2.5rem;
+  --ds-gap-18: 3rem;
+  --ds-gap-20: 3rem;
+  --ds-gap-24: 3.5rem;
+  --ds-gap-28: 4rem;
+  --ds-gap-32: 4.5rem;
+  --ds-gap-64: 6rem;
+  --ds-gap-px: 0.0625rem;
+  --ds-gap-0_5: 0.125rem;
+  --ds-gap-1_5: 0.375rem;
+  --ds-p-0: 0;
+  --ds-p-1: 0.25rem;
+  --ds-p-2: 0.5rem;
+  --ds-p-3: 0.75rem;
+  --ds-p-4: 1rem;
+  --ds-p-5: 1rem;
+  --ds-p-6: 1rem;
+  --ds-p-7: 1.25rem;
+  --ds-p-8: 1.5rem;
+  --ds-p-9: 1.75rem;
+  --ds-p-10: 1.75rem;
+  --ds-p-11: 2rem;
+  --ds-p-12: 2rem;
+  --ds-p-0_5: 0.125rem;
+  --ds-p-1_5: 0.375rem;
+  --ds-p-2_5: 0.625rem;
+  --ds-p-3_5: 0.875rem;
+  --ds-text-xs: 0.75rem;
+  --ds-text-sm: 0.875rem;
+  --ds-text-base: 1rem;
+  --ds-text-lg: 1.125rem;
+  --ds-text-xl: 1.125rem;
+  --ds-text-2xl: 1.25rem;
+  --ds-text-3xl: 1.5rem;
+  --ds-leading-4: 1rem;
+  --ds-leading-5: 1rem;
+  --ds-leading-6: 1.375rem;
+  --ds-leading-7: 1.625rem;
+  --ds-leading-8: 1.75rem;
+  --ds-leading-9: 1.875rem;
+}
+
+@layer theme {
+  :root {
+    @variant tablet {
+      --ds-gap-3: 0.75rem;
+      --ds-gap-4: 1rem;
+      --ds-gap-5: 1.25rem;
+      --ds-gap-6: 1.25rem;
+      --ds-gap-7: 1.5rem;
+      --ds-gap-8: 1.75rem;
+      --ds-gap-9: 2rem;
+      --ds-gap-10: 2rem;
+      --ds-gap-11: 2.25rem;
+      --ds-gap-12: 2.5rem;
+      --ds-gap-14: 3rem;
+      --ds-gap-16: 3rem;
+      --ds-gap-18: 3.5rem;
+      --ds-gap-20: 4rem;
+      --ds-gap-24: 4.5rem;
+      --ds-gap-28: 5rem;
+      --ds-gap-32: 6rem;
+      --ds-gap-64: 8rem;
+      --ds-p-5: 1.25rem;
+      --ds-p-6: 1.25rem;
+      --ds-p-7: 1.5rem;
+      --ds-p-8: 1.75rem;
+      --ds-p-9: 2rem;
+      --ds-p-10: 2rem;
+      --ds-p-11: 2.25rem;
+      --ds-p-12: 2.5rem;
+      --ds-text-xl: 1.25rem;
+      --ds-text-2xl: 1.375rem;
+      --ds-text-3xl: 1.75rem;
+      --ds-leading-5: 1.25rem;
+      --ds-leading-7: 1.75rem;
+      --ds-leading-8: 2rem;
+      --ds-leading-9: 2.125rem;
+    }
+    @variant desktop {
+      --ds-gap-6: 1.5rem;
+      --ds-gap-7: 1.75rem;
+      --ds-gap-8: 2rem;
+      --ds-gap-9: 2.25rem;
+      --ds-gap-10: 2.5rem;
+      --ds-gap-11: 2.75rem;
+      --ds-gap-12: 3rem;
+      --ds-gap-14: 3.5rem;
+      --ds-gap-16: 4rem;
+      --ds-gap-18: 4.5rem;
+      --ds-gap-20: 5rem;
+      --ds-gap-24: 6rem;
+      --ds-gap-28: 7rem;
+      --ds-gap-32: 8rem;
+      --ds-gap-64: 16rem;
+      --ds-p-6: 1.5rem;
+      --ds-p-7: 1.75rem;
+      --ds-p-8: 2rem;
+      --ds-p-9: 2.25rem;
+      --ds-p-10: 2.5rem;
+      --ds-p-11: 2.75rem;
+      --ds-p-12: 3rem;
+      --ds-text-2xl: 1.5rem;
+      --ds-text-3xl: 1.875rem;
+      --ds-leading-6: 1.5rem;
+      --ds-leading-9: 2.25rem;
+    }
+  }
+}
+
+/* 간격: Figma gap/padding 변수. 예) ds-gap-6 = PC 24 · tablet 20 · mobile 16 */
+@utility ds-gap-* {
+  gap: --value(--ds-gap-*);
+}
+@utility ds-gap-x-* {
+  column-gap: --value(--ds-gap-*);
+}
+@utility ds-gap-y-* {
+  row-gap: --value(--ds-gap-*);
+}
+@utility ds-p-* {
+  padding: --value(--ds-p-*);
+}
+@utility ds-px-* {
+  padding-inline: --value(--ds-p-*);
+}
+@utility ds-py-* {
+  padding-block: --value(--ds-p-*);
+}
+@utility ds-pt-* {
+  padding-top: --value(--ds-p-*);
+}
+@utility ds-pr-* {
+  padding-right: --value(--ds-p-*);
+}
+@utility ds-pb-* {
+  padding-bottom: --value(--ds-p-*);
+}
+@utility ds-pl-* {
+  padding-left: --value(--ds-p-*);
+}
+
+/* 텍스트 스타일: Figma text-{크기}/leading-{행간}/{굵기} → ds-text-{크기}-{행간}-{굵기} */
+/* text-xs/leading-4/normal */
+@utility ds-text-xs-4-normal {
+  font-size: var(--ds-text-xs);
+  line-height: var(--ds-leading-4);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+/* text-xs/leading-4/medium */
+@utility ds-text-xs-4-medium {
+  font-size: var(--ds-text-xs);
+  line-height: var(--ds-leading-4);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+/* text-xs/leading-4/semibold */
+@utility ds-text-xs-4-semibold {
+  font-size: var(--ds-text-xs);
+  line-height: var(--ds-leading-4);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+/* text-xs/leading-5/normal */
+@utility ds-text-xs-5-normal {
+  font-size: var(--ds-text-xs);
+  line-height: var(--ds-leading-5);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+/* text-xs/leading-5/medium */
+@utility ds-text-xs-5-medium {
+  font-size: var(--ds-text-xs);
+  line-height: var(--ds-leading-5);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+/* text-xs/leading-5/semibold */
+@utility ds-text-xs-5-semibold {
+  font-size: var(--ds-text-xs);
+  line-height: var(--ds-leading-5);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+/* text-sm/leading-none/normal */
+@utility ds-text-sm-none-normal {
+  font-size: var(--ds-text-sm);
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+/* text-sm/leading-none/medium */
+@utility ds-text-sm-none-medium {
+  font-size: var(--ds-text-sm);
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+/* text-sm/leading-none/semibold */
+@utility ds-text-sm-none-semibold {
+  font-size: var(--ds-text-sm);
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+/* text-sm/leading-5/normal */
+@utility ds-text-sm-5-normal {
+  font-size: var(--ds-text-sm);
+  line-height: var(--ds-leading-5);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+/* text-sm/leading-5/medium */
+@utility ds-text-sm-5-medium {
+  font-size: var(--ds-text-sm);
+  line-height: var(--ds-leading-5);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+/* text-sm/leading-5/semibold */
+@utility ds-text-sm-5-semibold {
+  font-size: var(--ds-text-sm);
+  line-height: var(--ds-leading-5);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+/* text-sm/leading-6/medium */
+@utility ds-text-sm-6-medium {
+  font-size: var(--ds-text-sm);
+  line-height: var(--ds-leading-6);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+/* text-sm/leading-6/semibold */
+@utility ds-text-sm-6-semibold {
+  font-size: var(--ds-text-sm);
+  line-height: var(--ds-leading-6);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+/* text-base/leading-none/normal */
+@utility ds-text-base-none-normal {
+  font-size: var(--ds-text-base);
+  line-height: 1;
+  font-weight: 400;
+  letter-spacing: 0;
+}
+/* text-base/leading-none/medium */
+@utility ds-text-base-none-medium {
+  font-size: var(--ds-text-base);
+  line-height: 1;
+  font-weight: 500;
+  letter-spacing: 0;
+}
+/* text-base/leading-none/semibold */
+@utility ds-text-base-none-semibold {
+  font-size: var(--ds-text-base);
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+/* text-base/leading-6/normal */
+@utility ds-text-base-6-normal {
+  font-size: var(--ds-text-base);
+  line-height: var(--ds-leading-6);
+  font-weight: 400;
+  letter-spacing: 0;
+}
+/* text-base/leading-6/semibold */
+@utility ds-text-base-6-semibold {
+  font-size: var(--ds-text-base);
+  line-height: var(--ds-leading-6);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+/* text-base/leading-7/semibold */
+@utility ds-text-base-7-semibold {
+  font-size: var(--ds-text-base);
+  line-height: var(--ds-leading-7);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+/* text-lg/leading-none/semibold */
+@utility ds-text-lg-none-semibold {
+  font-size: var(--ds-text-lg);
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+/* text-lg/leading-7/medium */
+@utility ds-text-lg-7-medium {
+  font-size: var(--ds-text-lg);
+  line-height: var(--ds-leading-7);
+  font-weight: 500;
+  letter-spacing: 0;
+}
+/* text-lg/leading-7/semibold */
+@utility ds-text-lg-7-semibold {
+  font-size: var(--ds-text-lg);
+  line-height: var(--ds-leading-7);
+  font-weight: 600;
+  letter-spacing: 0;
+}
+/* text-xl/leading-none/semibold */
+@utility ds-text-xl-none-semibold {
+  font-size: var(--ds-text-xl);
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -0.6px;
+}
+/* text-2xl/leading-none/semibold */
+@utility ds-text-2xl-none-semibold {
+  font-size: var(--ds-text-2xl);
+  line-height: 1;
+  font-weight: 600;
+  letter-spacing: -0.6px;
+}
+/* text-2xl/leading-8/semibold */
+@utility ds-text-2xl-8-semibold {
+  font-size: var(--ds-text-2xl);
+  line-height: var(--ds-leading-8);
+  font-weight: 600;
+  letter-spacing: -0.6px;
+}
+/* text-3xl/leading-9/semibold */
+@utility ds-text-3xl-9-semibold {
+  font-size: var(--ds-text-3xl);
+  line-height: var(--ds-leading-9);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+}
+
+/* 그림자: Figma(Tailwind v3) 이름과 값. v4 기본 shadow-* 와 이름이 한 칸씩 어긋나 따로 둔다. */
+@utility ds-shadow-sm {
+  box-shadow: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+}
+@utility ds-shadow {
+  box-shadow:
+    0 1px 3px 0 rgb(0 0 0 / 0.1),
+    0 1px 2px -1px rgb(0 0 0 / 0.1);
+}
+@utility ds-shadow-md {
+  box-shadow:
+    0 4px 6px -1px rgb(0 0 0 / 0.1),
+    0 2px 4px -2px rgb(0 0 0 / 0.1);
+}
+@utility ds-shadow-lg {
+  box-shadow:
+    0 10px 15px -3px rgb(0 0 0 / 0.1),
+    0 4px 6px -4px rgb(0 0 0 / 0.1);
+}
+@utility ds-shadow-xl {
+  box-shadow:
+    0 20px 25px -5px rgb(0 0 0 / 0.1),
+    0 8px 10px -6px rgb(0 0 0 / 0.1);
+}
+@utility ds-shadow-2xl {
+  box-shadow: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+}
+@utility ds-shadow-inner {
+  box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.05);
+}

@@ -1,5 +1,6 @@
-import { ChevronLeft, TextAlignJustify } from "lucide-react";
+import { ChevronLeft } from "lucide-react";
 
+import { AlignJustifyIcon } from "@/shared/components/icons";
 import { cn } from "@/shared/lib/utils";
 
 import type { ReactNode } from "react";
@@ -66,7 +67,7 @@ export function AppHeader({
             className={cn(ICON_BUTTON_CLASS, "tablet:hidden")}
           >
             {/* Figma 예외: 메뉴 아이콘 선 1.5px(전역 1px 규칙과 다름). */}
-            <TextAlignJustify className="size-6" strokeWidth={1.5} />
+            <AlignJustifyIcon className="size-6" strokeWidth={1.5} />
           </button>
         )}
         {icon && (

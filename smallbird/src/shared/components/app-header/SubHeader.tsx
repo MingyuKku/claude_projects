@@ -26,7 +26,7 @@ const titleGroupVariants = cva("flex min-w-0 items-center", {
     variant: {
       default:
         "flex-1 gap-3 text-base leading-none font-semibold text-card-foreground",
-      chat: "flex-1 gap-3 text-card-foreground",
+      chat: "flex-1 gap-2 text-card-foreground tablet:gap-3",
       list: "gap-1 text-base leading-none font-semibold text-foreground",
       download:
         "gap-2 text-base leading-none font-semibold text-background tablet:text-xl tablet:tracking-[-0.6px]",

@@ -65,6 +65,7 @@
   "progressStatus": "진행 상태",
   "shopCode": "공구샵 코드",
   "otherTag": "기타문의",
+  "campaignTag": "캠페인 문의",
   "withdrawal": {
     "title": "빅버드 머니 출금 요청",
     "status": {

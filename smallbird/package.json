@@ -20,6 +20,8 @@
     "test:ui": "vitest --ui",
     "i18n": "node scripts/i18n.mjs",
     "i18n:check": "node scripts/i18n.mjs --check",
+    "ds:tokens": "node scripts/design-tokens/generate.mjs",
+    "ds:tokens:check": "node scripts/design-tokens/generate.mjs --check",
     "ai:check": "python3 convention/ai/render.py --check && python3 ai/scripts/render_agents.py --check",
     "ai:review": "bash scripts/ai-review.sh --local"
   },

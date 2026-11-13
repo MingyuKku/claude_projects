@@ -25,8 +25,9 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 import type { ComponentProps, ReactNode } from "react";
 
 // Figma 디자인 시스템 Combobox(6777:61876). Size md 40 / sm 36, 오류 문구가 있으면 Destructive.
+// 열림 링은 PC 팝오버(tablet 이상)에만 둠. MO 하단 시트가 열린 동안에는 시안(11315:50999)에 링이 없음.
 export const comboboxTriggerVariants = cva(
-  "flex w-full items-center rounded-md border border-input bg-background px-3 text-left text-sm leading-5 text-foreground outline-none transition-colors hover:bg-accent focus-visible:bg-background focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-background data-[state=open]:ring-2 data-[state=open]:ring-primary data-[state=open]:ring-offset-2",
+  "flex w-full items-center rounded-md border border-input bg-background px-3 text-left text-sm leading-5 text-foreground outline-none transition-colors hover:bg-accent focus-visible:bg-background focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-background tablet:data-[state=open]:ring-2 tablet:data-[state=open]:ring-primary tablet:data-[state=open]:ring-offset-2",
   {
     variants: {
       size: {
@@ -34,7 +35,7 @@ export const comboboxTriggerVariants = cva(
         sm: "h-9 py-2",
       },
       isInvalid: {
-        true: "focus-visible:ring-destructive data-[state=open]:ring-destructive",
+        true: "focus-visible:ring-destructive tablet:data-[state=open]:ring-destructive",
         false: "",
       },
     },
@@ -131,7 +132,7 @@ export function Combobox({
     );
   }
 
-  function renderCommand(listClassName?: string) {
+  function renderCommand(listClassName?: string, groupClassName?: string) {
     return (
       <Command>
         {isSearchable && <CommandInput placeholder={searchPlaceholder} />}
@@ -154,7 +155,7 @@ export function Combobox({
         )}
         <CommandList className={listClassName}>
           <CommandEmpty>{emptyText}</CommandEmpty>
-          <CommandGroup>
+          <CommandGroup className={groupClassName}>
             {options.map((option) => (
               // cmdk 는 value 로 항목을 구분하므로 라벨이 같은 옵션도 따로 선택되도록 value 는 유일한 값을 쓰고,
               // 검색은 keywords 로 라벨에 맞춤.
@@ -191,7 +192,13 @@ export function Combobox({
               <DrawerTitle className="sr-only">
                 {label ?? placeholder}
               </DrawerTitle>
-              <div className="pt-4">{renderCommand("max-h-74")}</div>
+              {/* Figma 검색 Drawer(11315:50984): 항목 328폭(목록 좌우 여백 0), 검색 밑줄 아래 첫 항목까지 12(검색 없으면 위 2). PC 팝오버는 그대로. */}
+              <div className="pt-4">
+                {renderCommand(
+                  "max-h-74",
+                  isSearchable ? "px-0 pt-3" : "px-0 pt-0.5",
+                )}
+              </div>
             </DrawerContent>
           </Drawer>
         ) : (

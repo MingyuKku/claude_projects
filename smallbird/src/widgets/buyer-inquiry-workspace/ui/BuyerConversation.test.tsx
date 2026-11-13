@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import { SWRConfig } from "swr";
 
 import { serverApiV3 } from "@/shared/api";
@@ -200,5 +200,79 @@ describe("인플루언서 문의 대화의 실시간 시작·종료 줄", () => 
     ).toBeInTheDocument();
     expect(screen.queryByText(STARTED)).not.toBeInTheDocument();
     expect(screen.queryByText(ENDED)).not.toBeInTheDocument();
+  });
+});
+
+describe("상대 메시지의 프로필 이미지", () => {
+  const PROFILE = "https://img.test/profile.png";
+
+  beforeEach(() => {
+    // Radix Avatar는 이미지를 불러온 뒤에야 <img>를 그려서, jsdom에서는 이미 불러온 이미지로 처리함.
+    vi.stubGlobal(
+      "Image",
+      class {
+        complete = true;
+        naturalWidth = 10;
+        src = "";
+        crossOrigin: string | null = null;
+        referrerPolicy = "";
+        addEventListener() {}
+        removeEventListener() {}
+      },
+    );
+    firestore.data = undefined;
+    vi.spyOn(console, "error").mockImplementation(() => {});
+    const thread = {
+      result: true,
+      data: [
+        {
+          threadIdx: 501,
+          sequence: 1318,
+          viewing: null,
+          toUserIdx: 1,
+          fmUserIdx: 77,
+          campaignIdx: 10,
+          finishTime: null,
+          created: "2026-10-01T10:00:00",
+          boardType: true,
+          status: "WAITING",
+          messages: [
+            restMessage(1, "텍스트만", 77, "2026-10-01T10:00:00"),
+            restMessage(2, "파일과 함께", 77, "2026-10-01T10:01:00"),
+            {
+              ...restMessage(
+                3,
+                "https://image.bigbird.co/sample.pptx",
+                77,
+                "2026-10-01T10:01:05",
+              ),
+              attachmentIdx: 9,
+              fileName: "sample.pptx",
+              fileSize: 1600,
+            },
+          ],
+        },
+      ],
+    };
+    vi.mocked(serverApiV3.get).mockImplementation(async (url: string) =>
+      url.startsWith("/help/user/")
+        ? {
+            result: true,
+            data: { nickname: null, id: null, profileImage: PROFILE },
+          }
+        : thread,
+    );
+  });
+
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("텍스트만 보낸 메시지와 파일이 붙은 메시지 모두 같은 프로필 이미지를 쓴다", async () => {
+    renderConversation(inquiry);
+    expect(await screen.findByText("파일과 함께")).toBeInTheDocument();
+    await waitFor(() =>
+      expect(document.querySelectorAll(`img[src="${PROFILE}"]`)).toHaveLength(
+        2,
+      ),
+    );
   });
 });

@@ -65,6 +65,7 @@
   "progressStatus": "Status",
   "shopCode": "Shop code",
   "otherTag": "Other",
+  "campaignTag": "Campaign",
   "withdrawal": {
     "title": "Bigbird Money withdrawal",
     "status": {

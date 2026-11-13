@@ -141,7 +141,8 @@ export function TextField({
       {textarea}
       <div className="flex w-full items-center justify-between gap-4">
         {leading ?? <span />}
-        <div className="flex items-center gap-4">
+        {/* 글자 수–전송 버튼 간격은 MO 12, TAB·PC 16(Figma Text Field Wrap) */}
+        <div className="flex items-center gap-3 tablet:gap-4">
           {counter}
           {submit}
         </div>

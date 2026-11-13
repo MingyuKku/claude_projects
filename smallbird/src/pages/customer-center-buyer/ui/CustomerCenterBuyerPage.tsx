@@ -40,7 +40,6 @@ function InquiryMenuPage({ menu }: { menu: InquiryMenu }) {
   const session = useOutletContext<SessionViewModel>();
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
-  const isMobile = !useMediaQuery("(min-width: 768px)");
   const isDesktop = useMediaQuery("(min-width: 1440px)");
   const {
     inquiries,
@@ -62,12 +61,11 @@ function InquiryMenuPage({ menu }: { menu: InquiryMenu }) {
     inquiryKey === undefined
       ? inquiries?.[0]
       : inquiries?.find((inquiry) => inquiry.key === inquiryKey);
-  // MO 목록만 보일 때는 자동 선택 문의를 강조하지 않음(빅버드 문의와 같음).
-  const listSelectedKey =
-    inquiryKey === undefined && isMobile ? undefined : selectedInquiry?.key;
-  // TAB·MO 목록 뒤에 가려진 자동 선택 문의는 패널을 그리지 않음(보이지 않는 대화·상세 조회 방지).
-  const openedInquiry =
-    inquiryKey === undefined && !isDesktop ? undefined : selectedInquiry;
+  // MO·TAB은 문의를 고르기 전에는 목록만 보임(사용자 결정 2026-11-11, PC만 첫 문의를 자동으로 열고 강조함).
+  // 가려진 자동 선택 문의는 강조하지 않고 패널도 그리지 않음(보이지 않는 대화·상세 조회 방지).
+  const isListOnly = inquiryKey === undefined && !isDesktop;
+  const listSelectedKey = isListOnly ? undefined : selectedInquiry?.key;
+  const openedInquiry = isListOnly ? undefined : selectedInquiry;
 
   // 구매자 실시간 상담 요청 크롬 알림(사용자 결정 2026-11-02, 구매자 문의만). 문구는 마켓이 쓴 alarmData 그대로임.
   function handleRealtimeAlarm(threadUserIdx: number, alarm: RealtimeAlarm) {

@@ -25,7 +25,8 @@ const cardVariants = cva(
 const TEXT = {
   // Figma MO 변수는 leading-5 = 16(7817:143170·6791:67529), TAB·PC는 20
   md: {
-    body: "items-center",
+    // 썸네일–글 간격은 MO 8, TAB·PC 12(Figma MO 49669·49864 Card Body)
+    body: "items-center gap-2 tablet:gap-3",
     thumbnail: "size-20",
     details: "flex-1 gap-1",
     title: "text-base leading-none",
@@ -40,7 +41,7 @@ const TEXT = {
     // 디자이너 요청(2026-10-23)으로, 남는 폭을 채우던 방식(2026-10-22)을 되돌렸습니다.
     // 긴 캠페인명이 글 폭을 늘리지 않게, 이름은 폭 계산에서 빼고(w-0 min-w-full) 유형·기간 줄 폭에 맞춰
     // 말줄임합니다. 기간이 없을 때를 위해 글 폭은 최소 120px입니다.
-    body: "items-center",
+    body: "items-center gap-3",
     thumbnail: "size-16.25",
     details: "min-w-30 shrink gap-1.5",
     title: "w-0 min-w-full text-sm leading-none",
@@ -87,7 +88,7 @@ export function ChatCodeCard({
 
   return (
     <article className={cn(cardVariants({ size }), className)}>
-      <div className={cn("flex gap-3", text.body)}>
+      <div className={cn("flex", text.body)}>
         {hasThumbnail ? (
           <img
             src={thumbnailSrc}

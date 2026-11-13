@@ -114,12 +114,21 @@ describe("BigbirdInquiryWorkspace 목록 카드", () => {
     messages: [],
   };
 
-  it("기타 문의 카드에만 기타문의 태그를 붙인다", () => {
+  it("기타 문의 카드는 기타문의 태그와 2행 제목 기타 문의를, 캠페인 문의 카드는 캠페인 문의 태그를 보인다", () => {
     render(
       <MemoryRouter>
         <BigbirdInquiryWorkspace
           threadUserIdx={undefined}
-          inquiries={[base, { ...base, threadIdx: 2, campaignIdx: 10 }]}
+          inquiries={[
+            base,
+            {
+              ...base,
+              threadIdx: 2,
+              campaignIdx: 10,
+              brandName: "LG전자",
+              productName: "디오스 냉장고",
+            },
+          ]}
           isLoading={false}
           isError={false}
           onClickRefresh={() => {}}
@@ -132,7 +141,9 @@ describe("BigbirdInquiryWorkspace 목록 카드", () => {
     );
 
     expect(screen.getAllByText("기타문의")).toHaveLength(1);
-    expect(screen.getByText("캠페인 문의")).toBeInTheDocument();
+    expect(screen.getAllByText("기타 문의")).toHaveLength(1);
+    expect(screen.getAllByText("캠페인 문의")).toHaveLength(1);
+    expect(screen.getByText("디오스 냉장고 문의")).toBeInTheDocument();
   });
 
   it("캠페인 목록에 없는 캠페인도 목록 응답의 브랜드명·상품명으로 보인다", () => {

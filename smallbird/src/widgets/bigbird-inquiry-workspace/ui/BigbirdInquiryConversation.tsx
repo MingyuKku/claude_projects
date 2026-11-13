@@ -11,6 +11,7 @@ import {
   useBigbirdInquiryDetail,
   useCampaignTimeline,
   useInquiryCampaigns,
+  isConsultationCompletedShown,
   isMatchFailureShown,
   useConsultationDocument,
   useRealtimeConsultationMessages,
@@ -170,9 +171,11 @@ export function BigbirdInquiryConversation({
   // 남긴 종료 안내(notice)가 대화의 마지막인 경우. 그 뒤에 일반 메시지가 오면 마지막 상담이 일반이라 안내를 걷음.
   // 일반 문의가 답변 완료·종료된 것만으로는 보이지 않음.
   // 실시간이 진행 중(요청 중·연결됨)이면 예전 종료 안내가 마지막 메시지여도 안내를 띄우지 않음.
+  // 운영이 직접 종료하면 서버가 종료 안내를 남기지 않아 상담 문서의 종료 사유로도 앎(isConsultationCompletedShown).
   const isRealtimeEnded = inquiry.isRealtime
     ? inquiry.isFinished
-    : messages.at(-1)?.kind === "notice";
+    : messages.at(-1)?.kind === "notice" ||
+      isConsultationCompletedShown(endedConsultation, inquiry.isFinished);
   // 대화 위에 고정되는 안내 카드(완료·요청 중·요청 실패). 첫 메시지가 가리지 않게 높이만큼 띄움.
   const isCompletedCardVisible = isRealtimeEnded && !isCompletedCardClosed;
   const hasTopCard =
@@ -312,7 +315,7 @@ export function BigbirdInquiryConversation({
                 <ChevronLeft />
               </Link>
             </Button>
-            {/* 뒤로가기와는 12, 배지와 제목 사이는 8(Figma Header / Sub의 안쪽 Title Group) */}
+            {/* 뒤로가기와는 MO 8·TAB 이상 12, 배지와 제목 사이는 8(Figma Header / Sub의 안쪽 Title Group) */}
             {/* 제목 영역을 누르면 상세 정보가 열림(Figma 3.0.6 "타이틀 영역 클릭 시 우측 상세정보 호출") */}
             {/* 버튼 안의 h2는 제목으로 읽히지 않아 h2가 버튼을 감쌈 */}
             <h2 className="flex min-w-0 text-base leading-none font-semibold">
@@ -342,7 +345,7 @@ export function BigbirdInquiryConversation({
         // MO는 2행에 상세 정보 버튼과 상담 종료 버튼이 반반으로 놓임(Figma 41621·41622·40280).
         actions={
           hasDetail || inquiry.isRealtime || canRequestRealtime ? (
-            <div className="flex items-center gap-3 tablet:justify-end">
+            <div className="flex items-center gap-2 tablet:justify-end tablet:gap-3">
               {hasDetail && (
                 <Button
                   variant="outline-foreground"
@@ -434,7 +437,7 @@ export function BigbirdInquiryConversation({
           >
             <ol
               className={cn(
-                "flex flex-col gap-3 px-5 py-4 tablet:gap-4 tablet:pt-5",
+                "flex flex-col gap-3 px-5 pt-5 pb-4 tablet:gap-4",
                 hasTopCard && "pt-36 tablet:pt-36",
               )}
             >

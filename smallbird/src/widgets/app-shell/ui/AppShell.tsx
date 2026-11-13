@@ -211,6 +211,8 @@ export function AppShell({
           <SidebarNav
             {...sidebarProps}
             navLabel={t("menu.collapsed")}
+            // Figma TAB 프레임의 Sidebar는 57px(11315:49878). 디자인 시스템 접힘 레일(PC)은 56이라 TAB 레일에서만 맞춤.
+            className="w-14.25"
             isCollapsed
             toggleLabel={t("menu.openFull")}
             onClickRailGroup={handleClickTabletRailGroup}
@@ -247,7 +249,8 @@ export function AppShell({
             side="left"
             overlayClassName="bg-foreground/10"
             showCloseButton={false}
-            className="w-57.5"
+            // 오른쪽 선은 SidebarNav 안쪽 그림자 1px 이 그림(Figma Sidebar: 선 1px, 그림자 없음).
+            className="w-57.5 border-r-0 shadow-none"
             aria-describedby={undefined}
             onCloseAutoFocus={handleCloseAutoFocus}
           >

@@ -48,6 +48,7 @@ export { AttachmentTextField } from "./ui/AttachmentTextField";
 export { ConversationFiles } from "./ui/ConversationFiles";
 export { InquiryUploadStatus } from "./ui/InquiryUploadStatus";
 export { groupAttachments } from "./lib/group-attachments";
+export { markReadByLaterReply } from "./lib/mark-read-by-later-reply";
 export type { ConversationRow } from "./lib/group-attachments";
 export {
   acquireConsultationLock,
@@ -77,6 +78,7 @@ export {
 export {
   applyRealtimeConsultation,
   isMatchFailureShown,
+  isConsultationCompletedShown,
   getConnectDeadline,
   getIdleTurn,
   REALTIME_IDLE_LIMIT_MS,

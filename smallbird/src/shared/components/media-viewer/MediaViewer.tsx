@@ -59,7 +59,7 @@ export function MediaViewer({
         }}
       >
         <header className="flex h-13 items-center gap-2 bg-slate-800 pr-2.5 pl-4 tablet:h-20 tablet:pr-5 tablet:pl-7 desktop:pl-8">
-          <DialogTitle className="text-base font-semibold tablet:text-xl">
+          <DialogTitle className="text-base font-semibold tablet:text-xl tablet:tracking-[-0.6px]">
             {title}
           </DialogTitle>
           {current?.downloadHref && (
@@ -80,7 +80,8 @@ export function MediaViewer({
             <X className="size-4 tablet:size-6" />
           </DialogPrimitive.Close>
         </header>
-        <div className="relative flex min-h-0 items-center justify-center p-4 tablet:p-8">
+        {/* 화살표는 PC·TAB 시안에서 화면 세로 가운데(relative 를 풀어 다이얼로그 기준), MO 는 이미지 영역 가운데. */}
+        <div className="relative flex min-h-0 items-center justify-center p-4 tablet:static tablet:p-8">
           {current?.type === "video" ? (
             <video
               key={current.src}
@@ -120,8 +121,9 @@ export function MediaViewer({
             </>
           )}
         </div>
+        {/* justify-center-safe: MO 에서 썸네일이 넘치면 시작 정렬로 바뀌어 왼쪽이 잘리지 않고 스크롤됨. */}
         {count > 1 && (
-          <ul className="flex justify-center gap-1 overflow-x-auto pt-4 pb-6 tablet:pb-7 desktop:pb-8">
+          <ul className="flex justify-center-safe gap-1 overflow-x-auto pt-4 pb-6 tablet:pb-7 desktop:pb-8">
             {items.map((item, itemIndex) => (
               <li key={`${item.src}-${itemIndex}`}>
                 <button

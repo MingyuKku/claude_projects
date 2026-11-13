@@ -66,7 +66,13 @@ export function deriveRealtimeLines(
       }
       continue;
     }
-    if (open && open.startAt === null && message.isUserMessage === false) {
+    // 일반 문의(`mode: general`)로 쓴 글은 연결로 보지 않음: 끝나지 않고 남은 요청 뒤의 일반 답장이 "시작" 줄을 만들던 문제(2026-11-12).
+    if (
+      open &&
+      open.startAt === null &&
+      message.isUserMessage === false &&
+      message.mode !== "general"
+    ) {
       open.startAt = at;
     }
   }

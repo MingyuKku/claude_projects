@@ -19,18 +19,20 @@ function doc(
     created: string,
     body: string,
     kind: "auto" | "requester" | "responder",
+    mode?: "general" | "realtime",
   ][],
   fields: Partial<RealtimeConsultation> = {},
 ): RealtimeConsultation {
   return {
     ...fields,
-    messages: messages.map(([created, body, kind]) => ({
+    messages: messages.map(([created, body, kind, mode]) => ({
       auto: kind === "auto",
       attachmentIdx: null,
       identifier: null,
       isUserMessage: kind === "auto" ? false : kind === "requester",
       body,
       created: `2026-11-06 ${created}`,
+      ...(mode ? { mode } : {}),
     })),
   };
 }
@@ -85,6 +87,25 @@ describe("deriveRealtimeLines", () => {
       ),
     );
     expect(lines).toEqual([{ kind: "start", at: at("16:55:00") }]);
+  });
+
+  it("일반 문의(mode general)로 쓴 답장은 끝나지 않고 남은 요청 뒤에 와도 연결로 보지 않는다", () => {
+    const lines = deriveRealtimeLines(
+      doc([
+        ["16:52:01", REQUEST, "auto"],
+        ["16:55:44", "일반 문의 답장", "responder", "general"],
+      ]),
+    );
+    expect(lines).toEqual([]);
+    // 같은 자리에서 실제 실시간(realtime)으로 쓴 답장이면 시작 줄이 생긴다.
+    expect(
+      deriveRealtimeLines(
+        doc([
+          ["16:52:01", REQUEST, "auto"],
+          ["16:55:44", "실시간 답장", "responder", "realtime"],
+        ]),
+      ),
+    ).toEqual([{ kind: "start", at: at("16:55:44") }]);
   });
 
   it("연결되지 않은 상담(응답 없이 종료)은 시작도 종료도 그리지 않는다", () => {

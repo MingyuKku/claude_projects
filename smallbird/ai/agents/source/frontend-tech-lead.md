@@ -21,4 +21,4 @@ claude_tools: Glob, Grep, Read, Edit, Write, Bash, WebFetch, WebSearch, LSP, Ski
 
 ## 완료 보고
 
-`pnpm verify`(typecheck·lint·i18n:check·test)를 실행하고, 실제 결과(통과/실패, 실행하지 못한 항목과 사유)를 변경 요약과 함께 보고합니다.
+`pnpm verify`(typecheck·lint·i18n:check·ds:tokens:check·test)를 실행하고, 실제 결과(통과/실패, 실행하지 못한 항목과 사유)를 변경 요약과 함께 보고합니다.

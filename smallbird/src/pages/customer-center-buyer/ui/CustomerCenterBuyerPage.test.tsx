@@ -90,11 +90,19 @@ describe("CustomerCenterBuyerPage", () => {
     expect(screen.getByText("목록 강조 없음")).toBeInTheDocument();
   });
 
-  it("TAB 목록에서는 첫 문의를 강조만 하고 가려진 패널은 그리지 않는다", () => {
+  // 사용자 결정 2026-11-11: TAB·MO는 목록만 보이므로 자동 선택하지 않음(시안 TAB 목록 프레임도 선택 카드 없음). PC만 자동 선택.
+  it("TAB 목록에서는 자동 선택 문의를 강조하지 않고 가려진 패널도 그리지 않는다", () => {
     mocks.width = 768;
     renderPage("/customer-center/buyer");
 
-    expect(screen.getByText("목록 강조 purchaser-2")).toBeInTheDocument();
+    expect(screen.getByText("목록 강조 없음")).toBeInTheDocument();
     expect(screen.queryByText("대화 purchaser-2")).not.toBeInTheDocument();
+  });
+
+  it("TAB에서 주소로 연 문의는 목록에서 강조한다", () => {
+    mocks.width = 768;
+    renderPage("/customer-center/buyer/purchaser-1");
+
+    expect(screen.getByText("목록 강조 purchaser-1")).toBeInTheDocument();
   });
 });

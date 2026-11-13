@@ -13,6 +13,7 @@ paths:
 - **변형**: variant, size 같은 변형은 `cva`로 선언해 타입으로 노출합니다. 문자열 삼항 연산으로 클래스를 조립하지 않습니다.
 - **ref**: React 19에서는 `ref`가 일반 prop이므로 `forwardRef`를 쓰지 않습니다.
 - **토큰**: 색상·간격은 시맨틱 토큰(`text-foreground`, `bg-primary`)을 쓰고 임의 값(`w-[347px]`)과 인라인 스타일을 피합니다. 디자인에 없는 스타일(예: glass 효과)은 추가하지 않습니다.
+- **Figma 디자인 시스템 토큰(`ds-`)**: Figma의 간격(gap·padding)·텍스트 스타일·그림자는 Tailwind 이름을 쓰지만 값이 기기마다 다르거나 묶음이라, 시안에 보이는 이름 앞에 `ds-`를 붙여 씁니다(`gap-6` → `ds-gap-6`, `text-sm/leading-5/medium` → `ds-text-sm-5-medium`). 정의는 `src/app/styles/ds-tokens.css`(생성 파일, 원본 `scripts/design-tokens/`)에 있고, 없는 이름이 필요하면 원본 JSON에 추가해 `pnpm ds:tokens`로 다시 만듭니다. 기존 화면의 Tailwind 기본 클래스는 그 화면을 고칠 때 옮깁니다.
 
 ```tsx
 const buttonVariants = cva("inline-flex items-center rounded-xl text-sm", {

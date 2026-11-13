@@ -3,6 +3,7 @@ import {
   getConnectDeadline,
   getRealtimePhase,
   isConsultationConnected,
+  isConsultationCompletedShown,
   isMatchFailureShown,
   REALTIME_CONNECT_TIMEOUT_MS,
 } from "./realtime-phase";
@@ -451,5 +452,33 @@ describe("isMatchFailureShown", () => {
         ],
       }),
     ).toBe(false);
+  });
+});
+
+describe("isConsultationCompletedShown", () => {
+  it("운영·광고주가 직접 종료한 상담은 종료 안내 메시지가 없어도 보인다", () => {
+    expect(
+      isConsultationCompletedShown({ endReason: "RESPONDER_FINISHED" }, true),
+    ).toBe(true);
+    expect(
+      isConsultationCompletedShown({ endReason: "REQUESTER_FINISHED" }, true),
+    ).toBe(true);
+  });
+
+  it("시간 초과(연결 대기 3분·무응답)로 끝난 상담은 정상 종료로 보지 않는다", () => {
+    expect(
+      isConsultationCompletedShown({ endReason: "MATCH_TIMEOUT" }, true),
+    ).toBe(false);
+    expect(
+      isConsultationCompletedShown({ endReason: "INACTIVITY_TIMEOUT" }, true),
+    ).toBe(false);
+  });
+
+  it("스레드가 아직 열려 있거나 종료 사유·문서가 없으면 보이지 않는다", () => {
+    expect(
+      isConsultationCompletedShown({ endReason: "RESPONDER_FINISHED" }, false),
+    ).toBe(false);
+    expect(isConsultationCompletedShown({ endReason: null }, true)).toBe(false);
+    expect(isConsultationCompletedShown(undefined, true)).toBe(false);
   });
 });
