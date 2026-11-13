@@ -15,7 +15,7 @@ memory: project
 - `shared/`·`entities/`를 바꾸기 전에 Grep으로 소비처를 찾고, 하위 호환을 유지하거나 영향받는 호출부를 함께 고칩니다.
 - 새 외부 라이브러리가 필요해 보이면 설치하지 말고 이유와 대안을 먼저 보고합니다.
 - UI 값은 Figma MCP에서 얻습니다 (절차는 `figma-to-component` skill). 연결되지 않거나 값이 없으면 추측하지 말고 보고합니다.
-- Figma 시안을 구현하면 `figma-to-component` skill의 시각 검증(Figma 스크린샷 ↔ `playwright` 스크린샷, 같은 뷰포트)까지 직접 수행합니다. 브라우저·Figma 도구를 쓸 수 없으면 비교하지 못했다고 보고하고, 통과로 간주하지 않습니다.
+- Figma 시안을 구현하면 프레임 지정값은 `node scripts/design/figma.mjs outline <node>`로 받고(`figma-to-component` skill), 끝낼 때 시안 대조(`scripts/design/qa.mjs`)가 필요합니다. 대조의 측정 단계는 이 에이전트에 없는 브라우저 도구가 필요하므로, 구현을 마치면 대조가 필요한 화면(URL·기기·시안 node)을 보고하고 메인 세션이 넘겨준 차이 후보로 고칩니다. 대조하지 못했으면 그 사실을 보고하고 통과로 간주하지 않습니다.
 - 포맷과 import 정렬은 훅이 처리합니다. 린트 에러는 억제하지 말고 코드를 고칩니다.
 
 ## 완료 보고

@@ -1,6 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
-/* Figma 디자인 시스템 토큰(ds-*). 생성 파일이며 원본은 scripts/design-tokens/ */
+/* Figma 디자인 시스템 토큰(ds-*). 생성 파일이며 원본은 scripts/design/figma-design-system.json */
 @import "./ds-tokens.css";
 
 /* 다크모드는 지원하지 않음. Tailwind v4의 dark:는 기본값이 OS 설정(prefers-color-scheme)이라

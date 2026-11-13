@@ -1,0 +1,552 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>디자인 QA 보고서</title>
+    <style>
+      :root {
+        --bg: #f1f5f9;
+        --card: #ffffff;
+        --text: #0f172a;
+        --muted: #64748b;
+        --line: #e2e8f0;
+        --accent: #2563eb;
+        --accent-bg: #eff6ff;
+        --high: #dc2626;
+        --high-bg: #fee2e2;
+        --mid: #ea580c;
+        --mid-bg: #ffedd5;
+        --low: #64748b;
+        --low-bg: #f1f5f9;
+        --ok: #16a34a;
+        --ok-bg: #dcfce7;
+        --top: 56px;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font: 14px/1.55 'Pretendard', -apple-system, BlinkMacSystemFont, 'Apple SD Gothic Neo', sans-serif;
+      }
+      header {
+        position: sticky;
+        top: 0;
+        z-index: 20;
+        height: var(--top);
+        display: flex;
+        align-items: center;
+        gap: 16px;
+        padding: 0 24px;
+        background: var(--card);
+        border-bottom: 1px solid var(--line);
+      }
+      header h1 {
+        margin: 0;
+        font-size: 16px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .meta {
+        color: var(--muted);
+        font-size: 12px;
+        white-space: nowrap;
+      }
+      .filters {
+        margin-left: auto;
+        display: flex;
+        gap: 6px;
+      }
+      .chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        height: 24px;
+        padding: 0 8px;
+        border-radius: 999px;
+        font-size: 12px;
+        font-weight: 600;
+        white-space: nowrap;
+      }
+      .chip.상 {
+        color: var(--high);
+        background: var(--high-bg);
+      }
+      .chip.중 {
+        color: var(--mid);
+        background: var(--mid-bg);
+      }
+      .chip.하 {
+        color: var(--low);
+        background: var(--low-bg);
+      }
+      .chip.ok {
+        color: var(--ok);
+        background: var(--ok-bg);
+      }
+      .chip.skip {
+        color: var(--muted);
+        background: transparent;
+        border: 1px dashed var(--line);
+      }
+      .chip.dev {
+        color: var(--text);
+        background: var(--low-bg);
+        font-weight: 700;
+        min-width: 40px;
+        justify-content: center;
+      }
+      .filters button {
+        border: 1px solid var(--line);
+        background: var(--card);
+        cursor: pointer;
+        opacity: 1;
+      }
+      .filters button[aria-pressed='false'] {
+        opacity: 0.35;
+      }
+      .layout {
+        display: grid;
+        grid-template-columns: 300px 1fr;
+      }
+      nav {
+        position: sticky;
+        top: var(--top);
+        height: calc(100vh - var(--top));
+        overflow: auto;
+        padding: 16px 12px 32px;
+        background: var(--card);
+        border-right: 1px solid var(--line);
+      }
+      nav .group {
+        margin: 16px 8px 6px;
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--muted);
+      }
+      nav .group:first-child {
+        margin-top: 0;
+      }
+      nav a {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        padding: 6px 8px;
+        border-radius: 8px;
+        border-left: 3px solid transparent;
+        color: inherit;
+        text-decoration: none;
+      }
+      nav a:hover {
+        background: var(--bg);
+      }
+      nav a.active {
+        background: var(--accent-bg);
+        border-left-color: var(--accent);
+        color: var(--accent);
+        font-weight: 600;
+      }
+      nav a .name {
+        flex: 1;
+        min-width: 0;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+      }
+      nav a .chip.dev {
+        min-width: 36px;
+        height: 20px;
+        font-size: 11px;
+      }
+      nav a .counts {
+        display: flex;
+        gap: 2px;
+      }
+      nav a .counts .chip {
+        height: 20px;
+        padding: 0 6px;
+        font-size: 11px;
+      }
+      main {
+        padding: 24px;
+        min-width: 0;
+      }
+      .card {
+        background: var(--card);
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin-bottom: 20px;
+        scroll-margin-top: calc(var(--top) + 16px);
+      }
+      .card-head {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+      .card-head h2 {
+        margin: 0;
+        font-size: 17px;
+      }
+      .card-head .counts {
+        margin-left: auto;
+        display: flex;
+        gap: 4px;
+      }
+      .links {
+        margin: 6px 0 16px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .links a {
+        color: var(--accent);
+      }
+      .summary ul {
+        margin: 8px 0 0;
+        padding-left: 18px;
+      }
+      .summary li + li {
+        margin-top: 4px;
+      }
+      .shots {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 16px;
+        align-items: start;
+      }
+      .shot {
+        margin: 0;
+      }
+      .shot figcaption {
+        font-size: 12px;
+        font-weight: 700;
+        color: var(--muted);
+        margin-bottom: 6px;
+      }
+      .frame {
+        position: relative;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        overflow: hidden;
+        background: #fff;
+        max-height: 720px;
+        overflow-y: auto;
+      }
+      .frame img {
+        display: block;
+        width: 100%;
+      }
+      .frame .empty {
+        padding: 24px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .mark {
+        position: absolute;
+        border: 2px solid var(--mid);
+        border-radius: 2px;
+        pointer-events: none;
+      }
+      .mark span {
+        position: absolute;
+        top: -10px;
+        left: -10px;
+        min-width: 20px;
+        height: 20px;
+        border-radius: 10px;
+        background: var(--mid);
+        color: #fff;
+        font-size: 11px;
+        font-weight: 700;
+        display: grid;
+        place-items: center;
+        padding: 0 4px;
+      }
+      .mark.상 {
+        border-color: var(--high);
+      }
+      .mark.상 span {
+        background: var(--high);
+      }
+      .mark.하 {
+        border-color: var(--low);
+      }
+      .mark.하 span {
+        background: var(--low);
+      }
+      .mark.active {
+        outline: 4px solid rgba(37, 99, 235, 0.35);
+      }
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-top: 20px;
+        font-size: 13px;
+      }
+      th,
+      td {
+        border-bottom: 1px solid var(--line);
+        padding: 8px;
+        text-align: left;
+        vertical-align: top;
+      }
+      th {
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 600;
+        background: var(--bg);
+      }
+      td.n {
+        width: 32px;
+        font-weight: 700;
+        color: var(--muted);
+      }
+      td.sev {
+        width: 52px;
+      }
+      td.el {
+        font-weight: 600;
+      }
+      td .note {
+        display: block;
+        margin-top: 4px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      td .val {
+        white-space: pre-wrap;
+      }
+      tbody tr {
+        cursor: pointer;
+      }
+      tbody tr:hover {
+        background: var(--accent-bg);
+      }
+      code {
+        font-size: 12px;
+        background: var(--bg);
+        padding: 1px 4px;
+        border-radius: 4px;
+      }
+      details {
+        margin-top: 12px;
+        font-size: 13px;
+      }
+      details > summary {
+        cursor: pointer;
+        color: var(--muted);
+        font-weight: 600;
+      }
+      details ul {
+        margin: 6px 0 0;
+        padding-left: 18px;
+      }
+      .clean-msg {
+        margin-top: 16px;
+        color: var(--ok);
+        font-weight: 600;
+      }
+      .hidden {
+        display: none !important;
+      }
+      @media (max-width: 960px) {
+        .layout,
+        .shots {
+          grid-template-columns: 1fr;
+        }
+        nav {
+          position: static;
+          height: auto;
+          border-right: 0;
+        }
+        .meta {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1 id="title"></h1>
+      <span class="meta" id="meta"></span>
+      <div class="filters" id="filters"></div>
+    </header>
+    <div class="layout">
+      <nav id="toc"></nav>
+      <main id="content"></main>
+    </div>
+    <!-- 보고 데이터. 같은 폴더의 data.js가 globalThis.QA_REPORT를 채운다. -->
+    <script src="data.js"></script>
+    <script>
+      const R = globalThis.QA_REPORT;
+      const SEV = ['상', '중', '하'];
+      const esc = (v) =>
+        String(v ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
+      const figmaUrl = (node) =>
+        `https://www.figma.com/design/${R.figmaFileKey}/?node-id=${String(node).split(' ')[0].replace(':', '-')}`;
+      const tally = (diffs) => SEV.map((s) => diffs.filter((d) => d.severity === s).length);
+      const countChips = (diffs, skipped) => {
+        if (skipped) return `<span class="chip skip">미검사</span>`;
+        if (!diffs.length) return `<span class="chip ok">차이 없음</span>`;
+        return tally(diffs)
+          .map((c, i) => (c ? `<span class="chip ${SEV[i]}" data-sev="${SEV[i]}">${SEV[i]} ${c}</span>` : ''))
+          .join('');
+      };
+
+      document.title = R.title;
+      document.getElementById('title').textContent = R.title;
+      document.getElementById('meta').textContent = [R.date, R.branch, R.commit].filter(Boolean).join(' · ');
+
+      const all = R.screens.flatMap((s) => s.diffs ?? []);
+      const totals = tally(all);
+      document.getElementById('filters').innerHTML = SEV.map(
+        (s, i) => `<button type="button" class="chip ${s}" data-filter="${s}" aria-pressed="true">${s} ${totals[i]}</button>`,
+      ).join('');
+
+      const toc = [];
+      const html = [];
+
+      if (R.summary?.length) {
+        html.push(
+          `<section class="card summary" id="summary"><div class="card-head"><h2>공통 차이</h2></div><ul>${R.summary.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></section>`,
+        );
+        toc.push(`<a href="#summary" data-target="summary"><span class="name">공통 차이</span></a>`);
+      }
+
+      // 목차는 기기(PC·TAB·MO)가 바뀔 때마다 묶음 제목을 넣는다
+      let lastDevice = null;
+      const marks = (diffs, key, width) =>
+        diffs
+          .filter((d) => d[key])
+          .map((d) => {
+            const b = d[key];
+            return `<div class="mark ${esc(d.severity)}" data-n="${esc(d.n)}" data-sev="${esc(d.severity)}" style="left:${(b.x / width) * 100}%;width:${(b.w / width) * 100}%" data-y="${b.y}" data-h="${b.h}" data-w="${width}"><span>${esc(d.n)}</span></div>`;
+          })
+          .join('');
+
+      R.screens.forEach((s, i) => {
+        const id = `s${i + 1}`;
+        const diffs = s.diffs ?? [];
+        const skipped = s.status === 'skipped';
+        const clean = !skipped && diffs.length === 0;
+
+        if (s.device !== lastDevice) {
+          toc.push(`<div class="group">${esc(s.device)}</div>`);
+          lastDevice = s.device;
+        }
+        toc.push(
+          `<a href="#${id}" data-target="${id}" title="${esc(s.title)}"><span class="name">${esc(s.title)}</span><span class="counts">${countChips(diffs, skipped)}</span></a>`,
+        );
+
+        const head =
+          `<div class="card-head"><span class="chip dev">${esc(s.device)}</span><h2>${esc(s.title)}</h2>${s.review ? `<span class="chip ${s.review === '캡처 확인' ? 'ok' : 'skip'}" title="판정 방식">${esc(s.review)}</span>` : ''}<span class="counts">${countChips(diffs, skipped)}</span></div>` +
+          `<div class="links">${s.url ? `<code>${esc(s.url)}</code>` : ''}${s.figmaNode ? ` · <a href="${figmaUrl(s.figmaNode)}" target="_blank">Figma ${esc(String(s.figmaNode).split(' ')[0])}</a>` : ''}</div>`;
+
+        if (skipped) {
+          html.push(`<section class="card" id="${id}">${head}<p>${esc(s.skipReason)}</p></section>`);
+          return;
+        }
+
+        const img = s.images ?? {};
+        const frame = (src, key, width) =>
+          `<div class="frame">${src ? `<img src="${esc(src)}" alt="">${marks(diffs, key, width)}` : '<div class="empty">이미지 없음</div>'}</div>`;
+        const shots =
+          img.figma || img.impl
+            ? `<div class="shots"><figure class="shot"><figcaption>시안</figcaption>${frame(img.figma, 'figmaBox', img.figmaWidth ?? s.width)}</figure>` +
+              `<figure class="shot"><figcaption>구현</figcaption>${frame(img.impl, 'box', img.implWidth ?? s.width)}</figure></div>`
+            : '';
+
+        const table = clean
+          ? `<p class="clean-msg">차이 없음</p>`
+          : `<table><thead><tr><th>#</th><th>심각도</th><th>요소 · 항목</th><th>시안</th><th>구현</th></tr></thead><tbody>` +
+            diffs
+              .map(
+                (d) =>
+                  `<tr data-n="${esc(d.n)}" data-sev="${esc(d.severity)}"><td class="n">${esc(d.n)}</td><td class="sev"><span class="chip ${esc(d.severity)}">${esc(d.severity)}</span></td>` +
+                  `<td class="el">${esc(d.element)}<span class="note">${esc(d.prop)}${d.note ? ` — ${esc(d.note)}` : ''}${d.code ? ` <code>${esc(d.code)}</code>` : ''}</span></td>` +
+                  `<td><span class="val">${esc(d.design)}</span></td><td><span class="val">${esc(d.impl)}</span></td></tr>`,
+              )
+              .join('') +
+            `</tbody></table>`;
+
+        const fold = (label, items) =>
+          items?.length ? `<details><summary>${label} ${items.length}</summary><ul>${items.map((x) => `<li>${esc(x)}</li>`).join('')}</ul></details>` : '';
+
+        html.push(
+          `<section class="card" id="${id}">${head}${shots}${table}${fold('시안 불일치', s.notes?.mismatch)}${fold('확인 필요', s.notes?.check)}</section>`,
+        );
+      });
+
+      document.getElementById('toc').innerHTML = toc.join('');
+      document.getElementById('content').innerHTML = html.join('');
+
+      // 이미지 실제 높이를 알아야 세로 위치를 비율로 그릴 수 있어 로드 후 배치
+      const placeMarks = (frame) => {
+        const im = frame.querySelector('img');
+        const first = frame.querySelector('.mark');
+        if (!im || !im.naturalWidth || !first) return;
+        const scale = im.clientWidth / Number(first.dataset.w);
+        frame.querySelectorAll('.mark').forEach((mk) => {
+          mk.style.top = `${Number(mk.dataset.y) * scale}px`;
+          mk.style.height = `${Number(mk.dataset.h) * scale}px`;
+        });
+      };
+      document.querySelectorAll('.frame').forEach((f) => {
+        const im = f.querySelector('img');
+        if (!im) return;
+        if (im.complete) placeMarks(f);
+        else im.addEventListener('load', () => placeMarks(f));
+      });
+      window.addEventListener('resize', () => document.querySelectorAll('.frame').forEach(placeMarks));
+
+      // 표 행을 누르면 같은 번호의 표시를 강조하고 이미지 안에서 그 위치로 이동
+      document.querySelectorAll('tbody tr').forEach((tr) =>
+        tr.addEventListener('click', () => {
+          const card = tr.closest('.card');
+          card.querySelectorAll('.mark').forEach((mk) => mk.classList.toggle('active', mk.dataset.n === tr.dataset.n));
+          card.querySelectorAll(`.mark[data-n="${tr.dataset.n}"]`).forEach((mk) => {
+            const fr = mk.closest('.frame');
+            fr.scrollTo({ top: Math.max(0, mk.offsetTop - fr.clientHeight / 3), behavior: 'smooth' });
+          });
+        }),
+      );
+
+      // 심각도 필터
+      const applyFilter = () => {
+        const on = [...document.querySelectorAll('[data-filter]')].filter((b) => b.getAttribute('aria-pressed') === 'true').map((b) => b.dataset.filter);
+        document.querySelectorAll('tbody tr, .mark').forEach((el) => el.classList.toggle('hidden', !on.includes(el.dataset.sev)));
+      };
+      document.querySelectorAll('[data-filter]').forEach((b) =>
+        b.addEventListener('click', () => {
+          b.setAttribute('aria-pressed', b.getAttribute('aria-pressed') === 'true' ? 'false' : 'true');
+          applyFilter();
+        }),
+      );
+
+      // 목차: 지금 보고 있는 화면을 강조하고 목차 안에서도 보이게 스크롤
+      const links = new Map([...document.querySelectorAll('nav a')].map((a) => [a.dataset.target, a]));
+      const setActive = (id) => {
+        links.forEach((a, key) => a.classList.toggle('active', key === id));
+        const a = links.get(id);
+        if (a) a.scrollIntoView({ block: 'nearest' });
+      };
+      const sections = [...document.querySelectorAll('main .card')];
+      const onScroll = () => {
+        const line = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--top')) + 40;
+        let current = sections[0]?.id;
+        for (const sec of sections) {
+          if (sec.getBoundingClientRect().top <= line) current = sec.id;
+          else break;
+        }
+        setActive(current);
+      };
+      document.addEventListener('scroll', onScroll, { passive: true });
+      onScroll();
+    </script>
+  </body>
+</html>

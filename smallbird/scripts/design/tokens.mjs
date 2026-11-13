@@ -1,14 +1,14 @@
 // Figma 디자인 시스템 토큰(ds-*) CSS 생성과 검사. 의존성 없이 Node 만으로 동작합니다.
-//   node scripts/design-tokens/generate.mjs          → src/app/styles/ds-tokens.css 생성 (pnpm ds:tokens)
-//   node scripts/design-tokens/generate.mjs --check  → 생성 파일이 최신인지 검사 (pnpm ds:tokens:check)
-// 입력은 같은 폴더의 figma-tokens.json(Figma 변수·스타일 스냅샷)입니다.
+//   node scripts/design/tokens.mjs          → src/app/styles/ds-tokens.css 생성 (pnpm ds:tokens)
+//   node scripts/design/tokens.mjs --check  → 생성 파일이 최신인지 검사 (pnpm ds:tokens:check)
+// 입력은 같은 폴더의 figma-design-system.json(Figma 변수·스타일 스냅샷, 시안 수집 figma.mjs 와 같이 씀)입니다.
 //
 // Figma 디자인 시스템은 Tailwind 이름(gap-6, text-sm/leading-5/medium)을 쓰지만 값이 기기(PC·tablet·mobile)마다
 // 다르고, 텍스트 스타일은 크기·행간·굵기·자간 묶음입니다. 같은 이름의 Tailwind 기본 클래스와 뜻이 다르므로
 // ds- 접두어로 따로 만듭니다. 모바일 값을 기본으로 두고 tablet(768)·desktop(1440) 구간에서 바뀐 값만 덮습니다.
 import { readFileSync, writeFileSync } from "node:fs";
 
-const INPUT = "scripts/design-tokens/figma-tokens.json";
+const INPUT = "scripts/design/figma-design-system.json";
 const OUTPUT = "src/app/styles/ds-tokens.css";
 
 const tokens = JSON.parse(readFileSync(INPUT, "utf8"));

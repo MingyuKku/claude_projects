@@ -63,9 +63,10 @@ static:
     - when: on_success
   script:
     # i18n:check 는 번역 파일의 언어별 키 구성·빈 값·위치와 생성 타입(resources.gen.d.ts)이 최신인지 검사한다.
+    # ds:tokens:check 는 ds-tokens.css 가 Figma 스냅샷과 맞는지, test:scripts 는 디자인 대조 스크립트 테스트(node:test, Figma 토큰 불필요)다.
     - |
       failed=""
-      for check in typecheck lint format:check i18n:check; do
+      for check in typecheck lint format:check i18n:check ds:tokens:check test:scripts; do
         echo "\$ pnpm $check"
         pnpm "$check" || failed="$failed $check"
       done
