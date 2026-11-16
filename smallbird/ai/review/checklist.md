@@ -50,6 +50,7 @@
 | 커스텀 훅 반환값이 셋 이상이면 객체 | R |
 | 매직 넘버·스트링, 경로 문자열 직접 사용 | R |
 | 무엇을 하는지 설명하는 주석 (왜만 남김) | R |
+| 새로 단 주석에 Figma node ID, 날짜·QA·요구명세 번호·"사용자 결정" 같은 출처, className에 이미 있는 수치, 화면 구성 요약이 있음 (`code-style.md` "주석") | R |
 
 ## 4. 데이터·상태 — `api-integration.md`, `state-management.md`
 

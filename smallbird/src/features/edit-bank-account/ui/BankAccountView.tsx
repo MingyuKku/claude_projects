@@ -18,7 +18,6 @@ interface BankAccountViewProps {
   onClickEdit: () => void;
 }
 
-// Figma 계좌정보 보기(10724:185992)·미등록(10724:185968): 읽기 전용 표와 아래 "수정"(미등록은 "등록").
 export function BankAccountView({
   account,
   onClickEdit,

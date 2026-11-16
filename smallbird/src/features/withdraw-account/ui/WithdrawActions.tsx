@@ -8,7 +8,6 @@ interface WithdrawActionsProps {
   className?: string;
 }
 
-// 시안 하단 버튼 한 쌍: "취소"(outline) · "동의 및 탈퇴하기"(destructive), 같은 폭.
 export function WithdrawActions({
   onClickCancel,
   onClickAgree,

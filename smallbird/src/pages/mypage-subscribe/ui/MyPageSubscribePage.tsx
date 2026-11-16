@@ -52,7 +52,6 @@ import type {
   Subscription,
 } from "@/entities/subscription";
 
-// 탭 본문의 최대 폭(시안 PC 1440 화면의 본문 폭 1170). 더 넓은 화면에서는 가운데 정렬함.
 const CONTENT_WIDTH_CLASS_NAME = "mx-auto w-full max-w-292.5";
 // 고정 탭 줄(sticky z-10)은 같은 층의 본문과 z-index로 겨루므로, 본문 안의 z-index(고정 제목줄 등)가 탭 줄 위로 올라오지 않게
 // 탭 본문을 isolate로 가둠. 본문 안에서 z-index가 커져도 탭 줄 아래에 그려짐.
@@ -67,7 +66,7 @@ const RESET_PARAMS = [
 ];
 
 // 셸(헤더·LNB)은 app 레이어의 MypageLayout이 감쌈. 탭·세그먼트·하위 화면은 URL 쿼리가 소유함(뒤로 가기로 닫히고 새로고침해도 유지).
-// 비로그인(session null)은 구독 탭의 상품만 봄(마이페이지 QA 2026-11-16). 탭 줄은 그대로 두고 다른 탭과 "구독하기"는 로그인 안내 알럿을 띄움.
+// 비로그인(session null)은 구독 탭의 상품만 봄. 탭 줄은 그대로 두고 다른 탭과 "구독하기"는 로그인 안내 알럿을 띄움.
 export function MyPageSubscribePage() {
   const { t } = useTranslation("pages/mypage-subscribe");
   const { t: tCommon } = useTranslation();
@@ -113,13 +112,13 @@ export function MyPageSubscribePage() {
     isCheckoutRequested &&
     subscriptions !== undefined &&
     getSubscribedTypes(subscriptions).has(checkoutType);
-  // 등록된 카드가 없으면 결제 화면 대신 구독 탭에서 카드 등록 안내를 띄움(스펙 §3 카드 없음). 주소로 바로 들어와도 같음.
+  // 등록된 카드가 없으면 결제 화면 대신 구독 탭에서 카드 등록 안내를 띄움. 주소로 바로 들어와도 같음.
   // 카드를 읽기 전에는 알 수 없어 결제 화면이 먼저 열리고, 읽은 뒤 0장이면 구독 탭으로 돌아와 안내함.
   const isCardRequired =
     isCheckoutRequested && !isAlreadySubscribed && cards?.length === 0;
   const isCheckout =
     isCheckoutRequested && !isAlreadySubscribed && !isCardRequired;
-  // TAB의 결제내역 필터 화면은 탭 줄까지 덮는 본문 전체 화면(탭 숨김은 의도, 스펙 §3).
+  // TAB의 결제내역 필터 화면은 탭 줄까지 덮는 본문 전체 화면(탭 숨김은 의도).
   const isTabletFilter = tab === "payments" && filterScreen.isOpen;
 
   // 이용요약 세그먼트: 쿼리가 없으면 구독 중인 첫 상품, 구독이 없으면 모집형.
@@ -221,7 +220,7 @@ export function MyPageSubscribePage() {
         }}
       />
       {!isGuest && <PaymentResultHandler />}
-      {/* 카드를 등록하고 돌아오면 구독하려던 상품·결제 주기의 결제 화면을 다시 열어 이어서 결제하게 함(스펙 §3 카드 없음, 사용자 결정 2026-11-03). */}
+      {/* 카드를 등록하고 돌아오면 구독하려던 상품·결제 주기의 결제 화면을 다시 열어 이어서 결제하게 함. */}
       <RegisterCardDialog
         open={isCardRequired}
         onCancel={closePanel}
@@ -241,11 +240,7 @@ export function MyPageSubscribePage() {
           onRegistered={(params) => params.set("tab", "payments")}
         />
       )}
-      <Tabs
-        value={tab}
-        onValueChange={handleChangeTab}
-        className="gap-4 tablet:gap-5 desktop:gap-6"
-      >
+      <Tabs value={tab} onValueChange={handleChangeTab} className="ds-gap-6">
         {!isTabletFilter && (
           // 탭 줄은 스크롤해도 화면 위에 고정함. 위 여백은 고정 영역이 직접 가져 스크롤 내용이 그 위로 비치지 않게 함.
           <StickyTabBar
@@ -266,7 +261,7 @@ export function MyPageSubscribePage() {
           value="usage"
           className={`${TAB_CONTENT_CLASS_NAME} pb-4 tablet:pb-5`}
         >
-          {/* 이용요약 API가 없어(§7 B-1) 목은 개발 서버에서만 그리고, 빌드(stage·prod)에서는 이 탭만 준비 중으로 둠(account.md §1). API가 공개되면 지움. */}
+          {/* 이용요약 API가 없어 목은 개발 서버에서만 그리고, 빌드(stage·prod)에서는 이 탭만 준비 중으로 둠. API가 공개되면 지움. */}
           {IS_USAGE_MOCK_ENABLED ? (
             <SubscriptionsGate skeleton={<UsageSkeleton />}>
               {(subscriptions) => (
@@ -287,7 +282,7 @@ export function MyPageSubscribePage() {
         </TabsContent>
         <TabsContent
           value="payments"
-          className={`${TAB_CONTENT_CLASS_NAME} flex flex-col gap-4 pb-4 tablet:gap-6 tablet:pb-5`}
+          className={`${TAB_CONTENT_CLASS_NAME} flex flex-col ds-gap-6 pb-4 tablet:pb-5`}
         >
           {!isTabletFilter && (
             <>

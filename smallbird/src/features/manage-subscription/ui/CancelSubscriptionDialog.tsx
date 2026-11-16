@@ -22,7 +22,7 @@ interface CancelSubscriptionDialogProps {
   onConfirm: () => void;
 }
 
-// Figma "구독 해지" Destructive 알럿(7064:180462). 해지가 성공하면 `CancelCompletedDialog`(7064:180448)가 이어서 열림.
+// 해지가 성공하면 `CancelCompletedDialog`가 이어서 열림.
 export function CancelSubscriptionDialog({
   open,
   subscription,

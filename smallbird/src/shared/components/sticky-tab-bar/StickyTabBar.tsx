@@ -1,7 +1,71 @@
+import { useEffect, useRef } from "react";
+
 import { cn } from "@/shared/lib/utils";
 import { TabsList, TabsTrigger } from "@/shared/ui/tabs";
 
 import type { ReactNode } from "react";
+
+const ACTIVE_TAB_SELECTOR = '[role="tab"][data-state="active"]';
+
+// 가로로 넘치는 탭 줄에서 선택된 탭이 화면 밖에 있으면 보이는 위치까지 스크롤함(주소로 바로 들어오거나 탭이 바뀔 때).
+// 선택 값은 Radix Tabs가 가지고 있어 data-state 변화를 보고 맞춤. 목록의 안쪽 여백(MO 좌우 여백)만큼 띄워 탭이 화면 끝에 붙지 않게 함.
+function useScrollActiveTabIntoView<T extends HTMLElement>(isEnabled: boolean) {
+  const scrollRef = useRef<T>(null);
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!isEnabled || !container) return;
+
+    let isFirst = true;
+    const reveal = () => {
+      const active = container.querySelector<HTMLElement>(ACTIVE_TAB_SELECTOR);
+      const list = active?.parentElement;
+      if (!active || !list) return;
+
+      const inset = parseFloat(getComputedStyle(list).paddingLeft) || 0;
+      const containerLeft = container.getBoundingClientRect().left;
+      const tabRect = active.getBoundingClientRect();
+      const start = tabRect.left - containerLeft + container.scrollLeft - inset;
+      const end = tabRect.right - containerLeft + container.scrollLeft + inset;
+      const viewEnd = container.scrollLeft + container.clientWidth;
+
+      let left: number | null = null;
+      if (start < container.scrollLeft) left = start;
+      else if (end > viewEnd) left = end - container.clientWidth;
+
+      if (left !== null) {
+        const isReducedMotion = window.matchMedia(
+          "(prefers-reduced-motion: reduce)",
+        ).matches;
+        container.scrollTo({
+          left,
+          behavior: isFirst || isReducedMotion ? "auto" : "smooth",
+        });
+      }
+      isFirst = false;
+    };
+
+    let isDisposed = false;
+    reveal();
+    const observer = new MutationObserver(reveal);
+    observer.observe(container, {
+      attributes: true,
+      attributeFilter: ["data-state"],
+      subtree: true,
+    });
+    // 글꼴이 늦게 로드돼 탭 폭이 바뀌면 처음 위치가 어긋나므로 다시 맞춤. 그 전에 정리됐으면 하지 않음.
+    void document.fonts?.ready.then(() => {
+      if (!isDisposed) reveal();
+    });
+
+    return () => {
+      isDisposed = true;
+      observer.disconnect();
+    };
+  }, [isEnabled]);
+
+  return scrollRef;
+}
 
 export interface StickyTabBarItem {
   value: string;
@@ -25,8 +89,11 @@ export function StickyTabBar({
   scrollable = false,
   className,
 }: StickyTabBarProps) {
+  const scrollRef = useScrollActiveTabIntoView<HTMLDivElement>(scrollable);
+
   return (
     <div
+      ref={scrollRef}
       className={cn(
         "sticky top-0 z-10 -mx-(--mypage-gutter) bg-background pt-2",
         // 스크롤하면 잘리는 위치가 콘텐츠 여백이 아니라 화면 가장자리가 되도록, MO는 첫 탭을 콘텐츠 선에 맞추는 여백을 목록이 가짐.

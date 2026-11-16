@@ -65,6 +65,8 @@ describe("requireSession", () => {
       ROUTES.mypageSubscribe,
       `${ROUTES.mypageSubscribe}/plans`,
       ROUTES.campaignCreate,
+      ROUTES.campaignRegister,
+      `${ROUTES.campaignRegister}/12`,
     ])("SUB가 %s로 오면 계정 설정으로 보낸다", async (pathname) => {
       mockAuthority("SUB");
 
@@ -81,6 +83,12 @@ describe("requireSession", () => {
       await expect(
         runRequireSession(`${ROUTES.mypageSubscribe}d`),
       ).resolves.toBeUndefined();
+    });
+
+    it("SUB도 등록 내역(캠페인 기본 정보)에는 들어갈 수 있다", async () => {
+      mockAuthority("SUB");
+
+      await expect(runRequireSession("/campaign/12")).resolves.toBeUndefined();
     });
 
     it("MASTER는 구독 경로와 그 하위 경로에 들어갈 수 있다", async () => {

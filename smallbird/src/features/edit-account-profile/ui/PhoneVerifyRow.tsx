@@ -13,7 +13,7 @@ interface PhoneVerifyRowProps {
   onClickVerify: () => void;
 }
 
-// 문구는 시안에 없어 v2 문구를 임시로 씀(스펙 §7 P-6).
+// 문구는 시안에 없어 v2 문구를 임시로 씀.
 const ERROR_KEYS = {
   failed: "form.phone.verification.failed",
   duplicate: "form.phone.verification.duplicate",

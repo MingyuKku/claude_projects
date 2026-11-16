@@ -27,7 +27,7 @@ export const EMPTY_CREATE_VALUES: CreateFormValues = {
   email: "",
 };
 
-/** 아이디 중복확인 진행 상태. 아이디를 고치면 다시 idle이 됨(v2는 고쳐도 통과한 것으로 남던 버그). */
+/** 아이디 중복확인 진행 상태. 아이디를 고치면 다시 idle이 됨. */
 export type IdCheckStatus = "idle" | "available" | "taken" | "error";
 
 export interface CreateFormErrors {
@@ -63,7 +63,7 @@ export function isUncheckableId(identifier: string) {
 
 /**
  * 모든 필수 칸(담당자명·아이디·비밀번호·비밀번호 확인·이메일)이 차 있고, 오류가 없고,
- * 아이디가 중복확인을 통과했을 때만 생성할 수 있음. 휴대폰 번호 칸은 2026-10-27 시안에서 빠짐.
+ * 아이디가 중복확인을 통과했을 때만 생성할 수 있음.
  */
 export function canCreateSubAccount(
   values: CreateFormValues,
@@ -75,7 +75,7 @@ export function canCreateSubAccount(
   return isFilled && !hasError && idStatus === "available";
 }
 
-/** 휴대폰 번호 칸은 2026-10-27 시안에서 빠졌고 서버도 받지 않음(2026-10-28). */
+/** 휴대폰 번호 칸은 시안에 없고 서버도 받지 않음. */
 export function toCreateSubAccountBody(
   values: CreateFormValues,
 ): CreateSubAccountBody {

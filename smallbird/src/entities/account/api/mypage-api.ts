@@ -31,9 +31,8 @@ export async function fetchSubSelfAccount() {
 }
 
 /**
- * 아이디·이메일 중복확인. 서버가 존재 여부를 돌려주므로 `result: false`가 사용 가능
- * (v2 동작, Stage 확인 전). `result`가 없거나 boolean이 아니면 파싱이 실패해 사용 가능으로
- * 읽히지 않음.
+ * 아이디·이메일 중복확인. 서버가 존재 여부를 돌려주므로 `result: false`가 사용 가능.
+ * `result`가 없거나 boolean이 아니면 파싱이 실패해 사용 가능으로 읽히지 않음.
  */
 export async function checkAccountValue(
   type: DuplicateCheckType,

@@ -27,13 +27,13 @@ import type { WithdrawResult } from "../model/schema";
 
 interface WithdrawPanelProps {
   onClose: () => void;
-  /** TAB·MO는 제목 앞에 뒤로 버튼도 둠(시안). 2단계에서는 항상 보이고 1단계로 돌아감. */
+  /** TAB·MO는 제목 앞에 뒤로 버튼도 둠. 2단계에서는 항상 보이고 1단계로 돌아감. */
   hasBackButton?: boolean;
   /** 출금 요청이 접수됐을 때. 완료 알럿과 내역 갱신은 호출하는 쪽이 함. */
   onWithdrawn: (result: WithdrawResult) => void;
 }
 
-// 빅버드 머니 출금 패널. 1단계(계좌 입력) → 2단계(확인·요청). 전액 출금만 가능해 금액 입력은 없고 보유 잔액을 그대로 요청함.
+// 전액 출금만 가능해 금액 입력은 없고 보유 잔액을 그대로 요청함.
 // PC는 오른쪽 인라인 패널, TAB·MO는 본문을 대체하는 카드. 배치는 페이지가 정함.
 export function WithdrawPanel({
   onClose,

@@ -5,46 +5,47 @@ import { SWRConfig } from "swr";
 
 import { FocusShell } from "./FocusShell";
 
-function renderShell(props: Partial<Parameters<typeof FocusShell>[0]> = {}) {
-  const onBack = vi.fn();
+function renderShell(onBack = vi.fn()) {
   render(
-    <SWRConfig value={{ provider: () => new Map() }}>
-      <MemoryRouter>
+    <MemoryRouter>
+      <SWRConfig value={{ provider: () => new Map() }}>
         <FocusShell
           session={null}
           title="캠페인 등록"
+          sidebar={<nav aria-label="등록 단계">단계 목록</nav>}
           onBack={onBack}
-          {...props}
         >
           <p>본문</p>
         </FocusShell>
-      </MemoryRouter>
-    </SWRConfig>,
+      </SWRConfig>
+    </MemoryRouter>,
   );
-  return { onBack };
+  return onBack;
 }
 
 describe("FocusShell", () => {
-  it("LNB 없이 뒤로가기 버튼과 제목, 본문을 그린다", () => {
+  it("LNB 없이 제목·사이드바 자리·본문을 그린다", () => {
     renderShell();
 
-    expect(screen.getByRole("heading", { name: "캠페인 등록" })).toBeVisible();
-    expect(screen.getByText("본문")).toBeVisible();
-    expect(screen.queryByRole("navigation")).not.toBeInTheDocument();
-    expect(screen.queryByRole("button", { name: "메뉴 열기" })).toBeNull();
+    expect(
+      screen.getByRole("heading", { name: "캠페인 등록" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("navigation", { name: "등록 단계" }).closest("aside"),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("main")).toHaveTextContent("본문");
+    // AppShell의 LNB 메뉴 버튼(메뉴 열기) 대신 뒤로가기만 있음.
+    expect(
+      screen.queryByRole("button", { name: "메뉴 열기" }),
+    ).not.toBeInTheDocument();
   });
 
-  it("뒤로가기 버튼을 누르면 onBack을 부른다", async () => {
-    const { onBack } = renderShell();
+  it('헤더 "<"를 누르면 onBack을 부른다', async () => {
+    const user = userEvent.setup();
+    const onBack = renderShell();
 
-    await userEvent.click(screen.getByRole("button", { name: "뒤로가기" }));
+    await user.click(screen.getByRole("button", { name: "뒤로가기" }));
 
     expect(onBack).toHaveBeenCalledTimes(1);
-  });
-
-  it("사이드바 자리에 넘긴 내용을 그린다", () => {
-    renderShell({ sidebar: <nav aria-label="단계">단계 목록</nav> });
-
-    expect(screen.getByText("단계 목록")).toBeInTheDocument();
   });
 });

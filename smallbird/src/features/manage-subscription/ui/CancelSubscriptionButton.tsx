@@ -8,7 +8,7 @@ interface CancelSubscriptionButtonProps {
   onClick: (subscription: Subscription) => void;
 }
 
-// Figma "구독해지"(destructive outline). 해지 예정이면 종료일까지 비활성 "해지 예정"(스펙 §3).
+// 해지 예정이면 종료일까지 비활성 "해지 예정"으로 보임.
 export function CancelSubscriptionButton({
   subscription,
   onClick,

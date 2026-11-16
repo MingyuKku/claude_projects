@@ -30,13 +30,11 @@ interface SubAccountTableProps {
   emptyContent?: ReactNode;
 }
 
-// 표는 PC(1440~)만 씀(TAB·MO는 카드). 긴 값은 두 줄까지 줄바꿈 뒤 말줄임, PC 시안(패널이 열려 표가 좁아진 경우)에서는 한 줄 말줄임.
 // 글자 단위로 줄바꿈(break-all)해 칸이 얼마든 좁아질 수 있게 둠. 그래야 자동 표 배치에서 이 열들이 남는 폭에 맞춰 줄고,
 // 줄일 수 없는 열(관리 버튼)은 내용 폭을 지켜 셀 밖으로 넘치지 않음.
 const CELL_TEXT_CLASS_NAME = "line-clamp-2 break-all desktop:line-clamp-1";
 
-// Figma Sub ID 목록 표(10061:201222): Header Gray, 열 폭 아이디 가변·담당자명(표 폭의 약 1/8: 1170→150, 773→100, 672→81)·이메일 가변·생성일 120·관리 184, 행 높이 56.
-// 고정 폭(table-fixed)을 쓰지 않음: 긴 언어에서 관리 버튼이 184보다 넓어지면 셀 밖으로 넘쳐 표 배경·선이 끊김. 자동 배치에서
+// 고정 폭(table-fixed)을 쓰지 않음: 긴 언어에서 관리 버튼이 지정 폭보다 넓어지면 셀 밖으로 넘쳐 표 배경·선이 끊김. 자동 배치에서
 // 지정한 폭은 최소 폭이 되어 시안 폭을 지키고, 내용이 더 넓으면 열이 늘어나 그래도 좁으면 표가 가로로 스크롤됨.
 export function SubAccountTable({
   accounts,
@@ -55,7 +53,7 @@ export function SubAccountTable({
         <TableHead className="w-1/8">{t("list.column.name")}</TableHead>
         <TableHead>{t("list.column.email")}</TableHead>
         <TableHead className="w-30">{t("list.column.createdAt")}</TableHead>
-        <TableHead className="w-46">{t("list.column.manage")}</TableHead>
+        <TableHead className="w-64">{t("list.column.manage")}</TableHead>
       </TableRow>
     </TableHeader>
   );

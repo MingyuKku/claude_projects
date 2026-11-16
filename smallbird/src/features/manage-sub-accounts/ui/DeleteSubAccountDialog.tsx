@@ -21,8 +21,6 @@ interface DeleteSubAccountDialogProps {
   onConfirm: (account: SubAccountViewModel) => void;
 }
 
-// Figma 삭제 알럿(10061:201625 PC·TAB, 10061:207084 MO): Destructive. 제목 "Sub ID 삭제", 모든 기기 같은 문구(사용자 확인).
-// PC·TAB은 왼쪽 정렬 + 취소·삭제 가로, MO는 가운데 정렬 + 삭제(위)·취소(아래) 세로(AlertDialog의 반응형 기본 구조).
 export function DeleteSubAccountDialog({
   open,
   account,

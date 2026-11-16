@@ -8,7 +8,7 @@ interface DeleteButtonProps {
   className?: string;
 }
 
-// Figma Toggle(trash): 40px 정사각, 반경 6, 테두리. 켜고 끄는 동작이 아니라 삭제 버튼이라 Button으로 그림.
+// 시안은 Toggle이지만 켜고 끄는 동작이 아니라 삭제 버튼이라 Button으로 그림.
 export function DeleteButton({ label, onClick, className }: DeleteButtonProps) {
   return (
     <Button

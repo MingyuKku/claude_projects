@@ -16,7 +16,7 @@ interface ProfilePasswordFieldsProps {
   ) => (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
-// 비밀번호 변경·확인 두 칸. 현재 비밀번호 칸은 없음(서버가 새 비밀번호만 받음, 스펙 §3).
+// 현재 비밀번호 칸은 없음: 서버가 새 비밀번호만 받음.
 export function ProfilePasswordFields({
   values,
   errors,

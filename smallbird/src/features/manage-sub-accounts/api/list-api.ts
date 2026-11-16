@@ -12,8 +12,8 @@ interface FetchSubAccountsParams {
 }
 
 /**
- * `GET /v3/mypage/account/sub`. MASTER·ADMIN 전용. 검색은 시안대로 검색어 하나로 아이디·담당자명·이메일을 찾으므로
- * `searchType` 없이 `keyword`만 보냄(백엔드가 이 방식으로 바꿈, 2026-10-27 Swagger 확인).
+ * `GET /v3/mypage/account/sub`. MASTER·ADMIN 전용. 검색어 하나로 아이디·담당자명·이메일을 찾으므로
+ * `searchType` 없이 `keyword`만 보냄.
  */
 export async function fetchSubAccounts({
   keyword,

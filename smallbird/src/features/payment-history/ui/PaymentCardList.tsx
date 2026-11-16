@@ -15,8 +15,7 @@ interface PaymentCardListProps {
   records: PaymentRecord[];
 }
 
-// Figma 건별 카드(TAB 2열 7064:187268, MO 1열 7064:190017): 위쪽 오른쪽 정렬 "거래명세서 ⬇", 아래 라벨 열(회색)·값 열 5행 표.
-// TAB 카드는 카드 사이 12px로 2열이고, 홀수면 마지막 카드는 왼쪽에 놓이며 같은 줄 카드는 높이를 맞춤(grid 기본 stretch).
+// 같은 줄 카드는 grid 기본 stretch로 높이를 맞춤.
 export function PaymentCardList({ records }: PaymentCardListProps) {
   const { t } = useTranslation("features/payment-history");
   const { formatDateTime, formatWon } = usePaymentFormat();

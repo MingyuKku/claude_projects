@@ -12,7 +12,7 @@ import { PAYMENT_ITEMS } from "../model/constants";
 import type { FilterField } from "@/shared/components/list-filter";
 
 /**
- * 결제 내역 필터(결제 일자·결제 내역·결제 수단·결제 상태). 값은 서버 코드(스펙 §7 B-2).
+ * 결제 내역 필터(결제 일자·결제 내역·결제 수단·결제 상태). 값은 서버 코드.
  * 결제 내역은 표의 "결제 내역" 열(상품명)을 결제 주기 × 상품 유형 조합(월·연 × PICK형·모집형)으로 거름.
  * 구독 결제는 신용카드만이라 결제 수단에 무통장 입금은 없음. 결제 상태는 배지 3종 기준(필터 시안은 환불 2개).
  */
@@ -33,7 +33,7 @@ export function usePaymentFilterFields(): FilterField[] {
       id: "item",
       label: t("filter.item.label"),
       placeholder: t("filter.item.placeholder"),
-      // 시안(11755:96965): 세 선택(결제 내역·결제 수단·결제 상태)이 모두 140px. 팝업은 트리거 폭 이상으로 내용만큼 늘어남.
+      // 팝업은 트리거 폭 이상으로 내용만큼 늘어남.
       width: NARROW_FIELD_WIDTH,
       // 선택지 이름은 표의 상품명과 같은 문구(엔티티의 상품 이름)를 씀.
       options: PAYMENT_ITEMS.map((item) => ({

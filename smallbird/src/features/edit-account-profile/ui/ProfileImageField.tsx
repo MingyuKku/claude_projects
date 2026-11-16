@@ -15,7 +15,6 @@ interface ProfileImageFieldProps {
   onChange: (event: ChangeEvent<HTMLInputElement>) => void;
 }
 
-// Figma 프로필 이미지 행: PC·TAB은 라벨 왼쪽·아바타 오른쪽 표, MO는 라벨 위·아바타 가운데.
 export function ProfileImageField({
   src,
   inputRef,

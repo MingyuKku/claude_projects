@@ -6,7 +6,7 @@ description: Figma URL이나 노드 ID를 받아 React + shadcn/ui + Tailwind �
 
 # Figma 디자인 → 코드
 
-Figma가 디자인의 원본입니다. 프레임 지정값은 `scripts/design/figma.mjs`(Figma REST, `.env.local`의 `FIGMA_TOKEN`)로 받고, 한두 노드의 상세나 스크린샷은 Figma MCP(`figma`)로 봅니다. **토큰이 없거나 연결이 안 되거나 값이 없으면 추측하지 말고 멈춰서 보고합니다.** 디자인이 없는 화면은 만들지 않고, 데이터 레이어(타입, 훅)까지만 만든 뒤 보고합니다.
+Figma가 디자인의 원본입니다. 페이지 스캔과 프레임 지정값은 `scripts/design/figma.mjs`(Figma REST, `.env.local`의 `FIGMA_TOKEN`)로 받고, 한두 노드의 상세나 스크린샷은 Figma MCP(`figma`)로 봅니다. **토큰이 없거나 연결이 안 되거나 값이 없으면 추측하지 말고 멈춰서 보고합니다.** 디자인이 없는 화면은 만들지 않고, 데이터 레이어(타입, 훅)까지만 만든 뒤 보고합니다.
 
 대상: 사용자가 지정한 Figma URL/노드와 구현할 컴포넌트 (지정이 없으면 질문)
 
@@ -18,11 +18,13 @@ Figma가 디자인의 원본입니다. 프레임 지정값은 `scripts/design/fi
 - 캐시는 화면 구성·문구·주석을 파악하는 지도입니다. **간격·색·글꼴 같은 지정값은 캐시에서 옮기지 않고 구현할 때마다 Figma에서 새로 받습니다**(`figma.mjs outline`).
 - `README.md`가 목차입니다. 페이지마다 파일 키·node ID·스캔일·Figma Change log 버전·문서 목록을 적습니다. 작업을 시작할 때 Figma Change log 버전이 캐시와 다르면 다시 스캔합니다.
 - 페이지(또는 구역) 문서에 담는 것: 화면 목록(node ID·기기·상태·쌍을 이루는 긴 스크롤 프레임), 화면별 구조와 **문구 원문**, 다이얼로그(제목·본문·버튼 원문), 디자이너 주석(`Guide Caption` 등) 원문, 반응형 차이, 애매한 점(node ID와 함께, 답은 추측하지 않음).
-- 문구 출처를 표시합니다: `[DC]`는 `get_design_context`로 읽은 텍스트, `[SS]`는 스크린샷으로 읽은 텍스트입니다. `[SS]` 문구와 간격·색 같은 정확한 값은 구현 전에 node ID로 다시 확인합니다.
+- **스캔은 `node scripts/design/figma.mjs scan <페이지 또는 구역 node,…>`** 한 번으로 합니다. REST 호출 1번으로 프레임 목록(기기·node·좌표·본문 앞 글자·상태 표시)을 화면에 보이고, 디자이너 주석·Change log·프레임 밖 다이얼로그와 프레임별 문구(컴포넌트 변형 포함)를 `.claude/figma-cache/scans/<node>.scan.txt`에 저장합니다. 캐시 문서는 이 파일을 프레임 단위로 읽어 씁니다. MCP 호출 한도를 쓰지 않고, 다음 버전 스캔 때 이 파일과 diff해 바뀐 프레임만 볼 수 있습니다(실측: 데모 모드 페이지 49프레임 약 20초, 마이페이지 전체 143프레임 한 번에 됨).
+- `FIGMA_TOKEN`이 없을 때만 MCP `use_figma`로 스캔합니다. 프레임 목록은 `design-qa` skill의 `references/figma-frames.md` 스크립트를 쓰고, 문구는 화면마다 부르지 말고 기기 줄(PC·TAB·MO)마다 한 번에 읽습니다.
+- 문구 출처를 표시합니다: `[DC]`는 노드 텍스트를 직접 읽은 것(`scan` 파일, `use_figma`, `get_design_context`), `[SS]`는 스크린샷으로 읽은 텍스트입니다. `[SS]` 문구와 간격·색 같은 정확한 값은 구현 전에 node ID로 다시 확인합니다.
 - 화면에 보이지 않는 숨은 레이어·주석 보조 문구는 "(숨김)"으로 따로 적습니다. 다른 화면에서 복사된 잔재가 많아 정책 근거로 쓰지 않습니다.
 - 프레임 이름은 실제 내용과 다를 수 있습니다(복붙). 이름이 아니라 내용으로 화면을 분류합니다.
-- 프레임 찾기는 `design-qa` skill의 `references/figma-frames.md`(Plugin API 한 번으로 페이지 전체 프레임과 화면 제목)를 씁니다. 사용자에게 node를 하나씩 달라고 하지 않습니다.
-- 큰 페이지는 최상위 노드를 구역별로 나누고 서브에이전트에 맡깁니다. 동시에 너무 많이 돌리지 않고(한도 초과 원인), 스크린샷은 레이아웃 확인이 필요한 프레임만 받습니다. 원격 MCP(`figma`)가 한도에 걸리면 데스크톱 MCP(`figma-desktop`)로 이어 받습니다. 이때 Figma 데스크톱 앱에 해당 파일이 열려 있어야 합니다.
+- 사용자에게 node를 하나씩 달라고 하지 않습니다. 페이지 URL 하나면 `scan`이 프레임을 모두 찾습니다.
+- 큰 페이지도 `scan` 한 번으로 받습니다. 응답이 커서(마이페이지 전체 약 1GB 메모리) 실패하면 구역(Section) node 여러 개를 쉼표로 넘깁니다. 스크린샷은 레이아웃 확인이 필요한 프레임만 받습니다(`figma.mjs image`도 REST). MCP를 쓸 때 원격 MCP(`figma`)가 한도에 걸리면 데스크톱 MCP(`figma-desktop`)로 이어 받습니다. 이때 Figma 데스크톱 앱에 해당 파일이 열려 있어야 합니다.
 
 ## 순서
 
@@ -38,6 +40,7 @@ Figma가 디자인의 원본입니다. 프레임 지정값은 `scripts/design/fi
    - 크기 방식: hug → 내용 크기, fill → `flex-1`·늘림, fixed → 고정 크기
    - Component Variants → `cva`의 `variant`/`size`
    - 상태(Default/Hover/Active/Focus/Disabled)와 반응형을 함께 구현
+   - node ID·프레임 이름·시안 수치는 캐시·스펙·완료 보고에만 쓰고 코드 주석에는 넣지 않습니다(`.claude/rules/code-style.md` "주석")
 5. **문구**: Figma 텍스트를 하드코딩하지 않고 슬라이스의 `locales/ko.json`에 키로 옮긴 뒤 `t()`로 연결하고, `en`·`ja`·`zh-CN` 번역도 같은 작업에서 씁니다. 서버 값 표시·미확정 고유 용어·간결한 번역 기준은 `.claude/rules/i18n.md`와 `i18n-translation.md`를 따릅니다.
 6. **마크업**: `<div>` 대신 의미에 맞는 태그(`header`, `nav`, `main`, `section`, `article`, `button`)를 씁니다.
 7. **시안 대조(완료 조건)**: 스크린샷 눈 비교로 끝내지 않습니다. `design-qa` skill의 일괄 도구(`references/workflow.md`)로 구현한 화면을 시안 프레임과 대조합니다. `screens.json`에 구현한 화면·기기를 적고 `qa.mjs prepare` → Playwright 측정 → `qa.mjs compare`를 돌려 나온 후보를 고칩니다. 고친 뒤 다시 `compare`까지 돌려 **상·중 차이 후보가 남지 않을 때까지** 반복합니다. 보고서(`report`)는 사용자가 원할 때만 만듭니다.

@@ -44,7 +44,6 @@ interface WithdrawInputStepProps {
   onNext: () => void;
 }
 
-// 출금 1단계(Figma 11224:105091): 전액 출금 안내, 보유 금액, 출금 은행·계좌번호·예금주 명·통장 사본, 안내 4행, "다음".
 export function WithdrawInputStep({
   balanceAmount,
   banks,
@@ -169,7 +168,7 @@ export function WithdrawInputStep({
                 />
               )}
             </FormField>
-            {/* 통장 사본 입력은 계정 설정 계좌 등록과 같은 컴포넌트·허용 형식·오류 문구를 임시로 씀(사용자 결정 2026-10-30). */}
+            {/* 통장 사본 입력은 계정 설정 계좌 등록과 같은 컴포넌트·허용 형식·오류 문구를 임시로 씀. */}
             <FormField
               label={bankBookLabel}
               isRequired

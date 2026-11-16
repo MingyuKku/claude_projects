@@ -1,5 +1,5 @@
-// 이용요약 목 데이터(스펙 §5, 이용요약 API 요청 B-1). 이용요약 API가 공개되면 이 파일과 api/의 목 분기를 지움.
-// 개발 서버에서만 채우고 빌드(stage·prod)에서는 비어 있어 번들에 목 값이 들어가지 않음(account.md §1 "목은 개발 서버에서만").
+// 이용요약 목 데이터. 이용요약 API가 공개되면 이 파일과 api/의 목 분기를 지움.
+// 개발 서버에서만 채우고 빌드(stage·prod)에서는 비어 있어 번들에 목 값이 들어가지 않음.
 import { isActiveProductType, USAGE_METRICS_BY_TYPE } from "./codes";
 
 import type { ActiveProductType, UsageMetric } from "./codes";

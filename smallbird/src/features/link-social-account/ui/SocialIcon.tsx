@@ -25,7 +25,6 @@ interface SocialIconProps {
   provider: SocialProvider;
 }
 
-// 시안의 24px 브랜드 아이콘(행 앞).
 export function SocialIcon({ provider }: SocialIconProps) {
   return (
     <span

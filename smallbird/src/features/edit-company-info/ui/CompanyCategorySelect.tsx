@@ -15,7 +15,7 @@ interface CompanyCategorySelectProps {
   "aria-invalid"?: true;
 }
 
-// 회사 분류는 최상위 목록만 씀(스펙). 분류 이름은 DB 값이라 번역하지 않고 그대로 보여 줌.
+// 회사 분류는 최상위 목록만 씀. 분류 이름은 DB 값이라 번역하지 않고 그대로 보여 줌.
 export function CompanyCategorySelect({
   value,
   categories,

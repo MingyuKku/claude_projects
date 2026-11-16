@@ -68,8 +68,7 @@ export function SubAccountTab({
     if (account.accountIdx === openedAccountIdx) onClosePanel();
   }
 
-  // TAB의 권한 부여는 목록 자리를 덮는 본문 전체 카드(시안 10724:187263). 탭 줄은 그대로 보임.
-  // 탭 본문(flex-col)의 남은 높이를 채움(디자인 QA 261111 TAB-49: 풀페이지 모달은 페이지 안을 fill).
+  // TAB의 권한 부여는 목록 자리를 덮는 본문 전체 카드. 탭 줄은 그대로 보임.
   if (layout === "tablet" && openedPanel === "permission" && openedAccount) {
     return (
       <div className="flex flex-1 flex-col overflow-hidden rounded-lg border">
@@ -97,7 +96,7 @@ export function SubAccountTab({
           onClickEdit={onOpenEdit}
           onClickDelete={deleteDialog.open}
         />
-        {/* MO는 생성 버튼을 화면 아래에 고정함(시안 Footer 10724:187939, 버튼 위 경계선 없음). 스크롤 컨테이너(<main>) 안에서 sticky로 붙여
+        {/* MO는 생성 버튼을 화면 아래에 고정함. 스크롤 컨테이너(<main>) 안에서 sticky로 붙여
             키보드 대응 JS 없이 처리하고, 목록 끝이 버튼에 가리지 않게 함. 화면 좌우 끝까지 채우도록 레이아웃 여백(--mypage-gutter)만큼 나감. */}
         <div className="sticky bottom-0 -mx-(--mypage-gutter) mt-auto bg-background px-(--mypage-gutter) py-4 tablet:hidden">
           <CreateSubAccountButton className="w-full" onClick={onOpenCreate} />
@@ -113,8 +112,8 @@ export function SubAccountTab({
         }}
       />
       {isPanelBeside && (
-        // 고객센터 상세 패널과 같은 인라인 패널(시안 377×640, 딤 없음). 생성·수정·권한 부여가 같은 자리를 씀.
-        // 높이는 640이되 낮은 창에서는 헤더·탭 줄 아래 간격(--account-tabs-offset)·아래 여백(20)을 뺀 남은 높이로 줄어들고(안쪽은 스크롤),
+        // 고객센터 상세 패널과 같은 인라인 패널. 생성·수정·권한 부여가 같은 자리를 씀.
+        // 낮은 창에서는 헤더·탭 줄 아래 간격(--account-tabs-offset)·아래 여백을 뺀 남은 높이로 줄어들고(안쪽은 스크롤),
         // 목록보다 낮아진 패널은 스크롤해도 탭 줄 아래에 고정되어 위로 밀려 올라가지 않음.
         <aside className="sticky top-(--account-tabs-offset) flex h-160 max-h-[calc(100dvh-var(--app-header-height)-var(--account-tabs-offset)-var(--spacing)*5)] w-94.25 shrink-0 flex-col self-start overflow-hidden rounded-lg border">
           {openedPanel === "permission" && openedAccount ? (

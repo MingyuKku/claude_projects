@@ -6,8 +6,8 @@ export const profileImageResponseSchema = z.object({
 });
 
 /**
- * 광고주 서버 `GET /cert/decrypte`(Swagger `CertDecrypteResponse`). Swagger는 `success`·`fail`만 적었으나
- * v2가 `same`·`exist`(이미 등록된 번호)도 처리해 문자열로 받음(docs/mypage-api.md §4-13 ④).
+ * 광고주 서버 `GET /cert/decrypte`(`CertDecrypteResponse`). 명세는 `success`·`fail`만 적었으나
+ * v2가 `same`·`exist`(이미 등록된 번호)도 처리해 문자열로 받음.
  */
 export const certDecryptSchema = z.object({
   result: z.string(),

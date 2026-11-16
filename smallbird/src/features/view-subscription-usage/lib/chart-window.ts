@@ -2,7 +2,7 @@ import type { UsageGranularity } from "@/entities/subscription";
 
 export type UsageLayout = "desktop" | "tablet" | "mobile";
 
-// 한 번에 보이는 막대 묶음(월·일) 수(스펙 §3 이용요약 차트). PC 월별은 12개 전체라 캐러셀이 없음.
+// 한 번에 보이는 막대 묶음(월·일) 수. PC 월별은 12개 전체라 캐러셀이 없음.
 const VISIBLE_COUNT: Record<UsageGranularity, Record<UsageLayout, number>> = {
   monthly: { desktop: 12, tablet: 7, mobile: 3 },
   daily: { desktop: 11, tablet: 7, mobile: 3 },

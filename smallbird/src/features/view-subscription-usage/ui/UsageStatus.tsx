@@ -25,7 +25,7 @@ interface UsageStatusProps {
   isSubscribed: boolean;
 }
 
-// 이용 현황 섹션: 지표·연도·(일별) 월 Select, 월별/일별 토글, 막대 차트. 미구독이면 필터는 두고 차트 자리에 빈 상태를 보임.
+// 미구독이면 필터는 두고 차트 자리에 빈 상태를 보임.
 export function UsageStatus({ type, isSubscribed }: UsageStatusProps) {
   const { t } = useTranslation("features/view-subscription-usage");
   const layout = useUsageLayout();

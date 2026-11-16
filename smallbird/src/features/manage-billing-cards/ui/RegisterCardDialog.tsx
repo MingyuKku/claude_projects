@@ -24,7 +24,7 @@ interface RegisterCardDialogProps {
   returnParams?: ReturnParams;
 }
 
-// Figma "결제 카드 등록" 알럿(11755:96280). 등록된 카드가 없을 때 구독하기를 누르면 결제 화면 대신 띄움(스펙 §3 카드 없음).
+// 등록된 카드가 없을 때 구독하기를 누르면 결제 화면 대신 띄움.
 // "결제 카드 등록하기"는 카드 추가와 같은 이니시스 카드 등록 페이지로 이동하므로, 이동하는 동안과 실패했을 때 알럿을 닫지 않음.
 export function RegisterCardDialog({
   open,

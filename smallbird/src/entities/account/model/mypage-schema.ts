@@ -1,7 +1,6 @@
 import { z } from "zod";
 
-// V3 Swagger `V3-마이페이지`(2026-10-22)의 스키마를 기준으로 함. 서버 필드명은 이 파일과
-// 트랜스포머 안에서만 쓰고, UI는 아래 뷰모델만 봄.
+// 서버 필드명은 이 파일과 트랜스포머 안에서만 쓰고, UI는 아래 뷰모델만 봄.
 
 /** 성공·실패를 `result`로만 알리는 응답(`SimpleResultResponse`). */
 export const simpleResultSchema = z.object({ result: z.boolean() });
@@ -67,14 +66,14 @@ export const subSelfAccountSchema = z.object({
   name: z.string(),
   email: z.string(),
   phone: z.string(),
-  // Sub 본인 이미지. `GET /profile`은 회사(Master) 기준이라 Sub 이미지는 여기서만 읽음(2026-11-03 백엔드 확인).
+  // Sub 본인 이미지. `GET /profile`은 회사(Master) 기준이라 Sub 이미지는 여기서만 읽음.
   profileImageUrl: z.string().nullish(),
-  // Sub 계정 생성일시(`yyyy-MM-dd HH:mm`, Master `user.created`와 같은 형식). 2026-11-03 Stage 추가.
+  // Sub 계정 생성일시(`yyyy-MM-dd HH:mm`, Master `user.created`와 같은 형식).
   created: z.string().nullish(),
 });
 export type SubSelfAccount = z.infer<typeof subSelfAccountSchema>;
 
-/** 간편 로그인 연동 대상. 페이스북은 연동하지 않음(사용자 결정 2026-10-29). */
+/** 간편 로그인 연동 대상. 페이스북은 연동하지 않음. */
 export const SOCIAL_PROVIDERS = ["kakao", "naver", "google", "apple"] as const;
 export type SocialProvider = (typeof SOCIAL_PROVIDERS)[number];
 
@@ -86,7 +85,7 @@ export interface SocialLinkViewModel {
 
 /**
  * `GET·POST·DELETE /v3/mypage/account/sns[/{platform}]`의 응답(`AccountSnsListV3Response`).
- * kakao·naver·google·apple 순서로 항상 4개(2026-11-02 Stage Swagger). 모르는 플랫폼은 트랜스포머가 버림.
+ * kakao·naver·google·apple 순서로 항상 4개. 모르는 플랫폼은 트랜스포머가 버림.
  */
 export const accountSnsListSchema = z.object({
   items: z.array(

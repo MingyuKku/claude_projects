@@ -25,8 +25,6 @@ import { WithdrawnDialog } from "./WithdrawnDialog";
 import type { MoneyLayout, MoneyPanel, MoneyTab } from "../model/tabs";
 import type { ReactNode } from "react";
 
-// 레이아웃 breakpoint는 홈·계정 설정과 같음(TAB 768~1439, PC 1440~).
-// 본문의 최대 폭(시안 PC 1440 화면의 본문 폭 1170). 더 넓은 화면에서는 가운데 정렬함.
 const CONTENT_WIDTH_CLASS_NAME = "mx-auto w-full max-w-292.5";
 // 탭이나 세그먼트를 바꾸면 하위 화면과 목록 쿼리를 지움.
 const RESET_PARAMS = ["panel", "id", "view", ...LIST_QUERY_PARAMS];
@@ -41,8 +39,6 @@ const PANEL_TABS: Record<MoneyPanel, readonly MoneyTab[]> = {
 };
 
 // 셸(헤더·LNB)은 app 레이어의 MypageLayout이 감쌈. 탭·세그먼트·하위 화면은 URL 쿼리가 소유함(뒤로 가기로 닫히고 새로고침해도 유지).
-// 배치(시안): PC는 보유 머니 카드·안내 → 탭 → 내역, 하위 화면은 오른쪽 377px 패널(맨 위부터). TAB은 같은 순서에 하위 화면이 열리면
-// 카드를 숨기고 탭 아래 본문을 대체. MO는 탭 → 세그먼트("충전" 카드·안내 / "상세 내역" 목록), 하위 화면은 탭 아래 본문을 대체.
 export function MyPageMoneyPage() {
   const { t } = useTranslation("pages/mypage-money");
   const [searchParams, setSearchParams] = useSearchParams();
@@ -90,7 +86,7 @@ export function MyPageMoneyPage() {
     onWithdrawn: withdrawn.onWithdrawn,
   });
   const isPanelOpen = sidePanel !== null;
-  // TAB 사용 내역의 "필터 검색 설정"은 모달처럼 헤더·LNB만 두고 본문 전체(요약 카드·탭 줄 포함)를 덮음(디자인 QA 26/11/05 - TAB - 26).
+  // TAB 사용 내역의 "필터 검색 설정"은 모달처럼 헤더·LNB만 두고 본문 전체(요약 카드·탭 줄 포함)를 덮음.
   // 충전/출금 내역은 TAB에서 필터가 인라인이라 화면이 없음.
   const filterScreen = useFilterScreen("desktop");
   const isTabletFilter = tab === "usage" && filterScreen.isOpen;
@@ -148,7 +144,7 @@ export function MyPageMoneyPage() {
     ),
   };
 
-  // 탭 아래 본문. TAB·MO에서 하위 화면이 열리면 그 카드가 본문을 대체하고 화면 아래까지 채움(하단 버튼이 맨 아래, 시안 `11224:104787`).
+  // 탭 아래 본문. TAB·MO에서 하위 화면이 열리면 그 카드가 본문을 대체하고 화면 아래까지 채움(하단 버튼이 맨 아래).
   const isScreenPanel = layout !== "desktop" && isPanelOpen;
 
   function tabBody(moneyTab: MoneyTab) {
@@ -173,11 +169,11 @@ export function MyPageMoneyPage() {
     );
   }
 
-  // PC·TAB은 카드를 탭 위에 둠. TAB에서 하위 화면이 열리면 카드를 숨김(시안 `11224:104787`).
+  // PC·TAB은 카드를 탭 위에 둠. TAB에서 하위 화면이 열리면 카드를 숨김.
   const showsSummaryAboveTabs =
     layout === "desktop" ||
     (layout === "tablet" && !isPanelOpen && !isTabletFilter);
-  // TAB·MO의 풀페이지 화면(거래·사용 상세, 충전, 출금, TAB 필터)은 모달처럼 상단 탭 줄 없이 본문만 그림(QA 2026-11-10).
+  // TAB·MO의 풀페이지 화면(거래·사용 상세, 충전, 출금, TAB 필터)은 모달처럼 상단 탭 줄 없이 본문만 그림.
   const hidesTabBar = isScreenPanel || isTabletFilter;
   const tabs = (
     <Tabs
@@ -185,18 +181,12 @@ export function MyPageMoneyPage() {
       onValueChange={setTab}
       // flex-1: 내역이 비면 안내가 화면 안의 남은 높이를 채움(페이지 전체 스크롤 방지).
       // 하위 화면 카드가 열리면 화면 높이를 넘지 않도록 min-h-0으로 줄어들 수 있게 함.
-      className={cn(
-        "flex-1 gap-4 tablet:gap-5 desktop:gap-6",
-        isScreenPanel && "min-h-0",
-      )}
+      className={cn("flex-1 ds-gap-6", isScreenPanel && "min-h-0")}
     >
       {/* 탭 줄은 스크롤해도 화면 위에 고정함. 위 여백은 고정 영역이 직접 가져 스크롤 내용이 그 위로 비치지 않게 함. */}
       {!hidesTabBar && (
         <StickyTabBar
-          // 카드 아래에서는 카드와 간격(TAB 16, PC 20).
-          className={
-            showsSummaryAboveTabs ? "tablet:pt-4 desktop:pt-5" : undefined
-          }
+          className={showsSummaryAboveTabs ? "tablet:ds-pt-6" : undefined}
           tabs={MONEY_TABS.map((moneyTab) => ({
             value: moneyTab,
             label: tabLabel(moneyTab),
@@ -211,7 +201,7 @@ export function MyPageMoneyPage() {
           className={cn(
             "isolate flex flex-col pb-4 tablet:pb-5",
             isScreenPanel && "min-h-0",
-            // 탭 줄이 없는 하위 화면 카드는 탭 줄이 가지던 위 여백 8을 이어받음. 필터 화면은 헤더 바로 아래에서 시작함(시안).
+            // 탭 줄이 없는 하위 화면 카드는 탭 줄이 가지던 위 여백을 이어받음. 필터 화면은 헤더 바로 아래에서 시작함.
             hidesTabBar && !isTabletFilter && "pt-2",
           )}
         >
@@ -239,7 +229,7 @@ export function MyPageMoneyPage() {
           {tabs}
         </div>
         {layout === "desktop" && isPanelOpen && (
-          // 패널은 스크롤해도 화면에 붙어 있고 높이는 화면에 맞춤(하단 버튼이 늘 보이게). 화면에서 헤더를 뺀 높이(위아래 여백 20 포함).
+          // 패널은 스크롤해도 화면에 붙어 있고 높이는 화면에 맞춤(하단 버튼이 늘 보이게). 화면에서 헤더를 뺀 높이.
           <div className="sticky top-0 flex h-[calc(100dvh-var(--app-header-height))] shrink-0 self-start py-5">
             <PanelFrame variant="aside">{sidePanel}</PanelFrame>
           </div>

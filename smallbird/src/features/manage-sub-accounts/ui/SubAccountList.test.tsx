@@ -101,7 +101,7 @@ describe("SubAccountList (PC 표)", () => {
       params: { page: 1, size: PAGE_SIZE, keyword: undefined },
     });
     const rows = within(screen.getByRole("table")).getAllByRole("row");
-    expect(rows).toHaveLength(1 + PAGE_SIZE); // 머리글 + 8행
+    expect(rows).toHaveLength(1 + PAGE_SIZE); // 머리글 포함
     expect(screen.queryByText("sub09")).toBeNull();
     expect(screen.getByRole("link", { name: "3쪽" })).toBeInTheDocument();
   });

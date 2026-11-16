@@ -16,6 +16,11 @@ export const campaignListItemSchema = z.object({
   endDate: z.string().nullish(),
   demo: z.boolean(),
   demoCompleted: z.boolean(),
+  /** 이전 캠페인 불러오기 표가 쓰는 칸(A-2). 현황 목록은 쓰지 않음. */
+  campaignType: z.string().nullish(),
+  platform: z.string().nullish(),
+  /** 등록일 `yyyy-MM-dd HH:mm:ss`. */
+  createdDate: z.string().nullish(),
 });
 export type CampaignListItem = z.infer<typeof campaignListItemSchema>;
 

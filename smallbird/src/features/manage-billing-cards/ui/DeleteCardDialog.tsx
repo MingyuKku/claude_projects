@@ -20,7 +20,7 @@ interface DeleteCardDialogProps {
   onConfirm: () => void;
 }
 
-// 시안에 없는 알럿(스펙 §6, 사용자 결정: 추천 문구). Destructive 알럿 구조는 구독 해지(7064:180462)와 같음.
+// 시안에 없는 알럿이라 구독 해지 알럿과 같은 Destructive 구조로 그림.
 export function DeleteCardDialog({
   open,
   card,

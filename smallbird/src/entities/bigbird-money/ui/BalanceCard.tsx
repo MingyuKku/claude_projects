@@ -17,8 +17,6 @@ interface BalanceCardProps {
   className?: string;
 }
 
-// Figma Card / Count: 지갑 아이콘 + 제목, 큰 금액 + 단위 "원", 선택 버튼. 충전 내역 탭과 충전 패널이 함께 씀.
-// 버튼이 있으면 금액 영역 아래 16px(MO 4px) + 버튼 영역 20px 여백(시안 PC 카드 176·MO 160). MO는 제목 줄 좌우 16·금액 20px.
 export function BalanceCard({
   amount,
   headerAction,
@@ -55,7 +53,7 @@ export function BalanceCard({
           {t("balance.unit")}
         </span>
       </p>
-      {/* 옆 안내 카드가 더 높으면 버튼은 카드 아래쪽에 붙음(시안 TAB `11224:104315`). */}
+      {/* 옆 안내 카드가 더 높으면 버튼은 카드 아래쪽에 붙음. */}
       {action && <div className="mt-auto flex flex-col p-5">{action}</div>}
     </section>
   );

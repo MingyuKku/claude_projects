@@ -25,7 +25,7 @@ import type { SessionViewModel } from "@/entities/session";
 
 const SUB_PANELS = ["create", "permission", "edit", "withdraw"] as const;
 // 레이아웃 breakpoint는 홈과 같음(TAB 768~1439, PC 1440~).
-// 모든 탭 본문이 공유하는 콘텐츠 폭. 시안(10061:200877)의 PC 1440 화면에서 본문 폭 1170을 최대 너비로 두고, 더 넓은 화면에서는
+// 모든 탭 본문이 공유하는 콘텐츠 폭. PC 시안의 본문 폭을 최대 너비로 두고, 더 넓은 화면에서는
 // 가로 가운데 정렬함. 그보다 좁으면 가용 폭을 다 씀.
 const TAB_CONTENT_WIDTH_CLASS_NAME = "mx-auto w-full max-w-292.5";
 
@@ -82,7 +82,7 @@ export function MyPageAccountPage() {
     (panel === "create" || panel === "permission" || panel === "edit")
       ? panel
       : null;
-  // TAB의 권한 부여 카드는 모달처럼 상단 탭 줄 없이 본문만 그림(시안 10724:187291, 디자인 QA TAB 해상도 모달 상단 탭 삭제).
+  // TAB의 권한 부여 카드는 모달처럼 상단 탭 줄 없이 본문만 그림.
   const hidesTabBar =
     subLayout === "tablet" &&
     subPanel === "permission" &&
@@ -106,7 +106,7 @@ export function MyPageAccountPage() {
     );
   }
 
-  // TAB·MO의 Sub ID 생성·수정은 탭 줄까지 덮는 본문 전체 화면(시안, QA 2026-11-10: MO도 탭 줄 없음).
+  // TAB·MO의 Sub ID 생성·수정은 탭 줄까지 덮는 본문 전체 화면.
   if (
     subLayout !== "desktop" &&
     (subPanel === "create" || (subPanel === "edit" && editAccount))
@@ -144,13 +144,13 @@ export function MyPageAccountPage() {
     <>
       <title>{t("title")}</title>
       {/* --account-tabs-offset: 고정된 탭 줄 높이(위 여백 + 탭 36) + 탭 줄과 본문 사이 간격(gap). 본문 안의 요소로 스크롤할 때
-          탭 줄에 가리지 않게 쓰는 값이라, 탭 줄·gap을 바꾸면 함께 맞춤(TAB 8+36+20, PC 20+36+24). */}
+          탭 줄에 가리지 않게 쓰는 값이라, 탭 줄·gap을 바꾸면 함께 맞춤. */}
       <Tabs
         value={tab}
         onValueChange={setTab}
-        className="min-h-full gap-4 [--account-tabs-offset:--spacing(16)] tablet:gap-5 desktop:gap-6 desktop:[--account-tabs-offset:--spacing(20)]"
+        className="min-h-full ds-gap-6 [--account-tabs-offset:--spacing(16)] desktop:[--account-tabs-offset:--spacing(20)]"
       >
-        {/* 탭 줄은 스크롤해도 화면 위에 고정함. 위 여백(MO·TAB 8px, PC 20px)은 고정 영역이 직접 가져 스크롤 내용이
+        {/* 탭 줄은 스크롤해도 화면 위에 고정함. 위 여백은 고정 영역이 직접 가져 스크롤 내용이
             그 위로 비치지 않게 함. 모바일은 탭이 넘치면 가로로 스크롤하는데, 잘리는 위치가 콘텐츠 여백이 아니라
             화면 가장자리가 되도록 스크롤 영역을 레이아웃 좌우 여백(--mypage-gutter)만큼 넓히고 첫 탭을 콘텐츠 선에 맞추는 여백은 목록이 가짐. */}
         {!hidesTabBar && (
@@ -175,7 +175,7 @@ export function MyPageAccountPage() {
               accountTab === "sub"
                 ? "data-[state=active]:flex data-[state=active]:flex-col tablet:pb-5"
                 : "pb-4 tablet:pb-5",
-              // 탭 줄이 없는 권한 부여 카드는 탭 줄이 가지던 위 여백 8을 이어받음(시안).
+              // 탭 줄이 없는 권한 부여 카드는 탭 줄이 가지던 위 여백을 이어받음.
               hidesTabBar && "tablet:pt-2",
             )}
           >
@@ -210,7 +210,7 @@ export function MyPageAccountPage() {
           </TabsContent>
         ))}
       </Tabs>
-      {/* PC·TAB은 시안대로 중앙 다이얼로그(딤 있음). 뒤로 가기로도 닫힘. */}
+      {/* PC·TAB은 중앙 다이얼로그. 뒤로 가기로도 닫힘. */}
       {isWithdrawOpen && <WithdrawFlow variant="dialog" onClose={closePanel} />}
     </>
   );

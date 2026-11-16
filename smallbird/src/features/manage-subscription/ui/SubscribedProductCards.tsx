@@ -15,7 +15,6 @@ interface SubscribedProductCardsProps {
   onClickCancel: (subscription: Subscription) => void;
 }
 
-// Figma MO 구독 결제 상품(7064:190017): 세로 key-value 표. 서비스명 행 오른쪽에 "구독해지" 버튼.
 export function SubscribedProductCards({
   subscriptions,
   onClickCancel,
@@ -51,7 +50,7 @@ export function SubscribedProductCards({
 
         return (
           <li key={subscription.id}>
-            <dl className="grid grid-cols-[minmax(6.25rem,max-content)_minmax(0,1fr)] overflow-hidden rounded-lg border">
+            <dl className="grid grid-cols-[minmax(6.25rem,7rem)_minmax(0,1fr)] overflow-hidden rounded-lg border">
               <dt className="flex min-h-12 items-center border-b bg-muted/40 px-4 text-sm leading-6 font-medium text-muted-foreground">
                 {t("column.name")}
               </dt>

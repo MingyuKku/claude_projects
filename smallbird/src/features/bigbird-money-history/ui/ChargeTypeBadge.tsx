@@ -9,7 +9,7 @@ interface ChargeTypeBadgeProps {
   record: Pick<ChargeRecord, "type" | "typeText">;
 }
 
-// 충전/출금 내역의 "구분" 배지: 충전(파랑)·출금(빨강, 시안 `11224:105006`·`105007`). 모르는 서버 값은 그대로 회색 배지.
+// 모르는 서버 값은 그대로 회색 배지.
 export function ChargeTypeBadge({ record }: ChargeTypeBadgeProps) {
   const { t } = useTranslation("features/bigbird-money-history");
 

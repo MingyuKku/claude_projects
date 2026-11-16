@@ -36,12 +36,11 @@ interface PaymentMethodSectionProps {
   onRetry: () => void;
 }
 
-// 카드 안쪽 여백(Figma Card 헤더·본문 20px, MO 16px)
 const CARD_SIDE_CLASS = "px-4 tablet:px-5";
-// 링(box-shadow)이 0.2초에 걸쳐 나타나고 사라짐(플랜 카드 강조와 같은 길이, 스펙 §3). 시안에 모션 정의는 없음. 동작 줄이기 설정이면 바로 바뀜.
+// 링(box-shadow)이 0.2초에 걸쳐 나타나고 사라짐(플랜 카드 강조와 같은 길이). 시안에 모션 정의는 없음. 동작 줄이기 설정이면 바로 바뀜.
 const TILE_RING_TRANSITION_CLASS_NAME =
   "transition-shadow duration-200 motion-reduce:transition-none";
-// 선택하지 않은 카드에 마우스를 올리면 선택 링보다 옅은 primary 링을 보임(사용자 결정 2026-11-03). 선택·포커스 중인 타일은
+// 선택하지 않은 카드에 마우스를 올리면 선택 링보다 옅은 primary 링을 보임. 선택·포커스 중인 타일은
 // 자기 링이 있으므로 제외해 호버 링이 그 링을 덮어 옅어지지 않게 함. 터치에서 탭한 뒤 호버가 남지 않게 hover 가능한 기기에서만 적용함
 // (Tailwind의 hover: 와 같은 조건). 클래스는 전체를 글자 그대로 써야 Tailwind가 찾으므로 접두사를 변수로 합치지 않음.
 const TILE_HOVER_RING_CLASS_NAME = [
@@ -50,7 +49,7 @@ const TILE_HOVER_RING_CLASS_NAME = [
   "[@media(hover:hover)]:[&:not(:has([data-state=checked],:focus-visible)):hover]:ring-offset-2",
 ].join(" ");
 
-// Figma 결제 수단(11755:99613): "카드 결제"(필수) 라디오 하나 아래에 등록 카드 타일. 결제 수단이 카드뿐이라 라디오는 선택된 채 고정임.
+// 결제 수단이 카드뿐이라 "카드 결제" 라디오는 선택된 채 고정함.
 // 카드 타일은 라디오 그룹이고, 선택된 타일은 포커스 링과 같은 강조 링을 가짐(시안).
 export function PaymentMethodSection({
   cards,
@@ -78,7 +77,6 @@ export function PaymentMethodSection({
               value="card"
               disabled
               aria-label={t("method.card")}
-              // 시안(Radio Base 선택·Disabled): 테두리와 점이 muted-foreground, 전체 50%.
               className="text-muted-foreground data-[state=checked]:border-muted-foreground [&_svg]:fill-muted-foreground"
             />
           </RadioGroup>
@@ -149,7 +147,7 @@ export function PaymentMethodSection({
                   disabled={card.id !== installmentCardId}
                 >
                   <SelectTrigger
-                    // 라디오 버튼 위에 놓여 눌러도 카드가 선택되지 않음. 비활성은 시안처럼 50%.
+                    // 라디오 버튼 위에 놓여 눌러도 카드가 선택되지 않음.
                     className="relative disabled:opacity-50"
                     aria-label={t("installment.label", {
                       card: `${card.issuer} ${card.maskedNumber}`,

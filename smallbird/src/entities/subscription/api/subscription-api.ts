@@ -29,7 +29,7 @@ const SAVED_CARD_PATH = "/v3/subscription/billing/subscribe/saved-card";
 /** 결제 서버의 카드 추가(결제 없이 카드만 등록) API. 결제창 값은 새 카드로 구독 시작과 같은 모양. */
 const CARD_REGISTER_PATH = "/v3/subscription/billing/cards/register";
 
-/** `GET /v3/mypage/subscription/plans`. 구독 탭 상품 카드와 월·연 가격. 비로그인도 받음(2026-11-16 백엔드 개방, Sub ID는 403). */
+/** `GET /v3/mypage/subscription/plans`. 구독 탭 상품 카드와 월·연 가격. 비로그인도 받음(Sub ID는 403). */
 export async function fetchSubscriptionPlans() {
   const response = await serverApiV3.get("/mypage/subscription/plans");
   return transformPlans(subscriptionPlanListSchema.parse(response));
@@ -80,7 +80,7 @@ export async function fetchSubscriptionPayments(query: PaymentQuery) {
 }
 
 /**
- * 등록된 카드로 구독 시작. 카드가 없으면 구독 화면이 먼저 카드를 등록하게 하므로(스펙 §3 카드 없음) 기본 카드가 있을 때만 부름. 결제창 없이 서버가 기본 카드로 바로 결제하고 결과를 JSON으로 줌.
+ * 등록된 카드로 구독 시작. 카드가 없으면 구독 화면이 먼저 카드를 등록하게 하므로 기본 카드가 있을 때만 부름. 결제창 없이 서버가 기본 카드로 바로 결제하고 결과를 JSON으로 줌.
  * 실패는 400 `{ result: false, reason }`(`NO_BILLING_CARD`·`ALREADY_SUBSCRIBED`·`PAYMENT_FAILED` 등)이고 보조 카드로 재시도하지 않음.
  */
 export async function requestSavedCardSubscription(

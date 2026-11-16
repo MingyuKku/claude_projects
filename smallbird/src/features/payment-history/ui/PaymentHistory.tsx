@@ -24,12 +24,10 @@ import { PAGE_SIZE_OPTIONS } from "../model/constants";
 import { PaymentCardList } from "./PaymentCardList";
 import { PaymentTable } from "./PaymentTable";
 
-// 구독 결제 내역. PC는 표, TAB은 2열 카드, MO는 1열 카드이고 툴바는 TAB부터 인라인(MO만 필터 모달). 한 페이지 10·20·30건(선택)·최신순.
-// 쪽 나누기·필터는 서버가 하고, 쪽·필터는 URL 쿼리가 소유함. 검색창은 두지 않음(사용자 결정 2026-11-04, 스펙 §3).
+// 쪽 나누기·필터는 서버가 하고, 쪽·필터는 URL 쿼리가 소유함. 검색창은 두지 않음.
 export function PaymentHistory() {
   const { t } = useTranslation("features/payment-history");
   const { t: tCommon } = useTranslation();
-  // 표는 PC(1440~)만 씀. TAB은 2열 카드, MO는 1열 카드.
   const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
   const fields = usePaymentFilterFields();
   const params = useListParams(fields);
@@ -73,7 +71,6 @@ export function PaymentHistory() {
   ) : undefined;
 
   return (
-    // 제목과 툴바는 MO 8px·TAB/PC 16px, 툴바와 목록은 MO 16px·TAB/PC 12px(시안). MO 빈 상태는 툴바와 8px(시안 11755:99514).
     <section
       className="flex flex-col gap-2 tablet:gap-4"
       aria-labelledby="payments-title"
@@ -123,7 +120,6 @@ export function PaymentHistory() {
             }
           />
         ) : (
-          /* 표(또는 카드)와 쪽 이동은 16px 간격(시안). */
           <div className="flex flex-col gap-4">
             {isDesktop ? (
               <PaymentTable records={pageRecords} emptyContent={emptyContent} />

@@ -19,7 +19,7 @@ export function useChargeForm(returnPath?: string) {
   const error = getAmountError(amount);
   const canCharge = isChargeable(amount) && !isRequesting;
 
-  // 충전하기는 약관 팝업을 열고, 팝업에서 동의해야 결제창으로 넘어감(v2의 필수 동의).
+  // 충전하기는 약관 팝업을 열고, 팝업에서 동의해야 결제창으로 넘어감(필수 동의).
   function handleSubmit(event: React.SyntheticEvent) {
     event.preventDefault();
     if (!isChargeable(amount) || isRequesting) return;

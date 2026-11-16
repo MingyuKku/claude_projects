@@ -14,7 +14,7 @@ interface PaymentCompletedDialogProps {
   onConfirm: () => void;
 }
 
-// 결제 완료 알럿. 완료 안내라 "확인"만 둠(스펙 §3 공통, Figma의 "취소"는 두지 않음).
+// 완료 안내라 "확인"만 둠(시안의 "취소"는 두지 않음).
 export function PaymentCompletedDialog({
   open,
   onConfirm,

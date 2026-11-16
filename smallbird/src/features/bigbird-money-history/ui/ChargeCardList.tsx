@@ -15,8 +15,6 @@ interface ChargeCardListProps {
   onClickDetail: (record: ChargeRecord) => void;
 }
 
-// Figma 건별 카드(TAB 2열 11224:104315, MO 1열 11224:105553): 위쪽 오른쪽 정렬 "거래명세서 ⬇"·"상세 보기" 버튼, 아래 라벨 열(회색)·값 열 7행 표.
-// TAB은 카드 사이 12px로 2열이고 같은 줄 카드는 높이를 맞춤.
 export function ChargeCardList({
   records,
   onClickDetail,
@@ -27,7 +25,7 @@ export function ChargeCardList({
   return (
     <ul
       aria-label={t("charge.list.label")}
-      className="grid grid-cols-1 gap-5 tablet:grid-cols-2 tablet:gap-3"
+      className="grid grid-cols-1 gap-3 tablet:grid-cols-2"
     >
       {records.map((record) => {
         const rows = [

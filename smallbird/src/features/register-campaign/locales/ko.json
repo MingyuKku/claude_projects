@@ -1,0 +1,248 @@
+{
+  "step": {
+    "campaignInfo": "캠페인 정보 입력",
+    "product": "제품 정보 입력",
+    "influencer": "인플루언서 조건",
+    "addOns": "부가서비스",
+    "intro": "캠페인 소개서",
+    "conditions": "진행 조건 설정",
+    "policy": "캠페인 정책 동의",
+    "payment": "결제"
+  },
+  "nav": {
+    "label": "등록 단계",
+    "open": "등록 단계 열기",
+    "indicator": {
+      "editing": "입력 중",
+      "warning": "필수 항목 미입력"
+    }
+  },
+  "action": {
+    "saveDraft": "임시저장",
+    "previous": "이전",
+    "next": "다음",
+    "pay": "결제하기"
+  },
+  "toast": {
+    "saved": "저장되었습니다.",
+    "saveFailed": "저장에 실패하였습니다. 다시 시도해 주세요.",
+    "fileType": "JPG, PNG 파일만 올릴 수 있습니다.",
+    "fileSize": "10MB 이하 파일만 올릴 수 있습니다.",
+    "requestFailed": "요청에 실패했습니다. 잠시 후 다시 시도해 주세요.",
+    "addressSearchFailed": "주소 검색을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요."
+  },
+  "dialog": {
+    "requiredInfo": {
+      "title": "필수 항목 미입력",
+      "description": "해당 페이지의 모든 항목을 입력하지 않을시 캠페인 등록이 불가능합니다."
+    },
+    "notEditable": {
+      "title": "수정할 수 없는 상태입니다",
+      "description": "이 캠페인은 이미 승인 검토 중이거나 승인되어 더 이상 수정할 수 없습니다. 등록 내역으로 이동합니다.",
+      "demoDescription": "작성을 완료한 데모 캠페인은 수정할 수 없습니다. 기본 정보로 이동합니다."
+    }
+  },
+  "info": {
+    "code": {
+      "label": "캠페인 코드"
+    },
+    "name": {
+      "label": "캠페인명",
+      "placeholder": "캠페인명을 입력해 주세요."
+    },
+    "type": {
+      "label": "캠페인 유형",
+      "PRODUCT_DELIVERY": "제품발송형",
+      "PRESS": "기자단형",
+      "STORE_VISIT": "매장방문형"
+    },
+    "typeChange": {
+      "title": "캠페인 유형 변경",
+      "description": "캠페인 유형을 변경하면 현재까지 입력하신 정보가 초기화됩니다. 변경 후 새 유형에 필요한 입력 항목이 표시됩니다.",
+      "confirm": "변경하기"
+    },
+    "brand": {
+      "label": "브랜드명",
+      "placeholder": "브랜드를 선택하세요.",
+      "manage": "브랜드 관리"
+    },
+    "period": {
+      "startLabel": "캠페인 희망 시작 일자",
+      "label": "캠페인 기간",
+      "endLabel": "종료일",
+      "placeholder": "날짜를 선택해 주세요.",
+      "help": "종료 날짜는 자동으로 30일 후로 세팅됩니다."
+    }
+  },
+  "brands": {
+    "title": "브랜드 관리",
+    "listTitle": "등록 브랜드",
+    "count_other": "<em>{{count}}</em> 개",
+    "add": "브랜드 추가",
+    "empty": "등록된 브랜드가 없습니다.",
+    "delete": "삭제",
+    "deleteLabel": "{{name}} 삭제",
+    "deleteDialog": {
+      "title": "등록 브랜드 삭제",
+      "description": "정말로 등록된 브랜드를 삭제하시겠습니까? 삭제된 데이터는 복구할 수 없습니다."
+    },
+    "addTitle": "브랜드 추가",
+    "name": {
+      "label": "브랜드명",
+      "placeholder": "브랜드명을 입력해 주세요."
+    },
+    "image": {
+      "label": "브랜드 이미지",
+      "title": "브랜드 이미지를 업로드해 주세요.",
+      "description": "미업로드 시 기본 프로필로 대체됩니다.",
+      "remove": "브랜드 이미지 삭제"
+    },
+    "save": "저장"
+  },
+  "loadPrevious": {
+    "title": "이전 캠페인 불러오기",
+    "listTitle": "캠페인 목록",
+    "load": "캠페인 불러오기",
+    "search": {
+      "label": "캠페인 검색",
+      "placeholder": "캠페인명 또는 브랜드명을 검색해 주세요.",
+      "submit": "검색"
+    },
+    "emptySearch": "‘{{keyword}}’에 대한 검색 결과가 없습니다.",
+    "empty": "등록된 캠페인이 없습니다.",
+    "column": {
+      "select": "선택",
+      "name": "캠페인명",
+      "brand": "브랜드",
+      "type": "유형",
+      "platform": "플랫폼",
+      "createdDate": "등록일"
+    },
+    "overwrite": {
+      "title": "캠페인 불러오기",
+      "description": "저장된 캠페인을 불러오면 현재 작성 중인 내용은 삭제되고 덮어씌워집니다. 계속 진행하시겠습니까?",
+      "confirm": "불러오기"
+    }
+  },
+  "platform": {
+    "INSTAGRAM": "인스타그램",
+    "NAVER_BLOG": "블로그",
+    "FACEBOOK": "페이스북",
+    "YOUTUBE": "유튜브",
+    "TIKTOK": "틱톡",
+    "X": "엑스"
+  },
+  "unit": {
+    "won": "원",
+    "count": "개"
+  },
+  "address": {
+    "search": "주소 검색",
+    "detail": "상세 주소 입력"
+  },
+  "product": {
+    "contactPlaceholder": "회수 시 연락할 연락처를 입력해 주세요.",
+    "delivery": {
+      "nameLabel": "협찬제품명 및 수량",
+      "namePlaceholder": "협찬제품명을 입력해 주세요.",
+      "quantityLabel": "1인당 제공 수량",
+      "quantityPlaceholder": "1인당 제공 수량을 입력해 주세요.",
+      "priceLabel": "협찬제품 금액",
+      "pricePlaceholder": "제품 1개당 금액을 입력해 주세요."
+    },
+    "return": {
+      "label": "반품 회수 여부",
+      "no": "회수 안함",
+      "yes": "회수 있음",
+      "notice": "최종선정된 크리에이터가 캠페인을 취소할 경우, 협찬제품 회수 반품 택배 주소를 입력해주세요.",
+      "addressLabel": "협찬제품 반품 회수 택배 주소",
+      "addressPlaceholder": "회수 주소를 입력해 주세요.",
+      "feeLabel": "반품 회수 택배 비용",
+      "feePlaceholder": "반품 택배 비용을 입력해 주세요.",
+      "contactLabel": "반품 회수 연락처"
+    },
+    "rental": {
+      "label": "대여 상품 여부",
+      "general": "일반 상품",
+      "rental": "대여 상품",
+      "noticePrice": "협찬제품 금액이 100만원 이상의 고가 협찬제품은 대여 상품으로 캠페인 진행이 가능해요.",
+      "noticeReturn": "단, 상품 회수는 광고주가 직접 진행해야해요.",
+      "addressLabel": "대여 상품 회수 택배 주소",
+      "feeLabel": "상품 회수 택배 비용",
+      "feePlaceholder": "회수 택배 비용을 입력해 주세요.",
+      "contactLabel": "상품 회수 연락처"
+    },
+    "store": {
+      "nameLabel": "방문 매장명",
+      "namePlaceholder": "방문 매장명을 입력해 주세요.",
+      "benefitLabel": "방문 시 제공 혜택 및 수량",
+      "benefitPlaceholder": "방문 시 제공되는 혜택 및 수량을 상세하게 입력해 주세요.",
+      "addressLabel": "매장 주소",
+      "addressPlaceholder": "매장 주소를 입력해 주세요.",
+      "couponLabel": "방문 쿠폰 인증번호",
+      "couponPlaceholder": "방문쿠폰 인증번호를 입력해 주세요."
+    },
+    "press": {
+      "noticeTitle": "다음 단계에서 입력해주세요.",
+      "noticeAbout": "기자단형 캠페인은 제품 제공, 매장 방문, 구매가 아닌 브랜드 및 서비스에 대한 취재·기사 작성을 진행하는 캠페인입니다.",
+      "noticeGuide": "콘텐츠 주제, 키워드, 참고자료 등 기사 작성 가이드는 '캠페인 소개서' 단계에서 자세히 안내할 수 있습니다.",
+      "emptyTitle": "기자단형은 별도의 협찬 정보 입력이 없습니다.",
+      "emptyDescription": "기사의 방향성과 상세 가이드는<br/>다음 단계인 '캠페인 소개서'에서 입력해 주세요."
+    }
+  },
+  "influencer": {
+    "platform": "플랫폼 선택",
+    "gender": {
+      "label": "선호 성별",
+      "FEMALE": "여성",
+      "MALE": "남성",
+      "ALL": "전체"
+    },
+    "ageGroup": {
+      "label": "선호 연령대(복수선택 가능)",
+      "AGE_10S": "10대",
+      "AGE_20S": "20대",
+      "AGE_30S": "30대",
+      "AGE_40S": "40대",
+      "AGE_50S_PLUS": "50대 이상"
+    },
+    "topic": {
+      "label": "포스팅 주제(복수선택 가능)",
+      "DigitalAppliances": "디지털&가전",
+      "Education": "교육",
+      "SportsLeisure": "스포츠&레져",
+      "MarketTools": "마켓&공구",
+      "Beauty": "뷰티",
+      "LivingHealth": "생활&건강",
+      "TravelCulture": "여행&문화",
+      "AgeProfession": "연령&직업",
+      "FoodCooking": "음식&요리",
+      "DailyLife": "일상&데일리",
+      "Region": "지역",
+      "BookPublication": "책&출판",
+      "PregnancyParenting": "출산&육아",
+      "Hobby": "취미",
+      "Fashion": "패션",
+      "Food": "식품",
+      "FurnitureInterior": "가구&인테리어",
+      "Pet": "반려동물",
+      "ASMR": "ASMR",
+      "Review": "리뷰",
+      "All": "전체"
+    }
+  },
+  "addOns": {
+    "noticeTitle": "부가서비스는 선택사항입니다.",
+    "noticeText": "필요한 경우에만 선택하실 수 있으며, 선택하지 않아도 다음 단계로 진행할 수 있습니다.",
+    "AI_POSTING_GUIDE": {
+      "name": "AI 포스팅 가이드",
+      "price": "10,000원",
+      "description": "캠페인 목적과 상품에 맞는 최적의 포스팅 가이드를 자동으로 생성해줍니다."
+    },
+    "MANUSCRIPT_CONFIRM": {
+      "name": "원고컨펌",
+      "price": "모집 인플루언서 당 5,000원",
+      "description": "인플루언서가 작성한 원고를 게시 전에 확인하고 수정 요청할 수 있습니다. AI 원고 컨펌 기능도 함께 이용할 수 있습니다."
+    }
+  }
+}

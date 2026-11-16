@@ -10,19 +10,17 @@ import type { ReactNode } from "react";
 
 interface FocusShellProps {
   session: SessionViewModel | null;
-  /** 헤더 제목. 모바일에서도 보임(시안 `Header / Main / Mobile`). */
+  /** 헤더 제목. 모바일 헤더에도 보임(시안 `Header / Main / Mobile`). */
   title: string;
-  /** PC·TAB에서 본문 왼쪽(LNB 자리)에 놓이는 사이드바. 모바일(768 미만)에서는 숨김. */
+  /** PC·TAB에서 LNB 자리(222px, 맨 위부터 전체 높이)에 놓이는 사이드바. 모바일(768 미만)에서는 숨김. */
   sidebar?: ReactNode;
   onBack: () => void;
   children: ReactNode;
   className?: string;
-  /** `<main>` 여백과 배경을 바꿈. 기본은 p-5. */
-  mainClassName?: string;
 }
 
-// 한 작업에 집중하는 화면(캠페인 등록)용 셸. LNB 없이 뒤로가기 헤더 + 사이드바 자리 + 본문으로 구성함.
-// 헤더 오른쪽(포인트·알림·프로필)은 AppShell과 같은 ShellHeaderActions를 씀.
+// 한 작업에 집중하는 화면(캠페인 등록·등록 내역)의 셸. LNB 대신 사이드바 자리를 두고, 헤더는 "<" + 제목 + 오른쪽 묶음.
+// AppShell에 모드를 더하지 않고 따로 둠(스펙 register §3 셸). 본문 스크롤·하단 고정 바는 화면이 정함.
 export function FocusShell({
   session,
   title,
@@ -30,14 +28,16 @@ export function FocusShell({
   onBack,
   children,
   className,
-  mainClassName,
 }: FocusShellProps) {
   const { t } = useTranslation("widgets/app-shell");
   const { t: tCommon } = useTranslation();
 
+  function handleClickGuide() {
+    window.open(CLIENT_GUIDE_URL, "_blank", "noopener,noreferrer");
+  }
+
   return (
     <div className={cn("flex h-dvh overflow-hidden bg-background", className)}>
-      {/* 시안(Sidebar / Sub)은 사이드바가 LNB 자리에서 맨 위부터 전체 높이로 서고, 헤더는 그 오른쪽 열 위에만 있음. */}
       {sidebar && (
         <aside className="hidden w-55.5 shrink-0 tablet:block">{sidebar}</aside>
       )}
@@ -51,19 +51,10 @@ export function FocusShell({
         >
           <ShellHeaderActions
             session={session}
-            onClickGuide={() =>
-              window.open(CLIENT_GUIDE_URL, "_blank", "noopener,noreferrer")
-            }
+            onClickGuide={handleClickGuide}
           />
         </AppHeader>
-        <main
-          className={cn(
-            "min-h-0 min-w-0 flex-1 overflow-auto",
-            mainClassName ?? "p-5",
-          )}
-        >
-          {children}
-        </main>
+        <main className="flex min-h-0 min-w-0 flex-1 flex-col">{children}</main>
       </div>
     </div>
   );

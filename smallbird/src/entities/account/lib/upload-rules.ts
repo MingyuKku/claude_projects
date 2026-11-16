@@ -1,4 +1,4 @@
-// 마이페이지 업로드 규칙(Figma 안내 기준). 회원가입(`join-validation`)은 5MB에 gif·bmp까지
+// 마이페이지 업로드 규칙. 회원가입(`join-validation`)은 5MB에 gif·bmp까지
 // 허용하는 별개의 규칙이라 섞지 않음. 서버 한도(파일당 500MB, 형식은 pdf·tiff·png·jpeg·jpg·bmp·heic)보다
 // 시안 안내가 좁아 프론트가 먼저 막음.
 export const MAX_UPLOAD_BYTES = 10 * 1024 * 1024;

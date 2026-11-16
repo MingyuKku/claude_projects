@@ -30,13 +30,11 @@ interface UsageTableProps {
   onClickDetail: (record: UsageRecord) => void;
   /** 0건·검색 결과 없음처럼 표 본문 자리에 그릴 내용. 있으면 행 대신 그림. */
   emptyContent?: ReactNode;
-  /** 옆 패널이 열려 있으면 캠페인 명·잔액 열을 숨김(시안 `11224:103932`, 캡션의 "내역 미노출"과 달리 시안은 내역 열을 남김). */
+  /** 옆 패널이 열려 있으면 캠페인 명·잔액 열을 숨김(시안 캡션의 "내역 미노출"과 달리 시안 화면대로 내역 열은 남김). */
   isPanelOpen?: boolean;
 }
 
-// Figma 사용 내역 표(11224:103786): 구분(배지)·일자·캠페인 명·내역·금액·잔액·상세 보기. 캠페인 코드 열은 없고 상세 보기에만 있음.
-// 지정한 폭은 자동 표 배치에서 최소 폭이 되어 시안 폭을 지킴. 캠페인 명은 두 줄까지 보이고 말줄임(행 높이 56, 시안 `11224:103786`).
-// 캠페인 명 옆에 40px 썸네일(`mainImageUrl`, 없으면 기본 이미지).
+// 시안의 고정 열만 폭을 주고 가변 열(캠페인 명)이 남는 폭을 가짐.
 export function UsageTable({
   records,
   activeId,
@@ -51,17 +49,17 @@ export function UsageTable({
   const header = (
     <TableHeader>
       <TableRow>
-        <TableHead className="w-20">{t("usage.column.type")}</TableHead>
+        <TableHead className="w-16.25">{t("usage.column.type")}</TableHead>
         <TableHead className="w-45">{t("usage.column.date")}</TableHead>
         {!isPanelOpen && (
-          <TableHead className="w-66.5">
-            {t("usage.column.campaignName")}
-          </TableHead>
+          <TableHead>{t("usage.column.campaignName")}</TableHead>
         )}
         <TableHead className="w-50">{t("usage.column.usage")}</TableHead>
-        <TableHead className="w-36">{t("usage.column.amount")}</TableHead>
+        <TableHead className="w-34.25">{t("usage.column.amount")}</TableHead>
         {!isPanelOpen && (
-          <TableHead className="w-36">{t("usage.column.remaining")}</TableHead>
+          <TableHead className="w-34.25">
+            {t("usage.column.remaining")}
+          </TableHead>
         )}
         <TableHead className="w-24 text-center">
           {t("usage.column.detail")}
@@ -140,8 +138,9 @@ export function UsageTable({
             <TableCell className="h-14 text-center">
               <Button
                 variant="outline-foreground"
-                size="icon-sm"
-                className="min-w-0"
+                size="icon"
+                // 시안이 충전/출금 표(sm)와 달리 md 크기를 씀.
+                className="min-w-0 rounded-md"
                 aria-label={t("usage.action.detail")}
                 onClick={() => onClickDetail(record)}
               >

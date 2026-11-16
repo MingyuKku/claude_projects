@@ -1,0 +1,248 @@
+{
+  "step": {
+    "campaignInfo": "填写活动信息",
+    "product": "填写产品信息",
+    "influencer": "网红条件",
+    "addOns": "附加服务",
+    "intro": "캠페인 소개서",
+    "conditions": "设置执行条件",
+    "policy": "同意活动政策",
+    "payment": "支付"
+  },
+  "nav": {
+    "label": "注册步骤",
+    "open": "打开步骤",
+    "indicator": {
+      "editing": "填写中",
+      "warning": "必填项未填写"
+    }
+  },
+  "action": {
+    "saveDraft": "暂存",
+    "previous": "上一步",
+    "next": "下一步",
+    "pay": "去支付"
+  },
+  "toast": {
+    "saved": "已保存。",
+    "saveFailed": "保存失败，请重试。",
+    "fileType": "仅可上传JPG、PNG文件。",
+    "fileSize": "仅可上传10MB以下的文件。",
+    "requestFailed": "请求失败，请稍后重试。",
+    "addressSearchFailed": "无法加载地址搜索，请稍后重试。"
+  },
+  "dialog": {
+    "requiredInfo": {
+      "title": "必填项未填写",
+      "description": "请填写本页所有项目，否则无法注册活动。"
+    },
+    "notEditable": {
+      "title": "无法修改",
+      "description": "该活动正在审核或已通过审核，无法修改。即将前往注册详情。",
+      "demoDescription": "已完成的데모 캠페인无法修改。即将前往基本信息。"
+    }
+  },
+  "info": {
+    "code": {
+      "label": "活动代码"
+    },
+    "name": {
+      "label": "活动名称",
+      "placeholder": "请输入活动名称。"
+    },
+    "type": {
+      "label": "活动类型",
+      "PRODUCT_DELIVERY": "제품발송형",
+      "PRESS": "기자단형",
+      "STORE_VISIT": "매장방문형"
+    },
+    "typeChange": {
+      "title": "更改活动类型",
+      "description": "更改类型后，已填写的信息将被重置。更改后将显示新类型所需的填写项。",
+      "confirm": "更改"
+    },
+    "brand": {
+      "label": "品牌名称",
+      "placeholder": "请选择品牌。",
+      "manage": "品牌管理"
+    },
+    "period": {
+      "startLabel": "期望开始日期",
+      "label": "活动期间",
+      "endLabel": "结束日期",
+      "placeholder": "请选择日期。",
+      "help": "结束日期将自动设为30天后。"
+    }
+  },
+  "brands": {
+    "title": "品牌管理",
+    "listTitle": "已注册品牌",
+    "count_other": "<em>{{count}}</em> 个",
+    "add": "添加品牌",
+    "empty": "暂无已注册品牌。",
+    "delete": "删除",
+    "deleteLabel": "删除{{name}}",
+    "deleteDialog": {
+      "title": "删除已注册品牌",
+      "description": "确定要删除该品牌吗？删除后数据无法恢复。"
+    },
+    "addTitle": "添加品牌",
+    "name": {
+      "label": "品牌名称",
+      "placeholder": "请输入品牌名称。"
+    },
+    "image": {
+      "label": "品牌图片",
+      "title": "请上传品牌图片。",
+      "description": "未上传时将使用默认头像。",
+      "remove": "删除品牌图片"
+    },
+    "save": "保存"
+  },
+  "loadPrevious": {
+    "title": "导入以往活动",
+    "listTitle": "活动列表",
+    "load": "导入活动",
+    "search": {
+      "label": "搜索活动",
+      "placeholder": "请输入活动名称或品牌名称搜索。",
+      "submit": "搜索"
+    },
+    "emptySearch": "没有找到“{{keyword}}”的结果。",
+    "empty": "暂无已注册的活动。",
+    "column": {
+      "select": "选择",
+      "name": "活动名称",
+      "brand": "品牌",
+      "type": "类型",
+      "platform": "平台",
+      "createdDate": "注册日期"
+    },
+    "overwrite": {
+      "title": "导入活动",
+      "description": "导入已保存的活动后，当前填写的内容将被删除并覆盖。确定继续吗？",
+      "confirm": "导入"
+    }
+  },
+  "platform": {
+    "INSTAGRAM": "Instagram",
+    "NAVER_BLOG": "博客",
+    "FACEBOOK": "Facebook",
+    "YOUTUBE": "YouTube",
+    "TIKTOK": "TikTok",
+    "X": "X"
+  },
+  "unit": {
+    "won": "韩元",
+    "count": "个"
+  },
+  "address": {
+    "search": "搜索地址",
+    "detail": "输入详细地址"
+  },
+  "product": {
+    "contactPlaceholder": "请输入回收时的联系方式。",
+    "delivery": {
+      "nameLabel": "赞助产品名称及数量",
+      "namePlaceholder": "请输入赞助产品名称。",
+      "quantityLabel": "每人提供数量",
+      "quantityPlaceholder": "请输入每人提供数量。",
+      "priceLabel": "赞助产品金额",
+      "pricePlaceholder": "请输入每件产品的金额。"
+    },
+    "return": {
+      "label": "是否回收退货",
+      "no": "不回收",
+      "yes": "回收",
+      "notice": "为防止最终入选的达人取消活动，请输入赞助产品退货回收地址。",
+      "addressLabel": "赞助产品退货回收地址",
+      "addressPlaceholder": "请输入回收地址。",
+      "feeLabel": "退货回收运费",
+      "feePlaceholder": "请输入退货运费。",
+      "contactLabel": "退货回收联系方式"
+    },
+    "rental": {
+      "label": "是否为租赁产品",
+      "general": "普通产品",
+      "rental": "租赁产品",
+      "noticePrice": "金额在100万韩元以上的高价赞助产品可作为租赁产品开展活动。",
+      "noticeReturn": "但产品回收需由广告主自行进行。",
+      "addressLabel": "租赁产品回收地址",
+      "feeLabel": "产品回收运费",
+      "feePlaceholder": "请输入回收运费。",
+      "contactLabel": "产品回收联系方式"
+    },
+    "store": {
+      "nameLabel": "到访门店名称",
+      "namePlaceholder": "请输入到访门店名称。",
+      "benefitLabel": "到店提供的福利及数量",
+      "benefitPlaceholder": "请详细输入到店时提供的福利及数量。",
+      "addressLabel": "门店地址",
+      "addressPlaceholder": "请输入门店地址。",
+      "couponLabel": "到店优惠券验证码",
+      "couponPlaceholder": "请输入到店优惠券验证码。"
+    },
+    "press": {
+      "noticeTitle": "请在下一步填写。",
+      "noticeAbout": "기자단형活动不是产品提供、到店或购买，而是针对品牌和服务进行采访、撰写报道的活动。",
+      "noticeGuide": "内容主题、关键词、参考资料等报道撰写指南可在“캠페인 소개서”步骤中详细说明。",
+      "emptyTitle": "기자단형无需填写赞助信息。",
+      "emptyDescription": "报道方向和详细指南<br/>请在下一步“캠페인 소개서”中填写。"
+    }
+  },
+  "influencer": {
+    "platform": "选择平台",
+    "gender": {
+      "label": "偏好性别",
+      "FEMALE": "女性",
+      "MALE": "男性",
+      "ALL": "全部"
+    },
+    "ageGroup": {
+      "label": "偏好年龄段（可多选）",
+      "AGE_10S": "10多岁",
+      "AGE_20S": "20多岁",
+      "AGE_30S": "30多岁",
+      "AGE_40S": "40多岁",
+      "AGE_50S_PLUS": "50岁以上"
+    },
+    "topic": {
+      "label": "发帖主题（可多选）",
+      "DigitalAppliances": "数码&家电",
+      "Education": "教育",
+      "SportsLeisure": "运动&休闲",
+      "MarketTools": "市集&团购",
+      "Beauty": "美妆",
+      "LivingHealth": "生活&健康",
+      "TravelCulture": "旅行&文化",
+      "AgeProfession": "年龄&职业",
+      "FoodCooking": "美食&烹饪",
+      "DailyLife": "日常",
+      "Region": "地区",
+      "BookPublication": "图书&出版",
+      "PregnancyParenting": "孕产&育儿",
+      "Hobby": "兴趣爱好",
+      "Fashion": "时尚",
+      "Food": "食品",
+      "FurnitureInterior": "家具&家居",
+      "Pet": "宠物",
+      "ASMR": "ASMR",
+      "Review": "测评",
+      "All": "全部"
+    }
+  },
+  "addOns": {
+    "noticeTitle": "附加服务为可选项。",
+    "noticeText": "仅在需要时选择，不选择也可进入下一步。",
+    "AI_POSTING_GUIDE": {
+      "name": "AI发帖指南",
+      "price": "10,000韩元",
+      "description": "根据活动目的和产品自动生成最合适的发帖指南。"
+    },
+    "MANUSCRIPT_CONFIRM": {
+      "name": "원고컨펌",
+      "price": "每位招募网红5,000韩元",
+      "description": "可在发布前查看网红撰写的稿件并要求修改，还可同时使用AI稿件审核功能。"
+    }
+  }
+}

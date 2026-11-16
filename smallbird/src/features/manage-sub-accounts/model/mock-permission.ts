@@ -1,4 +1,4 @@
-// 임시 목 데이터(스펙 §1·§7 B-3·B-6). 캠페인 할당의 진행 상태 기준이 확정되면(docs/mypage-api.md §4-5) 지움.
+// 임시 목 데이터. 캠페인 할당의 진행 상태 기준이 확정되면 지움.
 // 코드값(productType·detailType·status)은 임시. 개발 서버에서만 채우고 빌드(stage·prod)에서는 빈 목록이라 번들에 목 값이 들어가지 않음.
 import type { CampaignAssignment } from "./types";
 

@@ -34,14 +34,12 @@ interface SubAccountPermissionPanelProps {
   onClose: () => void;
   /** 있으면 제목 왼쪽에 뒤로 버튼을 그림(TAB의 본문 전체 카드). */
   onBack?: () => void;
-  /** 카드 안에서 한 줄에 놓을 캠페인 카드 수 등 본문 배치. TAB은 2열. */
+  /** 카드 안에서 한 줄에 놓을 캠페인 카드 수 등 본문 배치. */
   campaignClassName?: string;
   className?: string;
 }
 
-// Figma Sub ID 권한부여(10724:186486 PC 패널·10724:186508·10724:187263 TAB·10724:187964 MO): 서브헤더(제목 + X) 아래 "서비스 권한 | 캠페인 할당" 탭.
-// 서비스 권한은 스위치를 바꿀 때마다 바로 저장함(저장 버튼 없음). 캠페인 할당은 진행 상태 기준이 정해지기 전(docs/mypage-api.md §4-5)이라
-// 개발 서버에서만 목으로 그리고 스위치는 "준비 중" 안내만 함.
+// 캠페인 할당은 진행 상태 기준이 정해지기 전이라 개발 서버에서만 목으로 그리고 스위치는 "준비 중" 안내만 함.
 export function SubAccountPermissionPanel({
   accountIdx,
   onClose,
@@ -57,7 +55,7 @@ export function SubAccountPermissionPanel({
       className={cn("flex min-h-0 flex-1 flex-col bg-background", className)}
     >
       <SubHeader
-        // TAB·MO는 탭 줄 없이 제목줄을 위에 고정(생성·수정 화면과 같음). PC는 패널 안 고정 높이라 그대로 둠.
+        // TAB·MO는 탭 줄 없이 제목줄을 위에 고정. PC는 패널 안 고정 높이라 그대로 둠.
         className="sticky top-0 z-10 desktop:static"
         title={
           <>
@@ -87,7 +85,7 @@ export function SubAccountPermissionPanel({
           </Button>
         }
       />
-      {/* PC는 패널 안에서 스크롤함. 스크롤바는 시안의 Scroll-area라 `ScrollArea`로 그림(겹쳐서 자리를 차지하지 않음). Radix 안쪽 래퍼(display: table)는 block으로 되돌림.
+      {/* 스크롤바는 시안의 Scroll-area라 `ScrollArea`로 그림(겹쳐서 자리를 차지하지 않음). Radix 안쪽 래퍼(display: table)는 block으로 되돌림.
           isolate: 탭 토글의 z-10이 고정 제목줄(z-10) 위로 올라와 스크롤할 때 겹쳐 보이지 않게 본문 안에 가둠. */}
       <ScrollArea
         type="auto"
@@ -176,7 +174,7 @@ function ServicePermissions({ accountIdx }: { accountIdx: number }) {
   );
 }
 
-/** 캠페인 할당. 빌드(stage·prod)에서는 목 대신 "준비 중"(스펙 §1). */
+/** 캠페인 할당. 빌드(stage·prod)에서는 목 대신 "준비 중". */
 function CampaignAssignments({ className }: { className?: string }) {
   const { t } = useTranslation("features/manage-sub-accounts");
   const { t: tCommon } = useTranslation();

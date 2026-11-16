@@ -27,7 +27,7 @@ import type { KmcResult } from "@/shared/lib";
 
 /**
  * 휴대폰 변경용 KMC 본인인증. PC는 팝업, 터치 기기는 페이지 이동 뒤 결과 쿼리(`rec_cert`·`certNum`)를 달고 돌아옴.
- * 인증만 하고 서버 반영은 폼의 "저장"이 `certIdx`로 함(v2와 같음).
+ * 인증만 하고 서버 반영은 폼의 "저장"이 `certIdx`로 함.
  */
 export function usePhoneVerification(
   onRestoreDraft: (draft: ProfileDraft) => void,

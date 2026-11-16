@@ -10,7 +10,6 @@ interface ChargeInlineProps {
   returnPath: string;
 }
 
-// 다른 화면(캠페인 등록 결제)의 카드 안에 놓는 충전 입력: 금액·빠른 금액·안내·"충전하기"와 약관 팝업·결제 요청.
 // 보유 머니 표시와 제목은 쓰는 화면이 그림. 무통장 입금이라 입금이 확인돼야 잔액이 늘어남.
 export function ChargeInline({ returnPath }: ChargeInlineProps) {
   const { t } = useTranslation("features/charge-bigbird-money");

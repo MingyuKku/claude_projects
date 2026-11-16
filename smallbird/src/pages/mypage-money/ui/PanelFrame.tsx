@@ -3,7 +3,7 @@ import { cn } from "@/shared/lib/utils";
 import type { ReactNode } from "react";
 
 interface PanelFrameProps {
-  /** aside: PC의 오른쪽 인라인 패널(시안 377px), screen: TAB·MO에서 본문을 대체하는 카드. */
+  /** aside: PC의 오른쪽 인라인 패널, screen: TAB·MO에서 본문을 대체하는 카드. */
   variant: "aside" | "screen";
   children: ReactNode;
 }

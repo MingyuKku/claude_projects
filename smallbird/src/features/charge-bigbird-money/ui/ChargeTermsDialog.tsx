@@ -22,7 +22,6 @@ interface ChargeTermsDialogProps {
   onAgree: () => void;
 }
 
-// 회원 탈퇴 약관 다이얼로그(460×650 중앙, 헤더 + X + 약관 박스 + 하단 버튼 한 쌍)와 같은 구성.
 export function ChargeTermsDialog({
   isOpen,
   isAgreeing,
@@ -65,7 +64,7 @@ export function ChargeTermsDialog({
         {/* 설명은 본문(약관) 자체라 별도 문구 없이 접근성 연결만 비워 둠. */}
         <DialogDescription className="sr-only" />
         <div className="flex min-h-0 flex-1 flex-col px-5 pt-5 pb-3">
-          {/* 약관 박스의 스크롤바는 회원 탈퇴 약관과 같이 시안의 Scroll-area라서 `ScrollArea`로 그림(겹쳐서 자리를 차지하지 않음). Radix 안쪽 래퍼(display: table)는 긴 글을 줄바꿈하지 않아 block으로 되돌림. */}
+          {/* 약관 박스의 스크롤바는 시안의 Scroll-area라서 `ScrollArea`로 그림(겹쳐서 자리를 차지하지 않음). Radix 안쪽 래퍼(display: table)는 긴 글을 줄바꿈하지 않아 block으로 되돌림. */}
           <ScrollArea
             type="auto"
             className="min-h-0 flex-1 rounded-md border border-input bg-background [&_[data-slot=scroll-area-viewport]>div]:block!"

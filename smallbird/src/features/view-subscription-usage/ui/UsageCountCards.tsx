@@ -9,7 +9,6 @@ interface UsageCountCardsProps {
   proposal: UsageQuota | null;
 }
 
-// 검색·제안 횟수 카드. 큰 숫자는 사용 건수이고 진행 바는 사용 ÷ (사용 + 잔여). PC·TAB 2열(간격 16), MO 세로(간격 12).
 export function UsageCountCards({ search, proposal }: UsageCountCardsProps) {
   const { t } = useTranslation("features/view-subscription-usage");
 

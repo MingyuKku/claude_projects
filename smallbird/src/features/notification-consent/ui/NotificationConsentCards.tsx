@@ -31,9 +31,8 @@ const CONSENT_DATE_FORMAT: Intl.DateTimeFormatOptions = {
   day: "2-digit",
 };
 
-// Figma 알림 설정(10061:201106 PC·10061:204621 TAB·10061:206815 MO): "알림톡 알림"·"푸시 알림" 카드(PC 2열, TAB·MO 세로) + 필수 알림 안내.
 // 스위치를 바꿀 때마다 바로 저장함. 광고성 정보 수신 동의·철회 사실은 이 토스트로만 알리고, 응답에 일자가 없어
-// v2처럼 바꾼 날(오늘)을 씀.
+// 바꾼 날(오늘)을 씀.
 export function NotificationConsentCards() {
   const { t } = useTranslation("features/notification-consent");
   const { t: tCommon } = useTranslation();
@@ -77,7 +76,7 @@ export function NotificationConsentCards() {
   }
 
   return (
-    <div className="flex flex-col gap-4 tablet:gap-6">
+    <div className="flex flex-col ds-gap-6">
       <div className={NOTIFICATION_CARDS_CLASS_NAME}>
         {NOTIFICATION_CHANNELS.map((channel) => (
           <SectionCard

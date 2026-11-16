@@ -18,7 +18,7 @@ interface ChargeAmountFieldsProps {
   form: Pick<ChargeForm, "amount" | "setAmount" | "error">;
 }
 
-// 충전 금액 입력(Figma 충전 Default·Filled)과 빠른 금액, 안내. 마이페이지 패널과 결제 화면의 인라인 충전이 함께 씀.
+// 마이페이지 패널과 결제 화면의 인라인 충전이 함께 씀.
 export function ChargeAmountFields({ form }: ChargeAmountFieldsProps) {
   const { t } = useTranslation("features/charge-bigbird-money");
   const errorId = useId();

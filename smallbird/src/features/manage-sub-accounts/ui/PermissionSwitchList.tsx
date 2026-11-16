@@ -11,7 +11,7 @@ interface PermissionSwitchListProps {
   onChangePermission: (key: ApiPermissionKey, next: boolean) => void;
 }
 
-// Figma 서비스 권한(10724:186486): 권한명 | Switch 행 목록, 행 높이 48, 표 머리글·테두리 없음. 항목은 서버가 주는 권한만.
+// 항목은 서버가 주는 권한만 그림.
 export function PermissionSwitchList({
   permissions,
   onChangePermission,

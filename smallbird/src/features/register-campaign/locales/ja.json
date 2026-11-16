@@ -1,0 +1,248 @@
+{
+  "step": {
+    "campaignInfo": "キャンペーン情報入力",
+    "product": "商品情報入力",
+    "influencer": "クリエイター条件",
+    "addOns": "オプション",
+    "intro": "캠페인 소개서",
+    "conditions": "進行条件設定",
+    "policy": "ポリシー同意",
+    "payment": "決済"
+  },
+  "nav": {
+    "label": "登録ステップ",
+    "open": "ステップを開く",
+    "indicator": {
+      "editing": "入力中",
+      "warning": "必須項目未入力"
+    }
+  },
+  "action": {
+    "saveDraft": "一時保存",
+    "previous": "前へ",
+    "next": "次へ",
+    "pay": "決済する"
+  },
+  "toast": {
+    "saved": "保存しました。",
+    "saveFailed": "保存に失敗しました。もう一度お試しください。",
+    "fileType": "JPG・PNGファイルのみアップロードできます。",
+    "fileSize": "10MB以下のファイルのみアップロードできます。",
+    "requestFailed": "リクエストに失敗しました。しばらくしてからもう一度お試しください。",
+    "addressSearchFailed": "住所検索を読み込めませんでした。しばらくしてからもう一度お試しください。"
+  },
+  "dialog": {
+    "requiredInfo": {
+      "title": "必須項目未入力",
+      "description": "このページの全項目を入力しないとキャンペーンを登録できません。"
+    },
+    "notEditable": {
+      "title": "編集できません",
+      "description": "このキャンペーンは承認審査中または承認済みのため編集できません。登録内容に移動します。",
+      "demoDescription": "作成済みの데모 캠페인は編集できません。基本情報に移動します。"
+    }
+  },
+  "info": {
+    "code": {
+      "label": "キャンペーンコード"
+    },
+    "name": {
+      "label": "キャンペーン名",
+      "placeholder": "キャンペーン名を入力してください。"
+    },
+    "type": {
+      "label": "キャンペーン種類",
+      "PRODUCT_DELIVERY": "제품발송형",
+      "PRESS": "기자단형",
+      "STORE_VISIT": "매장방문형"
+    },
+    "typeChange": {
+      "title": "キャンペーン種類の変更",
+      "description": "種類を変更すると、入力した内容が初期化されます。変更後、新しい種類の入力項目が表示されます。",
+      "confirm": "変更する"
+    },
+    "brand": {
+      "label": "ブランド名",
+      "placeholder": "ブランドを選択してください。",
+      "manage": "ブランド管理"
+    },
+    "period": {
+      "startLabel": "希望開始日",
+      "label": "キャンペーン期間",
+      "endLabel": "終了日",
+      "placeholder": "日付を選択してください。",
+      "help": "終了日は自動で30日後に設定されます。"
+    }
+  },
+  "brands": {
+    "title": "ブランド管理",
+    "listTitle": "登録ブランド",
+    "count_other": "<em>{{count}}</em> 件",
+    "add": "ブランド追加",
+    "empty": "登録されたブランドはありません。",
+    "delete": "削除",
+    "deleteLabel": "{{name}}を削除",
+    "deleteDialog": {
+      "title": "登録ブランドの削除",
+      "description": "登録されたブランドを削除しますか？削除したデータは復元できません。"
+    },
+    "addTitle": "ブランド追加",
+    "name": {
+      "label": "ブランド名",
+      "placeholder": "ブランド名を入力してください。"
+    },
+    "image": {
+      "label": "ブランド画像",
+      "title": "ブランド画像をアップロードしてください。",
+      "description": "未アップロードの場合、基本プロフィールに置き換わります。",
+      "remove": "ブランド画像を削除"
+    },
+    "save": "保存"
+  },
+  "loadPrevious": {
+    "title": "過去のキャンペーンを読み込む",
+    "listTitle": "キャンペーン一覧",
+    "load": "キャンペーンを読み込む",
+    "search": {
+      "label": "キャンペーン検索",
+      "placeholder": "キャンペーン名またはブランド名で検索してください。",
+      "submit": "検索"
+    },
+    "emptySearch": "「{{keyword}}」の検索結果はありません。",
+    "empty": "登録されたキャンペーンはありません。",
+    "column": {
+      "select": "選択",
+      "name": "キャンペーン名",
+      "brand": "ブランド",
+      "type": "種類",
+      "platform": "プラットフォーム",
+      "createdDate": "登録日"
+    },
+    "overwrite": {
+      "title": "キャンペーンの読み込み",
+      "description": "保存済みのキャンペーンを読み込むと、作成中の内容は削除され上書きされます。続けますか？",
+      "confirm": "読み込む"
+    }
+  },
+  "platform": {
+    "INSTAGRAM": "Instagram",
+    "NAVER_BLOG": "ブログ",
+    "FACEBOOK": "Facebook",
+    "YOUTUBE": "YouTube",
+    "TIKTOK": "TikTok",
+    "X": "X"
+  },
+  "unit": {
+    "won": "ウォン",
+    "count": "個"
+  },
+  "address": {
+    "search": "住所検索",
+    "detail": "詳細住所を入力"
+  },
+  "product": {
+    "contactPlaceholder": "回収時の連絡先を入力してください。",
+    "delivery": {
+      "nameLabel": "協賛商品名と数量",
+      "namePlaceholder": "協賛商品名を入力してください。",
+      "quantityLabel": "1人あたりの提供数量",
+      "quantityPlaceholder": "1人あたりの提供数量を入力してください。",
+      "priceLabel": "協賛商品の金額",
+      "pricePlaceholder": "商品1個あたりの金額を入力してください。"
+    },
+    "return": {
+      "label": "返品回収の有無",
+      "no": "回収なし",
+      "yes": "回収あり",
+      "notice": "最終選定のクリエイターがキャンペーンを取り消した場合に備え、協賛商品の返品回収先住所を入力してください。",
+      "addressLabel": "協賛商品の返品回収住所",
+      "addressPlaceholder": "回収先住所を入力してください。",
+      "feeLabel": "返品回収の送料",
+      "feePlaceholder": "返品の送料を入力してください。",
+      "contactLabel": "返品回収の連絡先"
+    },
+    "rental": {
+      "label": "レンタル商品か",
+      "general": "通常商品",
+      "rental": "レンタル商品",
+      "noticePrice": "協賛商品の金額が100万ウォン以上の高額商品は、レンタル商品としてキャンペーンを実施できます。",
+      "noticeReturn": "ただし、商品の回収は広告主が直接行います。",
+      "addressLabel": "レンタル商品の回収住所",
+      "feeLabel": "商品回収の送料",
+      "feePlaceholder": "回収の送料を入力してください。",
+      "contactLabel": "商品回収の連絡先"
+    },
+    "store": {
+      "nameLabel": "訪問店舗名",
+      "namePlaceholder": "訪問店舗名を入力してください。",
+      "benefitLabel": "訪問時の提供特典と数量",
+      "benefitPlaceholder": "訪問時に提供する特典と数量を詳しく入力してください。",
+      "addressLabel": "店舗住所",
+      "addressPlaceholder": "店舗住所を入力してください。",
+      "couponLabel": "訪問クーポン認証番号",
+      "couponPlaceholder": "訪問クーポン認証番号を入力してください。"
+    },
+    "press": {
+      "noticeTitle": "次のステップで入力してください。",
+      "noticeAbout": "기자단형キャンペーンは、商品提供・店舗訪問・購入ではなく、ブランドやサービスの取材・記事作成を行うキャンペーンです。",
+      "noticeGuide": "テーマ・キーワード・参考資料など記事作成ガイドは「캠페인 소개서」ステップで詳しく案内できます。",
+      "emptyTitle": "기자단형は協賛情報の入力がありません。",
+      "emptyDescription": "記事の方向性と詳しいガイドは、<br/>次の「캠페인 소개서」で入力してください。"
+    }
+  },
+  "influencer": {
+    "platform": "プラットフォーム選択",
+    "gender": {
+      "label": "希望性別",
+      "FEMALE": "女性",
+      "MALE": "男性",
+      "ALL": "すべて"
+    },
+    "ageGroup": {
+      "label": "希望年代（複数選択可）",
+      "AGE_10S": "10代",
+      "AGE_20S": "20代",
+      "AGE_30S": "30代",
+      "AGE_40S": "40代",
+      "AGE_50S_PLUS": "50代以上"
+    },
+    "topic": {
+      "label": "投稿テーマ（複数選択可）",
+      "DigitalAppliances": "デジタル&家電",
+      "Education": "教育",
+      "SportsLeisure": "スポーツ&レジャー",
+      "MarketTools": "マーケット&共同購入",
+      "Beauty": "ビューティー",
+      "LivingHealth": "生活&健康",
+      "TravelCulture": "旅行&文化",
+      "AgeProfession": "年代&職業",
+      "FoodCooking": "料理&グルメ",
+      "DailyLife": "日常&デイリー",
+      "Region": "地域",
+      "BookPublication": "本&出版",
+      "PregnancyParenting": "出産&育児",
+      "Hobby": "趣味",
+      "Fashion": "ファッション",
+      "Food": "食品",
+      "FurnitureInterior": "家具&インテリア",
+      "Pet": "ペット",
+      "ASMR": "ASMR",
+      "Review": "レビュー",
+      "All": "すべて"
+    }
+  },
+  "addOns": {
+    "noticeTitle": "オプションは任意です。",
+    "noticeText": "必要な場合のみ選択でき、選択しなくても次のステップに進めます。",
+    "AI_POSTING_GUIDE": {
+      "name": "AI投稿ガイド",
+      "price": "10,000ウォン",
+      "description": "キャンペーンの目的と商品に合った最適な投稿ガイドを自動で作成します。"
+    },
+    "MANUSCRIPT_CONFIRM": {
+      "name": "원고컨펌",
+      "price": "募集クリエイター1人あたり5,000ウォン",
+      "description": "クリエイターが作成した原稿を投稿前に確認し、修正を依頼できます。AI原稿チェック機能も一緒に利用できます。"
+    }
+  }
+}

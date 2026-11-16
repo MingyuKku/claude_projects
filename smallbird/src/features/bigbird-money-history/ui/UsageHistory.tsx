@@ -31,8 +31,7 @@ interface UsageHistoryProps {
   onClickDetail: (id: string) => void;
 }
 
-// 사용 내역. PC는 표 + 인라인 툴바, TAB은 2열 카드 + "필터" 화면(`?panel=filter`), MO는 1열 카드 + 스크롤로 이어 읽기(맨 위로 버튼) + 필터 모달.
-// 필터(구분·사용 일자·캠페인 명·사용 내역)와 "N개 보기"(10·20·30)는 주소 쿼리가 소유하고 서버에 함께 보냄. 검색어(`keyword`)는 캠페인 명·코드·사용 내역 문구를 부분 일치로 찾음(Q-8).
+// 필터(구분·사용 일자·캠페인 명·사용 내역)와 "N개 보기"는 주소 쿼리가 소유하고 서버에 함께 보냄.
 export function UsageHistory({
   activeId,
   isPanelOpen,
@@ -82,86 +81,91 @@ export function UsageHistory({
 
   return (
     <section
-      className="flex flex-1 flex-col gap-4"
+      className="flex flex-1 flex-col gap-2 tablet:gap-4"
       aria-labelledby="usage-title"
     >
-      <h2 id="usage-title" className="text-base font-semibold text-foreground">
+      <h2
+        id="usage-title"
+        className="ds-text-sm-none-semibold text-foreground tablet:ds-text-base-none-semibold"
+      >
         {t("usage.title")}
       </h2>
-      <FilterToolbar
-        fields={fields}
-        values={params.filters}
-        onChangeValues={params.setFilters}
-        onApplyFromDialog={params.applyFiltersAndClosePanel}
-        onRefresh={refresh}
-        // TAB은 "필터" 버튼 → 본문을 대체하는 "필터 검색 설정" 화면(구독 결제 내역과 같음).
-        inlineFrom="desktop"
-        isCompact
-        pageSize={{
-          value: params.pageSize,
-          options: LIST_PAGE_SIZE_OPTIONS,
-          onChange: params.setPageSize,
-        }}
-        // 검색 대상은 캠페인 명·캠페인 코드·사용 내역 문구(부분 일치, 서버 `keyword`, API 명세 Q-8).
-        search={{
-          keyword: params.keyword,
-          onSubmit: params.setKeyword,
-          maxLength: USAGE_KEYWORD_MAX_LENGTH,
-        }}
-      />
+      <div className="flex flex-1 flex-col gap-3">
+        <FilterToolbar
+          fields={fields}
+          values={params.filters}
+          onChangeValues={params.setFilters}
+          onApplyFromDialog={params.applyFiltersAndClosePanel}
+          onRefresh={refresh}
+          // TAB은 "필터" 버튼 → 본문을 대체하는 "필터 검색 설정" 화면(구독 결제 내역과 같음).
+          inlineFrom="desktop"
+          isCompact
+          pageSize={{
+            value: params.pageSize,
+            options: LIST_PAGE_SIZE_OPTIONS,
+            onChange: params.setPageSize,
+          }}
+          // 검색 대상은 캠페인 명·캠페인 코드·사용 내역 문구(부분 일치, 서버 `keyword`).
+          search={{
+            keyword: params.keyword,
+            onSubmit: params.setKeyword,
+            maxLength: USAGE_KEYWORD_MAX_LENGTH,
+          }}
+        />
 
-      {isTabletUp ? (
-        <HistoryPagedList
-          list={paged.list}
-          isLoading={paged.isLoading || isOptionsPending}
-          isError={paged.isError}
-          onRetry={() => void paged.mutate()}
-          page={params.page}
-          onChangePage={params.setPage}
-          onClampPage={params.clampPage}
-          buildPageHref={params.buildPageHref}
-          skeleton={skeleton}
-          emptyContent={emptyContent}
-          emptyClassName={EMPTY_LIST_MAX_HEIGHT_CLASS}
-          isTable={isDesktop}
-          renderTable={(records, empty) => (
-            <UsageTable
-              records={records}
-              activeId={activeId}
-              isPanelOpen={isPanelOpen}
-              onClickDetail={(record) => onClickDetail(record.id)}
-              emptyContent={empty}
-            />
-          )}
-          renderCards={(records) => (
-            <UsageCardList
-              records={records}
-              onClickDetail={(record) => onClickDetail(record.id)}
-            />
-          )}
-        />
-      ) : (
-        <HistoryScrollList
-          records={scroll.records}
-          totalCount={scroll.totalCount}
-          hasMore={scroll.hasMore}
-          isLoading={scroll.isLoading || isOptionsPending}
-          isLoadingMore={scroll.isLoadingMore}
-          isError={scroll.isError}
-          isLoadMoreError={scroll.isLoadMoreError}
-          onLoadMore={scroll.loadMore}
-          onRetry={() => void scroll.reload()}
-          skeleton={skeleton}
-          emptyContent={emptyContent}
-          emptyClassName={EMPTY_LIST_MAX_HEIGHT_CLASS}
-          renderCards={(records) => (
-            <UsageCardList
-              records={records}
-              onClickDetail={(record) => onClickDetail(record.id)}
-            />
-          )}
-        />
-      )}
+        {isTabletUp ? (
+          <HistoryPagedList
+            list={paged.list}
+            isLoading={paged.isLoading || isOptionsPending}
+            isError={paged.isError}
+            onRetry={() => void paged.mutate()}
+            page={params.page}
+            onChangePage={params.setPage}
+            onClampPage={params.clampPage}
+            buildPageHref={params.buildPageHref}
+            skeleton={skeleton}
+            emptyContent={emptyContent}
+            emptyClassName={EMPTY_LIST_MAX_HEIGHT_CLASS}
+            isTable={isDesktop}
+            renderTable={(records, empty) => (
+              <UsageTable
+                records={records}
+                activeId={activeId}
+                isPanelOpen={isPanelOpen}
+                onClickDetail={(record) => onClickDetail(record.id)}
+                emptyContent={empty}
+              />
+            )}
+            renderCards={(records) => (
+              <UsageCardList
+                records={records}
+                onClickDetail={(record) => onClickDetail(record.id)}
+              />
+            )}
+          />
+        ) : (
+          <HistoryScrollList
+            records={scroll.records}
+            totalCount={scroll.totalCount}
+            hasMore={scroll.hasMore}
+            isLoading={scroll.isLoading || isOptionsPending}
+            isLoadingMore={scroll.isLoadingMore}
+            isError={scroll.isError}
+            isLoadMoreError={scroll.isLoadMoreError}
+            onLoadMore={scroll.loadMore}
+            onRetry={() => void scroll.reload()}
+            skeleton={skeleton}
+            emptyContent={emptyContent}
+            emptyClassName={EMPTY_LIST_MAX_HEIGHT_CLASS}
+            renderCards={(records) => (
+              <UsageCardList
+                records={records}
+                onClickDetail={(record) => onClickDetail(record.id)}
+              />
+            )}
+          />
+        )}
+      </div>
     </section>
   );
 }

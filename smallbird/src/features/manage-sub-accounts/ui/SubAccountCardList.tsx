@@ -17,8 +17,6 @@ interface SubAccountCardListProps {
   onClickDelete: (account: SubAccountViewModel) => void;
 }
 
-// Figma 카드(10724:187217 TAB·10724:187559 MO): 아바타 + 아이디, 그 아래 "권한 부여"(가로로 늘어남)·수정·삭제 버튼, 구분선, 라벨(굵게)·값(오른쪽 정렬) 세 줄.
-// TAB은 카드 2열, MO는 1열. 카드 사이 간격은 TAB 16·MO 20.
 export function SubAccountCardList({
   accounts,
   activeAccountIdx,

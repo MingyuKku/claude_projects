@@ -11,7 +11,7 @@ import type { UsageRecord } from "../model/usage-types";
 interface UsageDetailProps {
   record: UsageRecord;
   onClose: () => void;
-  /** TAB·MO는 제목 앞에 뒤로 버튼도 둠(시안). */
+  /** TAB·MO는 제목 앞에 뒤로 버튼도 둠. */
   hasBackButton?: boolean;
 }
 
@@ -30,10 +30,8 @@ function ContractTarget({ record }: { record: UsageRecord }) {
   );
 }
 
-// 사용 상세 보기(사용 11290:161387·환급 11290:161151·충전 11290:161266·출금 11290:161503): 구분(배지)·{유형} 일자·캠페인 명·캠페인 유형·
-// 캠페인 코드·사용 내역·{유형} 금액·사용 후 잔액. 하단 버튼 없음. 일자·금액 라벨은 유형별이고 모르는 유형은 사용 라벨.
-// 금액은 목록과 달리 검정 w600에 음수만 "-"(시안).
-// "계약 대상"(사용 내역과 사용 금액 사이)은 이름 + 아래 줄 "@아이디". 대상이 없으면 빈칸(스펙 §7 D-2).
+// 일자·금액 라벨은 유형별이고 모르는 유형은 사용 라벨.
+// 금액은 목록과 달리 음수만 "-"를 붙임.
 export function UsageDetail({
   record,
   onClose,

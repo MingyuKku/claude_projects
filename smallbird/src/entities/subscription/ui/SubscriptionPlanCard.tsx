@@ -14,7 +14,7 @@ import type {
 } from "../model/codes";
 import type { PlanCardType } from "@/shared/components/cards";
 
-// 연간 카드의 할인 전 금액(줄 긋기)은 월 요금 × 12로 계산함(스펙 §3, 서버가 따로 주지 않음).
+// 연간 카드의 할인 전 금액(줄 긋기)은 월 요금 × 12로 계산함(서버가 따로 주지 않음).
 const MONTHS_PER_YEAR = 12;
 
 const ITEM_IDS = ["1", "2", "3"] as const;
@@ -37,7 +37,7 @@ interface SubscriptionPlanCardProps {
   onSubscribe: (type: ActiveProductType) => void;
 }
 
-// 구독 탭의 상품 카드. 카드 자체는 클릭 동작이 없고, 호버는 연한 회색 배경으로 보이고 카드 단위 강조 링(포커스·펼침)은 쓰지 않음(스펙 §3).
+// 구독 탭의 상품 카드. 카드 자체는 클릭 동작이 없고, 호버는 연한 회색 배경으로 보이고 카드 단위 강조 링(포커스·펼침)은 쓰지 않음.
 export function SubscriptionPlanCard({
   type,
   period,
@@ -115,7 +115,6 @@ export function SubscriptionPlanCard({
   );
 }
 
-// 펼친 카드의 상세: 소개·이용 방식(Stepper 5단계)·브랜드형 설명·공구형 설명.
 function PlanDetail({ type }: { type: ActiveProductType }) {
   const { t } = useTranslation("entities/subscription");
 

@@ -1,53 +1,59 @@
-import { createMockStore, getMockFileUrl } from "@/shared/lib";
+import { ApiError } from "@/shared/api";
+import { getMockFileUrl, mockBrandDb } from "@/shared/lib";
 
 import type { Brand } from "../../model/schema";
+import type { MockBrandRecord } from "@/shared/lib";
 
-// 브랜드 목록·추가(A-4·A-5)의 목 저장소.
-interface BrandMockDb {
-  nextBrandIdx: number;
-  brands: Brand[];
+// 브랜드 목록·추가·삭제(A-6.1~A-6.3)의 목. 저장소는 캠페인 상세 목과 함께 읽어 shared에 있음.
+
+function toBrand({ brandIdx, name, imageUrl }: MockBrandRecord): Brand {
+  return { brandIdx, name, imageUrl };
 }
 
-const brandMockDb = createMockStore<BrandMockDb>("bigbird:mock:brands", () => ({
-  nextBrandIdx: 4,
-  brands: [
-    {
-      brandIdx: 3,
-      nameKo: "빅링크 코스메틱",
-      nameEn: "Biglink Cosmetic",
-      imageUrl: null,
-    },
-    { brandIdx: 2, nameKo: "초록숲", nameEn: "Green Forest", imageUrl: null },
-    {
-      brandIdx: 1,
-      nameKo: "데일리 스튜디오",
-      nameEn: "Daily Studio",
-      imageUrl: null,
-    },
-  ],
-}));
-
-/** 최근 추가순(A-4). */
-export async function listBrands(): Promise<Brand[]> {
-  return brandMockDb.get().brands;
+/** 지우지 않은 브랜드, 최근 추가순(A-6.1). */
+export async function listBrands(): Promise<{ brands: Brand[] }> {
+  return {
+    brands: mockBrandDb
+      .get()
+      .brands.filter((brand) => !brand.isDeleted)
+      .sort((a, b) => b.brandIdx - a.brandIdx)
+      .map(toBrand),
+  };
 }
 
 export async function createBrand(input: {
-  nameKo: string;
-  nameEn: string;
-  imageFileId: string | null;
+  name: string;
+  imageAttachmentIdx: number | null;
 }): Promise<Brand> {
-  let created: Brand | undefined;
-  brandMockDb.update((db) => {
+  const name = input.name.trim();
+  if (!name) throw new ApiError(400, { reason: "INVALID_BRAND_NAME" });
+
+  let created: MockBrandRecord | undefined;
+  mockBrandDb.update((db) => {
     created = {
       brandIdx: db.nextBrandIdx,
-      nameKo: input.nameKo,
-      nameEn: input.nameEn,
-      imageUrl: input.imageFileId ? getMockFileUrl(input.imageFileId) : null,
+      name,
+      imageUrl:
+        input.imageAttachmentIdx === null
+          ? null
+          : getMockFileUrl(input.imageAttachmentIdx),
+      isDeleted: false,
     };
     db.nextBrandIdx += 1;
-    db.brands.unshift(created);
+    db.brands.push(created);
   });
   if (!created) throw new Error("mock brand was not created");
-  return created;
+  return toBrand(created);
+}
+
+/** 삭제 표시만 함(A-6.3). 결제한 캠페인은 지운 브랜드도 그대로 보여 줌. */
+export async function deleteBrand(brandIdx: number): Promise<void> {
+  const target = mockBrandDb
+    .get()
+    .brands.find((brand) => brand.brandIdx === brandIdx && !brand.isDeleted);
+  if (!target) throw new ApiError(404, { reason: "BRAND_NOT_FOUND" });
+  mockBrandDb.update((db) => {
+    const brand = db.brands.find((item) => item.brandIdx === brandIdx);
+    if (brand) brand.isDeleted = true;
+  });
 }

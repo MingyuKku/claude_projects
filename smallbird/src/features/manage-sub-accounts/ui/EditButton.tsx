@@ -9,7 +9,6 @@ interface EditButtonProps {
   className?: string;
 }
 
-// Figma 목록 행의 연필 버튼(10724:186016): 삭제 버튼과 같은 정사각 outline 아이콘 버튼.
 export function EditButton({ label, onClick, className }: EditButtonProps) {
   return (
     <Button

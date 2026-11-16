@@ -1,4 +1,4 @@
-/** 충전/출금 내역의 상태. 서버 코드(`PENDING` 등, docs/mypage-api.md §2)를 화면용 코드로 바꿔 씀. */
+/** 충전/출금 내역의 상태. 서버 코드(`PENDING` 등)를 화면용 코드로 바꿔 씀. */
 export const CHARGE_STATUSES = [
   "paid",
   "withdrawn",

@@ -25,7 +25,7 @@ interface BankAccountTabProps {
   onLeave: () => void;
 }
 
-// 계좌정보는 회사정보 필수 항목이 모두 등록된 Master만 다룰 수 있음. 아니면 Figma 얼럿(10061:240624)으로 안내함.
+// 계좌정보는 회사정보 필수 항목이 모두 등록된 Master만 다룰 수 있음. 아니면 얼럿으로 안내함.
 // 회사정보를 읽는 Master 조회와 같은 SWR 키라 회사정보 탭에서 저장하면 여기도 바로 갱신됨.
 export function BankAccountTab({ onGoCompany, onLeave }: BankAccountTabProps) {
   const { t } = useTranslation("pages/mypage-account");

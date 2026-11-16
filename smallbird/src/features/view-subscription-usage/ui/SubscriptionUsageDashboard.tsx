@@ -19,7 +19,6 @@ interface SubscriptionUsageDashboardProps {
   onChangeType: (type: ActiveProductType) => void;
 }
 
-// 이용요약 탭: 상품 세그먼트 → 검색·제안 횟수 카드 → 이용 현황(필터·차트) → 브랜드형·공구형 카드.
 export function SubscriptionUsageDashboard({
   type,
   onChangeType,

@@ -13,7 +13,6 @@ interface WithdrawPasswordScreenProps {
   onClose: () => void;
 }
 
-// MO는 약관 화면과 같은 구조의 전체 화면(서브헤더 · 안내문과 입력 · 하단 고정 버튼 한 쌍).
 export function WithdrawPasswordScreen({
   form,
   onClose,

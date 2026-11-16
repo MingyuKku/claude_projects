@@ -16,7 +16,7 @@ interface BankAccountCardProps {
   onSaved: () => void;
 }
 
-// 계좌정보는 보기 → "수정"(미등록은 "등록") → 관리자 비밀번호 확인 → 입력 모드 → 취소·저장(Figma 10724:185992·185944). 들어갈 때마다 비밀번호를 다시 물음.
+// 수정에 들어갈 때마다 관리자 비밀번호를 다시 물음.
 export function BankAccountCard({
   account,
   banks,

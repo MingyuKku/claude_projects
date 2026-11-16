@@ -9,7 +9,7 @@ export const CHARGE_TYPE_OPTIONS = ["charge", "withdraw"] as const;
 
 /**
  * 충전/출금 내역 필터(구분·충전 일자·입금 상태. 결제 수단은 무통장 입금뿐이라 두지 않고 검색창도 없음).
- * 서버가 조건 동시 적용(AND)·기간·구분·상태 코드를 지원해(2026-10-30 Swagger) 모두 켬.
+ * 서버가 조건 동시 적용(AND)·기간·구분·상태 코드를 지원해 모두 켬.
  */
 export function useChargeFilterFields(): FilterField[] {
   const { t } = useTranslation("features/bigbird-money-history");

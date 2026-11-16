@@ -7,14 +7,12 @@ import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 
 interface MoneySummaryProps {
-  /** PC 오른쪽 패널이 열려 있음. 카드 폭이 278로 줄어듦(시안 `11224:104058`). */
+  /** PC 오른쪽 패널이 열려 있음. 카드 폭이 줄어듦. */
   isPanelOpen: boolean;
   onOpenCharge: () => void;
   onOpenWithdraw: () => void;
 }
 
-// 보유 머니 카드 + 충전 안내. 두 탭 위에 공통으로 둠(시안 PC `11224:103702`·`11224:103786`, TAB `11224:104315`·`11224:104580`).
-// 폭: PC는 카드 고정(376, 패널이 열리면 278) + 안내가 나머지, TAB 1:1, MO 세로 쌓기.
 export function MoneySummary({
   isPanelOpen,
   onOpenCharge,

@@ -10,7 +10,7 @@ export const SERVER_USAGE_TYPE = {
   withdraw: "WITHDRAWAL",
 } as const satisfies Record<UsageType, string>;
 
-/** 캠페인과 무관한 사용 유형. 캠페인 명·유형·코드·사용 내역·계약 대상 값을 비움(시안 `11290:161266`·`11290:161503`). 표 셀은 빈 값을 "-"로 그림. */
+/** 캠페인과 무관한 사용 유형. 캠페인 명·유형·코드·사용 내역·계약 대상 값을 비움. 표 셀은 빈 값을 "-"로 그림. */
 export const NON_CAMPAIGN_USAGE_TYPES: readonly UsageType[] = [
   "charge",
   "withdraw",
@@ -74,7 +74,7 @@ export interface UsageListViewModel {
   totalPages: number;
 }
 
-/** 사용 내역 요청 조건. 필터는 서버에서 함께 걸림(AND). 값이 없으면 보내지 않음. 검색어는 대상이 정해지기 전(Q-8)이라 보내지 않음. */
+/** 사용 내역 요청 조건. 필터는 서버에서 함께 걸림(AND). 값이 없으면 보내지 않음. 검색어는 대상이 정해지기 전이라 보내지 않음. */
 export interface UsageQuery {
   page: number;
   entrySize: number;

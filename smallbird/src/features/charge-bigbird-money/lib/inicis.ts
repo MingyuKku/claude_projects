@@ -21,7 +21,7 @@ const toText = (value: string | number | null | undefined) =>
   value === null || value === undefined ? "" : String(value);
 
 /**
- * 이니시스 표준결제 폼의 입력값. v2 충전(`BizMoneyModal`)과 같은 필드 구성:
+ * 이니시스 표준결제 폼의 입력값.
  * 결제 서버 응답은 그대로 넣고(`cardQuotaBase`만 이니시스 이름 `quotabase`로), 금액은 응답이 아니라 사용자가 입력한 값을 씀.
  * `returnUrl`은 응답 값, `closeUrl`은 호출하는 쪽이 정한 값을 씀(이니시스가 도메인이 요청 페이지와 같아야 한다고 검사함).
  */
@@ -53,7 +53,7 @@ export function buildInicisFields(
   };
 }
 
-// 이니시스 `INIStdPay_third-party.js`의 `$jINI.mobileBrowser`(detectmobilebrowser.com) 첫 번째 정규식을 그대로 옮김(2026-11-04 대조).
+// 이니시스 `INIStdPay_third-party.js`의 `$jINI.mobileBrowser`(detectmobilebrowser.com) 첫 번째 정규식을 그대로 옮김.
 // 스크립트는 이어서 UA 앞 4글자 목록(옛 피처폰용)도 검사하지만 요즘 브라우저 UA는 모두 `Mozi`/`Oper` 등으로 시작해 해당이 없어 뺌.
 // 이 기준이 스크립트와 다르면 PC 흐름으로 갔다가 이니시스가 "PC로 결제 진행" 알림만 띄움.
 const MOBILE_USER_AGENT =

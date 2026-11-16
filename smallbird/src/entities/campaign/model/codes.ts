@@ -66,3 +66,6 @@ export function isCampaignTypeFilter(
 
 /** 현황 목록 한 쪽의 개수(REQ-5-0014). */
 export const CAMPAIGN_PAGE_SIZE = 6;
+
+/** 이전 캠페인 불러오기 목록 한 번에 읽는 개수(A-2 기본값). 끝에 닿으면 이어 읽음. */
+export const COPY_SOURCE_PAGE_SIZE = 20;

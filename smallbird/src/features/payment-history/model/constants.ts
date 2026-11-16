@@ -1,4 +1,4 @@
-/** "N개 보기" 선택지(사용자 결정 2026-10-28). 서버는 1~100을 받음(Swagger `size`). 기본은 맨 앞 값. */
+/** "N개 보기" 선택지. 서버는 1~100을 받음. 기본은 맨 앞 값. */
 export const PAGE_SIZE_OPTIONS = [10, 20, 30] as const;
 export const DEFAULT_PAGE_SIZE = PAGE_SIZE_OPTIONS[0];
 
@@ -17,7 +17,7 @@ export const LIST_QUERY_PARAMS = [
 ] as const;
 
 /**
- * 결제 내역 필터 선택지(시안 11755:97599: 월·연 구독 상품 × PICK형·모집형, 이 순서). 값은 URL 쿼리(`?item=monthly_pick`)에 쓰고,
+ * 결제 내역 필터 선택지(월·연 구독 상품 × PICK형·모집형, 이 순서). 값은 URL 쿼리(`?item=monthly_pick`)에 쓰고,
  * 요청 때 결제 주기와 상품 유형 두 조건으로 나눔.
  */
 export const PAYMENT_ITEMS = [

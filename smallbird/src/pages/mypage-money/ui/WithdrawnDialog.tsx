@@ -25,7 +25,7 @@ interface WithdrawnDialogProps {
   onConfirm: () => void;
 }
 
-// 출금 요청 완료 알럿(Figma 11224:104313). 완료 알럿은 "확인"만 둠(스펙 공통 규칙, 시안의 "취소"는 두지 않음).
+// 완료 알럿은 "확인"만 둠(시안의 "취소"는 두지 않음).
 export function WithdrawnDialog({
   open,
   requestedAt,

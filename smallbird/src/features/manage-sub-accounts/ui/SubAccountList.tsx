@@ -28,8 +28,6 @@ import { SubAccountTable } from "./SubAccountTable";
 
 import type { SubAccountViewModel } from "../model/types";
 
-// 표는 PC(1440~)만 쓰고 TAB·MO는 카드(2026-10-27 시안).
-
 interface SubAccountListProps {
   /** 권한 부여·수정을 열어 둔 Sub ID. 그 행을 활성(accent) 처리함. */
   activeAccountIdx: number | null;
@@ -76,7 +74,7 @@ export function SubAccountList({
     );
   }, [isPageOutOfRange, totalPages, setSearchParams]);
 
-  /** 목록이 바뀌면 열어 둔 권한 부여·수정 패널은 닫음(스펙 §3). 생성 패널은 그대로 둠. */
+  /** 목록이 바뀌면 열어 둔 권한 부여·수정 패널은 닫음. 생성 패널은 그대로 둠. */
   function updateParams(update: (params: URLSearchParams) => void) {
     setSearchParams((prev) => {
       const params = new URLSearchParams(prev);
@@ -134,7 +132,7 @@ export function SubAccountList({
         />
       </div>
 
-      {/* 표(또는 카드)와 쪽 이동은 12px 간격으로 한 묶음(시안). 빈 상태가 남은 높이를 채우되 시안 높이까지만 늘어남. */}
+      {/* 빈 상태가 남은 높이를 채우되 시안 높이까지만 늘어남. */}
       {isLoading ? (
         <SubAccountListSkeleton isTable={isDesktop} />
       ) : isError || !list ? (

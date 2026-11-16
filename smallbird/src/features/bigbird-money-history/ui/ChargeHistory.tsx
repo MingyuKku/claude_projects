@@ -33,8 +33,7 @@ interface ChargeHistoryProps {
   onClickDetail: (id: string) => void;
 }
 
-// 충전/출금 내역. PC는 표, TAB은 2열 카드 + 쪽 이동, MO는 1열 카드 + 스크롤로 이어 읽기(맨 위로 버튼). 툴바는 PC·TAB 인라인, MO "필터" 모달. 검색창은 없음(스펙 §3).
-// 필터(구분·충전 일자·입금 상태)와 "N개 보기"(10·20·30)는 주소 쿼리가 소유하고 서버에 함께 보냄.
+// 필터(구분·충전 일자·입금 상태)와 "N개 보기"는 주소 쿼리가 소유하고 서버에 함께 보냄.
 export function ChargeHistory({
   activeId,
   isPanelOpen,
@@ -66,81 +65,86 @@ export function ChargeHistory({
 
   return (
     <section
-      className="flex flex-1 flex-col gap-4"
+      className="flex flex-1 flex-col gap-2 tablet:gap-4"
       aria-labelledby="charge-title"
     >
-      <h2 id="charge-title" className="text-base font-semibold text-foreground">
+      <h2
+        id="charge-title"
+        className="ds-text-sm-none-semibold text-foreground tablet:ds-text-base-none-semibold"
+      >
         {t("charge.title")}
       </h2>
-      <FilterToolbar
-        fields={fields}
-        values={params.filters}
-        onChangeValues={params.setFilters}
-        onApplyFromDialog={params.applyFiltersAndClosePanel}
-        onRefresh={() => {
-          params.reset();
-          void reload();
-        }}
-        shouldFillFields={isPanelOpen}
-        pageSize={{
-          value: params.pageSize,
-          options: LIST_PAGE_SIZE_OPTIONS,
-          onChange: params.setPageSize,
-        }}
-      />
+      <div className="flex flex-1 flex-col gap-3">
+        <FilterToolbar
+          fields={fields}
+          values={params.filters}
+          onChangeValues={params.setFilters}
+          onApplyFromDialog={params.applyFiltersAndClosePanel}
+          onRefresh={() => {
+            params.reset();
+            void reload();
+          }}
+          shouldFillFields={isPanelOpen}
+          pageSize={{
+            value: params.pageSize,
+            options: LIST_PAGE_SIZE_OPTIONS,
+            onChange: params.setPageSize,
+          }}
+        />
 
-      {isTabletUp ? (
-        <HistoryPagedList
-          list={paged.list}
-          isLoading={paged.isLoading}
-          isError={paged.isError}
-          onRetry={() => void paged.mutate()}
-          page={params.page}
-          onChangePage={params.setPage}
-          onClampPage={params.clampPage}
-          buildPageHref={params.buildPageHref}
-          skeleton={skeleton}
-          emptyContent={emptyContent}
-          emptyClassName={EMPTY_LIST_MAX_HEIGHT_CLASS}
-          isTable={isDesktop}
-          renderTable={(records, empty) => (
-            <ChargeTable
-              records={records}
-              activeId={activeId}
-              isPanelOpen={isPanelOpen}
-              onClickDetail={(record) => onClickDetail(record.id)}
-              emptyContent={empty}
-            />
-          )}
-          renderCards={(records) => (
-            <ChargeCardList
-              records={records}
-              onClickDetail={(record) => onClickDetail(record.id)}
-            />
-          )}
-        />
-      ) : (
-        <HistoryScrollList
-          records={scroll.records}
-          totalCount={scroll.totalCount}
-          hasMore={scroll.hasMore}
-          isLoading={scroll.isLoading}
-          isLoadingMore={scroll.isLoadingMore}
-          isError={scroll.isError}
-          isLoadMoreError={scroll.isLoadMoreError}
-          onLoadMore={scroll.loadMore}
-          onRetry={() => void scroll.reload()}
-          skeleton={skeleton}
-          emptyContent={emptyContent}
-          emptyClassName={EMPTY_LIST_MAX_HEIGHT_CLASS}
-          renderCards={(records) => (
-            <ChargeCardList
-              records={records}
-              onClickDetail={(record) => onClickDetail(record.id)}
-            />
-          )}
-        />
-      )}
+        {isTabletUp ? (
+          <HistoryPagedList
+            list={paged.list}
+            isLoading={paged.isLoading}
+            isError={paged.isError}
+            onRetry={() => void paged.mutate()}
+            page={params.page}
+            onChangePage={params.setPage}
+            onClampPage={params.clampPage}
+            buildPageHref={params.buildPageHref}
+            skeleton={skeleton}
+            emptyContent={emptyContent}
+            emptyClassName={EMPTY_LIST_MAX_HEIGHT_CLASS}
+            isTable={isDesktop}
+            renderTable={(records, empty) => (
+              <ChargeTable
+                records={records}
+                activeId={activeId}
+                isPanelOpen={isPanelOpen}
+                onClickDetail={(record) => onClickDetail(record.id)}
+                emptyContent={empty}
+              />
+            )}
+            renderCards={(records) => (
+              <ChargeCardList
+                records={records}
+                onClickDetail={(record) => onClickDetail(record.id)}
+              />
+            )}
+          />
+        ) : (
+          <HistoryScrollList
+            records={scroll.records}
+            totalCount={scroll.totalCount}
+            hasMore={scroll.hasMore}
+            isLoading={scroll.isLoading}
+            isLoadingMore={scroll.isLoadingMore}
+            isError={scroll.isError}
+            isLoadMoreError={scroll.isLoadMoreError}
+            onLoadMore={scroll.loadMore}
+            onRetry={() => void scroll.reload()}
+            skeleton={skeleton}
+            emptyContent={emptyContent}
+            emptyClassName={EMPTY_LIST_MAX_HEIGHT_CLASS}
+            renderCards={(records) => (
+              <ChargeCardList
+                records={records}
+                onClickDetail={(record) => onClickDetail(record.id)}
+              />
+            )}
+          />
+        )}
+      </div>
     </section>
   );
 }

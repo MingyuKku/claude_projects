@@ -1,6 +1,6 @@
 import { useLayoutEffect, useRef } from "react";
 
-// 시안 구독 탭 카드의 높이(278×384). 문구가 짧은 한국어에서도 이보다 낮아지지 않음.
+// 시안 카드 높이. 문구가 짧은 한국어에서도 이보다 낮아지지 않음.
 const BASE_CARD_HEIGHT = 384;
 
 export const CARD_MIN_HEIGHT_VAR = "--plan-card-min-height";

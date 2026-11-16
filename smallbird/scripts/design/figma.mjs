@@ -1,6 +1,7 @@
 // Figma 시안 수집. Figma REST API 결과를 파일로 저장해 에이전트 컨텍스트를 거치지 않게 한다.
 // 구현(figma-to-component)과 디자인 QA(design-qa)가 같이 쓴다.
 //   node scripts/design/figma.mjs frames <nodeId>             → 노드 아래 기기 크기(1440·768·360) 프레임 목록
+//   node scripts/design/figma.mjs scan <nodeId,...> [--out d] → 프레임 목록·상태 표시·주석·프레임별 문구를 <out>/<id>.scan.txt 로 저장
 //   node scripts/design/figma.mjs spec <nodeId,...> [--out d]  → 프레임 지정값을 <out>/<id>.json 으로 저장
 //   node scripts/design/figma.mjs outline <nodeId,...> [--depth n] → 구현용 요약(지정값 + ds- 클래스 이름)
 //   node scripts/design/figma.mjs image <nodeId,...> [--out d] → 프레임 PNG 를 <out>/<id>.png 로 저장
@@ -233,8 +234,8 @@ const ensureDir = (dir) => {
 const countNodes = (n) =>
   1 + (n.children || []).reduce((sum, c) => sum + countNodes(c), 0);
 
-// 기기 크기 프레임 목록(이름·위치). 프레임 이름은 복붙 잔재가 많아 믿지 않는다. 화면 제목으로 구분하려면
-// REST 로는 프레임 본문 전체(프레임당 약 1MB)를 받아야 해서, design-qa skill 의 Plugin API 스크립트(frames.figma.js)를 쓴다.
+// 기기 크기 프레임 목록(이름·위치)만 가볍게(depth 3) 받는다. 프레임 이름은 복붙 잔재가 많아 믿지 않으므로
+// 화면 제목·상태 표시까지 필요하면 scan 을 쓴다.
 export async function listFrames(target, file = DEFAULT_FILE) {
   const data = await api(`/v1/files/${file}/nodes?ids=${target}&depth=3`);
   const found = [];
@@ -294,6 +295,225 @@ export async function fetchSpecs(ids, outDir, file = DEFAULT_FILE) {
     });
   }
   return written;
+}
+
+// ── 페이지 스캔: 프레임 목록 · 주석 · 프레임별 문구 ────────────────────────────
+// 로컬 Figma 캐시를 쓰기 위한 것. REST 응답(노드 전체)을 한 번 받아 파일로 정리하므로 MCP 호출 한도를 쓰지 않는다.
+// 페이지 하나가 수십 MB 라 아주 큰 페이지는 구역(Section) node 여러 개로 나눠 넘긴다.
+const OVERLAY =
+  /Dimmed|Dialog|Modal|Sheet|Drawer|Popover|Dropdown|Alert|Toast|Tooltip|Menu/i;
+// 덤프에서 이름을 생략하는 작은 컴포넌트(글자는 그대로 남김)
+const QUIET = /Badge|Validation|Stepper|Table Base|Lucide|Icon|separator/i;
+const visible = (n) => n.visible !== false;
+const textsOf = (n, acc = []) => {
+  if (!visible(n)) return acc;
+  if (n.type === "TEXT") acc.push(n.characters.replace(/\s*\n\s*/g, " / "));
+  (n.children || []).forEach((c) => textsOf(c, acc));
+  return acc;
+};
+const variantsOf = (n) =>
+  Object.entries(n.componentProperties || {})
+    .filter(([, p]) => p.type === "VARIANT")
+    .map(([k, p]) => [k, String(p.value)]);
+// 폭이 기기 크기와 같은 주석 띠("New · 날짜", 높이 40)가 있어 높이로도 거른다. 가장 작은 화면(MO)도 600
+const MIN_SCREEN_HEIGHT = 300;
+const deviceOf = (n) =>
+  n.absoluteBoundingBox &&
+  n.absoluteBoundingBox.height >= MIN_SCREEN_HEIGHT &&
+  DEVICE_BY_WIDTH[Math.round(n.absoluteBoundingBox.width)];
+
+function componentName(n, ctx) {
+  const c = ctx.components[n.componentId];
+  if (!c) return n.name;
+  const set = c.componentSetId && ctx.componentSets[c.componentSetId];
+  return set ? set.name : c.name;
+}
+
+// design-qa 가 화면을 고를 때 쓰는 상태 표시: 겹침(딤·다이얼로그·열린 메뉴), 긴 본문, 선택된 탭·토글
+function frameFlags(frame, ctx) {
+  const flags = [];
+  for (const c of frame.children || []) {
+    if (!visible(c) || c.type !== "INSTANCE") continue;
+    const name = componentName(c, ctx);
+    if (OVERLAY.test(name)) flags.push(`겹침:${name}`);
+    const open = variantsOf(c).find(([k]) => k === "Open / Close");
+    if (
+      /Sidebar/i.test(name) &&
+      frame.absoluteBoundingBox.width < 1440 &&
+      /false/i.test(open?.[1] || "")
+    )
+      flags.push("메뉴열림");
+  }
+  const main = findMainContent(frame);
+  if (main !== frame) {
+    const fb = frame.absoluteBoundingBox,
+      mb = main.absoluteBoundingBox;
+    const bottom = Math.round(mb.y - fb.y + mb.height);
+    if (bottom > fb.height + 1) flags.push(`긴본문${bottom}`);
+  }
+  const selected = [];
+  const walk = (n) => {
+    if (!visible(n)) return;
+    if (n.type === "INSTANCE") {
+      const on = variantsOf(n).some(
+        ([k, v]) =>
+          /select|active|state|property 1/i.test(k) &&
+          /^(true|on|selected|active)$/i.test(v),
+      );
+      const first = on && textsOf(n)[0];
+      if (first && !selected.includes(first.slice(0, 10)))
+        selected.push(first.slice(0, 10));
+    }
+    (n.children || []).forEach(walk);
+  };
+  walk(frame);
+  if (selected.length) flags.push(`선택[${selected.slice(0, 5).join(",")}]`);
+  return flags.join(" ");
+}
+
+// 프레임 안 문구를 화면 구조 순서로. 인스턴스는 컴포넌트 이름과 변형을 붙이고, Sidebar 는 한 줄로 접는다.
+function frameDump(frame, ctx) {
+  const lines = [];
+  const walk = (n, d) => {
+    if (!visible(n)) return;
+    const pad = "  ".repeat(d);
+    if (n.type === "TEXT") {
+      lines.push(`${pad}"${n.characters.replace(/\s*\n\s*/g, " / ")}"`);
+      return;
+    }
+    if (!n.children || !textsOf(n).length) return;
+    if (n.type === "INSTANCE") {
+      const name = componentName(n, ctx);
+      if (/^Sidebar/i.test(name)) {
+        const items = textsOf(n).filter((t) => !/^\d+$/.test(t));
+        lines.push(`${pad}<Sidebar> ${items.join(" | ")}`);
+        return;
+      }
+      if (!QUIET.test(name)) {
+        const v = variantsOf(n)
+          .map(([k, val]) => `${k}=${val}`)
+          .join(",");
+        lines.push(`${pad}<${name}${v ? `{${v}}` : ""}> ${n.id}`);
+      }
+    }
+    n.children.forEach((c) => walk(c, d + 1));
+  };
+  (frame.children || []).forEach((c) => walk(c, 1));
+  return lines;
+}
+
+// REST 응답(nodes?ids=…)을 프레임 목록·주석·덤프로 정리한다. 기기 크기(1440·768·360) 프레임을 화면으로 보고,
+// 구역(Section·Group·넓은 Frame) 안으로 들어가며, 그 밖의 최상위 노드(주석·Change log·라벨)는 글자만 남긴다.
+export function scanNodes(data, ids) {
+  const frames = [],
+    notes = [],
+    dumps = [];
+  for (const id of ids) {
+    const entry = data.nodes[id];
+    if (!entry) {
+      notes.push({ id, type: "ERROR", name: "노드 없음", texts: [] });
+      continue;
+    }
+    const ctx = {
+      components: entry.components || {},
+      componentSets: entry.componentSets || {},
+    };
+    const walk = (n, depth) => {
+      for (const c of n.children || []) {
+        if (!visible(c)) continue;
+        const device = deviceOf(c);
+        const b = c.absoluteBoundingBox;
+        if (
+          device &&
+          (c.type === "FRAME" || c.type === "INSTANCE") &&
+          depth < 4
+        ) {
+          const main = findMainContent(c);
+          frames.push({
+            device,
+            id: c.id,
+            x: Math.round(b.x),
+            y: Math.round(b.y),
+            h: Math.round(b.height),
+            title: textsOf(main)
+              .slice(0, 6)
+              .map((t) => t.slice(0, 12))
+              .join("|"),
+            flags: frameFlags(c, ctx),
+          });
+          dumps.push(
+            `=== ${device} ${c.id} ${Math.round(b.x)},${Math.round(b.y)} ${b.width}x${b.height}`,
+            ...frameDump(c, ctx),
+          );
+          continue;
+        }
+        const isArea =
+          c.type === "SECTION" ||
+          c.type === "GROUP" ||
+          (c.type === "FRAME" && b && b.width > 2000);
+        const framesBefore = frames.length,
+          notesBefore = notes.length;
+        if (isArea) walk(c, depth + 1);
+        if (frames.length > framesBefore) continue;
+        // 화면이 없는 구역(Change log·구역 제목)은 안쪽 조각 대신 한 덩어리로, 구역 안팎의 주석은 그대로 글자를 남긴다
+        notes.length = notesBefore;
+        if (textsOf(c).length) note(c);
+      }
+    };
+    const note = (c) => {
+      const b = c.absoluteBoundingBox;
+      notes.push({
+        id: c.id,
+        type: c.type,
+        name: c.name,
+        x: b ? Math.round(b.x) : undefined,
+        y: b ? Math.round(b.y) : undefined,
+        texts: textsOf(c),
+      });
+    };
+    walk(entry.document, 0);
+  }
+  return { frames, notes, dumps };
+}
+
+export async function scanPage(ids, outDir, file = DEFAULT_FILE) {
+  ensureDir(outDir);
+  // 호출은 한 번으로 받고, 파일은 node 마다 따로 쓴다. 다음 스캔 때 node 를 다르게 묶어 넘겨도 같은 파일끼리 diff 할 수 있다.
+  const data = await api(`/v1/files/${file}/nodes?ids=${ids.join(",")}`);
+  const outs = [],
+    frameLines = [];
+  let noteCount = 0;
+  for (const id of ids) {
+    const { frames, notes, dumps } = scanNodes(data, [id]);
+    const head = `# scan ${id} · file ${file} · version ${data.version} · lastModified ${data.lastModified}`;
+    const lines = frames.map((f) =>
+      [f.device, f.id, `${f.x},${f.y}`, `h${f.h}`, f.title, f.flags].join("\t"),
+    );
+    const noteLines = notes.map(
+      (n) =>
+        `${n.type} ${n.id} "${n.name}"${n.x !== undefined ? ` ${n.x},${n.y}` : ""} :: ${n.texts.join(" ‖ ")}`,
+    );
+    const out = path.join(outDir, `${fileName(id)}.scan.txt`);
+    writeFileSync(
+      out,
+      [
+        head,
+        "",
+        "## 프레임",
+        ...lines,
+        "",
+        "## 주석 · 그 밖의 노드",
+        ...noteLines,
+        "",
+        "## 프레임별 문구",
+        ...dumps,
+      ].join("\n") + "\n",
+    );
+    outs.push(out);
+    frameLines.push(...lines);
+    noteCount += notes.length;
+  }
+  return { outs, version: data.version, frameLines, noteCount };
 }
 
 export async function fetchImages(
@@ -417,12 +637,26 @@ if (import.meta.url === pathToFileURL(process.argv[1]).href) {
         ),
       );
     }
+  } else if (command === "scan" && target) {
+    // 프레임 목록만 화면에 보이고, 주석·프레임별 문구는 파일에서 필요한 만큼 읽는다
+    const scanned = await scanPage(
+      target.split(","),
+      options.out || ".claude/figma-cache/scans",
+      file,
+    );
+    console.log(
+      ["device", "id", "x,y", "h", "본문 앞 글자", "상태"].join("\t"),
+    );
+    scanned.frameLines.forEach((l) => console.log(l));
+    console.log(
+      `\n프레임 ${scanned.frameLines.length}개 · 그 밖의 노드 ${scanned.noteCount}개 · version ${scanned.version} → ${scanned.outs.join(", ")}`,
+    );
   } else if (command === "image" && target) {
     for (const w of await fetchImages(target.split(","), out, file))
       console.log(w.error ? `${w.id}\t${w.error}` : w.file);
   } else {
     console.error(
-      "사용법: figma.mjs frames|spec|outline|image <nodeId[,nodeId...]> [--file 키] [--out 폴더] [--depth n]",
+      "사용법: figma.mjs frames|scan|spec|outline|image <nodeId[,nodeId...]> [--file 키] [--out 폴더] [--depth n]",
     );
     process.exit(1);
   }

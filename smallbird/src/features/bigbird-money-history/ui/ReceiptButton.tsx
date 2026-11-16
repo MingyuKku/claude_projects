@@ -25,7 +25,7 @@ export function ReceiptButton({ record, variant }: ReceiptButtonProps) {
       <Button
         variant="outline-foreground"
         size="icon-sm"
-        className="min-w-0"
+        className="size-9 min-w-0"
         aria-label={t("charge.action.receipt")}
         disabled={!receiptUrl}
         onClick={handleClick}
@@ -36,7 +36,6 @@ export function ReceiptButton({ record, variant }: ReceiptButtonProps) {
   }
 
   return (
-    // 시안: 거래 상세 하단 "거래명세서 받기"는 Outline(파랑 글자, `11224:104200`), 카드 위 "거래명세서"는 Outline Foreground.
     <Button
       variant={variant === "detail" ? "outline" : "outline-foreground"}
       className={variant === "detail" ? "w-full" : undefined}

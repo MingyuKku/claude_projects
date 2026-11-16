@@ -51,7 +51,13 @@ function requireSessionRoute(
 }
 
 // 캠페인 화면은 API가 나오기 전이라 stage·prod 빌드에서는 준비 중 화면임. 개발 서버에서는 목으로 동작하는 화면을 아래에서 엶.
-const CAMPAIGN_COMING_SOON_PATHS = [ROUTES.campaign, ROUTES.campaignCreate];
+const CAMPAIGN_COMING_SOON_PATHS = [
+  ROUTES.campaign,
+  ROUTES.campaignCreate,
+  ROUTES.campaignRegister,
+  ROUTES.campaignRegisterEdit,
+  ROUTES.campaignDetail,
+];
 
 function comingSoonPage(path: string) {
   return page(
@@ -114,7 +120,7 @@ export const routes: RouteObject[] = [
         ),
       ]),
 
-      // 캠페인 현황·개설. Sub ID 차단은 세션 middleware가 맡음.
+      // 캠페인 현황·개설·등록. Sub ID 차단은 세션 middleware가 맡음.
       ...(import.meta.env.DEV
         ? [
             requireSessionRoute(CampaignLayout, [
@@ -127,6 +133,21 @@ export const routes: RouteObject[] = [
                 ROUTES.campaignCreate,
                 async () =>
                   (await import("@/pages/campaign-create")).CampaignCreatePage,
+              ),
+            ]),
+            // 등록 마법사는 LNB 없이 FocusShell을 화면이 직접 그림.
+            requireSessionRoute(SessionLayout, [
+              page(
+                ROUTES.campaignRegister,
+                async () =>
+                  (await import("@/pages/campaign-register"))
+                    .CampaignRegisterEntryPage,
+              ),
+              page(
+                ROUTES.campaignRegisterEdit,
+                async () =>
+                  (await import("@/pages/campaign-register"))
+                    .CampaignRegisterPage,
               ),
             ]),
           ]

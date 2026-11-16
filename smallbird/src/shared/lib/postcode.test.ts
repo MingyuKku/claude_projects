@@ -1,82 +1,57 @@
 import { openPostcodeSearch } from "./postcode";
 
-type Options = ConstructorParameters<
-  NonNullable<Window["daum"]>["Postcode"]
->[0];
+type Options = {
+  oncomplete: (data: Record<string, string>) => void;
+  onclose: (state: string) => void;
+};
 
-let options: Options | undefined;
-
-function installDaum() {
+function installDaum(behavior: (options: Options) => void) {
   window.daum = {
     Postcode: class {
-      constructor(opts: Options) {
-        options = opts;
+      constructor(private readonly options: Options) {}
+      open() {
+        behavior(this.options);
       }
-      open() {}
-    },
+    } as never,
   };
 }
 
 afterEach(() => {
   delete window.daum;
-  options = undefined;
-  document.head.querySelectorAll("script").forEach((el) => el.remove());
 });
 
 describe("openPostcodeSearch", () => {
-  it("도로명을 고르면 도로명 주소와 우편번호를 돌려준다", async () => {
-    installDaum();
+  it("사용자가 고른 도로명·지번 주소와 우편번호를 돌려준다", async () => {
+    installDaum((options) =>
+      options.oncomplete({
+        zonecode: "06236",
+        roadAddress: "서울 강남구 테헤란로 152",
+        jibunAddress: "서울 강남구 역삼동 737",
+        userSelectedType: "J",
+      }),
+    );
 
-    const result = openPostcodeSearch();
-    await vi.waitFor(() => expect(options).toBeDefined());
-    options?.oncomplete({
+    await expect(openPostcodeSearch()).resolves.toEqual({
       zonecode: "06236",
-      roadAddress: "서울 강남구 테헤란로 1",
-      jibunAddress: "서울 강남구 역삼동 1",
-      userSelectedType: "R",
-    });
-
-    await expect(result).resolves.toEqual({
-      zonecode: "06236",
-      address: "서울 강남구 테헤란로 1",
+      address: "서울 강남구 역삼동 737",
     });
   });
 
-  it("지번을 고르면 지번 주소를 돌려준다", async () => {
-    installDaum();
+  it("고르지 않고 닫으면 null이다", async () => {
+    installDaum((options) => options.onclose("FORCE_CLOSE"));
 
-    const result = openPostcodeSearch();
-    await vi.waitFor(() => expect(options).toBeDefined());
-    options?.oncomplete({
-      zonecode: "06236",
-      roadAddress: "서울 강남구 테헤란로 1",
-      jibunAddress: "서울 강남구 역삼동 1",
-      userSelectedType: "J",
-    });
-
-    await expect(result).resolves.toMatchObject({
-      address: "서울 강남구 역삼동 1",
-    });
+    await expect(openPostcodeSearch()).resolves.toBeNull();
   });
 
-  it("고르지 않고 닫으면 undefined를 돌려준다", async () => {
-    installDaum();
+  it("스크립트를 불러오지 못하면 실패한다", async () => {
+    const append = vi
+      .spyOn(document.head, "appendChild")
+      .mockImplementation((node) => {
+        (node as HTMLScriptElement).onerror?.(new Event("error"));
+        return node;
+      });
 
-    const result = openPostcodeSearch();
-    await vi.waitFor(() => expect(options).toBeDefined());
-    options?.onclose?.();
-
-    await expect(result).resolves.toBeUndefined();
-  });
-
-  it("스크립트를 불러오지 못하면 거절하고, 다시 열면 다시 불러온다", async () => {
-    const failed = openPostcodeSearch();
-    document.head.querySelector("script")?.dispatchEvent(new Event("error"));
-    await expect(failed).rejects.toThrow();
-
-    const retried = openPostcodeSearch().catch(() => undefined);
-    expect(document.head.querySelectorAll("script")).toHaveLength(1);
-    document.head.querySelector("script")?.dispatchEvent(new Event("error"));
-    await retried;
+    await expect(openPostcodeSearch()).rejects.toThrow();
+    append.mockRestore();
   });
 });

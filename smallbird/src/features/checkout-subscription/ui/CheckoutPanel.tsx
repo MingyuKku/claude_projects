@@ -43,7 +43,6 @@ interface RowProps {
   emphasis?: "value" | "total";
 }
 
-// Figma Table Base / Cell: 높이 48px, 라벨·값 칸이 반반(flex-1)에 좌우 16px, 구분선 없음. 값이 길면 줄바꿈되어 행이 커짐.
 function Row({ label, value, emphasis }: RowProps) {
   const isTotal = emphasis === "total";
 
@@ -67,10 +66,8 @@ function Row({ label, value, emphasis }: RowProps) {
   );
 }
 
-// 카드 안쪽 여백(Figma Card 헤더·본문 20px, MO 16px)
 const CARD_SIDE_CLASS = "px-4 tablet:px-5";
 
-// 구독하기 → 결제 화면. PC 2단(오른쪽 결제 요약 496px), TAB·MO 1단(결제 요약이 아래).
 export function CheckoutPanel({
   catalog,
   type,
@@ -93,7 +90,7 @@ export function CheckoutPanel({
   const [isAgreed, setIsAgreed] = useState(false);
   const agreeId = useId();
   const plan = catalog.plans.find((item) => item.type === type);
-  // 연간은 서버가 준 연간 결제 총액을 한 번에 결제함(스펙 §3 결제 흐름).
+  // 연간은 서버가 준 연간 결제 총액을 한 번에 결제함.
   const price =
     period === "yearly" ? (plan?.yearlyPrice ?? 0) : (plan?.monthlyPrice ?? 0);
   const amount = formatNumber(price);
@@ -173,7 +170,7 @@ export function CheckoutPanel({
             </ul>
           </SectionCard>
         </div>
-        {/* PC 2단에서는 왼쪽 본문이 길어 스크롤해도 결제 요약이 화면에 남게 고정함. 위 여백(top-5)은 본문 위 여백(pt-5)과 같음. */}
+        {/* PC 2단에서는 왼쪽 본문이 길어 스크롤해도 결제 요약이 화면에 남게 고정함. */}
         <Card className="desktop:sticky desktop:top-5">
           <CardHeader className={cn("py-4", CARD_SIDE_CLASS)}>
             <CardTitle role="heading" aria-level={2}>

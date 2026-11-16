@@ -23,7 +23,6 @@ interface ProfileImageFieldProps {
   currentImageUrl?: string | null;
 }
 
-// Sub ID 생성·수정 폼의 "프로필 이미지(선택)" 행. 고른 이미지를 바꾸거나 화면을 떠날 때 미리보기 주소를 풀어 줌.
 export function ProfileImageField({
   image,
   onChange,

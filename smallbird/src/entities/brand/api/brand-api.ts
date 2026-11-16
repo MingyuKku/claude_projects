@@ -1,8 +1,8 @@
-import { brandSchema } from "../model/schema";
+import { brandListSchema, brandSchema } from "../model/schema";
 
 import type { Brand } from "../model/schema";
 
-// 요구 명세 A-4·A-5. API가 없는 동안은 개발 서버에서만 목이 응답함.
+// 요구 명세 A-6.1~A-6.3. 개발 서버에서만 목이 응답함(목 응답도 Zod로 검증해 실제 응답과 같은 길을 지남).
 async function loadMockBrandApi() {
   if (!import.meta.env.DEV) {
     throw new Error("The brand API is not available yet.");
@@ -10,19 +10,24 @@ async function loadMockBrandApi() {
   return import("./mock/brand-mock");
 }
 
-/** A-4 `GET /v3/campaign/brands`. 이 광고주가 등록한 브랜드(최근 추가순). */
+/** A-6.1 `GET /v3/brand`. 지우지 않은 내 브랜드 전체(최근 추가순). */
 export async function fetchBrands(): Promise<Brand[]> {
   const mock = await loadMockBrandApi();
-  return (await mock.listBrands()).map((brand) => brandSchema.parse(brand));
+  return brandListSchema.parse(await mock.listBrands()).brands;
 }
 
-/** A-5 `POST /v3/campaign/brands`. 이미지를 올리지 않으면 응답의 `imageUrl`이 `null`이고 화면이 기본 프로필을 그림. */
+/** A-6.2 `POST /v3/brand`. 이미지를 올리지 않으면 응답의 `imageUrl`이 `null`이고 화면이 기본 프로필을 그림. */
 export async function addBrand(input: {
-  nameKo: string;
-  nameEn: string;
-  /** A-8로 먼저 올린 파일(`kind=BRAND_IMAGE`). 없으면 `null`. */
-  imageFileId: string | null;
+  name: string;
+  /** A-7로 먼저 올린 이미지 번호. 없으면 `null`. */
+  imageAttachmentIdx: number | null;
 }): Promise<Brand> {
   const mock = await loadMockBrandApi();
   return brandSchema.parse(await mock.createBrand(input));
+}
+
+/** A-6.3 `DELETE /v3/brand/{brandIdx}`. 없거나 이미 지운 브랜드면 404 `BRAND_NOT_FOUND`. */
+export async function deleteBrand(brandIdx: number): Promise<void> {
+  const mock = await loadMockBrandApi();
+  await mock.deleteBrand(brandIdx);
 }

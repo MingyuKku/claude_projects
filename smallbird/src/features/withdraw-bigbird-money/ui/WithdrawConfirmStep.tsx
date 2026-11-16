@@ -33,7 +33,6 @@ function Row({
     <div
       className={cn(
         "flex min-h-12 items-center justify-between gap-4 border-b px-4 text-sm leading-5",
-        // 시안: 출금 후 예상 잔액은 라벨·값 모두 16px w600.
         isStrong && "text-base leading-6 font-semibold",
       )}
     >
@@ -45,7 +44,6 @@ function Row({
   );
 }
 
-// 출금 2단계(Figma 11224:105105): 출금 금액·은행·계좌번호·예금주·처리 방식·통장 사본·출금 후 예상 잔액, 안내, "전액 출금 요청하기".
 export function WithdrawConfirmStep({
   amount,
   bankName,
@@ -68,7 +66,6 @@ export function WithdrawConfirmStep({
     >
       <ScrollArea className="min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:block!">
         <div className="flex flex-col gap-4 p-4 tablet:px-5 tablet:pt-4 tablet:pb-3">
-          {/* 시안 행 높이 48 + 행 사이 8 */}
           <dl className="flex flex-col gap-2">
             <Row label={t("confirm.amount")}>
               {t("won", { amount: formatNumber(amount) })}

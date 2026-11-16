@@ -25,6 +25,7 @@ import type featuresNewBigbirdInquiry from "../../features/new-bigbird-inquiry/l
 import type featuresNotificationConsent from "../../features/notification-consent/locales/ko.json";
 import type featuresPaymentHistory from "../../features/payment-history/locales/ko.json";
 import type featuresRealtimeConsultation from "../../features/realtime-consultation/locales/ko.json";
+import type featuresRegisterCampaign from "../../features/register-campaign/locales/ko.json";
 import type featuresSearchInfluencer from "../../features/search-influencer/locales/ko.json";
 import type featuresSocialLogin from "../../features/social-login/locales/ko.json";
 import type featuresSwitchAccount from "../../features/switch-account/locales/ko.json";
@@ -32,6 +33,7 @@ import type featuresViewSubscriptionUsage from "../../features/view-subscription
 import type featuresWithdrawAccount from "../../features/withdraw-account/locales/ko.json";
 import type featuresWithdrawBigbirdMoney from "../../features/withdraw-bigbird-money/locales/ko.json";
 import type pagesCampaignCreate from "../../pages/campaign-create/locales/ko.json";
+import type pagesCampaignRegister from "../../pages/campaign-register/locales/ko.json";
 import type pagesCampaignStatus from "../../pages/campaign-status/locales/ko.json";
 import type pagesCertSuccess from "../../pages/cert-success/locales/ko.json";
 import type pagesChangePassword from "../../pages/change-password/locales/ko.json";
@@ -89,6 +91,7 @@ declare module "i18next" {
       "features/notification-consent": typeof featuresNotificationConsent;
       "features/payment-history": typeof featuresPaymentHistory;
       "features/realtime-consultation": typeof featuresRealtimeConsultation;
+      "features/register-campaign": typeof featuresRegisterCampaign;
       "features/search-influencer": typeof featuresSearchInfluencer;
       "features/social-login": typeof featuresSocialLogin;
       "features/switch-account": typeof featuresSwitchAccount;
@@ -96,6 +99,7 @@ declare module "i18next" {
       "features/withdraw-account": typeof featuresWithdrawAccount;
       "features/withdraw-bigbird-money": typeof featuresWithdrawBigbirdMoney;
       "pages/campaign-create": typeof pagesCampaignCreate;
+      "pages/campaign-register": typeof pagesCampaignRegister;
       "pages/campaign-status": typeof pagesCampaignStatus;
       "pages/cert-success": typeof pagesCertSuccess;
       "pages/change-password": typeof pagesChangePassword;

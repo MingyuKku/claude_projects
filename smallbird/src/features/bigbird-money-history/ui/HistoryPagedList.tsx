@@ -80,8 +80,8 @@ export function HistoryPagedList<T>({
   const empty = list.totalCount === 0 ? emptyContent : undefined;
 
   return (
-    // 표(또는 카드)와 쪽 이동은 12px 간격으로 한 묶음(시안). 빈 상태가 남은 높이를 채우도록 늘어남.
-    <div className={cn("flex flex-1 flex-col gap-3", empty && emptyClassName)}>
+    // 빈 상태가 남은 높이를 채우도록 늘어남.
+    <div className={cn("flex flex-1 flex-col gap-4", empty && emptyClassName)}>
       {isTable
         ? renderTable(list.records, empty)
         : (empty ?? renderCards(list.records))}

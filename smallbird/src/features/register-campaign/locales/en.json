@@ -1,0 +1,249 @@
+{
+  "step": {
+    "campaignInfo": "Campaign info",
+    "product": "Product info",
+    "influencer": "Influencer criteria",
+    "addOns": "Add-ons",
+    "intro": "캠페인 소개서",
+    "conditions": "Campaign terms",
+    "policy": "Policy consent",
+    "payment": "Payment"
+  },
+  "nav": {
+    "label": "Registration steps",
+    "open": "Open steps",
+    "indicator": {
+      "editing": "In progress",
+      "warning": "Required fields missing"
+    }
+  },
+  "action": {
+    "saveDraft": "Save draft",
+    "previous": "Previous",
+    "next": "Next",
+    "pay": "Pay"
+  },
+  "toast": {
+    "saved": "Saved.",
+    "saveFailed": "Failed to save. Please try again.",
+    "fileType": "Only JPG and PNG files can be uploaded.",
+    "fileSize": "Only files up to 10MB can be uploaded.",
+    "requestFailed": "Request failed. Please try again later.",
+    "addressSearchFailed": "Couldn't load address search. Please try again later."
+  },
+  "dialog": {
+    "requiredInfo": {
+      "title": "Required fields missing",
+      "description": "Fill in all fields on this page to register the campaign."
+    },
+    "notEditable": {
+      "title": "Can't be edited",
+      "description": "This campaign is under review or approved and can't be edited. Going to registration details.",
+      "demoDescription": "A completed 데모 캠페인 can't be edited. Going to basic info."
+    }
+  },
+  "info": {
+    "code": {
+      "label": "Campaign code"
+    },
+    "name": {
+      "label": "Campaign name",
+      "placeholder": "Enter a campaign name."
+    },
+    "type": {
+      "label": "Campaign type",
+      "PRODUCT_DELIVERY": "제품발송형",
+      "PRESS": "기자단형",
+      "STORE_VISIT": "매장방문형"
+    },
+    "typeChange": {
+      "title": "Change campaign type",
+      "description": "Changing the type resets the info you've entered. Fields for the new type will appear.",
+      "confirm": "Change"
+    },
+    "brand": {
+      "label": "Brand",
+      "placeholder": "Select a brand.",
+      "manage": "Manage brands"
+    },
+    "period": {
+      "startLabel": "Preferred start date",
+      "label": "Campaign period",
+      "endLabel": "End date",
+      "placeholder": "Select a date.",
+      "help": "The end date is set 30 days later automatically."
+    }
+  },
+  "brands": {
+    "title": "Manage brands",
+    "listTitle": "Registered brands",
+    "count_one": "<em>{{count}}</em> brand",
+    "count_other": "<em>{{count}}</em> brands",
+    "add": "Add brand",
+    "empty": "No brands registered.",
+    "delete": "Delete",
+    "deleteLabel": "Delete {{name}}",
+    "deleteDialog": {
+      "title": "Delete brand",
+      "description": "Delete this brand? Deleted data can't be recovered."
+    },
+    "addTitle": "Add brand",
+    "name": {
+      "label": "Brand name",
+      "placeholder": "Enter a brand name."
+    },
+    "image": {
+      "label": "Brand image",
+      "title": "Upload a brand image.",
+      "description": "A default profile is used if none is uploaded.",
+      "remove": "Remove brand image"
+    },
+    "save": "Save"
+  },
+  "loadPrevious": {
+    "title": "Load previous campaign",
+    "listTitle": "Campaigns",
+    "load": "Load campaign",
+    "search": {
+      "label": "Search campaigns",
+      "placeholder": "Search by campaign or brand name.",
+      "submit": "Search"
+    },
+    "emptySearch": "No results for ‘{{keyword}}’.",
+    "empty": "No campaigns registered.",
+    "column": {
+      "select": "Select",
+      "name": "Campaign name",
+      "brand": "Brand",
+      "type": "Type",
+      "platform": "Platform",
+      "createdDate": "Created"
+    },
+    "overwrite": {
+      "title": "Load campaign",
+      "description": "Loading a saved campaign replaces what you're writing now. Continue?",
+      "confirm": "Load"
+    }
+  },
+  "platform": {
+    "INSTAGRAM": "Instagram",
+    "NAVER_BLOG": "Blog",
+    "FACEBOOK": "Facebook",
+    "YOUTUBE": "YouTube",
+    "TIKTOK": "TikTok",
+    "X": "X"
+  },
+  "unit": {
+    "won": "KRW",
+    "count": "ea"
+  },
+  "address": {
+    "search": "Find address",
+    "detail": "Enter detailed address"
+  },
+  "product": {
+    "contactPlaceholder": "Enter a contact for the return.",
+    "delivery": {
+      "nameLabel": "Product name and quantity",
+      "namePlaceholder": "Enter the product name.",
+      "quantityLabel": "Quantity per person",
+      "quantityPlaceholder": "Enter the quantity per person.",
+      "priceLabel": "Product price",
+      "pricePlaceholder": "Enter the price per item."
+    },
+    "return": {
+      "label": "Product return",
+      "no": "No return",
+      "yes": "Return",
+      "notice": "Enter the return address in case a selected creator cancels the campaign.",
+      "addressLabel": "Return shipping address",
+      "addressPlaceholder": "Enter the return address.",
+      "feeLabel": "Return shipping fee",
+      "feePlaceholder": "Enter the return shipping fee.",
+      "contactLabel": "Return contact"
+    },
+    "rental": {
+      "label": "Rental product",
+      "general": "Regular",
+      "rental": "Rental",
+      "noticePrice": "Products priced at 1,000,000 KRW or more can run as rental products.",
+      "noticeReturn": "The advertiser handles product retrieval directly.",
+      "addressLabel": "Rental return address",
+      "feeLabel": "Retrieval shipping fee",
+      "feePlaceholder": "Enter the retrieval shipping fee.",
+      "contactLabel": "Retrieval contact"
+    },
+    "store": {
+      "nameLabel": "Store name",
+      "namePlaceholder": "Enter the store name.",
+      "benefitLabel": "Visit benefits and quantity",
+      "benefitPlaceholder": "Describe the benefits and quantity offered on visit.",
+      "addressLabel": "Store address",
+      "addressPlaceholder": "Enter the store address.",
+      "couponLabel": "Visit coupon code",
+      "couponPlaceholder": "Enter the visit coupon code."
+    },
+    "press": {
+      "noticeTitle": "Enter details in the next step.",
+      "noticeAbout": "기자단형 campaigns cover a brand or service through reporting and articles, not product delivery, store visits or purchases.",
+      "noticeGuide": "Article guides such as topics, keywords and references can be described in the '캠페인 소개서' step.",
+      "emptyTitle": "No sponsorship details are needed for 기자단형.",
+      "emptyDescription": "Enter the article direction and guide<br/>in the next step, '캠페인 소개서'."
+    }
+  },
+  "influencer": {
+    "platform": "Platform",
+    "gender": {
+      "label": "Preferred gender",
+      "FEMALE": "Female",
+      "MALE": "Male",
+      "ALL": "All"
+    },
+    "ageGroup": {
+      "label": "Preferred age (multiple)",
+      "AGE_10S": "10s",
+      "AGE_20S": "20s",
+      "AGE_30S": "30s",
+      "AGE_40S": "40s",
+      "AGE_50S_PLUS": "50s+"
+    },
+    "topic": {
+      "label": "Posting topics (multiple)",
+      "DigitalAppliances": "Digital & Appliances",
+      "Education": "Education",
+      "SportsLeisure": "Sports & Leisure",
+      "MarketTools": "Market & Group Buy",
+      "Beauty": "Beauty",
+      "LivingHealth": "Living & Health",
+      "TravelCulture": "Travel & Culture",
+      "AgeProfession": "Age & Occupation",
+      "FoodCooking": "Food & Cooking",
+      "DailyLife": "Daily Life",
+      "Region": "Local",
+      "BookPublication": "Books & Publishing",
+      "PregnancyParenting": "Pregnancy & Parenting",
+      "Hobby": "Hobbies",
+      "Fashion": "Fashion",
+      "Food": "Groceries",
+      "FurnitureInterior": "Furniture & Interior",
+      "Pet": "Pets",
+      "ASMR": "ASMR",
+      "Review": "Reviews",
+      "All": "All"
+    }
+  },
+  "addOns": {
+    "noticeTitle": "Add-ons are optional.",
+    "noticeText": "Choose them only if needed. You can move on without selecting any.",
+    "AI_POSTING_GUIDE": {
+      "name": "AI Posting Guide",
+      "price": "10,000 KRW",
+      "description": "Automatically creates the best posting guide for your campaign goals and product."
+    },
+    "MANUSCRIPT_CONFIRM": {
+      "name": "원고컨펌",
+      "price": "5,000 KRW per recruited influencer",
+      "description": "Review drafts written by influencers before posting and request changes. AI draft review is included."
+    }
+  }
+}

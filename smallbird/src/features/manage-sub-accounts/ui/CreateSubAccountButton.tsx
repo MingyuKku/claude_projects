@@ -8,7 +8,7 @@ interface CreateSubAccountButtonProps {
   className?: string;
 }
 
-// Figma "Sub ID 생성" 버튼(+ 아이콘, primary). PC·TAB은 목록 머리에, MO는 페이지가 화면 하단에 고정해 그림.
+// 위치는 쓰는 쪽이 정함: PC·TAB은 목록 머리에, MO는 페이지가 화면 하단에 고정해 그림.
 export function CreateSubAccountButton({
   onClick,
   className,

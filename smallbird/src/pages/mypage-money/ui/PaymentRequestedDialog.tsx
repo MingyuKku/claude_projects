@@ -14,7 +14,7 @@ interface PaymentRequestedDialogProps {
   onConfirm: () => void;
 }
 
-// 결제창에서 돌아와 충전 요청이 접수된 것을 알림(Figma 충전 완료 알럿 문구를 무통장 입금에 맞춤, 스펙 §6). "확인"만 둠.
+// 결제창에서 돌아와 충전 요청이 접수된 것을 알림. 시안의 충전 완료 알럿 문구를 무통장 입금에 맞춤.
 export function PaymentRequestedDialog({
   open,
   onConfirm,

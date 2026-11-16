@@ -39,9 +39,9 @@ interface SocialLinkCardProps {
   className?: string;
 }
 
-// Figma 간편 로그인 연동(10061:200931): 카드 안 4행(브랜드 아이콘 24 + 이름 | Switch sm), 행 높이 48. 시안의 페이스북 행은 그리지 않음.
-// 해제는 `DELETE /v3/mypage/account/sns/{platform}`(2026-11-02 Stage)로 실제 호출하고, 응답의 최신 상태로 스위치를 바꿈(controlled).
-// 연결(켜기)은 공급자 인가 코드를 받아 `POST`로 보냄. 켜기·끄기 흐름은 스펙 §3.
+// 시안의 페이스북 행은 그리지 않음.
+// 해제는 `DELETE /v3/mypage/account/sns/{platform}`로 실제 호출하고, 응답의 최신 상태로 스위치를 바꿈(controlled).
+// 연결(켜기)은 공급자 인가 코드를 받아 `POST`로 보냄.
 export function SocialLinkCard({
   links,
   onChangeLinks,

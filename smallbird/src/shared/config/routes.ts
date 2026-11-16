@@ -22,6 +22,11 @@ export const ROUTES = {
   // 캠페인 현황과 개설. 개설은 서비스·상품만 고르는 화면이고 등록(마법사)과는 다름.
   campaign: "/campaign",
   campaignCreate: "/campaign/new",
+  // 등록 마법사. 새 캠페인은 `?type=pick|recruit`(데모 `&demo=true`)로 들어와 만든 뒤 작성 경로로 바꿈.
+  campaignRegister: "/campaign/register",
+  campaignRegisterEdit: "/campaign/register/:campaignIdx",
+  // 등록 내역(기본 정보). 결제 뒤 승인 상태를 봄.
+  campaignDetail: "/campaign/:campaignIdx",
   mypageSubscribe: "/mypage/subscribe",
   mypageMoney: "/mypage/money",
   mypageAccount: "/mypage/account",

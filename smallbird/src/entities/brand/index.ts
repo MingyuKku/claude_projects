@@ -1,4 +1,4 @@
-export { addBrand, fetchBrands } from "./api/brand-api";
+export { addBrand, deleteBrand, fetchBrands } from "./api/brand-api";
 export { BRANDS_KEY, useBrands } from "./api/use-brands";
 export { brandSchema } from "./model/schema";
 export type { Brand } from "./model/schema";

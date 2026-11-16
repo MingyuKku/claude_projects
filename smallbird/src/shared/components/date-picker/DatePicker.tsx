@@ -41,6 +41,8 @@ interface DatePickerProps extends Omit<
   placeholder: string;
   formatValue?: (value: Date) => string;
   label?: string;
+  /** 라벨 옆 필수 표시(*). */
+  isRequired?: boolean;
   helpText?: string;
   errorText?: string;
   icon?: ReactNode;
@@ -62,6 +64,7 @@ export function DatePicker({
   placeholder,
   formatValue = (date) => formatDate(date),
   label,
+  isRequired = false,
   helpText,
   errorText,
   icon,
@@ -103,6 +106,7 @@ export function DatePicker({
   return (
     <FormField
       label={label}
+      isRequired={isRequired}
       helpText={helpText}
       errorText={errorText}
       disabled={disabled}

@@ -23,6 +23,7 @@ developer_instructions = '''
 - React 19 패턴 위반, 측정 가능한 성능 문제(렌더 폭주, 불필요한 리페치 등)
 - 요청과 무관한 변경(최소 변경 원칙 위반), 테스트 누락
 - 파일 단위 책임 과다, 훅으로 뺄 로직이 본문에 쌓임, 이름 없는 복잡한 조건(`react-components.md`, `code-style.md`)
+- 새로 단 주석이 `code-style.md` "주석"의 쓰지 않는 항목(Figma node ID, 날짜·QA 번호·결정 출처, className에 있는 수치, 화면 구성 요약)에 걸림
 
 ## 보고 기준
 

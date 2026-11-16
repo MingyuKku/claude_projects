@@ -41,7 +41,6 @@ interface CompanyInfoFormProps {
   onFinishEdit?: () => void;
 }
 
-// Figma 회사정보(6925:64463): 라벨 왼쪽·입력 오른쪽 표(MO는 위·아래), 하단 취소·저장, 카드 아래 이용 안내.
 export function CompanyInfoForm({
   company,
   onSaved,

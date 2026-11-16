@@ -28,8 +28,7 @@ interface PaymentTableProps {
 
 const COLUMN_COUNT = 6;
 
-// Figma 구독 결제 내역 표(8010:404671): 결제 일자 183·결제 내역 240·결제 금액 183·결제 수단 183·결제 상태 183·거래명세서 96, 행 높이 48.
-// 지정한 폭은 자동 표 배치에서 최소 폭이 되어 시안 폭을 지킴.
+// 고정 열만 폭을 주고 가변 열은 비워 남는 폭을 나눠 가지게 함. 자동 표 배치라 내용이 더 넓으면 열이 늘어남.
 export function PaymentTable({ records, emptyContent }: PaymentTableProps) {
   const { t } = useTranslation("features/payment-history");
   const { formatDateTime, formatWon } = usePaymentFormat();
@@ -40,12 +39,12 @@ export function PaymentTable({ records, emptyContent }: PaymentTableProps) {
     <Table headerTone="gray" size="xs" aria-label={t("list.label")}>
       <TableHeader>
         <TableRow>
-          <TableHead className="w-45.75">{t("column.paidAt")}</TableHead>
-          <TableHead className="w-60">{t("column.name")}</TableHead>
-          <TableHead className="w-45.75">{t("column.amount")}</TableHead>
-          <TableHead className="w-45.75">{t("column.method")}</TableHead>
-          <TableHead className="w-45.75">{t("column.status")}</TableHead>
-          <TableHead className="w-24 text-center">
+          <TableHead>{t("column.paidAt")}</TableHead>
+          <TableHead>{t("column.name")}</TableHead>
+          <TableHead>{t("column.amount")}</TableHead>
+          <TableHead>{t("column.method")}</TableHead>
+          <TableHead className="w-35">{t("column.status")}</TableHead>
+          <TableHead className="w-35 text-center">
             {t("column.receipt")}
           </TableHead>
         </TableRow>

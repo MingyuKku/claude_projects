@@ -20,7 +20,7 @@ interface UnlinkSocialDialogProps {
   onConfirm: (provider: SocialProvider) => void;
 }
 
-// 해제 확인 알럿. 시안에 없는 화면이라 삭제 알럿과 같은 구조·문구는 스펙 §6(사용자 결정).
+// 해제 확인 알럿. 시안에 없는 화면이라 삭제 알럿과 같은 구조를 씀.
 export function UnlinkSocialDialog({
   open,
   provider,

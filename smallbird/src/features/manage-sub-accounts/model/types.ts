@@ -25,7 +25,7 @@ export interface SubAccountPageViewModel {
 /** 서버에 저장할 수 있는 권한(API가 나온 것만). */
 export type ApiPermissionKey = keyof typeof PERMISSION_FIELDS;
 
-/** Sub ID에 부여하는 메뉴 권한 한 항목. 서버가 주는 권한만 그림(스펙 §3). */
+/** Sub ID에 부여하는 메뉴 권한 한 항목. 서버가 주는 권한만 그림. */
 export interface SubAccountPermission {
   key: ApiPermissionKey;
   isGranted: boolean;

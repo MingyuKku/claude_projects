@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// `GET /v3/mypage/account/bank`(Swagger `BankInfoResponse`). 항상 HTTP 200이고, 미등록은
+// `GET /v3/mypage/account/bank`(`BankInfoResponse`). 항상 HTTP 200이고, 미등록은
 // `{ result: false, reason }`로 와서 나머지 필드는 없음.
 export const bankAccountResponseSchema = z.object({
   result: z.boolean(),

@@ -14,7 +14,7 @@ export type PhoneVerificationState =
 const DUPLICATE_RESULTS: readonly string[] = ["same", "exist", "exists"];
 const FAIL_RESULT = "fail";
 
-/** 복호화 응답 → 화면 상태. 저장에 쓸 `certIdx`나 번호가 없으면 성공으로 보지 않음(v2는 성공으로 봤음). */
+/** 복호화 응답 → 화면 상태. 저장에 쓸 `certIdx`나 번호가 없으면 성공으로 보지 않음. */
 export function toPhoneVerificationState(
   response: z.infer<typeof certDecryptSchema>,
 ): PhoneVerificationState {

@@ -22,8 +22,7 @@ interface CompanyInfoViewProps {
   onClickEdit: () => void;
 }
 
-// Figma 회사정보 보기(10724:185906): 라벨(필수는 파란 *)·값 읽기 전용 표와 아래 "수정". 서류는 파일명 다운로드 버튼(MO는 라벨 아래 전체 폭).
-// 미등록은 회원가입에서 필수라 시안에 없어, 디자인 QA(26/11/05 - PC - 33)대로 계좌정보 미등록 보기(10724:185968)처럼 빈 값 + "등록"으로 그림.
+// 미등록은 회원가입에서 필수라 시안에 없어 계좌정보 미등록 보기처럼 빈 값 + "등록"으로 그림.
 export function CompanyInfoView({
   company,
   onClickEdit,

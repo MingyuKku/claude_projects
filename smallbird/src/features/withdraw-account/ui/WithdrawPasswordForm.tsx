@@ -16,8 +16,7 @@ interface WithdrawPasswordFormProps {
   className?: string;
 }
 
-// v2 비밀번호 확인 단계: 안내문 "회원정보 탈퇴를 위해 비밀번호를 입력해주세요" + 비밀번호 칸 + 확인 버튼. 칸 아래 오류는 서버가 비밀번호가 다르다고 한 경우만.
-// v2는 비밀번호·비밀번호 확인 두 칸이었으나 두 값을 서로 비교하지 않고 뒤 칸만 보냈으므로 v3는 한 칸으로 줄임. 취소 버튼은 v3 다이얼로그 규칙에 맞춰 추가.
+// v2는 비밀번호·비밀번호 확인 두 칸이었으나 두 값을 서로 비교하지 않고 뒤 칸만 보냈으므로 한 칸으로 줄임.
 export function WithdrawPasswordForm({
   form,
   onClickCancel,

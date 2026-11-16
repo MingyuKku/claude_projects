@@ -14,7 +14,7 @@ interface CancelCompletedDialogProps {
   onConfirm: () => void;
 }
 
-// Figma "구독 해지 완료" 알럿(7064:180448). 완료 안내라 "확인"만 둠(스펙 §3 공통).
+// 완료 안내라 "확인"만 둠.
 export function CancelCompletedDialog({
   open,
   onConfirm,

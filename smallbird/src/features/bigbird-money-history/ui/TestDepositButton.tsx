@@ -11,7 +11,7 @@ import { useReloadChargeHistory } from "../api/use-charge-history";
 
 import type { ChargeRecord } from "../model/charge-types";
 
-/** 테스트 API 실패 사유(Swagger). 개발 서버 전용 확인 도구라 문구를 번역하지 않음. */
+/** 테스트 API 실패 사유. 개발 서버 전용 확인 도구라 문구를 번역하지 않음. */
 const FAILURE_MESSAGE: Record<string, string> = {
   ALREADY_DEPOSITED: "이미 입금 완료된 건입니다.",
   NOT_VBANK: "무통장 입금 건이 아닙니다.",

@@ -21,7 +21,6 @@ interface WithdrawFlowProps {
   onClose: () => void;
 }
 
-// 회원 탈퇴 흐름: 약관 → 비밀번호 확인(`POST /check/pw`) → 탈퇴(`PUT /exit`) → 완료 안내 → 로그아웃(스펙 §3, v2와 같은 순서).
 // 열릴 때마다 약관부터 시작하도록 부모가 열린 동안만 그림. 비밀번호 단계는 URL에 남기지 않음(새로고침하면 약관부터).
 export function WithdrawFlow({ variant, onClose }: WithdrawFlowProps) {
   const { t } = useTranslation("features/withdraw-account");
@@ -34,7 +33,7 @@ export function WithdrawFlow({ variant, onClose }: WithdrawFlowProps) {
   });
 
   async function handleConfirmDone() {
-    // 탈퇴가 끝난 계정이라 로그아웃 요청이 실패해도 로그인 화면으로 보냄(v2는 성공·실패와 상관없이 이동).
+    // 탈퇴가 끝난 계정이라 로그아웃 요청이 실패해도 로그인 화면으로 보냄.
     try {
       await logout();
     } catch (error) {

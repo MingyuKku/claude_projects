@@ -4,7 +4,6 @@ import { useTranslation } from "@/shared/i18n";
 
 const NOTICE_KEYS = ["method", "validity", "instant", "delay"] as const;
 
-// 충전 안내 카드(Figma "안내", 4행). 보유 머니 카드 옆에 놓음(MO는 세그먼트 "충전"). 문구는 스펙 §3.
 export function ChargeNotice() {
   const { t } = useTranslation("features/bigbird-money-history");
 

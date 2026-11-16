@@ -12,7 +12,7 @@ interface ReceiptButtonProps {
   variant: "table" | "card";
 }
 
-// 거래명세서는 결제 완료 건만 켬(스펙 §3). 서버가 준 명세서 주소(변환에서 https만 남김)를 새 창으로 엶.
+// 거래명세서는 결제 완료 건만 켬. 서버가 준 명세서 주소(변환에서 https만 남김)를 새 창으로 엶.
 export function ReceiptButton({ record, variant }: ReceiptButtonProps) {
   const { t } = useTranslation("features/payment-history");
   const { receiptUrl } = record;

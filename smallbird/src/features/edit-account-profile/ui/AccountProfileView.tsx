@@ -22,7 +22,6 @@ interface AccountProfileViewProps {
   onClickWithdraw?: () => void;
 }
 
-// Figma 기본 정보 보기(10724:185324): 읽기 전용 행과 아래 "회원 탈퇴"·"수정". 수정은 비밀번호 확인 뒤 입력 모드로 바뀜.
 export function AccountProfileView({
   accountType = "master",
   profile,
@@ -39,7 +38,7 @@ export function AccountProfileView({
     <>
       <div className="flex flex-col p-4 tablet:p-5">
         <dl className="flex min-h-12 items-start gap-2 px-4">
-          <dt className="shrink-0 text-sm leading-5 font-semibold text-foreground tablet:min-w-0 tablet:flex-1">
+          <dt className="flex h-12 shrink-0 items-center text-sm leading-5 font-semibold text-foreground tablet:min-w-0 tablet:flex-1">
             {t("form.profileImage.label")}
           </dt>
           <dd className="flex flex-1 justify-end tablet:min-w-0">

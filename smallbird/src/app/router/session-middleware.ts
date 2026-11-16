@@ -31,9 +31,11 @@ let hasForbiddenNotice = false;
 
 // Sub ID는 권한과 관계없이 들어갈 수 없는 화면. 서버도 403으로 막으며, 안내 없이 계정 설정으로 보냄(스펙 main.md).
 // 하위 경로도 막도록 접두사로 비교함.
+// 등록 내역(`/campaign/:campaignIdx`)은 할당된 Sub ID도 보므로 막지 않음(스펙 register P-18).
 const MASTER_ONLY_PATHS: readonly string[] = [
   ROUTES.mypageSubscribe,
   ROUTES.campaignCreate,
+  ROUTES.campaignRegister,
 ];
 
 // 마이페이지 안에서도 비로그인이 들어올 수 있는 화면. 구독 상품 목록은 비로그인도 봄(마이페이지 QA 2026-11-16).

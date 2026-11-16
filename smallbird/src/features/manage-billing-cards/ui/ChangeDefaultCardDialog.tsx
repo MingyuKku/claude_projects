@@ -16,7 +16,7 @@ interface ChangeDefaultCardDialogProps {
   onConfirm: () => void;
 }
 
-// Figma "결제카드 변경" 알럿(7185:124562). 변경이 성공하면 `CardChangedDialog`(7185:124652)가 이어서 열림.
+// 변경이 성공하면 `CardChangedDialog`가 이어서 열림.
 export function ChangeDefaultCardDialog({
   open,
   onCancel,

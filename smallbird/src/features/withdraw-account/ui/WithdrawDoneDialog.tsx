@@ -14,7 +14,7 @@ interface WithdrawDoneDialogProps {
   isConfirming: boolean;
 }
 
-// v2 완료 안내: 제목만 있고 "확인" 버튼 하나(X 없음). 이미 탈퇴가 끝났으므로 닫기·Esc로 벗어나지 못하고 확인을 눌러야 로그아웃함.
+// 이미 탈퇴가 끝났으므로 닫기·Esc로 벗어나지 못하고 확인을 눌러야 로그아웃함.
 export function WithdrawDoneDialog({
   onConfirm,
   isConfirming,

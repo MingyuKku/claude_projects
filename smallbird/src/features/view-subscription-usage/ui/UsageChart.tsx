@@ -24,22 +24,20 @@ import type {
 } from "@/entities/subscription";
 import type { ChartConfig } from "@/shared/ui/chart";
 
-// 브랜드형 파랑(primary)·공구형 초록(green/500). 색은 하단 카드 제목의 점이 범례를 대신함(시안).
+// 범례는 두지 않고 하단 카드 제목의 색 점이 대신함(시안).
 const CHART_CONFIG = {
   brand: { color: "var(--color-primary)" },
   groupBuy: { color: "var(--color-green-500)" },
 } satisfies ChartConfig;
 
-// 시안: 막대 묶음 사이 간격은 PC 40·TAB 20·MO 16px이고, 막대 폭은 남는 폭을 나눈 값(PC 월별 24·일별 26, TAB 30, MO 31px).
-// Recharts의 barCategoryGap은 묶음 양쪽에 각각 적용되므로 절반을 넘기고, 양 끝에 생기는 여백은 x축 padding으로 상쇄해 시안처럼 가장자리에 붙임. y축 라벨과 차트 사이 간격은 PC 24·TAB 20·MO 16px.
+// Recharts의 barCategoryGap은 묶음 양쪽에 각각 적용되므로 절반을 넘기고, 양 끝에 생기는 여백은 x축 padding으로 상쇄해 시안처럼 가장자리에 붙임.
 const CATEGORY_GAP = { desktop: 40, tablet: 20, mobile: 16 } as const;
 const AXIS_GAP = { desktop: 24, tablet: 20, mobile: 16 } as const;
-// 시안(11755:96300): x축 라벨 행은 높이 20px이고 막대 영역과 2px 떨어짐. Recharts가 tickMargin에 3px를 더 얹어 그리므로 라벨(12px)이 행 가운데 오도록 2를 둠.
+// Recharts가 tickMargin에 3px를 더 얹어 그리므로 라벨이 x축 라벨 행 가운데 오도록 2를 둠.
 const X_AXIS_HEIGHT = 22;
 const X_AXIS_TICK_MARGIN = 2;
 // y축 라벨(text-xs leading-5)의 높이. 라벨 가운데가 눈금 위치에 오도록 열을 이 절반만큼 위아래로 내어 그림.
 const Y_AXIS_LABEL_HEIGHT = 20;
-// 툴팁은 마우스를 올린 막대 위(시안: 막대 위 8px, 높이 32px, 폭 60px 이상)에 뜸.
 const TOOLTIP_HEIGHT = 32;
 const TOOLTIP_MIN_WIDTH = 60;
 const TOOLTIP_GAP = 8;
@@ -55,7 +53,6 @@ interface UsageChartProps {
   focusPeriod: number | null;
 }
 
-// 월별·일별 이용량 막대 차트. 보이는 개수보다 많으면 ←/→로 보이는 개수만큼 넘김(PC 월별은 12개 전체).
 // 조건(지표·연·월·단위)이나 화면 크기가 바뀌면 부모가 key로 다시 그려 처음 위치부터 시작함.
 export function UsageChart({
   points,
@@ -150,7 +147,7 @@ export function UsageChart({
         )}
       </div>
       <div className="px-6 pt-6 pb-6 tablet:pt-7 desktop:pt-8">
-        {/* y축 라벨은 막대 영역(x축 라벨 행 제외)에 같은 간격으로 늘어서고, 라벨 가운데가 눈금 위치에 오므로 맨 아래 "0 건"이 막대 바닥선과 같은 줄임(디자인 QA 26/11/10 - PC - 42).
+        {/* y축 라벨은 막대 영역(x축 라벨 행 제외)에 같은 간격으로 늘어서고, 라벨 가운데가 눈금 위치에 오므로 맨 아래 "0 건"이 막대 바닥선과 같은 줄에 옴.
             Recharts의 y축은 값 위치에 눈금을 두고 맨 위 라벨을 영역 안으로 밀어 간격이 달라지므로 라벨은 직접 그림. */}
         <div
           className="flex h-57 tablet:h-56 desktop:h-55"

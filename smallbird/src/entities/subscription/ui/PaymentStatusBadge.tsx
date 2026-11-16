@@ -6,7 +6,7 @@ import { toPaymentStatus } from "../model/codes";
 import type { PaymentStatus } from "../model/codes";
 import type { ComponentProps } from "react";
 
-// 결제 완료(회색)·환불 진행(빨강)·환불 완료(초록). PC 시안 기준(스펙 §3 시안 오류 통일).
+// 시안마다 배지 색이 달라 PC 시안 기준으로 통일함.
 const VARIANT_BY_STATUS = {
   paid: "gray",
   refunding: "red",

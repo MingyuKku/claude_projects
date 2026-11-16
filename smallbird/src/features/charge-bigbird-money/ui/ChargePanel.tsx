@@ -12,11 +12,11 @@ import { ChargeTermsDialog } from "./ChargeTermsDialog";
 
 interface ChargePanelProps {
   onClose: () => void;
-  /** TAB·MO는 제목 앞에 뒤로 버튼도 둠(시안). */
+  /** TAB·MO는 제목 앞에 뒤로 버튼도 둠. */
   hasBackButton?: boolean;
 }
 
-// 빅버드 머니 충전 패널(Figma 충전 Default·Filled). PC는 오른쪽 인라인 패널, TAB·MO는 본문을 대체하는 카드. 배치는 페이지가 정함.
+// PC는 오른쪽 인라인 패널, TAB·MO는 본문을 대체하는 카드. 배치는 페이지가 정함.
 // 결제 수단은 무통장 입금뿐이라 수단 선택이 없고, 결제창(이니시스)에서 가상계좌를 받음.
 export function ChargePanel({
   onClose,

@@ -12,8 +12,7 @@ interface WithdrawTermsScreenProps {
   onAgree: () => void;
 }
 
-// Figma MO 회원 탈퇴 약관(스펙 §2·§3 회원 탈퇴): 다이얼로그가 아니라 헤더 아래 전체 화면. 서브헤더(제목 + X) · 약관 박스(여백 16) · 하단 버튼 한 쌍.
-// 레이아웃 여백(--mypage-gutter)만큼 나가 가장자리까지 채우고, 화면 높이에서 멈춰 약관 박스 안쪽만 스크롤함(시안 10724:188183, 페이지는 스크롤하지 않음).
+// 레이아웃 여백(--mypage-gutter)만큼 나가 가장자리까지 채우고, 화면 높이에서 멈춰 약관 박스 안쪽만 스크롤함(페이지는 스크롤하지 않음).
 export function WithdrawTermsScreen({
   onClose,
   onAgree,
@@ -38,7 +37,7 @@ export function WithdrawTermsScreen({
           </Button>
         }
       />
-      <div className="flex min-h-0 flex-1 flex-col p-4">
+      <div className="flex min-h-0 flex-1 flex-col p-4 pb-0">
         <WithdrawTermsBox className="min-h-0 flex-1" />
       </div>
       <WithdrawActions

@@ -1,6 +1,6 @@
 import { z } from "zod";
 
-// V3 Swagger `V3-마이페이지`(2026-10-23)의 Sub ID 목록·권한 스키마. 서버 필드명은 이 파일과 트랜스포머 안에서만 씀.
+// 서버 필드명은 이 파일과 트랜스포머 안에서만 씀.
 
 const pagingInfoSchema = z.object({
   page: z.number(),
@@ -24,7 +24,7 @@ export const subAccountListSchema = z.object({
 });
 export type SubAccountList = z.infer<typeof subAccountListSchema>;
 
-/** `GET·PUT /v3/mypage/account/authorization`(`SubAccountAuthorizationV3Response`, 권한 6개 · 2026-10-27 배포). */
+/** `GET·PUT /v3/mypage/account/authorization`(`SubAccountAuthorizationV3Response`). */
 export const subAccountAuthorizationSchema = z.object({
   accountIdx: z.number(),
   isCampaignAccess: z.boolean(),

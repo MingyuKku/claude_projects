@@ -20,7 +20,7 @@ interface WithdrawPasswordDialogProps {
   onClose: () => void;
 }
 
-// 시안에 없는 단계라 약관 다이얼로그(460 폭, 헤더 60 · 안쪽 20)와 같은 계열의 작은 다이얼로그로 만듦(스펙 §3).
+// 시안에 없는 단계라 약관 다이얼로그와 같은 계열의 작은 다이얼로그로 만듦.
 export function WithdrawPasswordDialog({
   form,
   onClose,

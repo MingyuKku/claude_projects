@@ -14,7 +14,7 @@ import type { ChargeRecord } from "../model/charge-types";
 interface ChargeDetailProps {
   record: ChargeRecord;
   onClose: () => void;
-  /** TAB·MO는 제목 앞에 뒤로 버튼도 둠(시안). */
+  /** TAB·MO는 제목 앞에 뒤로 버튼도 둠. */
   hasBackButton?: boolean;
 }
 
@@ -27,7 +27,7 @@ export function ChargeDetail({
   const { formatDateTime, formatWon } = useMoneyFormat();
   const paymentMethodLabel = usePaymentMethodLabel();
   const isWithdraw = record.type === "withdraw";
-  // 개발 서버에서만: 대기 중 무통장 입금 충전 건을 Stage 테스트 API로 입금 완료 처리(실제 입금 대신).
+  // 개발 서버에서만: 대기 중 무통장 입금 충전 건을 테스트 API로 입금 완료 처리(실제 입금 대신).
   const canTestDeposit =
     import.meta.env.DEV &&
     record.type === "charge" &&

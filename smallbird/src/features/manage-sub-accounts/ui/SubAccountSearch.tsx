@@ -12,7 +12,6 @@ interface SubAccountSearchProps {
   className?: string;
 }
 
-// Figma Table Filter의 Search(Filled, 287w). Enter로 검색하고 1쪽부터 다시 보여 줌(스펙).
 export function SubAccountSearch({
   keyword,
   onSubmitKeyword,
@@ -30,7 +29,7 @@ export function SubAccountSearch({
     <form role="search" onSubmit={handleSubmit} className={className}>
       <SearchInput
         variant="filled"
-        // Figma는 테두리까지 포함해 높이 40이라 세로 여백을 1px씩 줄임(공통 Search는 42, 고객센터는 그대로 둠).
+        // 시안은 테두리까지 포함해 높이 40이라 공통 Search(42)보다 세로 여백을 1px씩 줄임.
         className="py-2.25"
         aria-label={t("list.search.label")}
         placeholder={t("list.search.placeholder")}

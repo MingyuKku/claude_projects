@@ -29,13 +29,12 @@ interface ChargeTableProps {
   onClickDetail: (record: ChargeRecord) => void;
   /** 0건·검색 결과 없음처럼 표 본문 자리에 그릴 내용. 있으면 행 대신 그림. */
   emptyContent?: ReactNode;
-  /** 오른쪽 패널(충전·출금·거래 상세)이 열려 있으면 은행·계좌 번호·입금자 명 열을 숨김(시안 캡션 11224:105057). */
+  /** 오른쪽 패널(충전·출금·거래 상세)이 열려 있으면 은행·계좌 번호·입금자 명 열을 숨김. */
   isPanelOpen?: boolean;
 }
 
-// Figma 충전/출금 내역 표(11224:103702): 구분(배지)·일자·금액·은행·계좌 번호·입금자 명·입금 상태(글자)·거래명세서·상세 보기, 행 높이 48.
-// 결제 수단은 거래 상세에만 있음.
-// 지정한 폭은 자동 표 배치에서 최소 폭이 되어 시안 폭을 지킴(패널이 열려 좁아지면 일시는 말줄임).
+// 시안의 고정 열만 폭을 주고 가변 열(일자·금액·입금자 명)은 비워 남는 폭을 나눠 가지게 함.
+// 자동 표 배치라 내용이 더 넓으면 열이 늘어남.
 export function ChargeTable({
   records,
   activeId,
@@ -49,18 +48,20 @@ export function ChargeTable({
   const header = (
     <TableHeader>
       <TableRow>
-        <TableHead className="w-18">{t("charge.column.type")}</TableHead>
-        <TableHead className="w-45">{t("charge.column.date")}</TableHead>
-        <TableHead className="w-36">{t("charge.column.amount")}</TableHead>
+        <TableHead className="w-16.25">{t("charge.column.type")}</TableHead>
+        <TableHead>{t("charge.column.date")}</TableHead>
+        <TableHead>{t("charge.column.amount")}</TableHead>
         {!isPanelOpen && (
           <>
-            <TableHead className="w-34">{t("charge.column.bank")}</TableHead>
-            <TableHead className="w-44">{t("charge.column.account")}</TableHead>
-            <TableHead className="w-44">{t("charge.column.holder")}</TableHead>
+            <TableHead className="w-29.25">{t("charge.column.bank")}</TableHead>
+            <TableHead className="w-42.75">
+              {t("charge.column.account")}
+            </TableHead>
+            <TableHead>{t("charge.column.holder")}</TableHead>
           </>
         )}
-        <TableHead className="w-28">{t("charge.column.status")}</TableHead>
-        <TableHead className="w-28 text-center">
+        <TableHead className="w-24.25">{t("charge.column.status")}</TableHead>
+        <TableHead className="w-24 text-center">
           {t("charge.column.receipt")}
         </TableHead>
         <TableHead className="w-24 text-center">
@@ -141,7 +142,7 @@ export function ChargeTable({
               <Button
                 variant="outline-foreground"
                 size="icon-sm"
-                className="min-w-0"
+                className="size-9 min-w-0"
                 aria-label={t("charge.action.detail")}
                 onClick={() => onClickDetail(record)}
               >

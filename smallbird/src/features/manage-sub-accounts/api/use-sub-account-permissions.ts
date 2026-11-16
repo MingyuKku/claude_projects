@@ -49,7 +49,7 @@ export function useUpdateSubAccountPermission(accountIdx: number) {
 
 /**
  * Master의 캠페인과 이 Sub ID의 담당 여부(페이지 없이 전부). `GET /campaign`이 있으나 화면의 "진행 상태"가 어느 상태 코드인지
- * 정해지지 않아(docs/mypage-api.md §4-5) 개발 서버에서만 목 데이터를 돌려줌. 빌드에서는 빈 목록. 실제 훅은 `accountIdx`를 받음.
+ * 정해지지 않아 개발 서버에서만 목 데이터를 돌려줌. 빌드에서는 빈 목록. 실제 훅은 `accountIdx`를 받음.
  */
 export function useCampaignAssignments() {
   return { campaigns: MOCK_CAMPAIGN_ASSIGNMENTS, isLoading: false };

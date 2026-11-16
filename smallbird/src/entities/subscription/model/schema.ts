@@ -75,7 +75,7 @@ export const subscriptionPaymentListSchema = z.object({
         id: z.string(),
         paidAt: z.string(),
         name: z.string(),
-        // 상품 유형·결제 주기 코드(2026-11-16 추가). 이름을 언어별로 만들 때 쓰고, 없거나 모르는 값이면 `name`을 그대로 보임.
+        // 상품 유형·결제 주기 코드. 이름을 언어별로 만들 때 쓰고, 없거나 모르는 값이면 `name`을 그대로 보임.
         productType: z.string().nullish(),
         billingPeriod: z.string().nullish(),
         amount: z.number(),

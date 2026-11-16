@@ -22,7 +22,7 @@ interface UsageBreakdownCardsProps {
   groupBuy: UsageBreakdown;
 }
 
-// 하단 브랜드형·공구형 표 카드. 제목 앞 색 점이 차트의 범례를 대신함(시안). PC·TAB 2열, MO 세로.
+// 제목 앞 색 점이 차트의 범례를 대신함(시안).
 export function UsageBreakdownCards({
   productName,
   metrics,

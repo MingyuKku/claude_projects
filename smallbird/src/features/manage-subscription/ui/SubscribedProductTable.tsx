@@ -34,7 +34,7 @@ interface SubscribedProductTableProps {
   subscriptions: Subscription[];
 }
 
-// Figma 구독 결제 상품(PC·TAB 표 7185:113898, MO 세로 표 7064:190017). 오탈자 "결재액"·"결제방법"은 "결제액"·"결제 방법"으로 통일(스펙 §3).
+// 시안 오기 "결재액"·"결제방법"은 "결제액"·"결제 방법"으로 통일.
 // "구독해지"는 확인 알럿 → 해지 API → 완료 알럿. 성공하면 구독 목록을 다시 읽어 "해지 예정"으로 바뀜.
 export function SubscribedProductTable({
   subscriptions,

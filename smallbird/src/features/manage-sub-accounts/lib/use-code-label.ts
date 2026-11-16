@@ -12,7 +12,7 @@ const PERMISSION_LABEL_KEYS = {
   bigbirdMoney: "access.permission.name.bigbirdMoney",
 } as const satisfies Record<PermissionKey, string>;
 
-// 서버가 코드(enum)로 주는 값 → 번역 키 표(스펙 §6, i18n 규칙 "서버 데이터"). 코드는 임시이고 백엔드 확정 뒤(§7 B-6) 맞춤.
+// 서버가 코드(enum)로 주는 값 → 번역 키 표. 코드는 임시이고 백엔드 확정 뒤 맞춤.
 // 표에 없는 코드는 화면을 깨지 않고 서버가 준 값을 그대로 보임.
 
 const PRODUCT_TYPE_KEYS = {
@@ -52,7 +52,7 @@ export function useCodeLabel() {
   };
 }
 
-/** 진행 상태 배지 색(Figma: 진행 완료 slate·대기중 blue·진행중 green). 모르는 코드는 회색. */
+/** 진행 상태 배지 색. 모르는 코드는 회색. */
 export function getStatusBadgeVariant(status: string) {
   if (status === "waiting") return "blue";
   if (status === "running") return "green";

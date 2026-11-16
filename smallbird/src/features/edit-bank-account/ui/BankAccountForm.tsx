@@ -37,7 +37,7 @@ interface BankAccountFormProps {
   onFinishEdit?: () => void;
 }
 
-// Figma 계좌정보(6925:68046): 라벨 왼쪽·입력 오른쪽 표(MO는 위·아래), 하단 취소·저장. 은행은 시안의 입력칸 대신 Select(사용자 확인).
+// 은행은 시안의 입력칸 대신 Select로 고름.
 export function BankAccountForm({
   account,
   banks,

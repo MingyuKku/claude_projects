@@ -37,7 +37,7 @@ export function transformChargeList(list: ChargeList): ChargeListViewModel {
         holderName: textOrEmpty(item.holderName),
         completedAt: parseServerDate(item.completedDate),
         completedAtText: textOrEmpty(item.completedDate),
-        // 거래명세서는 입금 완료 건만 켬(스펙 §3). 대기 중 건도 주소가 오지만 가상계좌 발급 영수증이라 쓰지 않음.
+        // 거래명세서는 입금 완료 건만 켬. 대기 중 건도 주소가 오지만 가상계좌 발급 영수증이라 쓰지 않음.
         receiptUrl: status === "paid" ? toReceiptUrl(item.receiptUrl) : null,
       };
     }),

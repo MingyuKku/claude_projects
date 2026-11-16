@@ -20,14 +20,13 @@ import { DeleteCardDialog } from "./DeleteCardDialog";
 
 import type { BillingCard } from "@/entities/subscription";
 
-/** 정기결제 카드는 최대 2장(디자이너 주석). 2장이면 "카드 추가" 칸이 사라짐. */
+/** 정기결제 카드는 최대 2장. 2장이면 "카드 추가" 칸이 사라짐. */
 const MAX_CARD_COUNT = 2;
-/** MO는 칸 폭을 채우고 높이는 TAB·PC 카드(186×100) 비율을 따름. */
 const CARD_SIZE_CLASS =
   "w-full max-tablet:aspect-186/100 max-tablet:h-auto tablet:w-46.5";
 
-// Figma 정기결제 카드(7185:113898 카드 1장, 7185:123698 카드 2장, 0장 7185:120263). 섹션명은 "정기결제 카드"로 통일(시안 오기 "정기결제 방법").
-// 목록·삭제·결제 카드로 등록은 API 연동(낙관적 갱신). 카드 추가는 결제 서버가 준 값으로 이니시스 카드 등록 페이지로 이동함(결과는 BillingCardResultHandler).
+// 섹션명은 "정기결제 카드"로 통일(시안 오기 "정기결제 방법").
+// 카드 추가는 이니시스 카드 등록 페이지로 이동하고, 돌아온 결과는 BillingCardResultHandler가 받음.
 export function BillingCardList() {
   const { t } = useTranslation("features/manage-billing-cards");
   const { t: tCommon } = useTranslation();
@@ -69,7 +68,6 @@ export function BillingCardList() {
           }
         />
       ) : (
-        /* MO는 카드 156px 2열이고 높이는 186:100 비율로 줄어 83.9px(시안), TAB·PC는 186×100. */
         <ul className="grid grid-cols-2 gap-4 tablet:flex tablet:flex-wrap tablet:gap-5">
           {cards.map((card) => (
             <li key={card.id} className="contents">

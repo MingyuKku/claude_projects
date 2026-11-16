@@ -6,7 +6,7 @@ import type {
   UsageMetric,
 } from "./codes";
 
-/** 구독 탭의 상품 카드 한 장. 가격은 정책이 없어 더미(스펙 §1). */
+/** 구독 탭의 상품 카드 한 장. 가격은 정책이 없어 더미. */
 export interface SubscriptionPlan {
   type: SubscriptionProductType;
   /** false면 "준비중" 카드(라이브형·어플리에이터형). */
@@ -40,7 +40,7 @@ export interface Subscription {
   /** 가장 최근 결제에 쓴 카드의 종류. 모르거나 없으면 null. */
   cardKind: CardKind | null;
   isCancelScheduled: boolean;
-  /** 구독 상태. `paymentFailed`는 정기결제 실패로 이용이 멈춘 구독(스펙 §7 P-17~P-22, 화면은 시안 후). */
+  /** 구독 상태. `paymentFailed`는 정기결제 실패로 이용이 멈춘 구독(화면은 시안 후). */
   status: SubscriptionStatus;
   /** 다음 재결제 날짜(`YYYY-MM-DD`). 결제 실패(`paymentFailed`)일 때만 있고 그 외 null. */
   nextRetryAt: string | null;
@@ -130,9 +130,9 @@ export interface PaymentQuery {
   size: number;
   from?: string;
   to?: string;
-  /** 결제 내역 필터의 상품 유형 코드(`recruit`·`pick`). 없으면 전체(Swagger `getPayments`). */
+  /** 결제 내역 필터의 상품 유형 코드(`recruit`·`pick`). 없으면 전체. */
   productType?: string;
-  /** 결제 내역 필터의 결제 주기(`monthly`·`yearly`). 서버 파라미터가 아직 없어 백엔드 반영 전에는 걸러지지 않음(스펙 §7 B-6). */
+  /** 결제 내역 필터의 결제 주기(`monthly`·`yearly`). 서버 파라미터가 아직 없어 백엔드 반영 전에는 걸러지지 않음. */
   billingPeriod?: string;
   method?: string;
   status?: string;

@@ -20,7 +20,7 @@ interface ChangeDefaultCardDialogProps {
   onConfirm: () => void;
 }
 
-// Figma "기본 카드 변경" 알럿(11755:99783). 결제 화면에서 기본 카드가 아닌 카드를 골랐을 때 띄움(스펙 §3 기본 카드 변경).
+// 결제 화면에서 기본 카드가 아닌 카드를 골랐을 때 띄움.
 // 확인을 눌러도 바꾸는 요청이 끝날 때까지 닫지 않으므로 기본 동작(닫힘)을 막음.
 export function ChangeDefaultCardDialog({
   open,

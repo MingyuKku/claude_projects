@@ -16,8 +16,7 @@ interface UsageCardListProps {
   onClickDetail: (record: UsageRecord) => void;
 }
 
-// 캠페인 유형·캠페인 코드는 상세 보기에만 있음. 캠페인 명 옆에 40px 썸네일(`mainImageUrl`, 없으면 기본 이미지).
-// 값이 없는 항목도 행을 숨기지 않고 값은 "-"로 보임(스펙 §3). TAB은 카드 사이 12px로 2열이고 같은 줄 카드는 높이를 맞춤.
+// 값이 없는 항목도 행을 숨기지 않고 값은 "-"로 보임.
 export function UsageCardList({ records, onClickDetail }: UsageCardListProps) {
   const { t } = useTranslation("features/bigbird-money-history");
   const { formatDateTime, formatWon } = useMoneyFormat();
@@ -26,7 +25,7 @@ export function UsageCardList({ records, onClickDetail }: UsageCardListProps) {
   return (
     <ul
       aria-label={t("usage.list.label")}
-      className="grid grid-cols-1 gap-5 tablet:grid-cols-2 tablet:gap-3"
+      className="grid grid-cols-1 gap-3 tablet:grid-cols-2"
     >
       {records.map((record) => {
         const rows = [

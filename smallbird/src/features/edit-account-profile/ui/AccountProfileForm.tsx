@@ -41,7 +41,6 @@ interface AccountProfileFormProps {
   className?: string;
 }
 
-// Figma 정보 수정(7046:124807): PC·TAB은 라벨 왼쪽·입력 오른쪽 표, MO는 라벨 위·입력 아래.
 export function AccountProfileForm({
   accountType = "master",
   profile,

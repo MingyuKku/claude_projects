@@ -14,7 +14,7 @@ interface CardChangedDialogProps {
   onConfirm: () => void;
 }
 
-// Figma "결제카드 변경 완료" 알럿(7185:124652). 완료 안내라 "확인"만 둠(스펙 §3 공통).
+// 완료 안내라 "확인"만 둠.
 export function CardChangedDialog({ open, onConfirm }: CardChangedDialogProps) {
   const { t } = useTranslation("features/manage-billing-cards");
   const { t: tCommon } = useTranslation();

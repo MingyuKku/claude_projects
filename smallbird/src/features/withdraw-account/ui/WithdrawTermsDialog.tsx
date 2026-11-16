@@ -21,8 +21,7 @@ interface WithdrawTermsDialogProps {
   onAgree: () => void;
 }
 
-// Figma 회원 탈퇴 약관(PC 10061:207234, TAB 10061:207315): 460×650 중앙 다이얼로그, 딤 있음. 헤더(제목 + X) · 약관 박스 · 버튼 한 쌍.
-// 가운데 정렬 기본 다이얼로그가 아니라 시안의 칸 구성(헤더 60, 본문 위 20·아래 12, 버튼 20)이라 직접 짬.
+// 시안의 칸 구성이 가운데 정렬 기본 다이얼로그와 달라 직접 짬.
 export function WithdrawTermsDialog({
   isOpen,
   onClose,

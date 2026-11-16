@@ -6,7 +6,7 @@ import { bankAccountResponseSchema } from "../model/schema";
 export interface BankAccountBody {
   bankIdx: number;
   accountHolder: string;
-  /** 하이픈 없이 숫자만(Swagger). */
+  /** 하이픈 없이 숫자만. */
   accountNumber: string;
 }
 
@@ -25,7 +25,7 @@ export function saveBankAccount(body: BankAccountBody) {
   return serverApiV3.post("/mypage/account/bank", body);
 }
 
-/** 회사정보가 먼저 등록돼 있어야 함(스펙 §3 계좌정보 진입 조건). */
+/** 회사정보가 먼저 등록돼 있어야 함. */
 export function uploadBankBook(file: File) {
   const body = new FormData();
   body.append("file", file);

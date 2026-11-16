@@ -14,7 +14,7 @@ interface UseMoneySidePanelOptions {
   panel: MoneyPanel | null;
   /** 상세로 연 내역(쿼리 `id`). */
   activeId: string | null;
-  /** TAB·MO는 제목 앞에 뒤로 버튼도 둠(시안). */
+  /** TAB·MO는 제목 앞에 뒤로 버튼도 둠. */
   hasBackButton: boolean;
   onClose: () => void;
   onWithdrawn: (result: WithdrawResult) => void;
