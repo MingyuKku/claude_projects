@@ -17,6 +17,7 @@ const MAIN_CLASS_NAME =
   "px-(--mypage-gutter) [--mypage-gutter:--spacing(4)] tablet:[--mypage-gutter:--spacing(5)]";
 
 // 로그인 확인과 Sub ID의 구독 진입 차단은 라우트의 세션 middleware가 화면을 그리기 전에 끝냄(app/router/session-middleware.ts).
+// 구독만 비로그인도 들어오며 이때 session은 null이라 셸은 비로그인 헤더·LNB로 그림.
 export function MypageLayout() {
   const session = useLoaderData<typeof sessionLoader>();
 

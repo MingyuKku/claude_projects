@@ -1,11 +1,13 @@
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { MemoryRouter, useLocation } from "react-router";
+import { MemoryRouter, Outlet, Route, Routes, useLocation } from "react-router";
 import { SWRConfig } from "swr";
 
 import { serverApiV3 } from "@/shared/api";
 
 import { MyPageSubscribePage } from "./MyPageSubscribePage";
+
+import type { SessionViewModel } from "@/entities/session";
 
 vi.mock("@/shared/api", async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>();
@@ -94,11 +96,41 @@ function Location() {
   return <p data-testid="search">{search}</p>;
 }
 
-function setup(initialEntry: string) {
+const MASTER_SESSION: SessionViewModel = {
+  isAllowed: true,
+  userIdx: 1,
+  accountIdx: 2,
+  threadUserIdx: 3,
+  authority: "MASTER",
+  service: "client",
+  displayName: "테스트",
+  identifier: "tester",
+  email: "test@example.com",
+  profileImageUrl: null,
+  permissions: {
+    campaign: true,
+    influencerMatching: true,
+    influencerMarket: true,
+    commerce: true,
+    bigbirdMoney: true,
+    purchaserQuestion: true,
+    influencerQuestion: true,
+  },
+};
+
+/** 세션은 MypageLayout처럼 Outlet context로 넘김. null은 비로그인. */
+function setup(
+  initialEntry: string,
+  session: SessionViewModel | null = MASTER_SESSION,
+) {
   render(
     <SWRConfig value={{ provider: () => new Map(), dedupingInterval: 0 }}>
       <MemoryRouter initialEntries={[initialEntry]}>
-        <MyPageSubscribePage />
+        <Routes>
+          <Route element={<Outlet context={session} />}>
+            <Route path="/mypage/subscribe" element={<MyPageSubscribePage />} />
+          </Route>
+        </Routes>
         <Location />
       </MemoryRouter>
     </SWRConfig>,
@@ -271,5 +303,66 @@ describe("MyPageSubscribePage 카드 없음", () => {
 
     await waitFor(() => expect(screen.queryByRole("alertdialog")).toBeNull());
     expect(screen.getByTestId("search")).toBeEmptyDOMElement();
+  });
+});
+
+describe("MyPageSubscribePage 비로그인", () => {
+  it("상품 카드만 보이고 구독 목록·카드는 요청하지 않는다", async () => {
+    setup("/mypage/subscribe", null);
+
+    expect(
+      (await screen.findAllByRole("button", { name: "구독하기" })).length,
+    ).toBeGreaterThan(0);
+    const paths = vi.mocked(serverApiV3.get).mock.calls.map(([path]) => path);
+    expect(paths).toContain("/mypage/subscription/plans");
+    expect(paths).not.toContain("/mypage/subscription/subscriptions");
+    expect(paths).not.toContain("/mypage/subscription/billing-cards");
+  });
+
+  it("구독하기를 누르면 결제 화면 대신 로그인 안내를 띄운다", async () => {
+    const user = setup("/mypage/subscribe", null);
+    const [firstSubscribe] = await screen.findAllByRole("button", {
+      name: "구독하기",
+    });
+    if (!firstSubscribe) throw new Error("구독하기 버튼이 없음");
+    await user.click(firstSubscribe);
+
+    expect(
+      await screen.findByRole("alertdialog", { name: "로그인 필요" }),
+    ).toBeInTheDocument();
+    expect(screen.getByTestId("search")).toBeEmptyDOMElement();
+  });
+
+  it("다른 탭을 누르면 로그인 안내를 띄우고 구독 탭에 머문다", async () => {
+    const user = setup("/mypage/subscribe", null);
+    await user.click(await screen.findByRole("tab", { name: "결제내역" }));
+
+    expect(
+      await screen.findByRole("alertdialog", { name: "로그인 필요" }),
+    ).toBeInTheDocument();
+    // 알럿이 열리면 뒤 화면은 aria-hidden이라 hidden까지 찾음.
+    expect(
+      screen.getByRole("tab", { name: "구독", hidden: true }),
+    ).toHaveAttribute("aria-selected", "true");
+    expect(screen.getByTestId("search")).toBeEmptyDOMElement();
+  });
+
+  it("주소로 다른 탭을 넣어도 구독 탭을 보인다", async () => {
+    setup("/mypage/subscribe?tab=payments", null);
+    expect(
+      await screen.findByRole("tab", { name: "구독", selected: true }),
+    ).toBeInTheDocument();
+  });
+
+  it("주소로 결제 화면을 넣어도 결제 화면 대신 구독 탭의 상품 카드를 보인다", async () => {
+    setup("/mypage/subscribe?panel=checkout&plan=pick", null);
+    // 상품 카드까지 그려진 뒤에 결제 화면이 없음을 확인함(결제 화면은 상품 목록을 읽은 뒤 열리므로).
+    expect(
+      await screen.findByRole("tab", { name: "구독", selected: true }),
+    ).toBeInTheDocument();
+    expect(
+      (await screen.findAllByRole("button", { name: "구독하기" })).length,
+    ).toBeGreaterThan(0);
+    expect(screen.queryByText("결제 즉시 1개월 이용 시작")).toBeNull();
   });
 });

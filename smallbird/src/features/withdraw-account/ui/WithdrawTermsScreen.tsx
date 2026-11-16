@@ -42,7 +42,7 @@ export function WithdrawTermsScreen({
         <WithdrawTermsBox className="min-h-0 flex-1" />
       </div>
       <WithdrawActions
-        className="shrink-0 border-t bg-background p-4"
+        className="shrink-0 bg-background p-4"
         onClickCancel={onClose}
         onClickAgree={onAgree}
       />

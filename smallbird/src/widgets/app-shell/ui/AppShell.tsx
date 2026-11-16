@@ -118,6 +118,8 @@ export function AppShell({
   );
 
   const isAdmin = session?.authority === "ADMIN";
+  // 할당된 Sub ID는 캠페인을 만들 수 없어 "캠페인 등록하기" 버튼을 숨김(스펙 campaign/status P-3).
+  const isSubAccount = session?.authority === "SUB";
   const isCustomerCenterPath = CUSTOMER_CENTER_PATH_PREFIXES.some((prefix) =>
     pathname.startsWith(prefix),
   );
@@ -151,14 +153,25 @@ export function AppShell({
     openMenu();
   }
 
+  function handleClickRegisterCampaign() {
+    closeMenu();
+    if (!session) {
+      setIsLoginAlertOpen(true);
+      return;
+    }
+    void navigate(ROUTES.campaignCreate);
+  }
+
   const sidebarProps = {
     items,
     logoAlt: t("logo.alt"),
     logoHref: isAdmin ? ROUTES.switchAccount : ROUTES.main,
     logoLinkLabel: isAdmin ? t("logo.adminLinkLabel") : t("logo.homeLinkLabel"),
     linkAs: ShellLink,
-    primaryActionLabel: t("registerCampaign"),
-    isPrimaryActionDisabled: true,
+    primaryActionLabel: isSubAccount ? undefined : t("registerCampaign"),
+    // 캠페인 기능은 개발 서버에서만 켬(API가 나오면 함께 공개).
+    isPrimaryActionDisabled: !import.meta.env.DEV,
+    onClickPrimaryAction: handleClickRegisterCampaign,
     // 비로그인의 이용 가이드는 헤더에만 둠(Figma 주석 5180:89119).
     guideLabel: session ? t("guide") : undefined,
     guideExtra: import.meta.env.DEV ? <DevLanguageSwitcher /> : undefined,

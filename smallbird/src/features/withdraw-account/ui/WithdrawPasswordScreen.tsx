@@ -43,7 +43,7 @@ export function WithdrawPasswordScreen({
         form={form}
         className="flex flex-1 flex-col"
         contentClassName="flex-1 p-4"
-        actionsClassName="sticky bottom-0 border-t bg-background p-4"
+        actionsClassName="sticky bottom-0 bg-background p-4"
         onClickCancel={onClose}
       />
     </div>

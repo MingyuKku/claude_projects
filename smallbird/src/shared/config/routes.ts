@@ -19,10 +19,9 @@ export const ROUTES = {
   // 인플루언서 문의는 구매자 문의와 같은 화면(인플루언서 문의·캠페인 Q&A).
   customerCenterInfluencer: "/customer-center/influencer",
   customerCenterInfluencerThread: "/customer-center/influencer/:inquiryKey?",
-  // 캠페인 등록은 `/campaign/register`(새로 만듦)와 `/campaign/register/:campaignId`(작성), 등록 내역은 `/campaign/:campaignId`.
-  campaignRegister: "/campaign/register",
-  campaignRegisterDraft: "/campaign/register/:campaignId",
-  campaignDetail: "/campaign/:campaignId",
+  // 캠페인 현황과 개설. 개설은 서비스·상품만 고르는 화면이고 등록(마법사)과는 다름.
+  campaign: "/campaign",
+  campaignCreate: "/campaign/new",
   mypageSubscribe: "/mypage/subscribe",
   mypageMoney: "/mypage/money",
   mypageAccount: "/mypage/account",

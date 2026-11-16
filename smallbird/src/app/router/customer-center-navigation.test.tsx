@@ -1,4 +1,4 @@
-import { act, screen, waitFor, within } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { ApiError, serverApi, serverApiV3 } from "@/shared/api";
@@ -101,7 +101,6 @@ describe("고객센터 진입", () => {
     path: ROUTES.customerCenterBigbird,
     title: "빅버드 문의",
   };
-  const BUYER_PAGE = { path: ROUTES.customerCenterBuyer, title: "구매자 문의" };
 
   it("로그인 후 LNB 빅버드 문의를 누르면 그 경로의 세션을 확인하고 빅버드 문의 화면으로 이동한다", async () => {
     const user = userEvent.setup();
@@ -115,31 +114,6 @@ describe("고객센터 진입", () => {
     });
     // 세션은 `GET /v3/sec`로만 확인하고 V2 `GET /sec`는 부르지 않음.
     expect(serverApi.get).not.toHaveBeenCalled();
-  });
-
-  it("빅버드 문의에서 LNB 구매자 문의를 누르면 구매자 문의 화면으로 이동한다", async () => {
-    const user = userEvent.setup();
-    const router = await renderRoute(ROUTES.customerCenterBigbird);
-    await expectCustomerCenterPage(router, BIGBIRD_PAGE);
-    await user.click(
-      within(screen.getByRole("navigation", { name: "주 메뉴" })).getByRole(
-        "link",
-        { name: "구매자 문의" },
-      ),
-    );
-    await expectCustomerCenterPage(router, BUYER_PAGE);
-  });
-
-  it("구매자 문의에서 뒤로 가면 빅버드 문의 화면과 선택 메뉴가 복원된다", async () => {
-    const router = await renderRoute([
-      ROUTES.customerCenterBigbird,
-      ROUTES.customerCenterBuyer,
-    ]);
-    await expectCustomerCenterPage(router, BUYER_PAGE);
-    await act(async () => {
-      await router.navigate(-1);
-    });
-    await expectCustomerCenterPage(router, BIGBIRD_PAGE);
   });
 
   describe("빅버드 문의 대화", () => {

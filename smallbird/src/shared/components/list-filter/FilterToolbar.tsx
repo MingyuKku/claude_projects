@@ -15,6 +15,7 @@ import { ListSearch } from "./ListSearch";
 
 import type { FilterField, FilterValues } from "./filter-fields";
 import type { InlineFrom } from "./use-filter-screen";
+import type { ReactNode } from "react";
 
 interface PageSizeSelect {
   value: number;
@@ -49,6 +50,13 @@ interface FilterToolbarProps {
   isCompact?: boolean;
   /** PC에서 필드가 남은 폭을 똑같이 나눠 채움(빅버드 머니 충전/출금 내역에 옆 패널이 열렸을 때, 시안 187px씩). */
   shouldFillFields?: boolean;
+  /**
+   * 검색창을 TAB에서도 필터 필드와 같은 줄 맨 앞에 둠(기본은 TAB에서 필터 줄 아래 둘째 줄). 이때 필드는 TAB에서도 시안 폭(고정)이고
+   * 검색창은 PC·TAB 모두 287px임(캠페인 현황 시안).
+   */
+  isSearchInline?: boolean;
+  /** 인라인(PC·TAB) 툴바 줄 오른쪽 끝에 놓을 버튼(캠페인 현황의 "캠페인 등록하기"). MO는 쓰는 쪽이 따로 둠. */
+  endAction?: ReactNode;
   /** 없으면 검색창을 그리지 않음(충전 내역은 검색 없음). */
   search?: {
     keyword: string;
@@ -75,6 +83,8 @@ export function FilterToolbar({
   pageSize,
   isCompact = false,
   shouldFillFields = false,
+  isSearchInline = false,
+  endAction,
   search,
 }: FilterToolbarProps) {
   const { t } = useTranslation();
@@ -158,10 +168,13 @@ export function FilterToolbar({
           isDisabled={search.isDisabled}
           maxLength={search.maxLength}
           className={cn(
-            "order-last w-full desktop:order-first",
-            isCompact
-              ? "desktop:w-auto desktop:max-w-51 desktop:min-w-0 desktop:flex-1"
-              : "desktop:w-71.75",
+            isSearchInline
+              ? "w-71.75 shrink-0"
+              : "order-last w-full desktop:order-first",
+            !isSearchInline &&
+              (isCompact
+                ? "desktop:w-auto desktop:max-w-51 desktop:min-w-0 desktop:flex-1"
+                : "desktop:w-71.75"),
           )}
         />
       )}
@@ -174,7 +187,9 @@ export function FilterToolbar({
             // 폭은 필드가 정함. 옆 패널이 열려 채우는 모드에서는 남은 폭을 나눠 가짐.
             !isCompact &&
               !shouldFillFields &&
-              "desktop:w-(--field-width) desktop:flex-none",
+              (isSearchInline
+                ? "w-(--field-width) flex-none"
+                : "desktop:w-(--field-width) desktop:flex-none"),
           )}
           style={getFieldWidthStyle(field)}
         >
@@ -198,7 +213,7 @@ export function FilterToolbar({
             <SelectField
               field={field}
               value={values[field.id]}
-              placeholder={field.label}
+              placeholder={field.inlinePlaceholder ?? field.label}
               onChange={(value) => setValue({ [field.id]: value })}
             />
           )}
@@ -215,6 +230,7 @@ export function FilterToolbar({
         <RotateCw />
       </Button>
       {pageSize && <div className="ml-auto">{pageSizeNode}</div>}
+      {endAction && <div className="ml-auto">{endAction}</div>}
     </div>
   );
 }

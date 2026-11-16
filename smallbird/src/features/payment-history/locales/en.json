@@ -27,13 +27,7 @@
     },
     "item": {
       "label": "Description",
-      "placeholder": "Select a description.",
-      "option": {
-        "monthly_pick": "Monthly plan_PICK",
-        "monthly_recruit": "Monthly plan_Recruitment",
-        "yearly_pick": "Yearly plan_PICK",
-        "yearly_recruit": "Yearly plan_Recruitment"
-      }
+      "placeholder": "Select a description."
     },
     "method": {
       "label": "Payment method",

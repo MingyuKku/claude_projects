@@ -1,4 +1,5 @@
-import { useSearchParams } from "react-router";
+import { useState } from "react";
+import { useNavigate, useOutletContext, useSearchParams } from "react-router";
 
 import {
   getSubscribedTypes,
@@ -23,7 +24,9 @@ import { LIST_QUERY_PARAMS, PaymentHistory } from "@/features/payment-history";
 import { SubscriptionUsageDashboard } from "@/features/view-subscription-usage";
 import { EmptyState } from "@/shared/components/empty-state";
 import { useFilterScreen } from "@/shared/components/list-filter";
+import { LoginRequiredAlert } from "@/shared/components/login-required-alert";
 import { StickyTabBar } from "@/shared/components/sticky-tab-bar";
+import { ROUTES } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { usePanelParam, useTabParam } from "@/shared/lib";
 import { Tabs, TabsContent } from "@/shared/ui/tabs";
@@ -42,7 +45,12 @@ import { SubscriptionPlansGate } from "./SubscriptionPlansGate";
 import { SubscriptionsGate } from "./SubscriptionsGate";
 import { UsageSkeleton } from "./UsageSkeleton";
 
-import type { ActiveProductType, Subscription } from "@/entities/subscription";
+import type { SessionViewModel } from "@/entities/session";
+import type {
+  ActiveProductType,
+  BillingPeriod,
+  Subscription,
+} from "@/entities/subscription";
 
 // 탭 본문의 최대 폭(시안 PC 1440 화면의 본문 폭 1170). 더 넓은 화면에서는 가운데 정렬함.
 const CONTENT_WIDTH_CLASS_NAME = "mx-auto w-full max-w-292.5";
@@ -59,11 +67,15 @@ const RESET_PARAMS = [
 ];
 
 // 셸(헤더·LNB)은 app 레이어의 MypageLayout이 감쌈. 탭·세그먼트·하위 화면은 URL 쿼리가 소유함(뒤로 가기로 닫히고 새로고침해도 유지).
+// 비로그인(session null)은 구독 탭의 상품만 봄(마이페이지 QA 2026-11-16). 탭 줄은 그대로 두고 다른 탭과 "구독하기"는 로그인 안내 알럿을 띄움.
 export function MyPageSubscribePage() {
   const { t } = useTranslation("pages/mypage-subscribe");
   const { t: tCommon } = useTranslation();
+  const session = useOutletContext<SessionViewModel | null>();
+  const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
-  const { tab, setTab } = useTabParam({
+  const [isLoginAlertOpen, setIsLoginAlertOpen] = useState(false);
+  const { tab: requestedTab, setTab } = useTabParam({
     tabs: SUBSCRIBE_TABS,
     defaultTab: "plans",
     resetParams: RESET_PARAMS,
@@ -74,10 +86,13 @@ export function MyPageSubscribePage() {
     linkedParams: [CHECKOUT_PLAN_PARAM, CHECKOUT_PERIOD_PARAM],
   });
   const filterScreen = useFilterScreen("desktop");
+  const isGuest = session === null;
+  // 비로그인은 주소로 다른 탭을 넣어도 구독 탭을 보임.
+  const tab = isGuest ? "plans" : requestedTab;
   // 구독하기를 누르기 전에 읽어 두어 카드가 없는지 바로 알 수 있게 함(결제 화면도 같은 키를 읽어 한 번만 요청함).
-  const { data: cards } = useBillingCards();
+  const { data: cards } = useBillingCards({ isEnabled: !isGuest });
   // 결제 화면 주소로 바로 들어왔을 때 이미 구독 중인 상품인지 확인함(구독 탭·결제내역과 같은 키라 한 번만 요청함).
-  const { data: subscriptions } = useSubscriptions();
+  const { data: subscriptions } = useSubscriptions({ isEnabled: !isGuest });
 
   const checkoutParam = searchParams.get(CHECKOUT_PLAN_PARAM);
   const checkoutType = isActiveProductType(checkoutParam)
@@ -87,7 +102,10 @@ export function MyPageSubscribePage() {
   const checkoutPeriod = isBillingPeriod(periodParam) ? periodParam : "monthly";
   // 결제 화면은 구독 탭에서 상품이 정해졌을 때만 열림(주소를 직접 고쳐 다른 탭·잘못된 상품을 넣어도 무시).
   const isCheckoutRequested =
-    panel === "checkout" && tab === "plans" && checkoutType !== null;
+    !isGuest &&
+    panel === "checkout" &&
+    tab === "plans" &&
+    checkoutType !== null;
   // 구독 중인 상품은 구독 탭의 버튼이 비활성이라 결제 화면에 갈 수 없고, 주소로 바로 들어와도 열지 않고 구독 탭("구독 중" 카드)을 보임.
   // 구독 목록을 읽기 전에는 알 수 없어 결제 화면이 먼저 열림. 서버도 결제를 `ALREADY_SUBSCRIBED`로 거절함.
   // 결제할 일이 없으므로 카드 확인보다 먼저 봄(카드가 0장이어도 카드 등록 안내를 띄우지 않음).
@@ -113,6 +131,25 @@ export function MyPageSubscribePage() {
       .map((item) => item.type)
       .find(isActiveProductType);
     return firstSubscribed ?? "recruit";
+  }
+
+  function handleChangeTab(next: string) {
+    if (isGuest && next !== "plans") {
+      setIsLoginAlertOpen(true);
+      return;
+    }
+    setTab(next);
+  }
+
+  function handleSubscribe(type: ActiveProductType, period: BillingPeriod) {
+    if (isGuest) {
+      setIsLoginAlertOpen(true);
+      return;
+    }
+    openPanel("checkout", {
+      [CHECKOUT_PLAN_PARAM]: type,
+      [CHECKOUT_PERIOD_PARAM]: period,
+    });
   }
 
   function handleChangeUsageType(next: ActiveProductType) {
@@ -148,10 +185,42 @@ export function MyPageSubscribePage() {
     );
   }
 
+  const planList = (
+    <SubscriptionPlansGate>
+      {(catalog) =>
+        isGuest ? (
+          <SubscriptionPlanList
+            catalog={catalog}
+            subscriptions={[]}
+            onSubscribe={handleSubscribe}
+          />
+        ) : (
+          <SubscriptionsGate skeleton={<PlanCardsSkeleton />}>
+            {(subscriptions) => (
+              <SubscriptionPlanList
+                catalog={catalog}
+                subscriptions={subscriptions}
+                onSubscribe={handleSubscribe}
+              />
+            )}
+          </SubscriptionsGate>
+        )
+      }
+    </SubscriptionPlansGate>
+  );
+
   return (
     <>
       <title>{t("title")}</title>
-      <PaymentResultHandler />
+      <LoginRequiredAlert
+        open={isLoginAlertOpen}
+        onCancel={() => setIsLoginAlertOpen(false)}
+        onLogin={() => {
+          setIsLoginAlertOpen(false);
+          void navigate(ROUTES.login);
+        }}
+      />
+      {!isGuest && <PaymentResultHandler />}
       {/* 카드를 등록하고 돌아오면 구독하려던 상품·결제 주기의 결제 화면을 다시 열어 이어서 결제하게 함(스펙 §3 카드 없음, 사용자 결정 2026-11-03). */}
       <RegisterCardDialog
         open={isCardRequired}
@@ -167,12 +236,14 @@ export function MyPageSubscribePage() {
         }
       />
       {/* 결제내역 탭의 카드 추가 후에는 카드가 보이는 결제내역 탭으로 옮김. */}
-      <BillingCardResultHandler
-        onRegistered={(params) => params.set("tab", "payments")}
-      />
+      {!isGuest && (
+        <BillingCardResultHandler
+          onRegistered={(params) => params.set("tab", "payments")}
+        />
+      )}
       <Tabs
         value={tab}
-        onValueChange={setTab}
+        onValueChange={handleChangeTab}
         className="gap-4 tablet:gap-5 desktop:gap-6"
       >
         {!isTabletFilter && (
@@ -189,24 +260,7 @@ export function MyPageSubscribePage() {
           value="plans"
           className={`${TAB_CONTENT_CLASS_NAME} pb-4 tablet:pb-5`}
         >
-          <SubscriptionPlansGate>
-            {(catalog) => (
-              <SubscriptionsGate skeleton={<PlanCardsSkeleton />}>
-                {(subscriptions) => (
-                  <SubscriptionPlanList
-                    catalog={catalog}
-                    subscriptions={subscriptions}
-                    onSubscribe={(type, period) =>
-                      openPanel("checkout", {
-                        [CHECKOUT_PLAN_PARAM]: type,
-                        [CHECKOUT_PERIOD_PARAM]: period,
-                      })
-                    }
-                  />
-                )}
-              </SubscriptionsGate>
-            )}
-          </SubscriptionPlansGate>
+          {planList}
         </TabsContent>
         <TabsContent
           value="usage"

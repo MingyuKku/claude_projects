@@ -1,6 +1,6 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// E2E 스모크: 빌드한 번들을 `vite preview`로 띄워 실제 브라우저에서 여러 화면을 잇는 흐름을 확인한다.
+// E2E: 빌드한 번들을 `vite preview`로 띄워 실제 브라우저에서 여러 화면을 잇는 흐름을 확인한다.
 // 단일 화면 동작은 Vitest(jsdom)가 맡는다. 백엔드는 부르지 않고 e2e/support/api.ts 가 브라우저에서 응답을 정한다.
 const PORT = 4317;
 const OUTPUT = "e2e/.output";
@@ -9,7 +9,7 @@ export default defineConfig({
   testDir: "e2e",
   outputDir: `${OUTPUT}/test-results`,
   forbidOnly: !!process.env.CI,
-  // 시범 운영 기간에는 재시도로 간헐 실패를 가리지 않는다. 실패하면 trace 로 원인을 본다.
+  // 재시도로 간헐 실패를 가리지 않는다(.gitlab-ci.yml .verify 와 같은 원칙). 실패하면 trace 로 원인을 본다.
   retries: 0,
   reporter: process.env.CI
     ? [

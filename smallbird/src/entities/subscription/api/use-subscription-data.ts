@@ -41,13 +41,20 @@ export function useSubscriptionPlans() {
 
 export const SUBSCRIPTIONS_KEY = ["mypage", "subscription", "subscriptions"];
 
+interface LoginOnlyQueryOptions {
+  /** false면 요청하지 않음. 비로그인이 보는 구독 화면은 로그인 전용 API(구독·카드)를 부르지 않음. */
+  isEnabled?: boolean;
+}
+
 /**
  * 구독 중인 상품들(해지 예정 포함). 구독 탭·결제 화면 진입 확인·결제내역·이용요약이 같은 키를 읽어 한 번만 요청함.
  * 해지·결제 뒤에는 `mutate()`로 다시 읽음.
  */
-export function useSubscriptions() {
+export function useSubscriptions({
+  isEnabled = true,
+}: LoginOnlyQueryOptions = {}) {
   const { data, error, isLoading, mutate } = useSWR(
-    SUBSCRIPTIONS_KEY,
+    isEnabled ? SUBSCRIPTIONS_KEY : null,
     fetchSubscriptions,
   );
   return { data, isLoading, isError: Boolean(error), mutate };
@@ -70,9 +77,11 @@ export function useUsageSeries(
 export const BILLING_CARDS_KEY = ["mypage", "subscription", "billing-cards"];
 
 /** 정기결제 카드(최대 2장). 삭제·기본 카드 변경은 `mutate`의 낙관적 갱신으로 반영함. */
-export function useBillingCards() {
+export function useBillingCards({
+  isEnabled = true,
+}: LoginOnlyQueryOptions = {}) {
   const { data, error, isLoading, mutate } = useSWR(
-    BILLING_CARDS_KEY,
+    isEnabled ? BILLING_CARDS_KEY : null,
     fetchBillingCards,
   );
   return { data, isLoading, isError: Boolean(error), mutate };

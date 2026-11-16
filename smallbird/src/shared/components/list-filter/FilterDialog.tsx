@@ -1,14 +1,15 @@
-import { RotateCcw } from "lucide-react";
+import { RotateCcw, X } from "lucide-react";
 import { useId, useState } from "react";
 
+import { SubHeader } from "@/shared/components/app-header";
 import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 import {
   Dialog,
+  DialogClose,
   DialogContent,
   DialogDescription,
-  DialogHeader,
   DialogTitle,
 } from "@/shared/ui/dialog";
 
@@ -61,16 +62,28 @@ export function FilterDialog({
         // 오버레이는 헤더 자리만 보이므로, 헤더가 어둡게 가려지지 않게 딤을 없앰.
         overlayClassName="bg-transparent"
         className="top-(--app-header-height) left-0 flex h-[calc(100dvh-var(--app-header-height))] w-screen max-w-none translate-x-0 translate-y-0 flex-col gap-0 rounded-none border-0 p-0 sm:max-w-none"
+        // 닫기 버튼은 시안(Header / Sub / Mobile)대로 서브헤더 안의 40px 아이콘 버튼을 씀.
+        showCloseButton={false}
         aria-describedby={undefined}
       >
-        <DialogHeader className="border-b border-border px-4 py-4 text-left">
-          <DialogTitle className="text-base">
-            {t("list.filter.title")}
-          </DialogTitle>
-          <DialogDescription className="sr-only">
-            {t("list.filter.description")}
-          </DialogDescription>
-        </DialogHeader>
+        <SubHeader
+          title={<DialogTitle>{t("list.filter.title")}</DialogTitle>}
+          actions={
+            <DialogClose asChild>
+              <Button
+                type="button"
+                variant="ghost-foreground"
+                size="icon"
+                aria-label={t("action.close")}
+              >
+                <X />
+              </Button>
+            </DialogClose>
+          }
+        />
+        <DialogDescription className="sr-only">
+          {t("list.filter.description")}
+        </DialogDescription>
         <FilterDialogBody fields={fields} values={values} onApply={onApply} />
       </DialogContent>
     </Dialog>

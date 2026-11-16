@@ -60,6 +60,7 @@ export type {
 export {
   usePaymentMethodLabel,
   useProductTypeLabel,
+  useSubscriptionProductName,
 } from "./lib/use-subscription-labels";
 export { PaymentStatusBadge } from "./ui/PaymentStatusBadge";
 export { SubscriptionPlanCard } from "./ui/SubscriptionPlanCard";

@@ -27,6 +27,7 @@ React Router는 **data mode**(`createBrowserRouter` + `RouterProvider`)로 `app`
 - 진입 확인 결과는 데이터 캐시(SWR)에 두지 않습니다. 권한은 서버에서 바뀌고, 캐시된 거부 결과가 다음 진입에 읽히기 때문입니다. 같은 라우트 패턴 안의 이동(탭·필터·문의 선택)만 직전 허용 결과를 재사용합니다.
 - 확인된 세션은 레이아웃 `loader`가 넘기고 레이아웃이 `<Outlet context>`로 화면에 내립니다. 화면은 `useOutletContext<SessionViewModel>()`로 받고 세션을 다시 요청하지 않습니다.
 - 로그인이 선택인 화면(홈 등)은 `loader`가 확인을 기다리지 않고 Promise로 넘겨 화면을 먼저 그리고, 셸만 결과에 따라 바꿉니다.
+- 보호 화면 묶음 안에서 일부 화면만 비로그인을 받아야 하면(마이페이지 구독) middleware의 `GUEST_ALLOWED_PATHS`에 넣습니다. 비로그인이면 401을 로그인으로 보내지 않고 세션을 `null`로 넘기며, 화면은 `useOutletContext<SessionViewModel | null>()`로 받아 로그인 전용 API를 부르지 않습니다. 로그인한 사용자는 다른 보호 화면과 같은 확인(권한·Sub ID 차단)을 받습니다.
 - 새 보호 화면은 `routes.tsx`의 `requireSessionRoute`로 묶습니다.
 
 ## 에러·404

@@ -19,17 +19,19 @@ const ENABLED_HREFS = new Set<string>([
 ]);
 // 이 메뉴는 Sub ID가 해당 권한을 받아야 활성. 비로그인은 로그인 안내가 따로 있어 활성으로 둠.
 const PERMISSION_BY_HREF: Record<string, keyof MenuPermissions> = {
+  [ROUTES.campaign]: "campaign",
   [ROUTES.influencerSearch]: "influencerMatching",
   [ROUTES.mypageMoney]: "bigbirdMoney",
   [ROUTES.customerCenterBuyer]: "purchaserQuestion",
   [ROUTES.customerCenterInfluencer]: "influencerQuestion",
 };
+// 비로그인이 누르면 로그인으로 보내는 메뉴. 구독은 비로그인도 상품을 볼 수 있어 빠짐(마이페이지 QA 2026-11-16).
 const LOGIN_REQUIRED_HREFS = new Set<string>([
+  ROUTES.campaign,
   ROUTES.customerCenterBigbird,
   ROUTES.customerCenterBuyer,
   ROUTES.customerCenterInfluencer,
   ROUTES.mypageAccount,
-  ROUTES.mypageSubscribe,
   ROUTES.mypageMoney,
 ]);
 

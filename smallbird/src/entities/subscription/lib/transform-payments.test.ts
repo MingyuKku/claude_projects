@@ -22,6 +22,8 @@ describe("transformPayments", () => {
       records: [
         {
           ...item,
+          productType: null,
+          billingPeriod: null,
           cardKind: null,
           receiptUrl: "https://iniweb.inicis.com/receipt",
         },
@@ -64,6 +66,25 @@ describe("transformPayments", () => {
       "debit",
       null,
       null,
+    ]);
+  });
+
+  it("상품 유형·결제 주기 코드를 읽고, 모르는 값은 null로 둔다", () => {
+    const { records } = transformPayments({
+      totalCount: 2,
+      items: [
+        { ...item, productType: "pick", billingPeriod: "yearly" },
+        { ...item, id: "42", productType: "unknown", billingPeriod: "weekly" },
+      ],
+    });
+    expect(
+      records.map(({ productType, billingPeriod }) => [
+        productType,
+        billingPeriod,
+      ]),
+    ).toEqual([
+      ["pick", "yearly"],
+      [null, null],
     ]);
   });
 });

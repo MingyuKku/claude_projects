@@ -3,7 +3,11 @@
     "recruit": "招募型",
     "pick": "PICK型",
     "live": "直播型",
-    "applicator": "어플리에이터형"
+    "applicator": "联盟型"
+  },
+  "productName": {
+    "monthly": "月度套餐_{{type}}",
+    "yearly": "年度套餐_{{type}}"
   },
   "paymentStatus": {
     "paid": "已支付",

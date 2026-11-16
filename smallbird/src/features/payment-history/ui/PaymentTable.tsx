@@ -1,6 +1,7 @@
 import {
   PaymentStatusBadge,
   usePaymentMethodLabel,
+  useSubscriptionProductName,
 } from "@/entities/subscription";
 import { useTranslation } from "@/shared/i18n";
 import { orEmptyValue } from "@/shared/lib";
@@ -33,6 +34,7 @@ export function PaymentTable({ records, emptyContent }: PaymentTableProps) {
   const { t } = useTranslation("features/payment-history");
   const { formatDateTime, formatWon } = usePaymentFormat();
   const paymentMethodLabel = usePaymentMethodLabel();
+  const productName = useSubscriptionProductName();
 
   return (
     <Table headerTone="gray" size="xs" aria-label={t("list.label")}>
@@ -66,7 +68,13 @@ export function PaymentTable({ records, emptyContent }: PaymentTableProps) {
                 {orEmptyValue(formatDateTime(record.paidAt))}
               </TableCell>
               <TableCell className="whitespace-normal">
-                {orEmptyValue(record.name)}
+                {orEmptyValue(
+                  productName(
+                    record.productType,
+                    record.billingPeriod,
+                    record.name,
+                  ),
+                )}
               </TableCell>
               <TableCell>{formatWon(record.amount)}</TableCell>
               <TableCell className="whitespace-normal">

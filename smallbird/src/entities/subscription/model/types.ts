@@ -1,4 +1,5 @@
 import type {
+  BillingPeriod,
   CardKind,
   SubscriptionProductType,
   SubscriptionStatus,
@@ -26,8 +27,10 @@ export interface SubscriptionPlanCatalog {
 export interface Subscription {
   id: string;
   type: SubscriptionProductType;
-  /** 서버가 만드는 상품 이름(그대로 표시). */
+  /** 서버가 만드는 상품 이름(한국어). 결제 주기를 알면 `useSubscriptionProductName`이 언어별 이름으로 바꿈. */
   productName: string;
+  /** 결제 주기. 응답에 코드가 없어 멤버십 시작·종료일 간격으로 정하고, 판단할 수 없으면 null. */
+  billingPeriod: BillingPeriod | null;
   /** 멤버십 시작·종료일(`YYYY-MM-DD`). */
   startedAt: string;
   endsAt: string;
@@ -98,8 +101,11 @@ export interface PaymentRecord {
   id: string;
   /** 결제 일시(ISO 8601). */
   paidAt: string;
-  /** 결제 내역 이름(서버가 만드는 상품명, 그대로 표시). */
+  /** 결제 내역 이름(서버가 만드는 한국어 상품명). 코드를 알면 `useSubscriptionProductName`이 언어별 이름으로 바꿈. */
   name: string;
+  /** 상품 유형·결제 주기 코드. 모르거나 없으면 null. */
+  productType: SubscriptionProductType | null;
+  billingPeriod: BillingPeriod | null;
   amount: number;
   /** 서버 결제 수단 값. 코드(`PAYMENT_METHODS`)가 아니면 그대로 표시함. */
   method: string;

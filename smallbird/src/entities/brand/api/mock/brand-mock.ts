@@ -2,7 +2,7 @@ import { createMockStore, getMockFileUrl } from "@/shared/lib";
 
 import type { Brand } from "../../model/schema";
 
-// 브랜드 목록·추가(A-4·A-5)의 목 저장소. 키와 항목 모양은 `entities/campaign`의 `brand-snapshot`이 읽으므로 함께 맞춰야 함.
+// 브랜드 목록·추가(A-4·A-5)의 목 저장소.
 interface BrandMockDb {
   nextBrandIdx: number;
   brands: Brand[];

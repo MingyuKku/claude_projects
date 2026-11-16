@@ -21,6 +21,8 @@ function record(
     id: `pay-${id}`,
     paidAt: new Date(2026, 9, 28 - id).toISOString(),
     name: `상품 ${id}`,
+    productType: null,
+    billingPeriod: null,
     amount: 99999,
     method: "card",
     cardKind: "credit",

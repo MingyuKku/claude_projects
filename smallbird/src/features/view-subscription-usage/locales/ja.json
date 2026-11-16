@@ -8,8 +8,8 @@
     "tooltip": "{{value}}件"
   },
   "quota": {
-    "search": "インフルエンサー検索回数",
-    "proposal": "インフルエンサー提案回数",
+    "search": "クリエイター検索回数",
+    "proposal": "クリエイター提案回数",
     "used": "使用",
     "remaining": "残り"
   },
@@ -26,7 +26,7 @@
   },
   "metric": {
     "campaignCount": "キャンペーン作成数",
-    "searchCount": "インフルエンサー検索数",
+    "searchCount": "クリエイター検索数",
     "proposalCount": "提案送信数",
     "matchCount": "マッチング成立数"
   },
@@ -38,7 +38,7 @@
   },
   "empty": {
     "title": "利用状況がありません。",
-    "description": "商品を購読してください。"
+    "description": "商品をサブスクしてください。"
   },
   "breakdown": {
     "brand": "{{product}} ブランド型",

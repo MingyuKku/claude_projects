@@ -1,5 +1,6 @@
 import { toCardKind, toSubscriptionStatus } from "../model/codes";
 import { isSubscriptionProductType } from "../model/schema";
+import { inferBillingPeriod } from "./infer-billing-period";
 
 import type { SubscriptionListResponse } from "../model/schema";
 import type { Subscription } from "../model/types";
@@ -15,6 +16,7 @@ export function transformSubscriptions(
             id: item.id,
             type: item.productType,
             productName: item.productName,
+            billingPeriod: inferBillingPeriod(item.startedAt, item.endsAt),
             startedAt: item.startedAt,
             endsAt: item.endsAt,
             amount: item.amount,

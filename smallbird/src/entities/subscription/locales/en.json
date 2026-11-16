@@ -3,7 +3,11 @@
     "recruit": "Recruitment",
     "pick": "PICK",
     "live": "Live",
-    "applicator": "어플리에이터형"
+    "applicator": "Affiliate"
+  },
+  "productName": {
+    "monthly": "Monthly plan_{{type}}",
+    "yearly": "Yearly plan_{{type}}"
   },
   "paymentStatus": {
     "paid": "Paid",

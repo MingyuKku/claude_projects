@@ -16,7 +16,9 @@ import type {
 // 화면 진입 여부는 서버만 알고(`GET /v3/sec` + `X-Path`) 권한이 바뀔 수 있어, 이동할 때마다 묻고 캐시하지 않음.
 // 권한 확인을 데이터 캐시(SWR)에서 빼야 앞 화면의 거부 결과가 다음 진입에 읽히지 않음.
 
-const sessionContext = createContext<SessionViewModel>();
+// null은 비로그인을 허용하는 화면(`GUEST_ALLOWED_PATHS`)에 비로그인으로 들어온 경우.
+// 기본값을 두지 않아 middleware 없이 읽으면 오류로 드러남.
+const sessionContext = createContext<SessionViewModel | null>();
 
 // 같은 화면(라우트 패턴) 안의 이동(문의 선택, 탭·필터·쪽 변경)은 권한이 같아 다시 묻지 않으려고
 // 직전 화면에서 허용된 결과를 들고 있음. 다른 화면으로 옮기면 루트 middleware가 버림.
@@ -28,11 +30,15 @@ let current: { pathname: string; href: string } | undefined;
 let hasForbiddenNotice = false;
 
 // Sub ID는 권한과 관계없이 들어갈 수 없는 화면. 서버도 403으로 막으며, 안내 없이 계정 설정으로 보냄(스펙 main.md).
-// 하위 경로(`/campaign/register/:campaignId`)도 막도록 접두사로 비교함. 캠페인 등록 내역(`/campaign/:campaignId`)은 막지 않음.
+// 하위 경로도 막도록 접두사로 비교함.
 const MASTER_ONLY_PATHS: readonly string[] = [
   ROUTES.mypageSubscribe,
-  ROUTES.campaignRegister,
+  ROUTES.campaignCreate,
 ];
+
+// 마이페이지 안에서도 비로그인이 들어올 수 있는 화면. 구독 상품 목록은 비로그인도 봄(마이페이지 QA 2026-11-16).
+// 로그인한 사용자는 다른 보호 화면과 같이 확인함(Sub ID의 구독은 계정 설정으로 보냄).
+const GUEST_ALLOWED_PATHS: readonly string[] = [ROUTES.mypageSubscribe];
 
 function isMasterOnlyPath(pathname: string) {
   return MASTER_ONLY_PATHS.some(
@@ -78,7 +84,10 @@ export const forgetOtherPageSession: MiddlewareFunction = ({ pattern }) => {
   if (lastAllowed?.pattern !== pattern) lastAllowed = undefined;
 };
 
-/** 로그인이 필요한 화면의 middleware. 로그인 안 됨은 로그인으로, 권한 없음은 막고, 허용되면 세션을 loader에 넘김. */
+/**
+ * 로그인이 필요한 화면의 middleware. 로그인 안 됨은 로그인으로, 권한 없음은 막고, 허용되면 세션을 loader에 넘김.
+ * 비로그인 허용 화면(`GUEST_ALLOWED_PATHS`)은 로그인 안 됨이면 비로그인(null)으로 넘김.
+ */
 export const requireSession: MiddlewareFunction = async ({
   request,
   url,
@@ -96,6 +105,10 @@ export const requireSession: MiddlewareFunction = async ({
   );
   if (error) {
     if (isApiError(error) && error.status === 401) {
+      if (GUEST_ALLOWED_PATHS.includes(url.pathname)) {
+        context.set(sessionContext, null);
+        return;
+      }
       throw redirect(ROUTES.login);
     }
     if (isApiError(error) && error.status === 403) forbidden(url.pathname);

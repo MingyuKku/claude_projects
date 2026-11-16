@@ -3,7 +3,6 @@ import { useEffect } from "react";
 import { usePaymentRecords } from "@/entities/subscription";
 import { EmptyState } from "@/shared/components/empty-state";
 import {
-  EmptyTableFrame,
   FilterToolbar,
   hasActiveFilter,
   ListEmptyState,
@@ -32,7 +31,6 @@ export function PaymentHistory() {
   const { t: tCommon } = useTranslation();
   // 표는 PC(1440~)만 씀. TAB은 2열 카드, MO는 1열 카드.
   const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
-  const isTabletUp = useMediaQuery(MEDIA_QUERY.tabletUp);
   const fields = usePaymentFilterFields();
   const params = useListParams(fields);
   const { dateFrom, dateTo, item, method, status } = params.filters;
@@ -73,8 +71,6 @@ export function PaymentHistory() {
       height="compact"
     />
   ) : undefined;
-  // TAB의 빈 상태는 툴바 아래 테두리 박스 안에 둠(시안 11755:97419). MO는 테두리 없이 안내만 둠.
-  const isTabletEmpty = isEmpty && isTabletUp && !isDesktop;
 
   return (
     // 제목과 툴바는 MO 8px·TAB/PC 16px, 툴바와 목록은 MO 16px·TAB/PC 12px(시안). MO 빈 상태는 툴바와 8px(시안 11755:99514).
@@ -131,8 +127,6 @@ export function PaymentHistory() {
           <div className="flex flex-col gap-4">
             {isDesktop ? (
               <PaymentTable records={pageRecords} emptyContent={emptyContent} />
-            ) : isTabletEmpty ? (
-              <EmptyTableFrame>{emptyContent}</EmptyTableFrame>
             ) : (
               (emptyContent ?? <PaymentCardList records={pageRecords} />)
             )}

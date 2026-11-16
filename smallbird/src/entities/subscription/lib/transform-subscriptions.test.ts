@@ -18,6 +18,7 @@ describe("transformSubscriptions", () => {
         id: "12",
         type: "recruit",
         productName: "월 구독 상품_모집형",
+        billingPeriod: "monthly",
         startedAt: "2026-10-01",
         endsAt: "2026-10-30",
         amount: 99000,
@@ -96,5 +97,14 @@ describe("transformSubscriptions", () => {
     expect(
       transformSubscriptions([{ ...item, productType: "unknown" }, item]),
     ).toHaveLength(1);
+  });
+
+  it("멤버십 시작·종료일 간격으로 결제 주기를 정하고, 판단할 수 없으면 null로 둔다", () => {
+    const [yearly, unknown] = transformSubscriptions([
+      { ...item, id: "1", startedAt: "2026-11-02", endsAt: "2027-11-02" },
+      { ...item, id: "2", startedAt: "2026-11-02", endsAt: "2026-11-20" },
+    ]);
+    expect(yearly?.billingPeriod).toBe("yearly");
+    expect(unknown?.billingPeriod).toBeNull();
   });
 });

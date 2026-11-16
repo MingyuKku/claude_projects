@@ -1,5 +1,5 @@
 {
-  "title": "サブスクリプション決済商品",
+  "title": "サブスク決済商品",
   "won": "{{amount}}ウォン",
   "column": {
     "name": "サービス名",
@@ -7,26 +7,26 @@
     "endsAt": "メンバーシップ終了",
     "amount": "決済額",
     "method": "決済方法",
-    "action": "サブスクリプション管理"
+    "action": "サブスク管理"
   },
   "action": {
-    "cancel": "解約",
+    "cancel": "サブスク解約",
     "cancelScheduled": "解約予定"
   },
   "empty": {
-    "title": "サブスクリプションを決済した商品がありません。"
+    "title": "サブスクを決済した商品がありません。"
   },
   "cancelDialog": {
-    "title": "サブスクリプション解約",
-    "description": "サブスクリプションを解約しますか？決済期間が終了する{{endsAt}}までは利用できます。",
-    "confirm": "解約",
+    "title": "サブスク解約",
+    "description": "サブスクを解約しますか？決済期間が終了する{{endsAt}}までは利用できます。",
+    "confirm": "サブスク解約",
     "completed": {
-      "title": "解約完了",
-      "description": "サブスクリプションを解約しました。またのご利用をお待ちしております！"
+      "title": "サブスク解約完了",
+      "description": "サブスクを解約しました。またのご利用をお待ちしております！"
     }
   },
   "error": {
-    "alreadyCanceled": "すでに解約済みのサブスクリプションです。",
-    "notFound": "サブスクリプション情報が見つかりません。"
+    "alreadyCanceled": "すでに解約済みのサブスクです。",
+    "notFound": "サブスク情報が見つかりません。"
   }
 }

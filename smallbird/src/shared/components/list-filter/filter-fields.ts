@@ -3,8 +3,10 @@ import type { SelectOption } from "@/shared/components/option-select";
 interface FilterFieldBase {
   /** URL 쿼리와 값의 키. 날짜 필드는 `{id}From`·`{id}To` 두 쿼리를 씀. */
   id: string;
-  /** PC·TAB 툴바의 자리표시 문구이자 필드 이름. */
+  /** PC·TAB 툴바의 자리표시 문구이자 필드 이름(MO 필터 화면의 필드 제목). */
   label: string;
+  /** 선택 필드의 PC·TAB 툴바 자리표시 문구가 필드 이름과 다를 때(캠페인 현황: 이름 "캠페인 유형", 툴바 "전체 캠페인 유형"). */
+  inlinePlaceholder?: string;
   /** MO 필터 모달에서 입력칸 안에 보이는 안내(예: "날짜를 선택하세요."). */
   placeholder: string;
   /**

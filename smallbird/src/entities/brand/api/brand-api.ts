@@ -2,7 +2,7 @@ import { brandSchema } from "../model/schema";
 
 import type { Brand } from "../model/schema";
 
-// 요구 명세 A-4·A-5. API가 없는 동안은 개발 서버에서만 목이 응답함(`entities/campaign`의 `load-mock-api`와 같은 방식).
+// 요구 명세 A-4·A-5. API가 없는 동안은 개발 서버에서만 목이 응답함.
 async function loadMockBrandApi() {
   if (!import.meta.env.DEV) {
     throw new Error("The brand API is not available yet.");

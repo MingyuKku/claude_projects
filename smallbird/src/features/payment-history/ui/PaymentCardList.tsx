@@ -1,6 +1,7 @@
 import {
   PaymentStatusBadge,
   usePaymentMethodLabel,
+  useSubscriptionProductName,
 } from "@/entities/subscription";
 import { useTranslation } from "@/shared/i18n";
 import { orEmptyValue } from "@/shared/lib";
@@ -20,6 +21,7 @@ export function PaymentCardList({ records }: PaymentCardListProps) {
   const { t } = useTranslation("features/payment-history");
   const { formatDateTime, formatWon } = usePaymentFormat();
   const paymentMethodLabel = usePaymentMethodLabel();
+  const productName = useSubscriptionProductName();
 
   return (
     <ul
@@ -29,7 +31,16 @@ export function PaymentCardList({ records }: PaymentCardListProps) {
       {records.map((record) => {
         const rows = [
           { key: "paidAt", value: orEmptyValue(formatDateTime(record.paidAt)) },
-          { key: "name", value: orEmptyValue(record.name) },
+          {
+            key: "name",
+            value: orEmptyValue(
+              productName(
+                record.productType,
+                record.billingPeriod,
+                record.name,
+              ),
+            ),
+          },
           { key: "amount", value: formatWon(record.amount) },
           {
             key: "method",

@@ -1,0 +1,85 @@
+{
+  "section": {
+    "service": "Register Campaign",
+    "product": "Select Campaign Product"
+  },
+  "service": {
+    "recruit": {
+      "name": "Recruitment",
+      "feature": {
+        "1": "Run recruitment campaigns",
+        "2": "Brand and Group Buy both available",
+        "3": "Flexible campaign types"
+      }
+    },
+    "pick": {
+      "name": "PICK",
+      "feature": {
+        "1": "Choose influencers and propose directly",
+        "2": "Brand and Group Buy both available",
+        "3": "Tailored collaboration"
+      }
+    },
+    "live": {
+      "name": "Live"
+    },
+    "applicator": {
+      "name": "Affiliate"
+    }
+  },
+  "badge": {
+    "brand": "Brand",
+    "groupBuy": "Group Buy",
+    "liveCommerce": "Live Commerce",
+    "liveClass": "Live Class",
+    "ota": "OTA",
+    "smallBusiness": "Small Business",
+    "inUse": "In use"
+  },
+  "action": {
+    "demo": "데모 체험하기",
+    "subscribe": "Subscribe",
+    "inUse": "In use",
+    "comingSoonButton": "Coming soon",
+    "demoRegister": "데모 캠페인 등록"
+  },
+  "comingSoon": "Coming soon.\nStay tuned!",
+  "product": {
+    "recruit": {
+      "brand": {
+        "1": "Brand campaigns via influencer recruitment",
+        "2": "Matching after proposal is accepted",
+        "3": "제품발송형, 매장방문형, 기자단형",
+        "4": "원고 컨펌 add-on available (5,000 KRW each)"
+      },
+      "groupBuy": {
+        "1": "Group buy campaigns via influencer recruitment",
+        "2": "제품발송형 only",
+        "3": "Set group buy fee per influencer",
+        "4": "Sales status and settlement"
+      }
+    },
+    "pick": {
+      "brand": {
+        "1": "Find influencers and propose per influencer",
+        "2": "Matching after proposal is accepted",
+        "3": "제품발송형, 매장방문형, 기자단형",
+        "4": "원고 컨펌 add-on available (5,000 KRW each)"
+      },
+      "groupBuy": {
+        "1": "Find influencers and propose group buys",
+        "2": "제품발송형 only",
+        "3": "Set group buy fee per influencer",
+        "4": "Sales status and settlement"
+      }
+    }
+  },
+  "notice": {
+    "title": "Notice",
+    "demo": "Demo is unlimited.",
+    "subscribe": "Subscribe to the product to register campaigns."
+  },
+  "error": {
+    "subscriptions": "Couldn't load subscriptions."
+  }
+}

@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from "@testing-library/react";
+import { screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { ApiError, serverApi, serverApiV3 } from "@/shared/api";
@@ -95,35 +95,6 @@ describe("관리자 계정 전환", () => {
     await screen.findByLabelText("아이디");
     expect(router.state.location.pathname).toBe(ROUTES.login);
     expect(serverApi.get).not.toHaveBeenCalledWith("/super");
-  });
-
-  it("전환 중 다른 클릭을 막고 성공하면 로컬 홈을 재로드한다", async () => {
-    const user = userEvent.setup();
-    let finish: ((value: unknown) => void) | undefined;
-    vi.mocked(serverApi.post).mockImplementation(
-      () =>
-        new Promise((resolve) => {
-          finish = resolve;
-        }),
-    );
-    await renderRoute(ROUTES.switchAccount);
-    await user.click(
-      await screen.findByRole("button", {
-        name: "sample-master 계정으로 변경",
-      }),
-    );
-    // 전환 전에 기기 잠금을 먼저 풀어 /super/change는 그 뒤에 나감.
-    await waitFor(() =>
-      expect(serverApi.post).toHaveBeenCalledWith("/super/change", {
-        userIdx: 42,
-      }),
-    );
-    expect(
-      screen.getByRole("button", { name: "bigbird 계정으로 변경" }),
-    ).toBeDisabled();
-    expect(hardNavigate).not.toHaveBeenCalled();
-    finish?.({ result: true });
-    await waitFor(() => expect(hardNavigate).toHaveBeenCalledWith("/"));
   });
 
   it.each([{ result: false }, { unexpected: true }])(

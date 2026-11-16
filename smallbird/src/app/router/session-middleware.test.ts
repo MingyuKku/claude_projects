@@ -3,14 +3,21 @@ import { RouterContextProvider } from "react-router";
 import { ApiError, serverApiV3 } from "@/shared/api";
 import { ROUTES } from "@/shared/config";
 
-import { requireSession, resetSessionMiddleware } from "./session-middleware";
+import {
+  requireSession,
+  resetSessionMiddleware,
+  sessionLoader,
+} from "./session-middleware";
 
 vi.mock("@/shared/api", async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   serverApiV3: { get: vi.fn() },
 }));
 
-function runRequireSession(pathname: string) {
+function runRequireSession(
+  pathname: string,
+  context = new RouterContextProvider(),
+) {
   const url = new URL(pathname, "http://localhost");
   return requireSession(
     {
@@ -18,7 +25,7 @@ function runRequireSession(pathname: string) {
       url,
       pattern: pathname,
       params: {},
-      context: new RouterContextProvider(),
+      context,
     },
     () => Promise.resolve(undefined),
   );
@@ -56,8 +63,8 @@ describe("requireSession", () => {
 
     it.each([
       ROUTES.mypageSubscribe,
-      ROUTES.campaignRegister,
-      "/campaign/register/CMP-1",
+      `${ROUTES.mypageSubscribe}/plans`,
+      ROUTES.campaignCreate,
     ])("SUB가 %s로 오면 계정 설정으로 보낸다", async (pathname) => {
       mockAuthority("SUB");
 
@@ -68,23 +75,59 @@ describe("requireSession", () => {
       );
     });
 
-    it("SUB도 캠페인 등록 내역과 비슷한 이름의 경로는 막지 않는다", async () => {
+    it("SUB도 구독 경로와 이름만 비슷한 경로는 막지 않는다", async () => {
       mockAuthority("SUB");
 
       await expect(
-        runRequireSession("/campaign/CMP-1"),
-      ).resolves.toBeUndefined();
-      await expect(
-        runRequireSession("/campaign/registered"),
+        runRequireSession(`${ROUTES.mypageSubscribe}d`),
       ).resolves.toBeUndefined();
     });
 
-    it("MASTER는 캠페인 등록 경로에 들어갈 수 있다", async () => {
+    it("MASTER는 구독 경로와 그 하위 경로에 들어갈 수 있다", async () => {
       mockAuthority("MASTER");
 
       await expect(
-        runRequireSession("/campaign/register/CMP-1"),
+        runRequireSession(ROUTES.mypageSubscribe),
+      ).resolves.toBeUndefined();
+      await expect(
+        runRequireSession(`${ROUTES.mypageSubscribe}/plans`),
       ).resolves.toBeUndefined();
     });
+  });
+
+  describe("비로그인", () => {
+    beforeEach(() => {
+      vi.mocked(serverApiV3.get).mockRejectedValue(
+        new ApiError(401, { result: false }),
+      );
+    });
+
+    it("구독 화면은 로그인으로 보내지 않고 비로그인(null) 세션으로 넘긴다", async () => {
+      const context = new RouterContextProvider();
+
+      await expect(
+        runRequireSession(ROUTES.mypageSubscribe, context),
+      ).resolves.toBeUndefined();
+      expect(
+        sessionLoader({
+          context,
+          request: new Request("http://localhost"),
+          params: {},
+          pattern: ROUTES.mypageSubscribe,
+          url: new URL(ROUTES.mypageSubscribe, "http://localhost"),
+        }),
+      ).toBeNull();
+    });
+
+    it.each([ROUTES.mypageAccount, ROUTES.mypageMoney])(
+      "%s는 로그인으로 보낸다",
+      async (pathname) => {
+        await expect(runRequireSession(pathname)).rejects.toSatisfy(
+          (thrown: unknown) =>
+            thrown instanceof Response &&
+            thrown.headers.get("Location") === ROUTES.login,
+        );
+      },
+    );
   });
 });

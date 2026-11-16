@@ -58,7 +58,12 @@ export const HOME_NAV_ITEM: ShellNavItem = {
 // 미구현 화면은 목적지를 만들지 않고 비활성 메뉴로 표시함.
 export const SHELL_NAV_ITEMS: ShellNavItem[] = [
   HOME_NAV_ITEM,
-  { id: "campaign", icon: Handshake },
+  // 캠페인 현황은 개발 서버에서만 연결함(API가 나오면 함께 공개). 그 밖에는 목적지 없이 비활성.
+  {
+    id: "campaign",
+    icon: Handshake,
+    href: import.meta.env.DEV ? ROUTES.campaign : undefined,
+  },
   {
     id: "influencerMatching",
     icon: Users,

@@ -2,6 +2,7 @@ import {
   PAYMENT_METHODS,
   PAYMENT_STATUSES,
   usePaymentMethodLabel,
+  useSubscriptionProductName,
 } from "@/entities/subscription";
 import { NARROW_FIELD_WIDTH } from "@/shared/components/list-filter";
 import { useTranslation } from "@/shared/i18n";
@@ -18,6 +19,7 @@ import type { FilterField } from "@/shared/components/list-filter";
 export function usePaymentFilterFields(): FilterField[] {
   const { t } = useTranslation("features/payment-history");
   const paymentMethodLabel = usePaymentMethodLabel();
+  const productName = useSubscriptionProductName();
 
   return [
     {
@@ -33,9 +35,10 @@ export function usePaymentFilterFields(): FilterField[] {
       placeholder: t("filter.item.placeholder"),
       // 시안(11755:96965): 세 선택(결제 내역·결제 수단·결제 상태)이 모두 140px. 팝업은 트리거 폭 이상으로 내용만큼 늘어남.
       width: NARROW_FIELD_WIDTH,
+      // 선택지 이름은 표의 상품명과 같은 문구(엔티티의 상품 이름)를 씀.
       options: PAYMENT_ITEMS.map((item) => ({
         value: item.value,
-        label: t(`filter.item.option.${item.value}`),
+        label: productName(item.productType, item.billingPeriod, item.value),
       })),
     },
     {

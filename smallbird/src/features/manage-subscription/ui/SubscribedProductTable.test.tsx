@@ -17,12 +17,16 @@ vi.mock("@/entities/subscription", () => ({
   readApiErrorReason: (error: unknown) => (error as { reason?: string }).reason,
   usePaymentMethodLabel: () => (value: string) =>
     value === "card" ? "신용카드(일반)" : value,
+  useSubscriptionProductName:
+    () => (_type: unknown, _period: unknown, name: string) =>
+      name,
 }));
 
 const active: Subscription = {
   id: "sub-1",
   type: "recruit",
   productName: "월 구독 상품_모집형",
+  billingPeriod: "monthly",
   startedAt: "2026-10-01",
   endsAt: "2026-10-31",
   amount: 99999,

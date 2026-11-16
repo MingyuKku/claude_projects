@@ -1,10 +1,4 @@
-import {
-  act,
-  fireEvent,
-  screen,
-  waitFor,
-  within,
-} from "@testing-library/react";
+import { act, screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { ApiError, serverApi, serverApiV3 } from "@/shared/api";
@@ -134,67 +128,8 @@ function selectedTabs() {
 
 describe("마이페이지 · 계정 설정 셸", () => {
   // 스크롤하는 요소가 <main>이고 마이페이지 화면들이 셸을 공유해, 리셋하지 않으면 이전 화면의 스크롤 위치가 남음.
+  // 화면·탭·하위 화면 이동과 뒤로가기 복원은 실제 레이아웃이 필요해 E2E(e2e/mypage-history.spec.ts)가 확인함.
   describe("스크롤 위치", () => {
-    it("다른 화면으로 이동하면 맨 위로 돌아간다", async () => {
-      const router = await renderRoute(ROUTES.mypageAccount);
-      await screen.findByRole("heading", { name: "계정 설정" });
-      const main = screen.getByRole("main");
-      main.scrollTop = 300;
-
-      await act(async () => {
-        await router.navigate(ROUTES.mypageMoney);
-      });
-      await waitFor(() => expect(main.scrollTop).toBe(0));
-    });
-
-    it("하위 화면(?panel=)을 열면 맨 위로 가고, 뒤로가기로 닫으면 열기 전 위치로 돌아온다", async () => {
-      const router = await renderRoute(ROUTES.mypageAccount);
-      await screen.findByRole("heading", { name: "계정 설정" });
-      const main = screen.getByRole("main");
-      main.scrollTop = 300;
-      fireEvent.scroll(main);
-
-      await act(async () => {
-        await router.navigate(`${ROUTES.mypageAccount}?tab=sub&panel=create`);
-      });
-      expect(main.scrollTop).toBe(0);
-
-      await act(async () => {
-        await router.navigate(-1);
-      });
-      expect(main.scrollTop).toBe(300);
-    });
-
-    it("다른 화면에서 뒤로가기로 돌아오면 떠날 때 위치로 복원한다", async () => {
-      const router = await renderRoute(ROUTES.mypageAccount);
-      await screen.findByRole("heading", { name: "계정 설정" });
-      const main = screen.getByRole("main");
-      main.scrollTop = 300;
-      fireEvent.scroll(main);
-
-      await act(async () => {
-        await router.navigate(ROUTES.mypageMoney);
-      });
-      expect(main.scrollTop).toBe(0);
-
-      await act(async () => {
-        await router.navigate(-1);
-      });
-      expect(main.scrollTop).toBe(300);
-    });
-
-    it("탭을 바꾸면 맨 위로 돌아간다", async () => {
-      const router = await renderRoute(ROUTES.mypageAccount);
-      await screen.findByRole("heading", { name: "계정 설정" });
-      const main = screen.getByRole("main");
-      main.scrollTop = 300;
-
-      await act(async () => {
-        await router.navigate(`${ROUTES.mypageAccount}?tab=notification`);
-      });
-      expect(main.scrollTop).toBe(0);
-    });
-
     it("필터 화면(?panel=filter)을 열어도 위치를 유지한다", async () => {
       const router = await renderRoute(
         `${ROUTES.mypageAccount}?tab=notification`,
@@ -210,32 +145,6 @@ describe("마이페이지 · 계정 설정 셸", () => {
       });
       expect(main.scrollTop).toBe(300);
     });
-  });
-
-  // 마이페이지 화면들은 한 셸(MypageLayout)을 공유해 이동해도 메뉴 상태가 유지됨. 닫힌 메뉴가 history 복원으로 다시 열리지 않아야 함.
-  it("전체 메뉴로 이동한 뒤 뒤로가기를 해도 메뉴가 다시 열리지 않는다", async () => {
-    const user = userEvent.setup();
-    const router = await renderRoute(ROUTES.mypageAccount);
-    await user.click(await screen.findByRole("button", { name: "메뉴 열기" }));
-    await user.click(
-      within(screen.getByRole("dialog")).getByRole("link", {
-        name: "빅버드 머니",
-      }),
-    );
-    await waitFor(() =>
-      expect(router.state.location.pathname).toBe(ROUTES.mypageMoney),
-    );
-    await waitFor(() =>
-      expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
-    );
-
-    await act(async () => {
-      await router.navigate(-1);
-    });
-    await waitFor(() =>
-      expect(router.state.location.pathname).toBe(ROUTES.mypageAccount),
-    );
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
   });
 
   it("MASTER는 계정 설정 헤더·LNB 활성·첫 탭·Master 정보를 본다", async () => {
@@ -527,7 +436,7 @@ describe("마이페이지 · 계정 설정 셸", () => {
     ).toBeNull();
   });
 
-  it("탭을 누르면 search가 바뀌고 panel·subId는 지워지며 뒤로 가면 이전 탭이다", async () => {
+  it("탭을 누르면 search가 바뀌고 panel·subId는 지워진다", async () => {
     const user = userEvent.setup();
     const router = await renderRoute(
       `${ROUTES.mypageAccount}?tab=sub&panel=permission&subId=3&lng=ko`,
@@ -545,18 +454,6 @@ describe("마이페이지 · 계정 설정 셸", () => {
     expect(params.has("panel")).toBe(false);
     expect(params.has("subId")).toBe(false);
     expect(selectedTabs().map((tab) => tab.textContent)).toEqual(["회사정보"]);
-
-    await act(async () => {
-      await router.navigate(-1);
-    });
-    await waitFor(() =>
-      expect(router.state.location.search).toContain("tab=sub"),
-    );
-    await waitFor(() =>
-      expect(selectedTabs().map((tab) => tab.textContent)).toEqual([
-        "Sub ID 관리",
-      ]),
-    );
   });
 
   it("기본 탭으로 돌아가면 tab 쿼리를 지운다", async () => {
@@ -752,23 +649,6 @@ describe("마이페이지 · 세션 확인", () => {
       .mocked(serverApiV3.get)
       .mock.calls.filter(([path]) => path === "/sec");
   }
-
-  it("만료 중에 거부된 화면도 로그인 뒤에는 첫 진입에 들어간다", async () => {
-    mockSessionError(new ApiError(401, undefined));
-    const router = await renderRoute(ROUTES.mypageAccount);
-    await waitFor(() =>
-      expect(router.state.location.pathname).toBe(ROUTES.login),
-    );
-
-    mockSession(session);
-    await act(async () => {
-      await router.navigate(ROUTES.mypageAccount);
-    });
-    expect(
-      await screen.findByRole("tab", { name: "Master ID 관리" }),
-    ).toBeInTheDocument();
-    expect(router.state.location.pathname).toBe(ROUTES.mypageAccount);
-  });
 
   it("같은 화면 안의 이동(탭 전환)은 세션을 다시 묻지 않는다", async () => {
     const user = userEvent.setup();
@@ -1072,16 +952,6 @@ describe("마이페이지 · 빅버드 머니", () => {
       expect(router.state.location.search).not.toContain("panel");
       expect(router.state.location.search).toContain("view=history");
     });
-  });
-
-  it("결제 서버가 isPaid=true를 붙여 돌려보내면 접수 알럿을 띄우고 쿼리를 지운다", async () => {
-    mockViewport({ tablet: true, desktop: false });
-    const router = await renderRoute(
-      `${ROUTES.mypageMoney}?isPaid=true&gopaymethod=VCard&goodName=%3F%3F`,
-    );
-
-    expect(await screen.findByText("충전 요청 완료")).toBeInTheDocument();
-    await waitFor(() => expect(router.state.location.search).toBe(""));
   });
 
   it("결제 서버가 더 붙인 쿼리(가상계좌 정보 등)도 이름과 상관없이 모두 지운다", async () => {

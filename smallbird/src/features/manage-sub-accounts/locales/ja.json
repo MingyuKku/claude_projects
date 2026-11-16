@@ -129,7 +129,7 @@
     "campaign": {
       "title": "サブIDキャンペーン割当",
       "column": {
-        "name": "キャンペーン名",
+        "name": "企画名",
         "productType": "商品タイプ",
         "detailType": "詳細商品",
         "status": "キャンペーン進行状況",

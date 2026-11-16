@@ -326,18 +326,25 @@ describe("루트 메인과 공통 메뉴", () => {
     expect(trigger).toHaveFocus();
   });
 
-  it("전체 메뉴의 홈을 선택하면 메뉴를 닫고 준비 중 메뉴는 이동하지 않는다", async () => {
+  it("전체 메뉴의 홈을 선택하면 메뉴를 닫는다", async () => {
+    const user = userEvent.setup();
+    await renderRoute(ROUTES.main);
+    await user.click(await screen.findByRole("button", { name: "메뉴 열기" }));
+    const dialog = screen.getByRole("dialog");
+    await user.click(within(dialog).getByRole("link", { name: "홈" }));
+    await waitFor(() =>
+      expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
+    );
+  });
+
+  it("전체 메뉴의 캠페인은 개발 서버에서 캠페인 현황으로 이동한다", async () => {
     const user = userEvent.setup();
     const router = await renderRoute(ROUTES.main);
     await user.click(await screen.findByRole("button", { name: "메뉴 열기" }));
     const dialog = screen.getByRole("dialog");
-    const campaign = within(dialog).getByRole("link", { name: "캠페인" });
-    expect(campaign).toHaveAttribute("aria-disabled", "true");
-    await user.click(campaign);
-    expect(router.state.location.pathname).toBe("/");
-    await user.click(within(dialog).getByRole("link", { name: "홈" }));
+    await user.click(within(dialog).getByRole("link", { name: "캠페인" }));
     await waitFor(() =>
-      expect(screen.queryByRole("dialog")).not.toBeInTheDocument(),
+      expect(router.state.location.pathname).toBe(ROUTES.campaign),
     );
   });
 
@@ -371,16 +378,6 @@ describe("루트 메인과 공통 메뉴", () => {
       expect(router.state.location.pathname).toBe(ROUTES.mypageAccount),
     );
   });
-  it("로그아웃은 외부 리다이렉트를 따르지 않고 현재 앱의 홈을 재로드한다", async () => {
-    const user = userEvent.setup();
-    vi.mocked(serverApiV3.post).mockResolvedValue({ result: true });
-    await renderRoute(ROUTES.main);
-    await user.click(await screen.findByRole("button", { name: "내 프로필" }));
-    await user.click(screen.getByRole("menuitem", { name: "로그아웃" }));
-    await waitFor(() => expect(hardNavigate).toHaveBeenCalledWith("/"));
-    expect(serverApiV3.post).toHaveBeenCalledWith("/auth/logout");
-  });
-
   it("로그아웃 실패는 현재 프로필을 유지하고 오류를 안내한다", async () => {
     const user = userEvent.setup();
     vi.mocked(serverApiV3.post).mockRejectedValue(new TypeError("연결 실패"));

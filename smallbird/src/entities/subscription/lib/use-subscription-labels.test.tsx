@@ -1,6 +1,9 @@
 import { renderHook } from "@testing-library/react";
 
-import { usePaymentMethodLabel } from "./use-subscription-labels";
+import {
+  usePaymentMethodLabel,
+  useSubscriptionProductName,
+} from "./use-subscription-labels";
 
 describe("usePaymentMethodLabel", () => {
   function label() {
@@ -21,5 +24,25 @@ describe("usePaymentMethodLabel", () => {
     expect(label()("cardInstallment", "credit")).toBe("신용카드(할부)");
     expect(label()("virtualAccount", "debit")).toBe("virtualAccount");
     expect(label()("")).toBe("-");
+  });
+});
+
+describe("useSubscriptionProductName", () => {
+  function name() {
+    return renderHook(() => useSubscriptionProductName()).result.current;
+  }
+
+  it("상품 유형·결제 주기로 이름을 만든다", () => {
+    expect(name()("recruit", "monthly", "서버 이름")).toBe(
+      "월 구독 상품_모집형",
+    );
+    expect(name()("pick", "yearly", "서버 이름")).toBe("연 구독 상품_PICK형");
+  });
+
+  it("코드를 하나라도 모르면 서버 이름을 그대로 보인다", () => {
+    expect(name()(null, "monthly", "월 구독 상품_모집형")).toBe(
+      "월 구독 상품_모집형",
+    );
+    expect(name()("recruit", null, "서버 이름")).toBe("서버 이름");
   });
 });

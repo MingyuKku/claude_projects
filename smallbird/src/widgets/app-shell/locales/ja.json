@@ -7,15 +7,15 @@
     "commerce": "コマース管理",
     "mypage": "マイページ",
     "support": "サポート",
-    "search": "インフルエンサー検索",
-    "influencerManage": "インフルエンサー管理",
+    "search": "クリエイター検索",
+    "influencerManage": "クリエイター管理",
     "chat": "チャット",
     "commerceSales": "販売状況管理",
     "commerceSettlement": "キャンペーン精算",
     "bigbird": "Bigbird問合せ",
     "buyer": "購入者問合せ",
-    "influencer": "インフルエンサー問合せ",
-    "subscribe": "サブスクリプション",
+    "influencer": "クリエイター問合せ",
+    "subscribe": "サブスク",
     "money": "ビッグバードマネー",
     "account": "アカウント設定"
   },
@@ -59,8 +59,8 @@
     "checkFailed": "ログイン状態を確認できませんでした。もう一度お試しください。"
   },
   "role": {
-    "label": "広告主・インフルエンサー切り替え",
+    "label": "広告主・クリエイター切り替え",
     "advertiser": "広告主",
-    "influencer": "インフルエンサー"
+    "influencer": "クリエイター"
   }
 }

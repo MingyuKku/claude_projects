@@ -69,9 +69,10 @@ export function SubAccountTab({
   }
 
   // TAB의 권한 부여는 목록 자리를 덮는 본문 전체 카드(시안 10724:187263). 탭 줄은 그대로 보임.
+  // 탭 본문(flex-col)의 남은 높이를 채움(디자인 QA 261111 TAB-49: 풀페이지 모달은 페이지 안을 fill).
   if (layout === "tablet" && openedPanel === "permission" && openedAccount) {
     return (
-      <div className="flex flex-col overflow-hidden rounded-lg border">
+      <div className="flex flex-1 flex-col overflow-hidden rounded-lg border">
         <SubAccountPermissionPanel
           key={openedAccount.accountIdx}
           accountIdx={openedAccount.accountIdx}

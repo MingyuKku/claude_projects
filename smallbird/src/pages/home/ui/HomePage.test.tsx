@@ -98,22 +98,47 @@ describe("HomePage", () => {
     expect(screen.getByRole("button", { name: "로그인" })).toBeInTheDocument();
   });
 
-  it("캠페인·요금 안내 카드는 비활성이고 준비 중 툴팁을 단다", async () => {
-    renderHome();
-    await screen.findByRole("heading", { level: 2 });
-    for (const name of [/캠페인 등록\/운영/, /요금 안내/]) {
-      const card = screen.getByRole("button", { name });
-      expect(card).toHaveAttribute("aria-disabled", "true");
-      expect(card.closest("[title]")).toHaveAttribute("title", "준비 중");
-    }
-  });
-
-  it("비활성 카드를 눌러도 아무 일도 일어나지 않는다", async () => {
+  it("캠페인 등록/운영 카드는 개발 서버에서 캠페인 현황으로 이동한다", async () => {
     const user = userEvent.setup();
     renderHome();
     await screen.findByRole("heading", { level: 2 });
-    await user.click(screen.getByRole("button", { name: /요금 안내/ }));
-    expect(screen.getByRole("heading", { level: 2 })).toBeInTheDocument();
+    const card = screen.getByRole("button", { name: /캠페인 등록\/운영/ });
+    expect(card).not.toHaveAttribute("aria-disabled");
+    await user.click(card);
+    expect(screen.getByTestId("location")).toHaveTextContent(ROUTES.campaign);
+  });
+
+  it("Sub ID에게 요금 안내 카드는 툴팁 없이 비활성이고 눌러도 이동하지 않는다", async () => {
+    vi.mocked(serverApiV3.get).mockResolvedValue({
+      ...session,
+      authority: "SUB",
+    });
+    const user = userEvent.setup();
+    renderHome();
+    await screen.findByRole("heading", { level: 2 });
+    // 세션 확인이 끝나면 비활성 카드로 바뀌므로 매번 다시 찾음.
+    await vi.waitFor(() =>
+      expect(screen.getByRole("button", { name: /요금 안내/ })).toHaveAttribute(
+        "aria-disabled",
+        "true",
+      ),
+    );
+    const card = screen.getByRole("button", { name: /요금 안내/ });
+    expect(card.closest("[title]")).toBeNull();
+    await user.click(card);
+    expect(screen.getByTestId("location")).toHaveTextContent(/^\/$/);
+  });
+
+  it("요금 안내 카드는 구독 화면으로 이동한다", async () => {
+    const user = userEvent.setup();
+    renderHome();
+    await screen.findByRole("heading", { level: 2 });
+    const card = screen.getByRole("button", { name: /요금 안내/ });
+    expect(card).not.toHaveAttribute("aria-disabled");
+    await user.click(card);
+    expect(screen.getByTestId("location")).toHaveTextContent(
+      "/mypage/subscribe",
+    );
   });
 
   it("인플루언서 추천 카드는 로그인하면 검색 화면으로 이동한다", async () => {
@@ -178,14 +203,15 @@ describe("HomePage", () => {
       expect(screen.getByTestId("location")).toHaveTextContent(/^\/$/);
     });
 
-    it("요금 안내 카드는 알럿 없이 비활성이다", async () => {
+    it("요금 안내 카드는 알럿 없이 구독 화면으로 이동한다", async () => {
       const user = userEvent.setup();
       renderHome();
       await screen.findByRole("heading", { level: 2 });
-      const card = screen.getByRole("button", { name: /요금 안내/ });
-      expect(card).toHaveAttribute("aria-disabled", "true");
-      await user.click(card);
+      await user.click(screen.getByRole("button", { name: /요금 안내/ }));
       expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+      expect(screen.getByTestId("location")).toHaveTextContent(
+        "/mypage/subscribe",
+      );
     });
   });
 
@@ -298,8 +324,10 @@ describe("HomePage", () => {
       expect(container).toHaveAttribute("data-keyboard", "closed");
       await user.click(screen.getByRole("textbox"));
       expect(container).toHaveAttribute("data-keyboard", "open");
-      const cards = screen.getByRole("button", { name: /요금 안내/ })
-        .parentElement?.parentElement;
+      // 개발 환경의 Master에게는 세 카드가 모두 활성이라 카드 바로 위가 카드 묶음임.
+      const cards = screen.getByRole("button", {
+        name: /요금 안내/,
+      }).parentElement;
       expect(cards?.className).toContain("in-data-[keyboard=open]:order-1");
       expect(screen.getByRole("textbox").closest("form")?.className).toContain(
         "in-data-[keyboard=open]:sticky",

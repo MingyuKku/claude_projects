@@ -1,11 +1,11 @@
 import { useState } from "react";
 
-import { usePaymentMethodLabel } from "@/entities/subscription";
-import { EmptyState } from "@/shared/components/empty-state";
 import {
-  EmptyTableFrame,
-  emptyHeightVariants,
-} from "@/shared/components/list-filter";
+  usePaymentMethodLabel,
+  useSubscriptionProductName,
+} from "@/entities/subscription";
+import { EmptyState } from "@/shared/components/empty-state";
+import { emptyHeightVariants } from "@/shared/components/list-filter";
 import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { orEmptyValue, useMediaQuery } from "@/shared/lib";
@@ -47,6 +47,7 @@ export function SubscribedProductTable({
   const [isCompletedOpen, setIsCompletedOpen] = useState(false);
   const { formatMembershipDate, formatWon } = useSubscriptionFormat();
   const paymentMethodLabel = usePaymentMethodLabel();
+  const productName = useSubscriptionProductName();
 
   const emptyState = (
     <EmptyState
@@ -56,8 +57,8 @@ export function SubscribedProductTable({
     />
   );
 
-  // TAB의 빈 상태는 표 머리글 없이 테두리 박스 안에 안내만 둠(시안 11755:97419). PC는 머리글을 두고 MO는 테두리가 없음.
-  const isTabletEmpty = isTabletUp && !isDesktop && subscriptions.length === 0;
+  // TAB·MO의 빈 상태는 표 머리글·테두리 없이 안내만 둠. PC는 머리글을 둠.
+  const isCompactEmpty = !isDesktop && subscriptions.length === 0;
 
   return (
     <section
@@ -70,8 +71,8 @@ export function SubscribedProductTable({
       >
         {t("title")}
       </h2>
-      {isTabletEmpty ? (
-        <EmptyTableFrame>{emptyState}</EmptyTableFrame>
+      {isCompactEmpty ? (
+        emptyState
       ) : isTabletUp ? (
         // 시안은 6열이 같은 폭이고 "구독해지"가 마지막 열의 왼쪽에 놓임.
         <Table
@@ -106,7 +107,13 @@ export function SubscribedProductTable({
               subscriptions.map((subscription) => (
                 <TableRow key={subscription.id}>
                   <TableCell className="whitespace-normal">
-                    {orEmptyValue(subscription.productName)}
+                    {orEmptyValue(
+                      productName(
+                        subscription.type,
+                        subscription.billingPeriod,
+                        subscription.productName,
+                      ),
+                    )}
                   </TableCell>
                   <TableCell>
                     {orEmptyValue(formatMembershipDate(subscription.startedAt))}

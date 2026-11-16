@@ -5,6 +5,10 @@
     "live": "라이브형",
     "applicator": "어플리에이터형"
   },
+  "productName": {
+    "monthly": "월 구독 상품_{{type}}",
+    "yearly": "연 구독 상품_{{type}}"
+  },
   "paymentStatus": {
     "paid": "결제 완료",
     "refunding": "환불 진행",

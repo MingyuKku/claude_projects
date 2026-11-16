@@ -20,6 +20,7 @@ function subscription(status: Subscription["status"]): Subscription {
     id: "sub-1",
     type: "recruit",
     productName: "월 구독 상품_모집형",
+    billingPeriod: "monthly",
     startedAt: "2026-11-02",
     endsAt: "2026-12-02",
     amount: 99000,

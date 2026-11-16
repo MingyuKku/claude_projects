@@ -1,8 +1,8 @@
 {
-  "title": "サブスクリプション決済履歴",
+  "title": "サブスク決済履歴",
   "won": "{{amount}}ウォン",
   "list": {
-    "label": "サブスクリプション決済履歴"
+    "label": "サブスク決済履歴"
   },
   "column": {
     "paidAt": "決済日",
@@ -27,13 +27,7 @@
     },
     "item": {
       "label": "決済内容",
-      "placeholder": "決済内容を選択してください。",
-      "option": {
-        "monthly_pick": "月額プラン_PICK型",
-        "monthly_recruit": "月額プラン_募集型",
-        "yearly_pick": "年額プラン_PICK型",
-        "yearly_recruit": "年額プラン_募集型"
-      }
+      "placeholder": "決済内容を選択してください。"
     },
     "method": {
       "label": "決済方法",
@@ -45,6 +39,6 @@
     }
   },
   "empty": {
-    "none": "サブスクリプションの決済履歴がありません。"
+    "none": "サブスクの決済履歴がありません。"
   }
 }

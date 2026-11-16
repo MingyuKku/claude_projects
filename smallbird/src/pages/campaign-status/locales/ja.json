@@ -1,0 +1,54 @@
+{
+  "tab": {
+    "all": "すべて",
+    "draft": "登録中",
+    "review": "承認待ち/差し戻し",
+    "active": "進行中",
+    "ended": "終了"
+  },
+  "filter": {
+    "type": {
+      "label": "キャンペーン種別",
+      "placeholder": "すべての種別"
+    }
+  },
+  "action": {
+    "register": "キャンペーン登録",
+    "registerShort": "登録",
+    "detail": "登録内容"
+  },
+  "list": {
+    "label": "キャンペーン一覧"
+  },
+  "column": {
+    "stage": "進行段階",
+    "name": "企画名",
+    "type": "種別",
+    "period": "期間",
+    "shortcut": "ショートカット",
+    "action": "その他"
+  },
+  "shortcut": {
+    "write": "続きを作成",
+    "detail": "登録内容",
+    "rejectReason": "差し戻し理由",
+    "manage": "管理",
+    "result": "結果確認"
+  },
+  "empty": {
+    "account": {
+      "title": "登録されたキャンペーンがありません。",
+      "description": "キャンペーンを登録してクリエイターと始めましょう。"
+    },
+    "tab": {
+      "all": "登録されたキャンペーンがありません。",
+      "draft": "登録中のキャンペーンがありません。",
+      "review": "承認待ち・差し戻しのキャンペーンがありません。",
+      "active": "進行中のキャンペーンがありません。",
+      "ended": "終了したキャンペーンがありません。"
+    }
+  },
+  "error": {
+    "list": "キャンペーン一覧を読み込めませんでした。"
+  }
+}

@@ -75,6 +75,9 @@ export const subscriptionPaymentListSchema = z.object({
         id: z.string(),
         paidAt: z.string(),
         name: z.string(),
+        // 상품 유형·결제 주기 코드(2026-11-16 추가). 이름을 언어별로 만들 때 쓰고, 없거나 모르는 값이면 `name`을 그대로 보임.
+        productType: z.string().nullish(),
+        billingPeriod: z.string().nullish(),
         amount: z.number(),
         // 모르는 코드가 와도 목록이 깨지지 않게 문자열로 읽음. 표시는 `usePaymentMethodLabel`·`PaymentStatusBadge`가 코드면 번역, 아니면 서버 값 그대로.
         method: z.string(),

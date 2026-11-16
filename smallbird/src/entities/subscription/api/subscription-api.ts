@@ -29,7 +29,7 @@ const SAVED_CARD_PATH = "/v3/subscription/billing/subscribe/saved-card";
 /** 결제 서버의 카드 추가(결제 없이 카드만 등록) API. 결제창 값은 새 카드로 구독 시작과 같은 모양. */
 const CARD_REGISTER_PATH = "/v3/subscription/billing/cards/register";
 
-/** `GET /v3/mypage/subscription/plans`. 구독 탭 상품 카드와 월·연 가격(MASTER/ADMIN만, Sub ID는 403). */
+/** `GET /v3/mypage/subscription/plans`. 구독 탭 상품 카드와 월·연 가격. 비로그인도 받음(2026-11-16 백엔드 개방, Sub ID는 403). */
 export async function fetchSubscriptionPlans() {
   const response = await serverApiV3.get("/mypage/subscription/plans");
   return transformPlans(subscriptionPlanListSchema.parse(response));

@@ -1,4 +1,7 @@
-import { usePaymentMethodLabel } from "@/entities/subscription";
+import {
+  usePaymentMethodLabel,
+  useSubscriptionProductName,
+} from "@/entities/subscription";
 import { useTranslation } from "@/shared/i18n";
 import { orEmptyValue } from "@/shared/lib";
 
@@ -20,6 +23,7 @@ export function SubscribedProductCards({
   const { t } = useTranslation("features/manage-subscription");
   const { formatMembershipDate, formatWon } = useSubscriptionFormat();
   const paymentMethodLabel = usePaymentMethodLabel();
+  const productName = useSubscriptionProductName();
 
   return (
     <ul aria-label={t("title")} className="flex flex-col gap-5">
@@ -53,7 +57,13 @@ export function SubscribedProductCards({
               </dt>
               <dd className="flex min-h-12 min-w-0 items-center justify-between gap-2 border-b px-4 py-2 text-sm leading-5 text-foreground">
                 <span className="min-w-0 break-all">
-                  {orEmptyValue(subscription.productName)}
+                  {orEmptyValue(
+                    productName(
+                      subscription.type,
+                      subscription.billingPeriod,
+                      subscription.productName,
+                    ),
+                  )}
                 </span>
                 <CancelSubscriptionButton
                   subscription={subscription}
