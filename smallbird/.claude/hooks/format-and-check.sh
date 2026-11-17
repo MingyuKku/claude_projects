@@ -9,6 +9,9 @@
 # Bash 는 파일 경로를 안 주므로 "직전 실행 이후 바뀐 파일"을 스탬프로 찾는다.
 # eslint/prettier 가 설치되기 전에는 아무것도 하지 않는다.
 
+# 훅은 세션의 현재 폴더에서 실행된다. Bash 로 cd 한 뒤에도 상대 경로가 맞도록 프로젝트 루트로 옮긴다.
+cd "${CLAUDE_PROJECT_DIR:-.}" || exit 0
+
 STAMP=".claude/.last-format-check"
 ESLINT="node_modules/.bin/eslint"
 PRETTIER="node_modules/.bin/prettier"

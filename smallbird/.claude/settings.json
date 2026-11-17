@@ -12,6 +12,7 @@
       "Bash(pnpm i18n)",
       "Bash(pnpm i18n:check)",
       "Bash(pnpm ai:check)",
+      "Bash(pnpm exec vitest run:*)",
       "Bash(python convention/ai/render.py:*)",
       "Bash(python3 convention/ai/render.py:*)",
       "Bash(python ai/scripts/render_agents.py:*)",
@@ -19,6 +20,8 @@
       "Bash(git status:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
+      "Bash(git show:*)",
+      "Bash(git fetch:*)",
       "Bash(git add:*)",
       "Bash(git commit:*)"
     ],
@@ -56,7 +59,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh .claude/hooks/format-and-check.sh",
+            "command": "sh \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/format-and-check.sh",
             "timeout": 60,
             "statusMessage": "컨벤션 자동 교정"
           }
@@ -68,7 +71,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "sh .claude/hooks/verify-on-stop.sh",
+            "command": "sh \"$CLAUDE_PROJECT_DIR\"/.claude/hooks/verify-on-stop.sh",
             "timeout": 180,
             "statusMessage": "타입체크 · 테스트"
           }

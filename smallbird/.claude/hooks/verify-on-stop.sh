@@ -12,6 +12,9 @@
 # - pnpm typecheck / pnpm i18n:check / pnpm test 스크립트가 없으면 해당 검사는 건너뛴다.
 #   lint 는 편집 직후 훅(format-and-check.sh)이 파일 단위로 처리하므로 여기서 돌리지 않는다.
 
+# 훅은 세션의 현재 폴더에서 실행된다. Bash 로 cd 한 뒤에도 상대 경로가 맞도록 프로젝트 루트로 옮긴다.
+cd "${CLAUDE_PROJECT_DIR:-.}" || exit 0
+
 MAX_ATTEMPTS=3
 VERIFIED=".claude/.last-verified"
 LOG=".claude/.last-verify.log"

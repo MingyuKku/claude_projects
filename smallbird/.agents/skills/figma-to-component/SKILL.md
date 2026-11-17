@@ -8,6 +8,8 @@ description: Figma URL이나 노드 ID를 받아 React + shadcn/ui + Tailwind �
 
 Figma가 디자인의 원본입니다. 페이지 스캔과 프레임 지정값은 `scripts/design/figma.mjs`(Figma REST, `.env.local`의 `FIGMA_TOKEN`)로 받고, 한두 노드의 상세나 스크린샷은 Figma MCP(`figma`)로 봅니다. **토큰이 없거나 연결이 안 되거나 값이 없으면 추측하지 말고 멈춰서 보고합니다.** 디자인이 없는 화면은 만들지 않고, 데이터 레이어(타입, 훅)까지만 만든 뒤 보고합니다.
 
+Figma 플러그인의 skill(`figma-design-to-code` 등)과 절차가 다르면 이 skill을 따릅니다. 지정값은 `figma.mjs outline`이 기준이고, `get_design_context`·`get_screenshot`은 한두 노드의 상세나 모양 확인에만 씁니다. 로컬 캐시 읽기와 7단계 시안 대조는 빼지 않습니다.
+
 대상: 사용자가 지정한 Figma URL/노드와 구현할 컴포넌트 (지정이 없으면 질문)
 
 ## 로컬 Figma 캐시
@@ -30,7 +32,7 @@ Figma가 디자인의 원본입니다. 페이지 스캔과 프레임 지정값�
 
 1. **파악**: 캐시가 있으면 먼저 읽어 화면 구성을 파악합니다. 구현할 프레임마다(기기별로) `node scripts/design/figma.mjs outline <node,…>`로 **프레임 전체 지정값**을 받습니다. 한 줄에 요소 하나씩, 자동 레이아웃(방향·gap·padding·정렬)·크기 방식(fixed/hug/fill)·색·테두리·radius·그림자·글자(크기/굵기/행간·자간·색)·컴포넌트 변형이 나오고, 변수가 연결된 값은 코드 클래스 이름(`ds-gap-4`, `ds-text-sm-5-medium`)이 함께 나옵니다. 필요한 노드만 골라 읽지 않고 이 요약 전체를 기준으로 구현합니다(빠진 값이 기본값으로 채워지는 것을 막기 위해). 모양을 눈으로 확인할 때만 `figma.mjs image` 또는 `get_screenshot`을 씁니다.
 2. **토큰**: 간격·텍스트 스타일·그림자는 시안 이름 앞에 `ds-`를 붙인 클래스를 씁니다(값이 기기마다 바뀌는 Figma 토큰, `.claude/rules/styling.md`). 색·radius는 shadcn 시맨틱 토큰(`bg-muted`, `rounded-md`)을 씁니다. `outline`에 변수 없이 숫자만 나온 값은 임의 값으로 옮기지 말고, 가까운 토큰이 있는지 확인한 뒤 없으면 "시안 불일치(토큰 밖 값)"로 보고합니다.
-3. **배치 결정**: 아래 기준으로 FSD 레이어를 정합니다. 애매하면 `architect` 에이전트(없으면 사용자)에게 묻습니다.
+3. **배치 결정**: 아래 기준으로 FSD 레이어를 정합니다. 애매하면 사용자에게 묻습니다.
    - 도메인과 무관한 기본 UI(버튼, 입력) → `shared/ui`
    - 도메인 데이터를 보여주는 카드·프로필 → `entities/{domain}/ui`
    - 사용자 동작이 있는 폼·다이얼로그 → `features/{domain}/ui`

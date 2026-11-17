@@ -14,9 +14,9 @@ paths:
 src/
 ├── app/         # 전역 설정, 프로바이더, 라우팅 초기화, 글로벌 스타일
 ├── pages/       # 라우트 단위 페이지 컴포넌트 (라우팅 뷰 조립)
-├── widgets/     # 독립적으로 완결된 대형 UI 블록 (예: Header, Sidebar, ProductFeed)
-├── features/    # 사용자 인터랙션 및 비즈니스 가치 단위 (예: AuthByEmail, AddToCart, FilterItems)
-├── entities/    # 비즈니스 핵심 도메인 모델 및 기본 UI (예: User, Product, Order)
+├── widgets/     # 독립적으로 완결된 대형 UI 블록 (예: app-shell, bigbird-inquiry-workspace)
+├── features/    # 사용자 인터랙션 및 비즈니스 가치 단위 (예: login, checkout-subscription, register-campaign)
+├── entities/    # 비즈니스 핵심 도메인 모델 및 기본 UI (예: session, campaign, bigbird-money)
 └── shared/      # 도메인 비종속적 공통 재사용 모듈 (shadcn/ui, API 클라이언트, 유틸, 훅)
 ```
 

@@ -7,7 +7,7 @@ paths:
 
 # 라우팅 (React Router · FSD)
 
-React Router는 **data mode**(`createBrowserRouter` + `RouterProvider`)로 `app` 레이어에서만 구성합니다. framework mode는 `routes/` 파일 규약과 loader 중심 구조를 강제해 FSD의 `pages`/슬라이스 경계와 충돌하므로 쓰지 않습니다. 버전별 API는 `react-router` skill과 `node_modules/react-router/docs/`를 기준으로 합니다.
+React Router는 **data mode**(`createBrowserRouter` + `RouterProvider`)로 `app` 레이어에서만 구성합니다. framework mode는 `routes/` 파일 규약과 loader 중심 구조를 강제해 FSD의 `pages`/슬라이스 경계와 충돌하므로 쓰지 않습니다. 버전별 API는 `node_modules/react-router/docs/`를 기준으로 합니다.
 
 ## 구조
 
