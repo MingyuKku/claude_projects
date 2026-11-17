@@ -11,7 +11,10 @@ import {
   useRealtimeSessionLines,
 } from "@/entities/inquiry";
 import { EditableChatMessage } from "@/features/edit-inquiry-message";
-import { ChatDivider } from "@/shared/components/chat-message";
+import {
+  ChatDivider,
+  MY_AVATAR_CLASS_NAME,
+} from "@/shared/components/chat-message";
 import { EmptyState } from "@/shared/components/empty-state";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery } from "@/shared/lib/useMediaQuery";
@@ -32,6 +35,8 @@ interface BuyerConversationProps {
   isOtherDevice?: boolean;
   /** 안 읽은 문의의 대화를 받아 읽음 처리된 뒤 목록을 다시 받을 때 부름(파란 점 갱신). */
   onRead?: () => void;
+  /** 내 말풍선의 프로필 이미지(광고주가 등록한 이미지). 없으면 기본 프로필. */
+  myAvatarSrc?: string;
 }
 
 /** 대화 영역의 메시지 부분. 구매자·인플루언서 문의는 상대↔광고주 스레드, 상품·캠페인 Q&A는 질문과 답변. */
@@ -39,14 +44,20 @@ export function BuyerConversation({
   inquiry,
   isOtherDevice = false,
   onRead,
+  myAvatarSrc,
 }: BuyerConversationProps) {
   return isQnaSource(inquiry.source) ? (
-    <QnaConversation inquiry={inquiry} onRead={onRead} />
+    <QnaConversation
+      inquiry={inquiry}
+      onRead={onRead}
+      myAvatarSrc={myAvatarSrc}
+    />
   ) : (
     <PurchaserConversation
       inquiry={inquiry}
       isOtherDevice={isOtherDevice}
       onRead={onRead}
+      myAvatarSrc={myAvatarSrc}
     />
   );
 }
@@ -55,6 +66,7 @@ function PurchaserConversation({
   inquiry,
   isOtherDevice = false,
   onRead,
+  myAvatarSrc,
 }: BuyerConversationProps) {
   const { t } = useTranslation("widgets/buyer-inquiry-workspace");
   const { t: tCommon } = useTranslation();
@@ -166,8 +178,9 @@ function PurchaserConversation({
                 <ConversationFiles
                   row={row}
                   name={name}
-                  // 텍스트만 있는 말풍선과 같은 프로필 이미지. 빠지면 첨부가 붙은 상대 메시지만 기본 아바타로 보임.
-                  avatarSrc={isMine ? undefined : avatarSrc}
+                  // 텍스트만 있는 말풍선과 같은 프로필 이미지. 빠지면 첨부가 붙은 메시지만 기본 아바타로 보임.
+                  avatarSrc={isMine ? myAvatarSrc : avatarSrc}
+                  avatarClassName={isMine ? MY_AVATAR_CLASS_NAME : undefined}
                   size={isTablet ? "sm" : "md"}
                   rowClassName={isMine ? "desktop:gap-3" : undefined}
                   time={
@@ -179,6 +192,8 @@ function PurchaserConversation({
                           <EditableChatMessage
                             message={groupedText}
                             name={name}
+                            avatarSrc={myAvatarSrc}
+                            avatarClassName={MY_AVATAR_CLASS_NAME}
                             time={formatMessageTime(groupedText.createdAt)}
                             size={isTablet ? "sm" : "md"}
                             // Figma 구매자 PC 내 메시지(6756:28994)는 아바타와 12px, 나머지는 8px입니다. 텍스트만 보낸 말풍선(아래)과 같습니다.
@@ -202,7 +217,8 @@ function PurchaserConversation({
                   <EditableChatMessage
                     message={row.message}
                     name={name}
-                    avatarSrc={isMine ? undefined : avatarSrc}
+                    avatarSrc={isMine ? myAvatarSrc : avatarSrc}
+                    avatarClassName={isMine ? MY_AVATAR_CLASS_NAME : undefined}
                     time={formatMessageTime(row.message.createdAt)}
                     size={isTablet ? "sm" : "md"}
                     // Figma 구매자 PC 내 메시지(6756:28994)는 아바타와 12px, 나머지는 8px입니다.

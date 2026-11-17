@@ -110,6 +110,9 @@ eslint_rc=0
 if [ -n "$linted" ]; then
   report=$(run_on "$linted" "$ESLINT" --no-warn-ignored --fix --format json 2>/dev/null)
   eslint_rc=$?
+  # GNU xargs(Linux)는 자식이 1~125 로 끝나면 123 을 돌려준다(macOS 는 1 그대로). lint 오류(1)와 같게 본다.
+  # 설정·실행 오류(2)는 stdout 에 JSON 이 없어 아래 jq 검사가 잡는다.
+  [ "$eslint_rc" -eq 123 ] && eslint_rc=1
 fi
 run_on "$checked" "$PRETTIER" --write --ignore-unknown >/dev/null 2>&1
 touch "$STAMP"

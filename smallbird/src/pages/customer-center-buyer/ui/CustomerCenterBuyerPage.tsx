@@ -115,6 +115,7 @@ function InquiryMenuPage({ menu }: { menu: InquiryMenu }) {
             threadUserIdx={session.threadUserIdx}
             onChangeStatus={() => void mutate()}
             onRead={() => void mutate()}
+            myAvatarSrc={session.profileImageUrl ?? undefined}
           />
         ) : (
           !isLoading && (

@@ -43,7 +43,13 @@ interface UserAvatarProps {
 function UserAvatar({ src, size }: UserAvatarProps) {
   return (
     <Avatar size={size}>
-      {src && <AvatarImage src={src} alt="" className="border border-border" />}
+      {src && (
+        <AvatarImage
+          src={src}
+          alt=""
+          className="rounded-[inherit] border border-border"
+        />
+      )}
       <AvatarPlaceholder />
     </Avatar>
   );

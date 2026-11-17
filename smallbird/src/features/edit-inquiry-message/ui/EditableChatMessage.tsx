@@ -133,6 +133,7 @@ export function EditableChatMessage({
       <MessageEditor
         name={name}
         avatarSrc={avatarSrc}
+        avatarClassName={avatarClassName}
         value={text}
         onChangeValue={setText}
         maxLength={MAX_LENGTH}

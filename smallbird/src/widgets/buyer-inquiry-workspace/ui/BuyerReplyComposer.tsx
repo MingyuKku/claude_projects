@@ -84,7 +84,8 @@ export function BuyerReplyComposer({
     <div className="shrink-0 bg-muted">
       {threadIdx !== null && <InquiryUploadStatus threadIdx={threadIdx} />}
       <form
-        className="p-4"
+        data-keyboard-anchor
+        className="p-4 in-data-[keyboard=open]:pb-(--keyboard-anchor-gap)"
         onSubmit={(event) => {
           event.preventDefault();
           void submit();

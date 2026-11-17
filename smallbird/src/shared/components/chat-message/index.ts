@@ -1,3 +1,4 @@
+export { MY_AVATAR_CLASS_NAME } from "./avatar-class";
 export { ChatCodeCard } from "./ChatCodeCard";
 export { ChatDivider } from "./ChatDivider";
 export { ChatMessage } from "./ChatMessage";

@@ -26,6 +26,7 @@ import {
   ChatDivider,
   ChatMessage,
   MessageAlert,
+  MY_AVATAR_CLASS_NAME,
 } from "@/shared/components/chat-message";
 import { EmptyState } from "@/shared/components/empty-state";
 import { TextField } from "@/shared/components/text-field";
@@ -75,11 +76,10 @@ const FAILED_CARD_MS = 10_000;
 
 // 빅버드 문의는 항상 같은 빅버드 담당자와 하는 대화라 상대 아바타를 빅버드 로고(심볼)로 고정함. 로고가 원에 잘리지 않게 여백을 둠.
 const MANAGER_AVATAR_CLASS = "bg-background object-contain p-1.5";
-const MY_AVATAR_CLASS = "border border-border";
 
 function toAvatarProps(isMine: boolean, myAvatarSrc?: string) {
   return isMine
-    ? { avatarSrc: myAvatarSrc, avatarClassName: MY_AVATAR_CLASS }
+    ? { avatarSrc: myAvatarSrc, avatarClassName: MY_AVATAR_CLASS_NAME }
     : { avatarSrc: managerSymbol, avatarClassName: MANAGER_AVATAR_CLASS };
 }
 

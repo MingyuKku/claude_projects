@@ -1,5 +1,5 @@
 #!/bin/sh
-# 턴이 끝날 때 타입체크·번역 검사·테스트를 돌린다. 빨간 채로 "다 했습니다" 하고 끝나는 것을 막는다.
+# 턴이 끝날 때 pnpm verify 의 검사(lint 제외)를 돌린다. 빨간 채로 "다 했습니다" 하고 끝나는 것을 막는다.
 #
 # - Claude 가 검증 입력을 바꾼 표시(.claude/.unverified-edits, 편집 직후 훅이 남김)가 없으면 아무것도 안 한다.
 #   질문만 한 턴이나 문서만 고친 턴에 사용자의 작업 중 코드 실패로 요청 밖 수정을 시키지 않기 위해서다.
@@ -9,7 +9,7 @@
 # - block 을 내면 Claude 가 다시 돌므로 무한 루프를 카운터로 막는다.
 #   MAX_ATTEMPTS 번까지 되돌리고, 그 뒤로는 사람에게 넘긴다.
 #   되돌릴 때 테스트를 고쳐 통과시키지 말라고 함께 알린다. 횟수 제한 안에 통과시켜야 하는 압박이 그쪽으로 새지 않게.
-# - pnpm typecheck / pnpm i18n:check / pnpm test 스크립트가 없으면 해당 검사는 건너뛴다.
+# - 검사 목록은 scripts/verify.sh --check-list 에서 읽고, package.json 에 없는 스크립트는 건너뛴다.
 #   lint 는 편집 직후 훅(format-and-check.sh)이 파일 단위로 처리하므로 여기서 돌리지 않는다.
 
 # 훅은 세션의 현재 폴더에서 실행된다. Bash 로 cd 한 뒤에도 상대 경로가 맞도록 프로젝트 루트로 옮긴다.
@@ -47,45 +47,37 @@ has_script() { jq -e --arg s "$1" '.scripts[$s] // empty' package.json >/dev/nul
 failures=""
 : > "$LOG" 2>/dev/null
 
-# 검사 출력에서 오류 줄만 뽑되, 정규식에 안 잡히면 끝부분을 그대로 보여준다.
+# 검사 출력에서 오류 줄만 뽑되, 정규식이 없거나 안 잡히면 끝부분을 그대로 보여준다.
 summarize() {
-  picked=$(printf '%s' "$2" | grep -E "$1" | head -8)
+  picked=""
+  [ -n "$1" ] && picked=$(printf '%s' "$2" | grep -E "$1" | head -8)
   [ -n "$picked" ] || picked=$(printf '%s' "$2" | tail -8)
   printf '%s' "$picked"
 }
 
-if has_script typecheck; then
-  typecheck=$($PNPM typecheck 2>&1); rc=$?
-  { printf '== pnpm typecheck (exit %s)\n%s\n' "$rc" "$typecheck"; } >> "$LOG" 2>/dev/null
-  if [ "$rc" -ne 0 ]; then
-    failures="타입 오류 (exit $rc):
-$(summarize '^[^ ].*error TS' "$typecheck")"
-  fi
-fi
+# 통과하면 pnpm verify 와 같은 지문을 남기므로 검사 목록도 verify.sh 에서 읽는다.
+checks="typecheck i18n:check test"
+[ -f scripts/verify.sh ] && checks=$(sh scripts/verify.sh --check-list)
 
-if has_script i18n:check; then
-  i18n=$($PNPM i18n:check 2>&1); rc=$?
-  { printf '== pnpm i18n:check (exit %s)\n%s\n' "$rc" "$i18n"; } >> "$LOG" 2>/dev/null
-  if [ "$rc" -ne 0 ]; then
-    [ -n "$failures" ] && failures="$failures
-
-"
-    failures="${failures}번역 검사 실패 (exit $rc):
-$(summarize '^  - ' "$i18n")"
-  fi
-fi
-
-if has_script test; then
-  tests=$($PNPM test 2>&1); rc=$?
-  { printf '== pnpm test (exit %s)\n%s\n' "$rc" "$tests"; } >> "$LOG" 2>/dev/null
-  if [ "$rc" -ne 0 ]; then
-    [ -n "$failures" ] && failures="$failures
+for check in $checks; do
+  [ "$check" = lint ] && continue
+  has_script "$check" || continue
+  out=$($PNPM "$check" 2>&1); rc=$?
+  { printf '== pnpm %s (exit %s)\n%s\n' "$check" "$rc" "$out"; } >> "$LOG" 2>/dev/null
+  [ "$rc" -eq 0 ] && continue
+  case "$check" in
+    typecheck) label="타입 오류"; pattern='^[^ ].*error TS' ;;
+    i18n:check) label="번역 검사 실패"; pattern='^  - ' ;;
+    test) label="테스트 실패"; pattern='✕|FAIL|AssertionError' ;;
+    test:scripts) label="스크립트 테스트 실패"; pattern='^not ok' ;;
+    *) label="pnpm $check 실패"; pattern="" ;;
+  esac
+  [ -n "$failures" ] && failures="$failures
 
 "
-    failures="${failures}테스트 실패 (exit $rc):
-$(summarize '✕|FAIL|AssertionError' "$tests")"
-  fi
-fi
+  failures="${failures}${label} (exit $rc):
+$(summarize "$pattern" "$out")"
+done
 
 if [ -z "$failures" ]; then
   rm -f "$COUNTER" "$UNVERIFIED"

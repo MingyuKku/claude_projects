@@ -2,7 +2,11 @@ import { LoaderCircle } from "lucide-react";
 
 import { deleteQnaReply, editQnaReply, useQnaDetail } from "@/entities/inquiry";
 import { EditableChatMessage } from "@/features/edit-inquiry-message";
-import { ChatDivider, ChatMessage } from "@/shared/components/chat-message";
+import {
+  ChatDivider,
+  ChatMessage,
+  MY_AVATAR_CLASS_NAME,
+} from "@/shared/components/chat-message";
 import { EmptyState } from "@/shared/components/empty-state";
 import { useTranslation } from "@/shared/i18n";
 
@@ -20,10 +24,16 @@ interface QnaConversationProps {
   inquiry: BuyerInquiryViewModel;
   /** 안 읽은 문의의 상세를 받아 읽음 처리된 뒤 목록을 다시 받을 때 부름(파란 점 갱신). */
   onRead?: () => void;
+  /** 내 답변 말풍선의 프로필 이미지(광고주가 등록한 이미지). 없으면 기본 프로필. */
+  myAvatarSrc?: string;
 }
 
 /** 상품 Q&A: 질문마다 광고주 답변 하나. 답변 입력은 구매자 문의처럼 하단 고정 입력창(QnaReplyComposer), 수정·삭제는 호버 버튼. */
-export function QnaConversation({ inquiry, onRead }: QnaConversationProps) {
+export function QnaConversation({
+  inquiry,
+  onRead,
+  myAvatarSrc,
+}: QnaConversationProps) {
   const { t } = useTranslation("widgets/buyer-inquiry-workspace");
   const { t: tCommon } = useTranslation();
   const { items, isLoading, isError, mutate } = useQnaDetail(inquiry);
@@ -84,6 +94,7 @@ export function QnaConversation({ inquiry, onRead }: QnaConversationProps) {
             item={item}
             onChanged={() => void mutate()}
             advertiserName={t("advertiser")}
+            avatarSrc={myAvatarSrc}
           />
         </li>
       ))}
@@ -94,10 +105,12 @@ export function QnaConversation({ inquiry, onRead }: QnaConversationProps) {
 function QnaReply({
   item,
   advertiserName,
+  avatarSrc,
   onChanged,
 }: {
   item: QnaItemViewModel;
   advertiserName: string;
+  avatarSrc?: string;
   onChanged: () => void;
 }) {
   const { reply } = item;
@@ -120,6 +133,8 @@ function QnaReply({
     <EditableChatMessage
       message={message}
       name={advertiserName}
+      avatarSrc={avatarSrc}
+      avatarClassName={MY_AVATAR_CLASS_NAME}
       time={reply.writtenAt ? formatMessageTime(reply.writtenAt) : ""}
       canModify={IS_BUYER_WRITE_ENABLED}
       onChanged={onChanged}

@@ -45,6 +45,8 @@ interface BuyerInquiryPanelsProps {
   onChangeStatus?: () => void;
   /** 안 읽은 문의를 열어 읽음 처리된 뒤 목록을 다시 받을 때 부름(목록의 파란 점 갱신). */
   onRead?: () => void;
+  /** 내 말풍선의 프로필 이미지(세션의 프로필 이미지). */
+  myAvatarSrc?: string;
 }
 
 /** 문의 대화(구매자·인플루언서 문의 스레드, 상품·캠페인 Q&A)와 상세 정보 패널. */
@@ -53,6 +55,7 @@ export function BuyerInquiryPanels({
   threadUserIdx,
   onChangeStatus,
   onRead,
+  myAvatarSrc,
 }: BuyerInquiryPanelsProps) {
   const { t } = useTranslation("widgets/buyer-inquiry-workspace");
   const navigate = useNavigate();
@@ -98,8 +101,8 @@ export function BuyerInquiryPanels({
       aria-label={t("conversation")}
       className={
         panel === "detail"
-          ? "hidden tablet:flex tablet:min-w-0 tablet:flex-1 tablet:flex-col tablet:overflow-hidden tablet:rounded-lg tablet:border tablet:border-border"
-          : "flex min-w-0 flex-1 flex-col tablet:overflow-hidden tablet:rounded-lg tablet:border tablet:border-border"
+          ? "hidden tablet:flex tablet:min-w-0 tablet:flex-1 tablet:flex-col tablet:overflow-hidden tablet:rounded-lg tablet:border tablet:border-border tablet:in-data-[keyboard=open]:overflow-visible"
+          : "flex min-w-0 flex-1 flex-col tablet:overflow-hidden tablet:rounded-lg tablet:border tablet:border-border tablet:in-data-[keyboard=open]:overflow-visible"
       }
     >
       {/* Figma Header / Sub(6756:28990): 배지·아바타·이름은 8px 간격입니다.
@@ -153,6 +156,7 @@ export function BuyerInquiryPanels({
             inquiry={inquiry}
             isOtherDevice={isOtherDevice}
             onRead={onRead}
+            myAvatarSrc={myAvatarSrc}
           />
         </div>
       </ScrollArea>

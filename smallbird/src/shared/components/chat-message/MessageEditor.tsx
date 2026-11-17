@@ -22,6 +22,7 @@ const editorVariants = cva("flex items-start gap-2", {
 interface MessageEditorProps {
   name: string;
   avatarSrc?: string;
+  avatarClassName?: string;
   value: string;
   onChangeValue: (value: string) => void;
   maxLength: number;
@@ -41,6 +42,7 @@ interface MessageEditorProps {
 export function MessageEditor({
   name,
   avatarSrc,
+  avatarClassName,
   value,
   onChangeValue,
   maxLength,
@@ -117,7 +119,9 @@ export function MessageEditor({
         </div>
       </div>
       <Avatar size="md">
-        {avatarSrc && <AvatarImage src={avatarSrc} alt="" />}
+        {avatarSrc && (
+          <AvatarImage src={avatarSrc} alt="" className={avatarClassName} />
+        )}
         <AvatarPlaceholder />
       </Avatar>
     </div>

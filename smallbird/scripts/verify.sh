@@ -6,6 +6,9 @@
 #   (.claude/hooks/verify-on-stop.sh)은 지문이 같으면 같은 검사를 다시 돌리지 않는다.
 # - `--fingerprint`: 검사 없이 지문만 출력한다. Stop 훅이 같은 계산을 쓰도록 여기 한 곳에 둔다.
 
+# 검사 목록. Stop 훅도 이 목록을 읽어, 같은 지문을 남기면서 검사 범위가 어긋나지 않게 한다.
+CHECKS="typecheck lint i18n:check ds:tokens:check test test:scripts"
+
 # 검증 입력이 되는 파일. lockfile 도 포함한다(의존성만 바뀌어도 이전 성공을 재사용하지 않기 위해).
 WATCH="src scripts/i18n.mjs scripts/design tsconfig.json vite.config.ts vitest.config.ts playwright.config.ts e2e eslint.config.js package.json pnpm-lock.yaml"
 VERIFIED=".claude/.last-verified"
@@ -27,8 +30,14 @@ if [ "${1:-}" = "--watch-list" ]; then
   exit 0
 fi
 
+# `--check-list`: 검사 목록을 출력한다.
+if [ "${1:-}" = "--check-list" ]; then
+  echo "$CHECKS"
+  exit 0
+fi
+
 failed=""
-for check in typecheck lint i18n:check ds:tokens:check test test:scripts; do
+for check in $CHECKS; do
   out=$(pnpm -s "$check" 2>&1)
   rc=$?
   if [ "$rc" -eq 0 ]; then
