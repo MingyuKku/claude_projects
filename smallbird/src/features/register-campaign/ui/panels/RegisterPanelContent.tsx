@@ -1,6 +1,7 @@
 import { AddBrandPanel } from "./AddBrandPanel";
 import { BrandManagePanel } from "./BrandManagePanel";
 import { LoadPreviousPanel } from "./LoadPreviousPanel";
+import { TermsPanel } from "./TermsPanel";
 
 import type { RegisterPanel } from "../../model/use-register-panel";
 
@@ -16,5 +17,7 @@ export function RegisterPanelContent({ panel }: RegisterPanelContentProps) {
       return <AddBrandPanel />;
     case "load-previous":
       return <LoadPreviousPanel />;
+    case "terms":
+      return <TermsPanel />;
   }
 }

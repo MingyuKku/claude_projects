@@ -2,7 +2,7 @@ import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
 
 import S2_BG from "../assets/s2-bg.jpg";
-import { REVEAL } from "../lib/tw";
+import { LAZY_BG, REVEAL } from "../lib/tw";
 import { section2 } from "../model/data";
 
 interface Props {
@@ -67,9 +67,13 @@ export function IntroSection2({ className }: Props) {
           디자이너를 기다리는 중.
           url() 을 인라인으로 두는 이유는 Tailwind 가 만든 CSS 가 컴포넌트 기준 상대 경로로 해석되지 않기 때문. */}
       <div
-        className="pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat"
+        className={cn(
+          LAZY_BG,
+          "pointer-events-none absolute inset-0 bg-cover bg-center bg-no-repeat",
+        )}
         style={{ backgroundImage: `url(${S2_BG})` }}
         aria-hidden="true"
+        data-lazy-bg=""
       />
 
       <img

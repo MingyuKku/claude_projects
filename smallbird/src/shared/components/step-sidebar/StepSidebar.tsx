@@ -34,10 +34,18 @@ const itemVariants = cva(
   },
 );
 
+/** 단계 목록 위에 따로 붙는 항목(캠페인 등록 내역의 "기본정보"). 번호 없이 이름만 있고 아래에 구분선이 붙음. */
+export interface StepSidebarOverviewItem {
+  id: string;
+  label: string;
+  isCurrent: boolean;
+}
+
 interface StepSidebarProps {
   /** 목록 이름(스크린 리더). */
   label: string;
   items: readonly StepSidebarItem[];
+  overviewItem?: StepSidebarOverviewItem;
   size?: "md" | "sm";
   /** 오른쪽 표시 아이콘의 스크린 리더 문구. */
   indicatorLabels: Record<StepSidebarIndicator, string>;
@@ -48,6 +56,7 @@ interface StepSidebarProps {
 export function StepSidebar({
   label,
   items,
+  overviewItem,
   size = "md",
   indicatorLabels,
   onSelect,
@@ -55,6 +64,24 @@ export function StepSidebar({
 }: StepSidebarProps) {
   return (
     <nav aria-label={label} className={className}>
+      {overviewItem && (
+        <>
+          <button
+            type="button"
+            aria-current={overviewItem.isCurrent ? "page" : undefined}
+            className={itemVariants({
+              size,
+              isCurrent: overviewItem.isCurrent,
+            })}
+            onClick={() => onSelect(overviewItem.id)}
+          >
+            <span className="min-w-0 flex-1 truncate ds-text-sm-5-medium text-foreground">
+              {overviewItem.label}
+            </span>
+          </button>
+          <hr className="my-4 border-border" />
+        </>
+      )}
       <ol className="flex flex-col gap-2">
         {items.map((item) => {
           const isDisabled = item.state === "disabled";

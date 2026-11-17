@@ -9,15 +9,20 @@ import { Sheet, SheetClose, SheetContent, SheetTitle } from "@/shared/ui/sheet";
 
 import { RegisterStepNav } from "./RegisterStepNav";
 
+import type { RegisterPreviewButtonState } from "./RegisterBottomBar";
+
 interface RegisterMobileHeaderProps {
   title: string;
-  onClickSave: () => void;
+  /** 5단계 "미리보기". 없으면 그리지 않음. */
+  preview: RegisterPreviewButtonState | null;
+  /** 없으면 "임시저장"을 그리지 않음(반려 뒤 수정 모드). */
+  onClickSave?: () => void;
 }
 
-// MO 서브 헤더(Figma `Header / Sub / Mobile` Type=List): "≡"(단계 드로어) + 단계 제목 + "임시저장".
 // 드로어는 왼쪽 222px(Figma `Sidebar / Sub / Mobile`), 단계를 고르면 닫힘.
 export function RegisterMobileHeader({
   title,
+  preview,
   onClickSave,
 }: RegisterMobileHeaderProps) {
   const { t } = useTranslation("features/register-campaign");
@@ -43,9 +48,26 @@ export function RegisterMobileHeader({
           </span>
         }
         actions={
-          <Button variant="outline-foreground" size="sm" onClick={onClickSave}>
-            {t("action.saveDraft")}
-          </Button>
+          <span className="flex gap-2">
+            {preview && (
+              <Button
+                variant="outline-foreground"
+                size="sm"
+                disabled={!preview.isEnabled}
+              >
+                {t("action.preview")}
+              </Button>
+            )}
+            {onClickSave && (
+              <Button
+                variant="outline-foreground"
+                size="sm"
+                onClick={onClickSave}
+              >
+                {t("action.saveDraft")}
+              </Button>
+            )}
+          </span>
         }
       />
       <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>

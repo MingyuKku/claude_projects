@@ -1,14 +1,14 @@
 import { ChevronsUpDown, RotateCw, Settings2 } from "lucide-react";
 
 import { comboboxTriggerVariants } from "@/shared/components/combobox";
-import { MEDIA_QUERY } from "@/shared/config";
+import { FILTER_PANEL, MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery, type CssVariableStyle } from "@/shared/lib";
 import { usePanelParam } from "@/shared/lib/usePanelParam";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 
-import { DEFAULT_FIELD_WIDTH, FILTER_PANEL } from "./constants";
+import { DEFAULT_FIELD_WIDTH } from "./constants";
 import { FilterDialog } from "./FilterDialog";
 import { InlineDateField, SelectField } from "./FilterFields";
 import { ListSearch } from "./ListSearch";

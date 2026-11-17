@@ -19,7 +19,7 @@ export function PaymentRequestedDialog({
   open,
   onConfirm,
 }: PaymentRequestedDialogProps) {
-  const { t } = useTranslation("pages/mypage-money");
+  const { t } = useTranslation("features/charge-bigbird-money");
   const { t: tCommon } = useTranslation();
 
   return (

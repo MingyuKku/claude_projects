@@ -21,7 +21,9 @@
     "saveDraft": "一時保存",
     "previous": "前へ",
     "next": "次へ",
-    "pay": "決済する"
+    "pay": "決済する",
+    "preview": "プレビュー",
+    "complete": "完了"
   },
   "toast": {
     "saved": "保存しました。",
@@ -29,7 +31,10 @@
     "fileType": "JPG・PNGファイルのみアップロードできます。",
     "fileSize": "10MB以下のファイルのみアップロードできます。",
     "requestFailed": "リクエストに失敗しました。しばらくしてからもう一度お試しください。",
-    "addressSearchFailed": "住所検索を読み込めませんでした。しばらくしてからもう一度お試しください。"
+    "addressSearchFailed": "住所検索を読み込めませんでした。しばらくしてからもう一度お試しください。",
+    "aiCompleted": "AI生成が完了しました。",
+    "aiFailed": "AI生成に失敗しました。URLを確認してもう一度お試しください。",
+    "fileCount": "最大5件までアップロードできます。"
   },
   "dialog": {
     "requiredInfo": {
@@ -106,7 +111,8 @@
     "search": {
       "label": "キャンペーン検索",
       "placeholder": "キャンペーン名またはブランド名で検索してください。",
-      "submit": "検索"
+      "submit": "検索",
+      "placeholderShort": "キャンペーン名・ブランド名で検索"
     },
     "emptySearch": "「{{keyword}}」の検索結果はありません。",
     "empty": "登録されたキャンペーンはありません。",
@@ -243,6 +249,280 @@
       "name": "원고컨펌",
       "price": "募集クリエイター1人あたり5,000ウォン",
       "description": "クリエイターが作成した原稿を投稿前に確認し、修正を依頼できます。AI原稿チェック機能も一緒に利用できます。"
+    }
+  },
+  "intro": {
+    "mode": {
+      "ai": {
+        "title": "AI 캠페인 소개서 作成",
+        "description": "商品情報をもとにAIがガイドを作成します。"
+      },
+      "manual": {
+        "title": "自分で作成する",
+        "description": "自分で作成して詳しく案内できます。"
+      }
+    },
+    "ai": {
+      "urlLabel": "商品/サービスURL",
+      "urlPlaceholder": "URLを入力してください。",
+      "urlHelp": "入力したURLとキャンペーン情報をもとに、ブランドの特徴と商品情報を分析して商品紹介を作成します。",
+      "generate": "AI生成",
+      "resultTitle": "AI生成",
+      "regenerate": "再生成する",
+      "loading": {
+        "title": "AI 캠페인 소개서 生成中",
+        "description": "生成が完了すると캠페인 소개서を確認できます。",
+        "caption": "状況により最大5分かかる場合があります。"
+      }
+    },
+    "mainImage": {
+      "label": "メイン画像",
+      "title": "募集ページ上部に表示される代表画像をアップロードしてください。",
+      "description": "JPG、PNG、10MB以下（推奨サイズ1200 x 630）",
+      "remove": "メイン画像を削除"
+    },
+    "detailMedia": {
+      "label": "商品詳細画像/動画",
+      "title": "商品詳細画像/動画をアップロードしてください。",
+      "description": "最大5件までアップロード可能",
+      "drop": "商品詳細画像/動画をドラッグ＆ドロップしてください。",
+      "remove": "{{index}}番目のファイルを削除",
+      "reorder": "{{index}}番目のファイルを並べ替え",
+      "video": "動画 {{index}}",
+      "image": "画像 {{index}}"
+    },
+    "description": {
+      "label": "キャンペーン説明",
+      "placeholder": "インフルエンサーに表示するキャンペーン紹介と期待する内容を入力してください。"
+    },
+    "notice": {
+      "label": "注意事項",
+      "placeholder": "キャンペーンの注意事項を入力してください。"
+    },
+    "hashtag": {
+      "single": "必須ハッシュタグ（キーワード）",
+      "title": "タイトル必須ハッシュタグ",
+      "content": "本文必須ハッシュタグ",
+      "placeholder": "キーワード入力後Enterキーで追加",
+      "remove": "{{keyword}}を削除"
+    }
+  },
+  "conditions": {
+    "period": {
+      "label": "投稿維持期間",
+      "months_other": "{{count}}か月",
+      "direct": "直接入力",
+      "unit": "か月",
+      "placeholder": "期間を入力してください。",
+      "rangeError": "1〜999か月の範囲で入力してください。"
+    },
+    "copyright": {
+      "label": "2차 저작권の使用",
+      "use": "使用",
+      "notUse": "使用しない"
+    }
+  },
+  "policy": {
+    "all": "すべての規約に同意",
+    "items": {
+      "service": "利用規約に同意",
+      "privacy": "プライバシーポリシーに同意",
+      "operation": "キャンペーン運営ポリシーに同意",
+      "reward": "리워드・決済ポリシーに同意"
+    },
+    "terms": {
+      "service": "利用規約",
+      "privacy": "プライバシーポリシー"
+    },
+    "agree": "同意する"
+  },
+  "payment": {
+    "won": "{{amount}}ウォン",
+    "campaignSummary": {
+      "title": "キャンペーン概要",
+      "serviceType": "サービス種別",
+      "campaignType": "キャンペーン種別",
+      "reward": "리워드",
+      "rewardValue": "製品提供（{{amount}}ウォン相当）",
+      "period": "キャンペーン期間",
+      "periodValue": "{{start}} - {{end}}（{{days}}日）"
+    },
+    "paymentSummary": {
+      "title": "決済概要",
+      "addOnItems": "付加サービス決済商品",
+      "addOnAmount": "付加サービス金額",
+      "total": "合計決済金額",
+      "notice": "決済はビッグバードマネーでのみ行われます。",
+      "demoNotice": "デモモードでは実際の決済は行われず、表示金額は実際のキャンペーン登録時に変わる場合があります。"
+    },
+    "method": {
+      "title": "決済方法",
+      "bigbirdMoney": "ビッグバードマネー",
+      "required": "必須"
+    },
+    "terms": {
+      "title": "規約への同意"
+    },
+    "dialog": {
+      "required": {
+        "title": "必須項目未入力",
+        "description": "未入力の項目があるため決済できません。表示されたステップの必須項目をすべて入力してください。"
+      },
+      "insufficientBalance": {
+        "title": "決済金額不足",
+        "description": "ビッグバードマネーの残高が不足しています。チャージ後に再度決済してください。"
+      },
+      "completed": {
+        "title": "決済完了",
+        "description": "決済が完了しました。"
+      },
+      "failed": {
+        "title": "決済失敗",
+        "description": "決済に失敗しました。しばらくしてから再度お試しください。"
+      },
+      "invalidStartDate": {
+        "title": "希望開始日の確認",
+        "description": "キャンペーン希望開始日が過ぎています。開始日を選び直してください。"
+      },
+      "subscriptionRequired": {
+        "title": "購読が必要です",
+        "description": "PICK型の購読がないか期限切れのため決済できません。購読後に再度決済してください。",
+        "subscribe": "購読する"
+      },
+      "demoConfirm": {
+        "title": "デモ作成完了",
+        "description": "デモキャンペーンの作成を完了しますか？完了後は、実際のキャンペーンに切り替えるか、以前のキャンペーンの読み込みでのみ情報を修正できます。"
+      }
+    }
+  },
+  "detail": {
+    "title": "基本情報",
+    "edit": "修正",
+    "cancelApproval": "承認リクエストを取り消す",
+    "requestReapproval": "再承認リクエスト",
+    "banner": {
+      "reviewing": {
+        "title": "このキャンペーンは承認審査中です。",
+        "description": "運営チームがキャンペーン内容を審査中です。修正が必要な場合は承認リクエストを取り消してから修正できます。"
+      },
+      "rejected": {
+        "title": "修正が必要な項目があります。",
+        "description": "差し戻し理由を確認し、表示された項目を修正してから再承認をリクエストしてください。"
+      },
+      "approved": {
+        "title": "承認済みのキャンペーンです。",
+        "description": "確定したキャンペーン情報を確認できます。"
+      }
+    },
+    "section": {
+      "info": "キャンペーン情報",
+      "product": "製品情報",
+      "influencer": "インフルエンサー条件",
+      "addOns": "付加サービス",
+      "intro": "캠페인 소개서",
+      "conditions": "進行条件",
+      "policy": "ポリシーへの同意",
+      "payment": "決済情報"
+    },
+    "info": {
+      "name": "キャンペーン名",
+      "code": "キャンペーンコード",
+      "type": "キャンペーン種別",
+      "brand": "ブランド名",
+      "period": "実施期間",
+      "brandImage": "ブランド画像"
+    },
+    "product": {
+      "type": "協賛種別",
+      "nameAndQuantity": "協賛製品名 / 数量",
+      "nameAndQuantityValue_other": "{{name}} / {{count}}個",
+      "price": "協賛製品金額",
+      "returnRequired": "返品回収の有無",
+      "returned": "回収あり",
+      "notReturned": "回収なし",
+      "returnFee": "返品回収の送料",
+      "returnContact": "返品回収の連絡先",
+      "returnAddress": "返品回収の住所",
+      "rentalReturn": "대여 상품の回収",
+      "rentalFee": "대여 상품回収の送料",
+      "rentalContact": "대여 상품回収の連絡先",
+      "rentalAddress": "대여 상품回収の住所",
+      "coupon": "来店クーポン認証番号",
+      "storeName": "来店店舗名",
+      "storeAddress": "店舗住所",
+      "benefit": "提供特典または体験内容"
+    },
+    "influencer": {
+      "platform": "プラットフォーム",
+      "ageGroups": "年代",
+      "gender": "性別",
+      "topics": "投稿テーマ"
+    },
+    "addOns": {
+      "applied": "申請済み",
+      "notApplied": "未申請"
+    },
+    "intro": {
+      "hashtag": {
+        "title": "必須ハッシュタグ（タイトル）",
+        "content": "必須ハッシュタグ（本文）"
+      },
+      "images": "メイン / 商品詳細画像",
+      "mainBadge": "メイン"
+    },
+    "conditions": {
+      "period": "投稿維持期間",
+      "periodValue_other": "{{count}}か月以上",
+      "copyright": "2차 저작권の使用",
+      "copyrightUsed": "使用（商用利用を含む）"
+    },
+    "policy": {
+      "required": "必須同意項目",
+      "allAgreed": "すべて同意済み"
+    },
+    "payment": {
+      "amount": "決済金額",
+      "method": "決済方法",
+      "methodValue": "ビッグバードマネー決済",
+      "paidAt": "決済日"
+    },
+    "toast": {
+      "refunded": "返金が完了しました。"
+    },
+    "dialog": {
+      "cancel": {
+        "title": "承認リクエストの取り消し",
+        "description": "承認リクエストを取り消すと、決済金額はビッグバードマネーに全額返金され、キャンペーンは登録中に戻ります。入力内容は保持され、修正後に再度決済すると承認リクエストが再受付されます。\n\n返金方法：ビッグバードマネー\n返金予定金額：{{amount}}ウォン",
+        "confirm": "承認リクエストを取り消す"
+      },
+      "reapproval": {
+        "title": "再承認をリクエストしました。",
+        "description": "修正内容が運営チームに再度送られます。承認されるとキャンペーンを進行できます。"
+      }
+    }
+  },
+  "revision": {
+    "lockedAmount": "決済金額に影響する値のため修正できません。",
+    "lockedCompleted": "同意・決済済みの内容のため修正できません。"
+  },
+  "demo": {
+    "notice": "現在デモモードでキャンペーンを作成しています。実際の決済や承認リクエストは行われません。",
+    "detail": {
+      "title": "このキャンペーンはデモモードで作成されました。",
+      "unsubscribedDescription": "デモモードで作成したキャンペーンは、プランを購読すると実際のキャンペーンに切り替えられます。",
+      "subscribedDescription": "デモモードで作成したキャンペーンを実際のキャンペーンに切り替えられます。",
+      "subscribe": "購読する",
+      "convert": "実際のキャンペーンに切り替え"
+    },
+    "dialog": {
+      "convert": {
+        "title": "実際のキャンペーンに切り替え",
+        "description": "デモモードで作成したキャンペーンを実際のキャンペーンに切り替えますか？",
+        "confirm": "切り替える"
+      }
+    },
+    "toast": {
+      "subscriptionRequired": "PICK型の購読が必要です。購読後にもう一度お試しください。"
     }
   }
 }

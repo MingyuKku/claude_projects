@@ -25,12 +25,13 @@ const ICON_BY_EXTENSION: Record<string, string> = {
 
 // Figma 파일 이름은 "파일명파일..."처럼 앞 5자만 보임(REQ-23-0009, 11315:49623). 확장자는 시안에 없어 이름 전체
 // (확장자 포함)를 기준으로 자르고, 형식은 앞의 아이콘이 알려 줌. 전체 이름은 title과 내려받는 이름에 남김.
+// macOS에서 올린 한글 이름은 자모가 분리(NFD)되어 와서, 합쳐(NFC) 세지 않으면 2글자만 보임.
 const MAX_NAME_LENGTH = 5;
 
 function toDisplayName(name: string) {
-  const characters = Array.from(name);
+  const characters = Array.from(name.normalize("NFC"));
   return characters.length <= MAX_NAME_LENGTH
-    ? name
+    ? characters.join("")
     : `${characters.slice(0, MAX_NAME_LENGTH).join("")}...`;
 }
 

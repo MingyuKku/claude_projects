@@ -237,6 +237,8 @@ export function BigbirdInquiryWorkspace({
           aria-label={panelLabel}
           className={cn(
             "min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-none border-0 bg-background tablet:rounded-lg tablet:border tablet:border-border",
+            // 키보드로 보이는 영역이 입력창에 못 미치게 낮아지면 입력창이 카드 밖으로 잘리지 않고 본문(main)과 함께 스크롤됨
+            "in-data-[keyboard=open]:overflow-visible",
             // MO는 상세 정보가 열리면 대화 대신 전체 화면으로 보임
             detail ? "hidden tablet:flex" : "flex",
           )}

@@ -4,7 +4,7 @@ import { cn } from "@/shared/lib";
 import S3_DOTS from "../assets/s3-dots.png";
 import S3_LOGOS_BOTTOM from "../assets/s3-logos-bottom.png";
 import S3_LOGOS_TOP from "../assets/s3-logos-top.png";
-import { REVEAL } from "../lib/tw";
+import { LAZY_BG, REVEAL } from "../lib/tw";
 
 interface Props {
   className?: string;
@@ -43,9 +43,13 @@ export function IntroSection3({ className }: Props) {
           원본 png 는 1024x512(2:1)로 노드의 비율과 다름. 디자인이 늘려 쓰므로
           background-size 100% 100% 가 같은 결과를 냄. */}
       <div
-        className="pointer-events-none absolute top-0 left-1/2 aspect-1440/497 w-[1440px] min-w-full -translate-x-1/2 bg-size-[100%_100%] opacity-80 mix-blend-screen invert max-introtab:w-[1322px] max-mo:w-[1236px]"
+        className={cn(
+          LAZY_BG,
+          "pointer-events-none absolute top-0 left-1/2 aspect-1440/497 w-[1440px] min-w-full -translate-x-1/2 bg-size-[100%_100%] opacity-80 mix-blend-screen invert max-introtab:w-[1322px] max-mo:w-[1236px]",
+        )}
         style={{ backgroundImage: `url(${S3_DOTS})` }}
         aria-hidden="true"
+        data-lazy-bg=""
       />
 
       {/* max-w-[512px] 는 디자인의 제목 폭. */}
@@ -76,16 +80,20 @@ export function IntroSection3({ className }: Props) {
         <div
           className={cn(
             ROW,
+            LAZY_BG,
             "animate-[intro-s3-left_29.6s_linear_infinite] bg-size-[1308.6px_63px]",
           )}
           style={{ backgroundImage: `url(${S3_LOGOS_TOP})` }}
+          data-lazy-bg=""
         />
         <div
           className={cn(
             ROW,
+            LAZY_BG,
             "animate-[intro-s3-right_40s_linear_infinite] bg-size-[1769.6px_63px]",
           )}
           style={{ backgroundImage: `url(${S3_LOGOS_BOTTOM})` }}
+          data-lazy-bg=""
         />
       </div>
     </section>

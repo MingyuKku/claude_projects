@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { HERO_SHRINK_DISTANCE } from "../model/constants";
 import { calcHeroProgress } from "./hero-progress";
+import { createLazyBackground, type LazyBackground } from "./lazy-background";
 import { createReveal, type Reveal } from "./reveal";
 
 /**
@@ -11,6 +12,7 @@ import { createReveal, type Reveal } from "./reveal";
 export function useIntroScroll() {
   const scrollerRef = useRef<HTMLDivElement>(null);
   const revealRef = useRef<Reveal | null>(null);
+  const lazyBackgroundRef = useRef<LazyBackground | null>(null);
   // rAF 예약 id. 렌더에 영향이 없어 state 로 두지 않음. null 이면 예약된 프레임이 없음.
   const frameRef = useRef<number | null>(null);
   const [heroProgress, setHeroProgress] = useState(0);
@@ -20,6 +22,8 @@ export function useIntroScroll() {
     revealRef.current = createReveal(scrollerRef.current);
     // 첫 화면 안에 이미 들어와 있는 블록.
     revealRef.current.check();
+    lazyBackgroundRef.current = createLazyBackground(scrollerRef.current);
+    lazyBackgroundRef.current.check();
 
     return () => {
       if (frameRef.current !== null) {
@@ -38,6 +42,7 @@ export function useIntroScroll() {
         calcHeroProgress(element ? element.scrollTop : 0, HERO_SHRINK_DISTANCE),
       );
       revealRef.current?.check();
+      lazyBackgroundRef.current?.check();
       frameRef.current = null;
     });
   }

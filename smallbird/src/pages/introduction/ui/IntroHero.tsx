@@ -1,4 +1,5 @@
 import { Fragment } from "react";
+import { preload } from "react-dom";
 
 import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
@@ -18,6 +19,8 @@ interface Props {
 export function IntroHero({ progress, className }: Props) {
   const { t } = useTranslation("pages/introduction");
   const style: CssVariableStyle = { "--hero-progress": progress };
+  // video 에는 fetchpriority 가 없어 poster 가 영상과 대역폭을 나눠 쓰며 늦게 도착함.
+  preload(hero.poster, { as: "image", fetchPriority: "high" });
 
   return (
     // 최대 축소 값은 여기에 두고, JS 는 --hero-progress(0~1)만 넘김.

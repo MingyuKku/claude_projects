@@ -39,6 +39,14 @@ MR 자동 AI 리뷰(`ai-review` 잡)의 설정, 토큰 갱신, 인증 방식 전
 `CODEOWNERS`가 AI 동작을 바꾸는 경로(`.claude/`, `ai/`, `convention/`, `AGENTS.md`, `CLAUDE.md`, `.mcp.json`)를 지정합니다.
 레포 호스팅에 맞게 위치(GitLab: 루트 또는 `.gitlab/CODEOWNERS`)와 소유자 이름을 조정하세요.
 
+## skill 작성과 점검
+
+skill은 에이전트가 description을 보고 스스로 판단해 읽습니다. 화면·기능별로 "여기엔 이 skill"을 문서에 적지 않고, 다음 세 가지로 운영합니다.
+
+- **작성**: description에 무엇을 하는지와 **어떤 작업일 때 읽는지**를 조건으로 씁니다. 화면·기능 이름이 아니라 작업에 들어 있는 동작으로 쓰면, 새 화면도 조건에 맞을 때 자동으로 해당됩니다. 본문에는 코드·규칙에서 읽히지 않는 절차·근거·함정(gotchas)만 씁니다.
+- **사용**: `AGENTS.md`의 "skill 확인" 지침에 따라 에이전트가 계획·구현을 시작할 때 description을 작업과 대조합니다.
+- **점검**: `pnpm ai:skill-usage`로 skill 별 사용 횟수와, 사용자가 이름을 말하지 않았는데 스스로 읽은 비율을 봅니다. 해당 작업을 했는데도 잘 읽히지 않는 skill은 그 skill의 description을 고칩니다. 집계 대상은 그 PC의 Claude Code 세션 기록뿐이며(Codex 제외), 팀 전체를 보려면 각자 돌려 결과를 모읍니다.
+
 ## Codex 설정 메모
 
 - Codex는 `.agents/skills/`에서 skill을 찾으므로 `.claude/skills/`를 복사해 둡니다 (심볼릭 링크 대신 복사 + `--check`로 drift 검증).

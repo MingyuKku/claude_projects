@@ -104,3 +104,27 @@ export type CampaignDetailResponse = z.infer<typeof campaignDetailSchema>;
 export const campaignInfoSavedSchema = z.object({
   endDate: z.string().nullable(),
 });
+
+/** `balance`는 결제 뒤 잔액(목은 잔액 API를 바꿀 수 없어 0, 화면은 잔액을 다시 읽음). */
+export const campaignPaidSchema = z.object({
+  status: z.string(),
+  paidAmount: z.number().int(),
+  paidAt: z.string(),
+  balance: z.number().int(),
+});
+
+/** `INCOMPLETE_DRAFT`이면 빈 단계의 경로 이름(`info` · `product` …)이 `missingSteps`로 옴. */
+export const campaignPaymentErrorSchema = z.object({
+  reason: z.string(),
+  missingSteps: z.array(z.string()).optional(),
+});
+
+export const campaignApprovalCanceledSchema = z.object({
+  status: z.string(),
+  refundedAmount: z.number().int(),
+  balance: z.number().int(),
+});
+
+export const campaignReapprovalRequestedSchema = z.object({
+  status: z.string(),
+});

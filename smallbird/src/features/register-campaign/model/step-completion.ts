@@ -16,6 +16,8 @@ import type {
 export const RENTAL_MIN_PRODUCT_PRICE = 1_000_000;
 /** 방문 시 제공 혜택 및 수량 최대 글자 수. */
 export const VISIT_BENEFIT_MAX_LENGTH = 300;
+/** 소개서 캠페인 설명·유의사항 최대 글자 수. */
+export const INTRO_TEXT_MAX_LENGTH = 1000;
 /** 소개서 상세 이미지·동영상 최대 개수. */
 export const DETAIL_MEDIA_MAX_COUNT = 5;
 /** 포스팅 유지기간 직접 입력 범위(개월). */

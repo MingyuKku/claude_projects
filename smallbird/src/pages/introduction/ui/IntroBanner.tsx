@@ -1,6 +1,7 @@
 import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
 
+import { LAZY_BG } from "../lib/tw";
 import { banner } from "../model/data";
 import { IntroCtaButton } from "./IntroCtaButton";
 
@@ -26,10 +27,12 @@ export function IntroBanner({ className }: Props) {
     // (433 - 128 - 32 - 112) / 2 = 80.5 로 디자인의 제목 y 와 맞음.
     <section
       className={cn(
+        LAZY_BG,
         "flex h-[433px] flex-col items-center gap-[57px] bg-[#343a40] bg-cover bg-center px-10 pt-[130px] max-mo:justify-center max-mo:gap-8 max-mo:px-5 max-mo:pt-0",
         className,
       )}
       style={{ backgroundImage: `url(${banner.bg})` }}
+      data-lazy-bg=""
     >
       {/* w-[580px] 는 디자인의 제목 폭. */}
       <div className="flex w-[580px] flex-col items-center gap-4 text-center max-mo:w-full">

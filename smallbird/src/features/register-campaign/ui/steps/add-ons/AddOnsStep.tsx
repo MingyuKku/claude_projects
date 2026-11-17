@@ -26,7 +26,7 @@ export function AddOnsStep() {
   }
 
   return (
-    <ul className="grid gap-4 tablet:grid-cols-2 desktop:grid-cols-3">
+    <ul className="grid ds-gap-4 desktop:grid-cols-3">
       {CAMPAIGN_ADD_ONS.map((addOn) => {
         const isSelected = addOns.includes(addOn);
         return (
@@ -41,7 +41,7 @@ export function AddOnsStep() {
               )}
               onClick={() => handleToggle(addOn)}
             >
-              <span className="flex flex-col items-center gap-4 px-5 pt-5">
+              <span className="flex flex-col items-center ds-gap-4 ds-px-5 ds-pt-5">
                 <span className="ds-text-2xl-none-semibold">
                   {t(`addOns.${addOn}.name`)}
                 </span>
@@ -50,7 +50,7 @@ export function AddOnsStep() {
                 </Badge>
                 <Separator />
               </span>
-              <span className="flex min-h-25 gap-1.5 px-5 pt-5 pb-1 ds-text-sm-5-normal">
+              <span className="flex min-h-25 gap-1.5 ds-px-5 ds-pt-5 pb-1 ds-text-sm-5-normal">
                 <span aria-hidden className="pt-2">
                   <span className="block size-1.5 rounded-full bg-foreground" />
                 </span>

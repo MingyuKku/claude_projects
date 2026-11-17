@@ -1,4 +1,5 @@
 import { ChevronDown, LogOut, Settings } from "lucide-react";
+import { useRef } from "react";
 
 import { cn } from "@/shared/lib/utils";
 import { Avatar, AvatarImage, AvatarPlaceholder } from "@/shared/ui/avatar";
@@ -42,7 +43,7 @@ interface UserAvatarProps {
 function UserAvatar({ src, size }: UserAvatarProps) {
   return (
     <Avatar size={size}>
-      {src && <AvatarImage src={src} alt="" />}
+      {src && <AvatarImage src={src} alt="" className="border border-border" />}
       <AvatarPlaceholder />
     </Avatar>
   );
@@ -63,6 +64,10 @@ export function UserMenu({
   triggerProps,
   ...rootProps
 }: UserMenuProps) {
+  // 포인터로 열면 트리거가 포커스를 받지 않았는데, 닫힐 때 Radix 가 포커스를 되돌리면 브라우저가 그 포커스를
+  // :focus-visible 로 봐서 링이 생김. 포인터로 열고 닫은 경우에만 되돌리지 않고, 키보드를 쓰면 그대로 되돌림.
+  const isOpenedByPointerRef = useRef(false);
+
   return (
     <DropdownMenu {...rootProps}>
       <DropdownMenuTrigger asChild>
@@ -70,6 +75,14 @@ export function UserMenu({
           type="button"
           aria-label={menuLabel}
           {...triggerProps}
+          onPointerDown={(event) => {
+            triggerProps?.onPointerDown?.(event);
+            isOpenedByPointerRef.current = true;
+          }}
+          onKeyDown={(event) => {
+            triggerProps?.onKeyDown?.(event);
+            isOpenedByPointerRef.current = false;
+          }}
           className={cn(
             "group/user-menu flex size-11 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-md p-2.5 transition-colors outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 data-[state=open]:bg-background tablet:size-auto tablet:p-2",
             className,
@@ -87,7 +100,16 @@ export function UserMenu({
           </span>
         </button>
       </DropdownMenuTrigger>
-      <DropdownMenuContent align="end" className="w-66 p-0 shadow-md">
+      <DropdownMenuContent
+        align="end"
+        className="w-66 p-0 shadow-md"
+        onKeyDown={() => {
+          isOpenedByPointerRef.current = false;
+        }}
+        onCloseAutoFocus={(event) => {
+          if (isOpenedByPointerRef.current) event.preventDefault();
+        }}
+      >
         <div className="p-1">
           <div className="flex items-start gap-2.5 rounded-md p-2">
             <UserAvatar src={avatarSrc} size="lg" />

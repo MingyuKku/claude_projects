@@ -19,3 +19,9 @@ export const CONTAINER =
  */
 export const REVEAL =
   "translate-y-8 opacity-0 transition-[opacity,translate] duration-1100 ease-[cubic-bezier(0.16,1,0.3,1)] data-revealed:translate-y-0 data-revealed:opacity-100";
+
+/**
+ * 배경 이미지 지연 로딩. `createLazyBackground` 가 `data-bg-ready` 를 붙이기 전까지 배경을 none 으로 둠.
+ * `data-lazy-bg` 속성과 함께 씀. 인라인 style 의 배경도 덮어야 해서 important 로 둠.
+ */
+export const LAZY_BG = "[&:not([data-bg-ready])]:bg-none!";

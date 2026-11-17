@@ -21,7 +21,9 @@
     "saveDraft": "임시저장",
     "previous": "이전",
     "next": "다음",
-    "pay": "결제하기"
+    "pay": "결제하기",
+    "preview": "미리보기",
+    "complete": "완료"
   },
   "toast": {
     "saved": "저장되었습니다.",
@@ -29,7 +31,10 @@
     "fileType": "JPG, PNG 파일만 올릴 수 있습니다.",
     "fileSize": "10MB 이하 파일만 올릴 수 있습니다.",
     "requestFailed": "요청에 실패했습니다. 잠시 후 다시 시도해 주세요.",
-    "addressSearchFailed": "주소 검색을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요."
+    "addressSearchFailed": "주소 검색을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
+    "aiCompleted": "AI 생성이 완료되었습니다.",
+    "aiFailed": "AI 생성에 실패했습니다. URL을 확인하고 다시 시도해 주세요.",
+    "fileCount": "최대 5개까지 올릴 수 있습니다."
   },
   "dialog": {
     "requiredInfo": {
@@ -106,7 +111,8 @@
     "search": {
       "label": "캠페인 검색",
       "placeholder": "캠페인명 또는 브랜드명을 검색해 주세요.",
-      "submit": "검색"
+      "submit": "검색",
+      "placeholderShort": "캠페인명 또는 브랜드명 검색"
     },
     "emptySearch": "‘{{keyword}}’에 대한 검색 결과가 없습니다.",
     "empty": "등록된 캠페인이 없습니다.",
@@ -243,6 +249,280 @@
       "name": "원고컨펌",
       "price": "모집 인플루언서 당 5,000원",
       "description": "인플루언서가 작성한 원고를 게시 전에 확인하고 수정 요청할 수 있습니다. AI 원고 컨펌 기능도 함께 이용할 수 있습니다."
+    }
+  },
+  "intro": {
+    "mode": {
+      "ai": {
+        "title": "AI 캠페인 소개서 작성",
+        "description": "상품 정보를 바탕으로 AI가 가이드를 생성해요."
+      },
+      "manual": {
+        "title": "직접 작성하기",
+        "description": "직접 소개서를 작성하여 더 자세히 안내할 수 있어요."
+      }
+    },
+    "ai": {
+      "urlLabel": "상품/서비스 URL",
+      "urlPlaceholder": "URL을 입력해 주세요.",
+      "urlHelp": "입력하신 URL과 캠페인 정보를 기반으로 브랜드 특징과 상품 정보를 분석하여 상품 소개서를 생성합니다.",
+      "generate": "AI 생성",
+      "resultTitle": "AI 생성",
+      "regenerate": "다시 생성하기",
+      "loading": {
+        "title": "AI 캠페인 소개서 생성 중",
+        "description": "생성이 완료되면 캠페인 소개서를 확인할 수 있습니다.",
+        "caption": "상황에 따라 최대 5분이 소요될 수 있습니다."
+      }
+    },
+    "mainImage": {
+      "label": "메인 이미지",
+      "title": "모집 페이지 상단에 노출되는 대표 이미지를 업로드해 주세요.",
+      "description": "JPG, PNG, 10MB 이하 (권장 사이즈 1200 x 630)",
+      "remove": "메인 이미지 삭제"
+    },
+    "detailMedia": {
+      "label": "상품 상세 이미지/동영상",
+      "title": "상품 상세 이미지/동영상을 업로드해 주세요.",
+      "description": "최대 5개까지 업로드 가능",
+      "drop": "상품 상세 이미지/동영상을 Drag-Drop 해 주세요.",
+      "remove": "{{index}}번째 파일 삭제",
+      "reorder": "{{index}}번째 파일 순서 바꾸기",
+      "video": "동영상 {{index}}",
+      "image": "이미지 {{index}}"
+    },
+    "description": {
+      "label": "캠페인 설명",
+      "placeholder": "인플루언서에게 보여질 캠페인 소개와 기대 내용을 작성해 주세요."
+    },
+    "notice": {
+      "label": "유의사항",
+      "placeholder": "캠페인 유의사항을 작성해 주세요."
+    },
+    "hashtag": {
+      "single": "필수 해시태그(키워드)",
+      "title": "제목 필수 해시태그",
+      "content": "본문 필수 해시태그",
+      "placeholder": "키워드 입력 후 Enter 키로 추가",
+      "remove": "{{keyword}} 삭제"
+    }
+  },
+  "conditions": {
+    "period": {
+      "label": "포스팅 유지기간",
+      "months_other": "{{count}}개월",
+      "direct": "직접 입력",
+      "unit": "개월",
+      "placeholder": "기간을 입력해 주세요.",
+      "rangeError": "1~999개월 사이로 입력해 주세요."
+    },
+    "copyright": {
+      "label": "2차 저작권 사용 여부",
+      "use": "사용",
+      "notUse": "미사용"
+    }
+  },
+  "policy": {
+    "all": "약관 전체 동의",
+    "items": {
+      "service": "서비스 이용약관 동의",
+      "privacy": "개인정보 처리방침 동의",
+      "operation": "캠페인 운영 정책 동의",
+      "reward": "리워드 및 결제 관련 정책 동의"
+    },
+    "terms": {
+      "service": "서비스 이용약관",
+      "privacy": "개인정보 처리방침"
+    },
+    "agree": "동의하기"
+  },
+  "payment": {
+    "won": "{{amount}}원",
+    "campaignSummary": {
+      "title": "캠페인 요약",
+      "serviceType": "서비스 유형",
+      "campaignType": "캠페인 유형",
+      "reward": "리워드",
+      "rewardValue": "제품 제공 ({{amount}}원 상당)",
+      "period": "캠페인 기간",
+      "periodValue": "{{start}} - {{end}} ({{days}}일)"
+    },
+    "paymentSummary": {
+      "title": "결제 요약",
+      "addOnItems": "부가서비스 결제 상품",
+      "addOnAmount": "부가서비스 금액",
+      "total": "총 결제 금액",
+      "notice": "결제는 빅버드 머니로만 진행됩니다.",
+      "demoNotice": "데모 모드에서는 실제 결제가 진행되지 않으며, 표시된 금액은 실제 캠페인 등록 시 변경될 수 있습니다."
+    },
+    "method": {
+      "title": "결제 수단",
+      "bigbirdMoney": "빅버드 머니",
+      "required": "필수"
+    },
+    "terms": {
+      "title": "약관 동의"
+    },
+    "dialog": {
+      "required": {
+        "title": "필수 항목 미입력",
+        "description": "입력하지 않은 항목이 있어 결제할 수 없습니다. 표시된 단계의 필수 항목을 모두 입력해 주세요."
+      },
+      "insufficientBalance": {
+        "title": "결제 금액 부족",
+        "description": "빅버드 머니 잔액이 부족합니다. 빅버드 머니 충전 후 다시 결제해 주세요."
+      },
+      "completed": {
+        "title": "결제 완료",
+        "description": "결제가 완료되었습니다."
+      },
+      "failed": {
+        "title": "결제 실패",
+        "description": "결제에 실패했습니다. 잠시 후 다시 시도해 주세요."
+      },
+      "invalidStartDate": {
+        "title": "희망 시작일 확인",
+        "description": "캠페인 희망 시작 일자가 지났습니다. 시작일을 다시 선택해 주세요."
+      },
+      "subscriptionRequired": {
+        "title": "구독이 필요합니다",
+        "description": "PICK형 구독이 없거나 만료되어 결제할 수 없습니다. 구독 후 다시 결제해 주세요.",
+        "subscribe": "구독하기"
+      },
+      "demoConfirm": {
+        "title": "데모 작성 완료",
+        "description": "데모 캠페인 작성을 완료하시겠습니까? 작성 완료 후에는 실제 캠페인으로 전환하거나 이전 캠페인 불러오기를 통해서만 정보를 수정할 수 있습니다."
+      }
+    }
+  },
+  "detail": {
+    "title": "기본정보",
+    "edit": "수정",
+    "cancelApproval": "승인 요청 취소",
+    "requestReapproval": "재승인 요청",
+    "banner": {
+      "reviewing": {
+        "title": "현재 캠페인은 승인 검토중입니다.",
+        "description": "운영팀에서 캠페인 내용을 검토 중입니다. 수정이 필요한 경우 승인 요청을 취소한 후 내용을 수정할 수 있습니다."
+      },
+      "rejected": {
+        "title": "수정이 필요한 항목이 있습니다.",
+        "description": "반려 사유를 확인하고 표시된 항목을 수정한 후 재승인 요청을 진행해 주세요."
+      },
+      "approved": {
+        "title": "승인이 완료된 캠페인입니다.",
+        "description": "확정된 캠페인 정보를 확인할 수 있습니다."
+      }
+    },
+    "section": {
+      "info": "캠페인 정보",
+      "product": "제품 정보",
+      "influencer": "인플루언서 조건",
+      "addOns": "부가서비스",
+      "intro": "캠페인 소개서",
+      "conditions": "진행 조건",
+      "policy": "정책 동의",
+      "payment": "결제 정보"
+    },
+    "info": {
+      "name": "캠페인명",
+      "code": "캠페인 코드",
+      "type": "캠페인 유형",
+      "brand": "브랜드명",
+      "period": "진행 기간",
+      "brandImage": "브랜드 이미지"
+    },
+    "product": {
+      "type": "협찬 유형",
+      "nameAndQuantity": "협찬 제품명 / 수량",
+      "nameAndQuantityValue_other": "{{name}} / {{count}}개",
+      "price": "협찬 제품 금액",
+      "returnRequired": "반품 회수 여부",
+      "returned": "회수함",
+      "notReturned": "회수 안함",
+      "returnFee": "반품 회수 택배 비용",
+      "returnContact": "반품 회수 연락처",
+      "returnAddress": "반품 회수 택배 주소",
+      "rentalReturn": "대여 상품 회수 여부",
+      "rentalFee": "대여 상품 회수 택배 비용",
+      "rentalContact": "대여 상품 회수 연락처",
+      "rentalAddress": "대여 상품 회수 택배 주소",
+      "coupon": "방문 쿠폰 인증번호",
+      "storeName": "방문 매장명",
+      "storeAddress": "매장 주소",
+      "benefit": "제공 혜택 또는 체험 내용"
+    },
+    "influencer": {
+      "platform": "플랫폼",
+      "ageGroups": "연령대",
+      "gender": "성별",
+      "topics": "포스팅 주제"
+    },
+    "addOns": {
+      "applied": "신청함",
+      "notApplied": "신청 안함"
+    },
+    "intro": {
+      "hashtag": {
+        "title": "필수 해시태그(제목)",
+        "content": "필수 해시태그(본문)"
+      },
+      "images": "메인 / 상품상세 이미지",
+      "mainBadge": "메인"
+    },
+    "conditions": {
+      "period": "포스팅 유지 기간",
+      "periodValue_other": "{{count}}개월 이상",
+      "copyright": "2차 저작권 사용",
+      "copyrightUsed": "사용함 (상업적 사용 포함)"
+    },
+    "policy": {
+      "required": "필수 동의 항목",
+      "allAgreed": "전체 동의 완료"
+    },
+    "payment": {
+      "amount": "결제 금액",
+      "method": "결제 수단",
+      "methodValue": "빅버드 머니 결제",
+      "paidAt": "결제 일시"
+    },
+    "toast": {
+      "refunded": "환불이 완료되었습니다."
+    },
+    "dialog": {
+      "cancel": {
+        "title": "승인 요청 취소",
+        "description": "승인 요청을 취소하면 결제한 금액이 빅버드 머니로 전액 환불되며, 캠페인은 등록 중 상태로 변경됩니다. 입력한 정보는 유지되며, 수정 후 다시 결제하면 승인 요청이 재접수됩니다.\n\n환불 수단: 빅버드 머니\n환불 예정 금액: {{amount}}원",
+        "confirm": "승인 요청 취소하기"
+      },
+      "reapproval": {
+        "title": "재승인 요청이 완료되었습니다.",
+        "description": "수정된 내용이 운영팀에 다시 전달됩니다. 승인 완료 시 캠페인을 진행할 수 있습니다."
+      }
+    }
+  },
+  "revision": {
+    "lockedAmount": "결제 금액에 영향을 주는 값이라 수정할 수 없습니다.",
+    "lockedCompleted": "이미 동의·결제를 마친 내용이라 수정할 수 없습니다."
+  },
+  "demo": {
+    "notice": "현재 데모 모드로 캠페인을 작성하고 있습니다. 실제 결제 및 승인 요청은 진행되지 않습니다.",
+    "detail": {
+      "title": "현재 캠페인은 데모 모드로 작성한 캠페인입니다.",
+      "unsubscribedDescription": "데모 모드로 작성한 캠페인은 요금제 구독 시 실제 캠페인으로 전환 가능합니다.",
+      "subscribedDescription": "데모 모드로 작성한 캠페인을 실제 캠페인으로 전환 가능합니다.",
+      "subscribe": "구독하기",
+      "convert": "실제 캠페인으로 전환"
+    },
+    "dialog": {
+      "convert": {
+        "title": "실제 캠페인으로 전환",
+        "description": "데모 모드로 작성한 캠페인을 실제 캠페인으로 전환하시겠습니까?",
+        "confirm": "전환하기"
+      }
+    },
+    "toast": {
+      "subscriptionRequired": "PICK형 구독이 필요합니다. 구독 후 다시 시도해 주세요."
     }
   }
 }

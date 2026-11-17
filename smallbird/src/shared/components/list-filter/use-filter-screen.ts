@@ -1,8 +1,6 @@
-import { MEDIA_QUERY } from "@/shared/config";
+import { FILTER_PANEL, MEDIA_QUERY } from "@/shared/config";
 import { useMediaQuery } from "@/shared/lib";
 import { usePanelParam } from "@/shared/lib/usePanelParam";
-
-import { FILTER_PANEL } from "./constants";
 
 /** 툴바가 인라인으로 바뀌는 폭. `tablet`은 TAB부터(기본), `desktop`은 PC부터(TAB·MO는 "필터" 버튼). */
 export type InlineFrom = "tablet" | "desktop";

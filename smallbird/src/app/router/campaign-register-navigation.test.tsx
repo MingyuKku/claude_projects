@@ -48,9 +48,12 @@ describe("캠페인 등록 진입", () => {
     );
     expect(router.state.location.search).toBe("?step=campaign-info");
     expect(router.state.historyAction).toBe("REPLACE");
-    expect(
-      await screen.findByRole("heading", { name: "캠페인 등록" }),
-    ).toBeInTheDocument();
+    // 진입 화면과 작성 화면이 각자 제목을 그려 findBy 로 찾은 직후 요소가 교체될 수 있어, 찾기와 검사를 함께 재시도함.
+    await waitFor(() =>
+      expect(
+        screen.getByRole("heading", { name: "캠페인 등록" }),
+      ).toBeInTheDocument(),
+    );
     expect(readMockCampaignCount()).toBe(SEED_COUNT + 1);
   });
 
@@ -133,5 +136,137 @@ describe("등록 마법사 골격", () => {
     );
     const { draft } = await fetchCampaignDetail(campaignIdx);
     expect(draft.info.name).toBe("떠나기 전 저장");
+  });
+});
+
+describe("8단계 충전 복귀", () => {
+  it("결제창에서 isPaid=true로 돌아오면 접수 알럿을 띄우고 결제 서버가 붙인 쿼리를 지운다", async () => {
+    const { campaignIdx } = await createCampaign({
+      serviceType: "PICK",
+      productType: "BRAND",
+      demo: false,
+    });
+    const router = await renderRoute(
+      `${ROUTES.campaignRegister}/${campaignIdx}?isPaid=true&gopaymethod=VBank&accountNumber=1234567890`,
+    );
+
+    expect(await screen.findByText("충전 요청 완료")).toBeInTheDocument();
+    await waitFor(() =>
+      expect(router.state.location.search).not.toContain("isPaid"),
+    );
+    expect(router.state.location.search).not.toContain("accountNumber");
+  });
+});
+
+describe("등록 내역 진입", () => {
+  it("승인 검토중 캠페인은 배너와 섹션을 보이고 승인 요청 취소를 둔다", async () => {
+    await renderRoute("/campaign/6");
+
+    expect(
+      await screen.findByText("현재 캠페인은 승인 검토중입니다."),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "승인 요청 취소" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("heading", { name: /결제 정보/ }),
+    ).toBeInTheDocument();
+  });
+
+  it("등록 중(결제 전) 캠페인은 작성 화면으로 보낸다", async () => {
+    const { campaignIdx } = await createCampaign({
+      serviceType: "PICK",
+      productType: "BRAND",
+      demo: false,
+    });
+    const router = await renderRoute(`/campaign/${campaignIdx}`);
+
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(
+        `${ROUTES.campaignRegister}/${campaignIdx}`,
+      ),
+    );
+  });
+});
+
+describe("반려 뒤 수정 모드", () => {
+  async function createRejectedCampaign() {
+    const { campaignIdx } = await createCampaign({
+      serviceType: "PICK",
+      productType: "BRAND",
+      demo: false,
+    });
+    const key = "bigbird:mock:campaign-db";
+    const db = JSON.parse(window.sessionStorage.getItem(key) ?? "{}") as {
+      campaigns: { campaignIdx: number; status: string; info: object }[];
+    };
+    const record = db.campaigns.find(
+      (campaign) => campaign.campaignIdx === campaignIdx,
+    );
+    if (!record) throw new Error("mock campaign not found");
+    record.status = "REJECTED";
+    record.info = {
+      ...record.info,
+      name: "반려된 캠페인",
+      brandIdx: 1,
+      campaignType: "PRODUCT_DELIVERY",
+      startDate: "2099-01-01",
+    };
+    window.sessionStorage.setItem(key, JSON.stringify(db));
+    return campaignIdx;
+  }
+
+  it("잠긴 단계는 읽기 전용 안내와 함께 열리고, 하단은 다음 하나로 등록 내역에 돌아간다", async () => {
+    const user = userEvent.setup();
+    const campaignIdx = await createRejectedCampaign();
+    const router = await renderRoute(
+      `${ROUTES.campaignRegister}/${campaignIdx}?step=add-ons`,
+    );
+
+    expect(
+      await screen.findByText(
+        "결제 금액에 영향을 주는 값이라 수정할 수 없습니다.",
+      ),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("checkbox", { name: /AI 포스팅 가이드/ }),
+    ).toBeDisabled();
+    expect(screen.queryByRole("button", { name: "임시저장" })).toBeNull();
+    expect(screen.queryByRole("button", { name: /이전/ })).toBeNull();
+
+    await user.click(screen.getByRole("button", { name: /다음/ }));
+
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(`/campaign/${campaignIdx}`),
+    );
+  });
+});
+
+describe("데모 모드", () => {
+  it("데모 캠페인은 헤더에 DEMO 뱃지, 본문 맨 위에 데모 안내가 붙는다", async () => {
+    const { campaignIdx } = await createCampaign({
+      serviceType: "PICK",
+      productType: "BRAND",
+      demo: true,
+    });
+    await renderRoute(`${ROUTES.campaignRegister}/${campaignIdx}`);
+
+    expect(
+      await screen.findByText(
+        "현재 데모 모드로 캠페인을 작성하고 있습니다. 실제 결제 및 승인 요청은 진행되지 않습니다.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("DEMO").length).toBeGreaterThan(0);
+  });
+
+  it("작성을 마친 데모의 기본 정보는 상태 배너 대신 데모 안내를 보인다", async () => {
+    await renderRoute("/campaign/3");
+
+    expect(
+      await screen.findByText("현재 캠페인은 데모 모드로 작성한 캠페인입니다."),
+    ).toBeInTheDocument();
+    expect(
+      screen.queryByRole("heading", { name: /결제 정보/ }),
+    ).not.toBeInTheDocument();
   });
 });

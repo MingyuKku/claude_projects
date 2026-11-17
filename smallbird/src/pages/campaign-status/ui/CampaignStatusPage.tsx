@@ -2,7 +2,12 @@ import { Plus } from "lucide-react";
 import { useNavigate, useOutletContext } from "react-router";
 import { toast } from "sonner";
 
-import { useCampaignPage, useCampaignScrollList } from "@/entities/campaign";
+import {
+  getCampaignDetailPath,
+  getCampaignRegisterPath,
+  useCampaignPage,
+  useCampaignScrollList,
+} from "@/entities/campaign";
 import { EmptyState } from "@/shared/components/empty-state";
 import {
   FilterToolbar,
@@ -19,11 +24,12 @@ import { useStatusParams } from "../model/use-status-params";
 import { CampaignListSection } from "./CampaignListSection";
 import { StatusTabs } from "./StatusTabs";
 
+import type { ShortcutKind } from "../lib/campaign-actions";
+import type { CampaignSummary } from "@/entities/campaign";
 import type { SessionViewModel } from "@/entities/session";
 
 // 캠페인 현황: 진행 단계 탭·검색·유형 필터·표(PC)/카드(TAB·MO). 탭·검색·유형·쪽은 주소 쿼리가 소유함.
-// 셸(헤더·LNB)은 app 레이어의 CampaignLayout이 감쌈. 바로 가기가 갈 등록 마법사·등록 내역·캠페인 관리 화면은 아직 없어
-// 모두 "준비 중" 토스트를 띄움(화면이 생기면 `onClickShortcut`·`onClickDetail`에서 이동으로 바꿈).
+// 셸(헤더·LNB)은 app 레이어의 CampaignLayout이 감쌈.
 export function CampaignStatusPage() {
   const { t } = useTranslation("pages/campaign-status");
   const { t: tCommon } = useTranslation();
@@ -46,8 +52,23 @@ export function CampaignStatusPage() {
     void navigate(ROUTES.campaignCreate);
   }
 
-  function handleClickComingSoon() {
-    toast(tCommon("status.comingSoon"));
+  // 캠페인 관리·결과 확인이 갈 진행 화면은 아직 없어 "준비 중" 토스트.
+  function handleClickShortcut(campaign: CampaignSummary, kind: ShortcutKind) {
+    switch (kind) {
+      case "write":
+        void navigate(getCampaignRegisterPath(campaign.campaignIdx));
+        return;
+      case "detail":
+      case "rejectReason":
+        void navigate(getCampaignDetailPath(campaign.campaignIdx));
+        return;
+      default:
+        toast(tCommon("status.comingSoon"));
+    }
+  }
+
+  function handleClickDetail(campaign: CampaignSummary) {
+    void navigate(getCampaignDetailPath(campaign.campaignIdx));
   }
 
   function handleReload() {
@@ -120,8 +141,8 @@ export function CampaignStatusPage() {
           scroll={scroll}
           emptyContent={emptyContent}
           isSubAccount={isSubAccount}
-          onClickShortcut={handleClickComingSoon}
-          onClickDetail={handleClickComingSoon}
+          onClickShortcut={handleClickShortcut}
+          onClickDetail={handleClickDetail}
           onDeleted={handleReload}
         />
       </div>

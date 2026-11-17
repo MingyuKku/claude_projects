@@ -15,6 +15,8 @@ interface AppHeaderProps {
   title?: string;
   // PC에서 제목 앞에 붙는 20px 아이콘 (모바일 시안에는 없음)
   icon?: ReactNode;
+  /** 제목 왼쪽에 붙는 뱃지(캠페인 등록 데모의 "DEMO"). 모바일에서도 보임. */
+  titleBadge?: ReactNode;
   /** 모바일에서도 제목을 보여 줌(기본은 숨김). */
   isTitleVisibleOnMobile?: boolean;
   menuLabel: string;
@@ -30,6 +32,7 @@ interface AppHeaderProps {
 export function AppHeader({
   title,
   icon,
+  titleBadge,
   isTitleVisibleOnMobile = false,
   menuLabel,
   onClickMenu,
@@ -74,6 +77,9 @@ export function AppHeader({
           <span className="hidden shrink-0 text-foreground tablet:flex [&_svg]:size-5">
             {icon}
           </span>
+        )}
+        {titleBadge && (
+          <span className="mr-2 flex shrink-0 tablet:mr-0">{titleBadge}</span>
         )}
         {title && (
           <h1

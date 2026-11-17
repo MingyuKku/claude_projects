@@ -90,7 +90,7 @@ export function AddBrandPanel() {
         </Button>
       }
     >
-      <section className="flex flex-col gap-4 ds-p-5 pb-0">
+      <section className="flex flex-col ds-gap-4 ds-p-5 pb-0">
         <h3 className="ds-text-base-none-semibold">{t("brands.addTitle")}</h3>
         <FormField label={t("brands.name.label")} isRequired>
           {(control) => (
@@ -104,7 +104,11 @@ export function AddBrandPanel() {
           )}
         </FormField>
         <div className="flex flex-col gap-2">
-          <p id={imageLabelId} className="ds-text-sm-5-medium">
+          <p
+            id={imageLabelId}
+            // 시안이 이 라벨만 기기 구분 없는 고정 행간이라 ds- 토큰을 쓰지 않음.
+            className="text-sm leading-5 font-medium"
+          >
             {t("brands.image.label")}
           </p>
           <ThumbnailUpload

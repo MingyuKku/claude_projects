@@ -1,4 +1,4 @@
-import { Plus, Trash2 } from "lucide-react";
+import { Plus, Trash } from "lucide-react";
 import { tryit } from "radash";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -76,12 +76,12 @@ export function BrandManagePanel() {
           className="h-full justify-center"
         />
       ) : (
-        <section className="flex flex-col gap-4 ds-p-5 pb-0">
+        <section className="flex flex-col ds-gap-4 ds-p-5 pb-0">
           <div className="flex items-center justify-between">
             <h3 className="ds-text-base-none-semibold">
               {t("brands.listTitle")}
             </h3>
-            <p className="ds-text-sm-5-medium">
+            <p className="ds-text-sm-none-medium">
               <Trans
                 t={t}
                 i18nKey="brands.count"
@@ -101,11 +101,10 @@ export function BrandManagePanel() {
                 </span>
                 <Button
                   variant="outline-foreground"
-                  size="sm"
                   aria-label={t("brands.deleteLabel", { name: brand.name })}
                   onClick={() => setDeleteTarget(brand)}
                 >
-                  <Trash2 aria-hidden />
+                  <Trash aria-hidden />
                   {t("brands.delete")}
                 </Button>
               </li>

@@ -5,10 +5,18 @@ export const IMAGE_ACCEPT = "image/jpeg,image/png";
 const IMAGE_TYPES = ["image/jpeg", "image/png"];
 const IMAGE_MAX_BYTES = 10 * 1024 * 1024;
 
+/** 소개서 상세 미디어: 이미지는 위 규칙, 동영상은 서버가 공통 동영상 정책으로 검사함. */
+export const DETAIL_MEDIA_ACCEPT = `${IMAGE_ACCEPT},video/*`;
+
 export type FileRuleError = "type" | "size";
 
 export function checkImageFile(file: File): FileRuleError | null {
   if (!IMAGE_TYPES.includes(file.type)) return "type";
   if (file.size > IMAGE_MAX_BYTES) return "size";
   return null;
+}
+
+export function checkDetailMediaFile(file: File): FileRuleError | null {
+  if (file.type.startsWith("video/")) return null;
+  return checkImageFile(file);
 }

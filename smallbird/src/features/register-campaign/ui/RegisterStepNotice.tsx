@@ -1,6 +1,10 @@
 import { Inform } from "@/shared/components/inform";
 import { useTranslation } from "@/shared/i18n";
 
+import {
+  isLockedInRevision,
+  REVISION_LOCK_NOTICE_KEYS,
+} from "../model/revision";
 import { useRegisterWizardStore } from "../model/wizard-context";
 
 import type { CampaignRegisterStep } from "@/entities/campaign";
@@ -16,6 +20,18 @@ export function RegisterStepNotice({ step }: RegisterStepNoticeProps) {
   const campaignType = useRegisterWizardStore(
     (state) => state.draft.info.campaignType,
   );
+  const isRevisionMode = useRegisterWizardStore(
+    (state) => state.isRevisionMode,
+  );
+
+  if (isRevisionMode && isLockedInRevision(step)) {
+    return (
+      <Inform
+        variant="filled"
+        items={[{ id: "locked", text: t(REVISION_LOCK_NOTICE_KEYS[step]) }]}
+      />
+    );
+  }
 
   if (step === "add-ons") {
     return (

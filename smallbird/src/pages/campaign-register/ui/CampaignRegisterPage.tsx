@@ -1,6 +1,17 @@
 import { Navigate, useParams } from "react-router";
 
-import { parseCampaignIdx, useCampaignDetail } from "@/entities/campaign";
+import { useRefreshBigbirdMoneyBalance } from "@/entities/bigbird-money";
+import {
+  CAMPAIGN_STEP_PARAM,
+  getCampaignRegisterPath,
+  parseCampaignIdx,
+  useCampaignDetail,
+} from "@/entities/campaign";
+import {
+  ChargeInline,
+  PaymentRequestedDialog,
+  usePaymentReturn,
+} from "@/features/charge-bigbird-money";
 import {
   RegisterStepSidebar,
   RegisterWizardContent,
@@ -21,6 +32,11 @@ export function CampaignRegisterPage() {
   const { campaignIdx: campaignIdxParam } = useParams();
   const campaignIdx = parseCampaignIdx(campaignIdxParam);
   const { detail, error } = useCampaignDetail(campaignIdx);
+  const refreshBalance = useRefreshBigbirdMoneyBalance();
+  const paymentReturn = usePaymentReturn({
+    onReturned: refreshBalance,
+    nextSearchParams: { [CAMPAIGN_STEP_PARAM]: "payment" },
+  });
 
   if (campaignIdx === null) throw new NotFoundError();
   if (error) {
@@ -33,7 +49,8 @@ export function CampaignRegisterPage() {
   const redirectPath = detail ? getRegisterRedirectPath(detail) : null;
   if (redirectPath) return <Navigate to={redirectPath} replace />;
 
-  if (!detail) return <RegisterShell />;
+  // 마법사는 열 때 주소의 단계를 고쳐 쓰는데, 결제 서버가 붙인 쿼리가 남은 채로 쓰면 지운 쿼리가 되살아남.
+  if (!detail || paymentReturn.isClearingQuery) return <RegisterShell />;
   if (detail.serviceType !== "PICK") {
     return (
       <RegisterShell>
@@ -44,9 +61,20 @@ export function CampaignRegisterPage() {
 
   return (
     <RegisterWizardProvider key={detail.campaignIdx} detail={detail}>
-      <RegisterShell sidebar={<RegisterStepSidebar />}>
-        <RegisterWizardContent />
+      <RegisterShell isDemo={detail.isDemo} sidebar={<RegisterStepSidebar />}>
+        <RegisterWizardContent
+          // 결제 서버가 복귀 주소 뒤에 `?isPaid=…`를 이어 붙여서 쿼리 없이 보냄.
+          chargeSlot={
+            <ChargeInline
+              returnPath={getCampaignRegisterPath(detail.campaignIdx)}
+            />
+          }
+        />
       </RegisterShell>
+      <PaymentRequestedDialog
+        open={paymentReturn.isRequested}
+        onConfirm={paymentReturn.closeAlert}
+      />
     </RegisterWizardProvider>
   );
 }

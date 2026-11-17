@@ -50,11 +50,12 @@ export function RealtimeComposer({
 
   return (
     <form
+      data-keyboard-anchor
       onSubmit={(event) => {
         event.preventDefault();
         void submit();
       }}
-      className="shrink-0 bg-muted p-4"
+      className="shrink-0 bg-muted p-4 in-data-[keyboard=open]:pb-(--keyboard-anchor-gap)"
     >
       <AttachmentTextField
         attachments={attachments}

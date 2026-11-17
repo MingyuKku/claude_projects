@@ -21,7 +21,9 @@
     "saveDraft": "暂存",
     "previous": "上一步",
     "next": "下一步",
-    "pay": "去支付"
+    "pay": "去支付",
+    "preview": "预览",
+    "complete": "完成"
   },
   "toast": {
     "saved": "已保存。",
@@ -29,7 +31,10 @@
     "fileType": "仅可上传JPG、PNG文件。",
     "fileSize": "仅可上传10MB以下的文件。",
     "requestFailed": "请求失败，请稍后重试。",
-    "addressSearchFailed": "无法加载地址搜索，请稍后重试。"
+    "addressSearchFailed": "无法加载地址搜索，请稍后重试。",
+    "aiCompleted": "AI生成已完成。",
+    "aiFailed": "AI生成失败。请检查URL后重试。",
+    "fileCount": "最多可上传5个文件。"
   },
   "dialog": {
     "requiredInfo": {
@@ -106,7 +111,8 @@
     "search": {
       "label": "搜索活动",
       "placeholder": "请输入活动名称或品牌名称搜索。",
-      "submit": "搜索"
+      "submit": "搜索",
+      "placeholderShort": "搜索活动或品牌名称"
     },
     "emptySearch": "没有找到“{{keyword}}”的结果。",
     "empty": "暂无已注册的活动。",
@@ -243,6 +249,280 @@
       "name": "원고컨펌",
       "price": "每位招募网红5,000韩元",
       "description": "可在发布前查看网红撰写的稿件并要求修改，还可同时使用AI稿件审核功能。"
+    }
+  },
+  "intro": {
+    "mode": {
+      "ai": {
+        "title": "AI 캠페인 소개서 撰写",
+        "description": "AI根据商品信息生成指南。"
+      },
+      "manual": {
+        "title": "自行撰写",
+        "description": "自行撰写，可更详细地说明。"
+      }
+    },
+    "ai": {
+      "urlLabel": "商品/服务URL",
+      "urlPlaceholder": "请输入URL。",
+      "urlHelp": "根据输入的URL和活动信息，分析品牌特点和商品信息，生成商品介绍。",
+      "generate": "AI生成",
+      "resultTitle": "AI生成",
+      "regenerate": "重新生成",
+      "loading": {
+        "title": "AI 캠페인 소개서 生成中",
+        "description": "生成完成后即可查看캠페인 소개서。",
+        "caption": "视情况最多可能需要5分钟。"
+      }
+    },
+    "mainImage": {
+      "label": "主图",
+      "title": "请上传显示在招募页面顶部的主图。",
+      "description": "JPG、PNG，10MB以下（建议尺寸1200 x 630）",
+      "remove": "删除主图"
+    },
+    "detailMedia": {
+      "label": "商品详情图片/视频",
+      "title": "请上传商品详情图片/视频。",
+      "description": "最多可上传5个",
+      "drop": "请拖放商品详情图片/视频。",
+      "remove": "删除第{{index}}个文件",
+      "reorder": "调整第{{index}}个文件顺序",
+      "video": "视频 {{index}}",
+      "image": "图片 {{index}}"
+    },
+    "description": {
+      "label": "活动说明",
+      "placeholder": "请填写向网红展示的活动介绍和期望内容。"
+    },
+    "notice": {
+      "label": "注意事项",
+      "placeholder": "请填写活动注意事项。"
+    },
+    "hashtag": {
+      "single": "必填话题标签（关键词）",
+      "title": "标题必填话题标签",
+      "content": "正文必填话题标签",
+      "placeholder": "输入关键词后按Enter添加",
+      "remove": "删除{{keyword}}"
+    }
+  },
+  "conditions": {
+    "period": {
+      "label": "帖子保留期限",
+      "months_other": "{{count}}个月",
+      "direct": "直接输入",
+      "unit": "个月",
+      "placeholder": "请输入期限。",
+      "rangeError": "请输入1~999个月。"
+    },
+    "copyright": {
+      "label": "2차 저작권使用",
+      "use": "使用",
+      "notUse": "不使用"
+    }
+  },
+  "policy": {
+    "all": "同意全部条款",
+    "items": {
+      "service": "同意服务条款",
+      "privacy": "同意隐私政策",
+      "operation": "同意活动运营政策",
+      "reward": "同意리워드及支付相关政策"
+    },
+    "terms": {
+      "service": "服务条款",
+      "privacy": "隐私政策"
+    },
+    "agree": "同意"
+  },
+  "payment": {
+    "won": "{{amount}}韩元",
+    "campaignSummary": {
+      "title": "活动概要",
+      "serviceType": "服务类型",
+      "campaignType": "活动类型",
+      "reward": "리워드",
+      "rewardValue": "提供产品（价值{{amount}}韩元）",
+      "period": "活动期间",
+      "periodValue": "{{start}} - {{end}}（{{days}}天）"
+    },
+    "paymentSummary": {
+      "title": "支付概要",
+      "addOnItems": "增值服务支付商品",
+      "addOnAmount": "增值服务金额",
+      "total": "支付总额",
+      "notice": "仅可使用 Bigbird 余额支付。",
+      "demoNotice": "演示模式下不会进行实际支付，所示金额在实际登记活动时可能会变化。"
+    },
+    "method": {
+      "title": "支付方式",
+      "bigbirdMoney": "Bigbird 余额",
+      "required": "必选"
+    },
+    "terms": {
+      "title": "同意条款"
+    },
+    "dialog": {
+      "required": {
+        "title": "必填项未填写",
+        "description": "有未填写的项目，无法支付。请填写所标步骤中的全部必填项。"
+      },
+      "insufficientBalance": {
+        "title": "支付金额不足",
+        "description": "Bigbird 余额不足。请充值后再支付。"
+      },
+      "completed": {
+        "title": "支付完成",
+        "description": "支付已完成。"
+      },
+      "failed": {
+        "title": "支付失败",
+        "description": "支付失败。请稍后重试。"
+      },
+      "invalidStartDate": {
+        "title": "确认期望开始日期",
+        "description": "活动期望开始日期已过。请重新选择开始日期。"
+      },
+      "subscriptionRequired": {
+        "title": "需要订阅",
+        "description": "PICK型订阅不存在或已过期，无法支付。请订阅后再支付。",
+        "subscribe": "去订阅"
+      },
+      "demoConfirm": {
+        "title": "完成演示撰写",
+        "description": "要完成演示活动的撰写吗？完成后只能通过转为实际活动或加载以往活动来修改信息。"
+      }
+    }
+  },
+  "detail": {
+    "title": "基本信息",
+    "edit": "修改",
+    "cancelApproval": "取消审批申请",
+    "requestReapproval": "申请重新审批",
+    "banner": {
+      "reviewing": {
+        "title": "该活动正在审批中。",
+        "description": "运营团队正在审核活动内容。如需修改，请先取消审批申请再修改。"
+      },
+      "rejected": {
+        "title": "有需要修改的项目。",
+        "description": "请确认驳回原因，修改所标项目后申请重新审批。"
+      },
+      "approved": {
+        "title": "该活动已审批通过。",
+        "description": "可查看已确定的活动信息。"
+      }
+    },
+    "section": {
+      "info": "活动信息",
+      "product": "产品信息",
+      "influencer": "网红条件",
+      "addOns": "增值服务",
+      "intro": "캠페인 소개서",
+      "conditions": "进行条件",
+      "policy": "同意政策",
+      "payment": "支付信息"
+    },
+    "info": {
+      "name": "活动名称",
+      "code": "活动代码",
+      "type": "活动类型",
+      "brand": "品牌名称",
+      "period": "进行期间",
+      "brandImage": "品牌图片"
+    },
+    "product": {
+      "type": "赞助类型",
+      "nameAndQuantity": "赞助产品名称 / 数量",
+      "nameAndQuantityValue_other": "{{name}} / {{count}}个",
+      "price": "赞助产品金额",
+      "returnRequired": "是否退货回收",
+      "returned": "回收",
+      "notReturned": "不回收",
+      "returnFee": "退货回收运费",
+      "returnContact": "退货回收联系方式",
+      "returnAddress": "退货回收地址",
+      "rentalReturn": "대여 상품回收",
+      "rentalFee": "대여 상품回收运费",
+      "rentalContact": "대여 상품回收联系方式",
+      "rentalAddress": "대여 상품回收地址",
+      "coupon": "到店优惠券验证码",
+      "storeName": "到店门店名称",
+      "storeAddress": "门店地址",
+      "benefit": "提供福利或体验内容"
+    },
+    "influencer": {
+      "platform": "平台",
+      "ageGroups": "年龄段",
+      "gender": "性别",
+      "topics": "帖子主题"
+    },
+    "addOns": {
+      "applied": "已申请",
+      "notApplied": "未申请"
+    },
+    "intro": {
+      "hashtag": {
+        "title": "必填话题标签（标题）",
+        "content": "必填话题标签（正文）"
+      },
+      "images": "主图 / 商品详情图",
+      "mainBadge": "主图"
+    },
+    "conditions": {
+      "period": "帖子保留期限",
+      "periodValue_other": "{{count}}个月以上",
+      "copyright": "2차 저작권使用",
+      "copyrightUsed": "使用（含商业用途）"
+    },
+    "policy": {
+      "required": "必填同意项",
+      "allAgreed": "已全部同意"
+    },
+    "payment": {
+      "amount": "支付金额",
+      "method": "支付方式",
+      "methodValue": "Bigbird 余额支付",
+      "paidAt": "支付日期"
+    },
+    "toast": {
+      "refunded": "退款已完成。"
+    },
+    "dialog": {
+      "cancel": {
+        "title": "取消审批申请",
+        "description": "取消审批申请后，已支付金额将全额退还至 Bigbird 余额，活动将变回登记中状态。已填写的信息会保留，修改后再次支付即可重新提交审批申请。\n\n退款方式：Bigbird 余额\n预计退款金额：{{amount}}韩元",
+        "confirm": "取消审批申请"
+      },
+      "reapproval": {
+        "title": "已申请重新审批。",
+        "description": "修改内容将再次提交给运营团队。审批通过后即可进行活动。"
+      }
+    }
+  },
+  "revision": {
+    "lockedAmount": "该值会影响支付金额，无法修改。",
+    "lockedCompleted": "已完成同意和支付，无法修改。"
+  },
+  "demo": {
+    "notice": "当前正在以演示模式撰写活动。不会进行实际支付和审批申请。",
+    "detail": {
+      "title": "该活动是以演示模式撰写的。",
+      "unsubscribedDescription": "订阅套餐后，可将演示模式撰写的活动转为实际活动。",
+      "subscribedDescription": "可将演示模式撰写的活动转为实际活动。",
+      "subscribe": "去订阅",
+      "convert": "转为实际活动"
+    },
+    "dialog": {
+      "convert": {
+        "title": "转为实际活动",
+        "description": "要将演示模式撰写的活动转为实际活动吗？",
+        "confirm": "转换"
+      }
+    },
+    "toast": {
+      "subscriptionRequired": "需要订阅PICK型。请订阅后重试。"
     }
   }
 }

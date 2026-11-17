@@ -7,9 +7,9 @@ import {
 } from "@/entities/campaign";
 import {
   applyFilterValues,
-  FILTER_PANEL_PARAM,
   readFilterValues,
 } from "@/shared/components/list-filter";
+import { FILTER_PANEL_PARAM } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { useTabParam } from "@/shared/lib";
 

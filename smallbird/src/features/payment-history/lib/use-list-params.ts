@@ -2,9 +2,9 @@ import { useSearchParams } from "react-router";
 
 import {
   applyFilterValues,
-  FILTER_PANEL_PARAM,
   readFilterValues,
 } from "@/shared/components/list-filter";
+import { FILTER_PANEL_PARAM } from "@/shared/config";
 
 import { PAGE_PARAM, SIZE_PARAM } from "../model/constants";
 import { parsePageParam, parsePageSizeParam } from "./page-param";

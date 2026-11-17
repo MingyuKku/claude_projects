@@ -7,16 +7,19 @@ import { RegisterPanelContent } from "./RegisterPanelContent";
 
 import type { RegisterPanel } from "../../model/use-register-panel";
 
+type DrawerPanel = Exclude<RegisterPanel, "terms">;
+
 const PANEL_TITLE_KEYS = {
   brands: "brands.title",
   "add-brand": "brands.title",
   "load-previous": "loadPrevious.title",
-} as const satisfies Record<RegisterPanel, string>;
+} as const satisfies Record<DrawerPanel, string>;
 
-// PC(1440 이상) 하위 화면: 오른쪽 드로어(딤). 폭은 시안 그대로 브랜드 관리 362, 이전 캠페인 불러오기 798.
 export function RegisterPanelDrawer() {
   const { t } = useTranslation("features/register-campaign");
-  const { panel, closePanel } = useRegisterPanel();
+  const { panel: openedPanel, closePanel } = useRegisterPanel();
+  // 약관 전문은 드로어가 아니라 가운데 다이얼로그(RegisterTermsDialog).
+  const panel = openedPanel === "terms" ? null : openedPanel;
 
   return (
     <Sheet

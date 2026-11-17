@@ -33,6 +33,7 @@ export function LoadPreviousPanel() {
   const { t } = useTranslation("features/register-campaign");
   const { t: tCommon } = useTranslation();
   const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
+  const isTabletUp = useMediaQuery(MEDIA_QUERY.tabletUp);
   const { closePanel } = useRegisterPanel();
   const campaignIdx = useRegisterWizardStore((state) => state.campaignIdx);
   const serviceType = useRegisterWizardStore((state) => state.serviceType);
@@ -108,8 +109,11 @@ export function LoadPreviousPanel() {
       );
     }
     return (
-      <>
-        <h3 className="ds-text-sm-5-medium">{t("loadPrevious.listTitle")}</h3>
+      <div className="flex flex-col gap-2">
+        {/* 시안이 이 제목만 기기 구분 없는 고정 행간이라 ds- 토큰을 쓰지 않음. */}
+        <h3 className="text-sm leading-5 font-medium">
+          {t("loadPrevious.listTitle")}
+        </h3>
         <CopySourceList
           records={list.records}
           selectedIdx={selectedIdx}
@@ -118,7 +122,7 @@ export function LoadPreviousPanel() {
           onSelect={handleSelect}
           onReachEnd={list.loadMore}
         />
-      </>
+      </div>
     );
   }
 
@@ -136,7 +140,7 @@ export function LoadPreviousPanel() {
         </Button>
       }
     >
-      <div className="flex min-h-full flex-col gap-3 ds-p-5 pb-0">
+      <div className="flex min-h-full flex-col ds-gap-3 ds-p-5 pb-0">
         <form
           role="search"
           className="flex gap-2 tablet:gap-3"
@@ -154,7 +158,12 @@ export function LoadPreviousPanel() {
               type="search"
               className="pl-9"
               aria-label={t("loadPrevious.search.label")}
-              placeholder={t("loadPrevious.search.placeholder")}
+              // MO 시안은 폭이 좁아 짧은 문구를 씀.
+              placeholder={t(
+                isTabletUp
+                  ? "loadPrevious.search.placeholder"
+                  : "loadPrevious.search.placeholderShort",
+              )}
               value={searchInput}
               onChange={(event) => setSearchInput(event.target.value)}
             />

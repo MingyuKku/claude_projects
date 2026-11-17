@@ -262,3 +262,12 @@ export async function copyCampaign(
     record.conditions = { ...source.conditions };
   });
 }
+
+export {
+  cancelCampaignApproval,
+  completeCampaignDemo,
+  convertCampaignDemo,
+  payCampaign,
+  requestCampaignReapproval,
+  reviewCampaignForDev,
+} from "./campaign-payment-mock";

@@ -4,11 +4,27 @@ export {
   fetchCopySources,
 } from "./api/campaign-api";
 export {
+  cancelCampaignApproval,
+  completeCampaignDemo,
+  convertCampaignDemo,
   copyCampaign,
   createCampaign,
   fetchCampaignDetail,
+  payCampaign,
+  readCampaignPaymentError,
+  requestCampaignReapproval,
+  reviewCampaignForDev,
   saveCampaignStep,
 } from "./api/campaign-detail-api";
+export {
+  AI_POSTING_GUIDE_PRICE,
+  calculateCampaignPayment,
+} from "./model/payment-amount";
+export type {
+  CampaignPayment,
+  CampaignPaymentInput,
+  CampaignPaymentItem,
+} from "./model/payment-amount";
 export {
   campaignDetailKey,
   useCampaignDetail,
@@ -20,6 +36,7 @@ export {
   useRevalidateCampaignList,
 } from "./api/use-campaigns";
 export { useCampaignTypeLabel } from "./lib/use-campaign-labels";
+export { toCampaignTypeFilter } from "./model/codes";
 export {
   CAMPAIGN_PAGE_SIZE,
   CAMPAIGN_STAGES,

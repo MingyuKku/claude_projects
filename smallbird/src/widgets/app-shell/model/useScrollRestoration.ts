@@ -1,11 +1,7 @@
 import { useEffect, useLayoutEffect, useRef } from "react";
 import { useLocation, useNavigationType } from "react-router";
 
-import {
-  FILTER_PANEL,
-  FILTER_PANEL_PARAM,
-} from "@/shared/components/list-filter";
-import { MEDIA_QUERY } from "@/shared/config";
+import { FILTER_PANEL, FILTER_PANEL_PARAM, MEDIA_QUERY } from "@/shared/config";
 import { useMediaQuery } from "@/shared/lib";
 
 import type { RefObject } from "react";

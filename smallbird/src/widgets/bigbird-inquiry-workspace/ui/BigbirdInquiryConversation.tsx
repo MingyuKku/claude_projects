@@ -13,6 +13,8 @@ import {
   useInquiryCampaigns,
   isConsultationCompletedShown,
   isMatchFailureShown,
+  showConnectNotice,
+  transformRealtimeConsultationMessages,
   useConsultationDocument,
   useRealtimeConsultationMessages,
 } from "@/entities/inquiry";
@@ -53,6 +55,8 @@ interface BigbirdInquiryConversationProps {
   inquiry: BigbirdInquiryViewModel;
   /** 내 말풍선에 표시할 광고주 이름. */
   myName: string;
+  /** 내 말풍선 아바타 이미지(헤더 프로필과 같은 이미지). 없으면 기본 아바타. */
+  myAvatarSrc?: string;
   threadUserIdx: number;
   /** 대화 아래에 붙는 입력창. 없으면 열린 일반 문의는 기본 입력창, 실시간 상담은 비활성 입력창. 종료된 문의는 입력창 없음. */
   composer?: ReactNode;
@@ -71,11 +75,26 @@ const FAILED_CARD_MS = 10_000;
 
 // 빅버드 문의는 항상 같은 빅버드 담당자와 하는 대화라 상대 아바타를 빅버드 로고(심볼)로 고정함. 로고가 원에 잘리지 않게 여백을 둠.
 const MANAGER_AVATAR_CLASS = "bg-background object-contain p-1.5";
+const MY_AVATAR_CLASS = "border border-border";
+
+function toAvatarProps(isMine: boolean, myAvatarSrc?: string) {
+  return isMine
+    ? { avatarSrc: myAvatarSrc, avatarClassName: MY_AVATAR_CLASS }
+    : { avatarSrc: managerSymbol, avatarClassName: MANAGER_AVATAR_CLASS };
+}
+
+// 운영 앱용 인사말 등 자동 안내는 숨기고, 연결 안내만 구분선으로 보임.
+function toVisibleMessages(messages: InquiryMessageViewModel[]) {
+  return messages
+    .map(showConnectNotice)
+    .filter((message) => message.kind !== "system");
+}
 
 // Figma 빅버드 문의 채팅(5202:101654, 완료 9298:260494). 날짜가 바뀔 때마다 구분 칩을 넣음.
 export function BigbirdInquiryConversation({
   inquiry,
   myName,
+  myAvatarSrc,
   threadUserIdx,
   composer,
   onChangedMessage,
@@ -88,6 +107,12 @@ export function BigbirdInquiryConversation({
   const realtime = useRealtimeConsultationMessages(
     threadUserIdx,
     inquiry.isRealtime ? inquiry.sequence : undefined,
+    inquiry.threadIdx,
+  );
+  // 3분 매칭 실패로 서버가 일반 문의로 돌린 스레드: 상담 문서의 endReason으로 앎. 끝난 상담의 종료 안내도 이 문서에서 가져옴.
+  const { consultation: endedConsultation } = useConsultationDocument(
+    threadUserIdx,
+    inquiry.isRealtime ? undefined : inquiry.sequence,
     inquiry.threadIdx,
   );
   // 캠페인 카드 메시지에는 기간이 없어 광고주의 캠페인 목록에서 캠페인 코드로 찾아 채움(이미지도 카드에 없을 때만).
@@ -115,14 +140,25 @@ export function BigbirdInquiryConversation({
   const canRequestRealtime =
     !inquiry.isRealtime && onClickRealtime !== undefined;
   const endRef = useRef<HTMLDivElement>(null);
-  // 일반·실시간 문의 모두 캠페인 카드를 표시하고, 운영 앱용 인사말 등 자동 안내만 숨김.
+  // 일반·실시간 문의 모두 캠페인 카드를 표시하고, 운영 앱용 인사말 등 자동 안내만 숨김. 연결 안내는 구분선으로 보임.
   // 실시간 상담도 같은 대화창에 이어 보임: 일반 문의 내용(REST)에 상담 문서의 실시간 메시지를 합침.
   const history = timeline.messages ?? detail.messages ?? inquiry.messages;
-  const messages = (
-    inquiry.isRealtime
-      ? mergeConversationMessages(history, realtime.messages ?? [])
-      : history
-  ).filter((message) => message.kind !== "system");
+  // 종료 안내(auto)는 상담 문서에만 있고 REST 대화에는 없을 수 있어, 상담이 끝나 스레드가 일반 문의로 바뀐 뒤에는 문서의
+  // 종료 안내만 합쳐 구분선이 사라지지 않게 함(사용자 요청 2026-11-13). 같은 안내가 REST에도 있으면 하나로 합쳐짐.
+  const endNotices =
+    !inquiry.isRealtime && endedConsultation
+      ? transformRealtimeConsultationMessages(endedConsultation).filter(
+          (message) => message.kind === "notice",
+        )
+      : [];
+  const historyMessages = toVisibleMessages(history);
+  const messages = inquiry.isRealtime
+    ? toVisibleMessages(
+        mergeConversationMessages(history, realtime.messages ?? []),
+      )
+    : endNotices.length > 0
+      ? toVisibleMessages(mergeConversationMessages(history, endNotices))
+      : historyMessages;
 
   // 타임라인(일반 문의 내용)이 있으면 상담 문서를 받는 중이거나 실패해도 대화를 가리지 않음.
   const hasNoMessages = messages.length === 0;
@@ -156,12 +192,6 @@ export function BigbirdInquiryConversation({
     const timer = setTimeout(() => setIsFailedCardHidden(true), FAILED_CARD_MS);
     return () => clearTimeout(timer);
   }, [isFailed]);
-  // 3분 매칭 실패로 서버가 일반 문의로 돌린 스레드: 상담 문서의 endReason으로 앎.
-  const { consultation: endedConsultation } = useConsultationDocument(
-    threadUserIdx,
-    inquiry.isRealtime ? undefined : inquiry.sequence,
-    inquiry.threadIdx,
-  );
   // endReason은 종료·전환 때마다 덮어써지고 새 요청 뒤에도 남을 수 있어(마켓 실측 2026-11-04) 요청 시각이 비었을 때만 인정하고,
   // 실패 뒤에 상담원이 일반 메시지를 보내거나 광고주가 일반 문의를 보내면 걷음. 규칙은 isMatchFailureShown.
   const isMatchFailed = isMatchFailureShown(endedConsultation, messages);
@@ -174,7 +204,7 @@ export function BigbirdInquiryConversation({
   // 운영이 직접 종료하면 서버가 종료 안내를 남기지 않아 상담 문서의 종료 사유로도 앎(isConsultationCompletedShown).
   const isRealtimeEnded = inquiry.isRealtime
     ? inquiry.isFinished
-    : messages.at(-1)?.kind === "notice" ||
+    : historyMessages.at(-1)?.kind === "notice" ||
       isConsultationCompletedShown(endedConsultation, inquiry.isFinished);
   // 대화 위에 고정되는 안내 카드(완료·요청 중·요청 실패). 첫 메시지가 가리지 않게 높이만큼 띄움.
   const isCompletedCardVisible = isRealtimeEnded && !isCompletedCardClosed;
@@ -242,7 +272,12 @@ export function BigbirdInquiryConversation({
     const name = message.isMine ? myName : t("bigbirdManager");
     // 서버의 상담 종료 안내는 말풍선이 아니라 가운데 구분선(마켓·인플루언서 시안과 같음).
     if (message.kind === "notice") {
-      return <ChatDivider className="self-center">{message.body}</ChatDivider>;
+      // 연결 안내는 한 줄이 길어 좁은 폭에서는 칩 안에서 줄을 바꿈.
+      return (
+        <ChatDivider className="max-w-full self-center text-center whitespace-normal">
+          {message.body}
+        </ChatDivider>
+      );
     }
     if (message.isDeleted) {
       return (
@@ -257,8 +292,7 @@ export function BigbirdInquiryConversation({
       return (
         <ChatMessage
           name={name}
-          avatarSrc={message.isMine ? undefined : managerSymbol}
-          avatarClassName={MANAGER_AVATAR_CLASS}
+          {...toAvatarProps(message.isMine, myAvatarSrc)}
           side={side}
           card={
             <ChatCodeCard
@@ -280,8 +314,7 @@ export function BigbirdInquiryConversation({
       <EditableChatMessage
         message={message}
         name={name}
-        avatarSrc={message.isMine ? undefined : managerSymbol}
-        avatarClassName={MANAGER_AVATAR_CLASS}
+        {...toAvatarProps(message.isMine, myAvatarSrc)}
         time={formatMessageTime(message.createdAt)}
         // 실시간 상담은 Firestore 메시지라 수정·삭제 API 대상이 아니고, 종료된 문의는 읽기 전용입니다.
         canModify={
@@ -384,7 +417,7 @@ export function BigbirdInquiryConversation({
         }
       />
       {/* 완료 카드는 대화 위에 고정됨(Figma 9298:260494). 종료된 문의는 입력창이 없음. */}
-      <div className="relative flex min-h-0 flex-1 flex-col bg-muted">
+      <div className="relative flex min-h-0 flex-1 flex-col overflow-hidden bg-muted">
         {renderTopCard()}
         {isHistoryLoading ||
         (hasNoMessages && inquiry.isRealtime && realtime.isLoading) ? (
@@ -472,8 +505,7 @@ export function BigbirdInquiryConversation({
                       <ConversationFiles
                         row={row}
                         name={row.isMine ? myName : t("bigbirdManager")}
-                        avatarSrc={row.isMine ? undefined : managerSymbol}
-                        avatarClassName={MANAGER_AVATAR_CLASS}
+                        {...toAvatarProps(row.isMine, myAvatarSrc)}
                         time={
                           row.text
                             ? formatMessageTime(row.text.createdAt)
@@ -507,6 +539,7 @@ export function BigbirdInquiryConversation({
           threadIdx={inquiry.threadIdx}
           isFinished
           isClosed={inquiry.isFinished}
+          isFromRealtime={isFailed || isRealtimeEnded}
           campaignIdx={inquiry.campaignIdx}
           onSent={onChangedMessage}
         />

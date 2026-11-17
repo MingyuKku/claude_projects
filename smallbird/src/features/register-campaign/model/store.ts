@@ -18,6 +18,26 @@ import type {
 
 export type WizardDialog = "requiredInfo" | "notEditable";
 
+/** 5단계 작성 방식. 서버에 저장되지 않음. */
+export type IntroMode = "AI" | "MANUAL";
+
+export interface IntroAiState {
+  url: string;
+  /** 생성 중인 작업 번호. 유형 변경·불러오기로 버린 작업의 결과를 무시하려고 둠. null이면 생성 중 아님. */
+  jobId: number | null;
+  /** 이번 방문에서 AI 결과를 받았는지. 받으면 "AI 생성" 카드를 보임. */
+  hasResult: boolean;
+  /** 마지막으로 끝난 작업의 결과. 다른 단계에 있어도 완료·실패를 알리려고 둠. */
+  lastOutcome: "SUCCEEDED" | "FAILED" | null;
+}
+
+const IDLE_INTRO_AI: IntroAiState = {
+  url: "",
+  jobId: null,
+  hasResult: false,
+  lastOutcome: null,
+};
+
 type ObjectDraftStep = Exclude<CampaignDraftStep, "addOns">;
 
 export interface RegisterWizardState {
@@ -27,6 +47,8 @@ export interface RegisterWizardState {
   serviceType: CampaignServiceType;
   productType: CampaignProductType;
   isDemo: boolean;
+  /** 반려 뒤 수정 모드. 결제 금액·동의·결제 단계는 읽기 전용. */
+  isRevisionMode: boolean;
   draft: CampaignDraft;
   /** 단계별 마지막으로 저장한 값. 바뀐 단계만 보내려고 둠. */
   savedDraft: CampaignDraft;
@@ -35,6 +57,8 @@ export interface RegisterWizardState {
   /** 저장 없이 나가도 되는 상태(수정 불가 안내 뒤 등록 내역으로 갈 때). */
   isLeaveAllowed: boolean;
   dialog: WizardDialog | null;
+  introMode: IntroMode;
+  introAi: IntroAiState;
 }
 
 export interface RegisterWizardActions {
@@ -60,7 +84,23 @@ export interface RegisterWizardActions {
   allowLeave: () => void;
   openDialog: (dialog: WizardDialog) => void;
   closeDialog: () => void;
+  setIntroMode: (mode: IntroMode) => void;
+  setIntroAiUrl: (url: string) => void;
+  /** 생성을 시작하고 작업 번호를 돌려줌. */
+  startIntroGeneration: () => number;
+  /** 결과가 오면 소개서 전체를 덮어씀. 실패(null)면 기존 입력을 그대로 둠. 버린 작업이면 아무것도 안 함. */
+  finishIntroGeneration: (
+    jobId: number,
+    intro: CampaignDraft["intro"] | null,
+  ) => void;
 }
+
+/** 작성 방식이 서버에 남지 않아, 소개서에 입력값이 있으면 직접 작성으로 엶. */
+function getInitialIntroMode(draft: CampaignDraft): IntroMode {
+  return isEqual(draft.intro, createEmptyDraft().intro) ? "AI" : "MANUAL";
+}
+
+let introJobSequence = 0;
 
 export type RegisterWizardStore = RegisterWizardState & RegisterWizardActions;
 export type RegisterWizardStoreApi = ReturnType<
@@ -77,11 +117,14 @@ export function createRegisterWizardStore(detail: CampaignDetail) {
         serviceType: detail.serviceType ?? "PICK",
         productType: detail.productType ?? "BRAND",
         isDemo: detail.isDemo,
+        isRevisionMode: detail.stage === "REJECTED",
         draft: detail.draft,
         savedDraft: detail.draft,
         hasVisitedPayment: false,
         isLeaveAllowed: false,
         dialog: null,
+        introMode: getInitialIntroMode(detail.draft),
+        introAi: IDLE_INTRO_AI,
         setStepDraft: (step, value) =>
           set((state) => ({ draft: { ...state.draft, [step]: value } })),
         patchStepDraft: (step, patch) =>
@@ -95,7 +138,13 @@ export function createRegisterWizardStore(detail: CampaignDetail) {
           set((state) => ({
             savedDraft: { ...state.savedDraft, [step]: value },
           })),
-        replaceDraft: (draft) => set({ draft, savedDraft: draft }),
+        replaceDraft: (draft) =>
+          set({
+            draft,
+            savedDraft: draft,
+            introMode: getInitialIntroMode(draft),
+            introAi: IDLE_INTRO_AI,
+          }),
         changeCampaignType: (campaignType) =>
           set((state) => {
             const empty = createEmptyDraft();
@@ -104,6 +153,9 @@ export function createRegisterWizardStore(detail: CampaignDetail) {
                 ...empty,
                 info: { ...state.draft.info, campaignType },
               },
+              introMode: "AI",
+              // 진행 중인 AI 생성 작업도 버림.
+              introAi: IDLE_INTRO_AI,
             };
           }),
         markServerCleared: (steps) =>
@@ -118,6 +170,37 @@ export function createRegisterWizardStore(detail: CampaignDetail) {
         allowLeave: () => set({ isLeaveAllowed: true }),
         openDialog: (dialog) => set({ dialog }),
         closeDialog: () => set({ dialog: null }),
+        setIntroMode: (introMode) => set({ introMode }),
+        setIntroAiUrl: (url) =>
+          set((state) => ({ introAi: { ...state.introAi, url } })),
+        startIntroGeneration: () => {
+          introJobSequence += 1;
+          const jobId = introJobSequence;
+          set((state) => ({ introAi: { ...state.introAi, jobId } }));
+          return jobId;
+        },
+        finishIntroGeneration: (jobId, intro) =>
+          set((state) => {
+            if (state.introAi.jobId !== jobId) return {};
+            if (!intro) {
+              return {
+                introAi: {
+                  ...state.introAi,
+                  jobId: null,
+                  lastOutcome: "FAILED",
+                },
+              };
+            }
+            return {
+              draft: { ...state.draft, intro },
+              introAi: {
+                ...state.introAi,
+                jobId: null,
+                hasResult: true,
+                lastOutcome: "SUCCEEDED",
+              },
+            };
+          }),
       }),
       { name: "register-campaign-wizard" },
     ),

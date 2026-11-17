@@ -31,8 +31,9 @@ const CUSTOMER_CENTER_PATH_PREFIXES: string[] = [
   ROUTES.customerCenterInfluencer,
 ];
 // 고객센터는 모바일에서 본문이 가장자리까지 차고, 태블릿 이상에서는 위쪽 여백 없이 좌우·아래만 둠.
+// 키보드가 열린 동안은 입력창 아래 여백이 --keyboard-anchor-gap 하나가 되도록 본문 아래 여백을 뺌.
 const CUSTOMER_CENTER_MAIN_CLASS =
-  "p-0 tablet:px-5 tablet:py-0 tablet:pb-5 desktop:px-5 desktop:pb-5";
+  "p-0 tablet:px-5 tablet:py-0 tablet:pb-5 tablet:in-data-[keyboard=open]:pb-0 desktop:px-5 desktop:pb-5";
 
 // iOS에서 키보드가 떠 있는 동안 본문 아래 끝은 보이는 영역의 아래 끝이고, 그 아래로 반투명한 주소·입력 보조 막대가 셸 아래 블록을 비춤.
 // 본문을 스크롤하면 내용이 그 끝에서 잘린 듯 끊겨 보이므로 아래를 흐리게 함. 흐리는 길이는 키보드가 열릴 때 입력 영역을 띄우는

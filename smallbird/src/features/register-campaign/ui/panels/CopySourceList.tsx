@@ -65,24 +65,26 @@ export function CopySourceList({
     return (
       <div className="overflow-hidden rounded-md border">
         <table className="w-full table-fixed text-left ds-text-sm-5-normal">
-          <thead className="bg-muted/50 text-muted-foreground">
+          <thead className="bg-muted/50 ds-text-sm-6-medium text-muted-foreground">
             <tr className="h-12 border-b">
               <th className="w-16">
                 <span className="sr-only">
                   {t("loadPrevious.column.select")}
                 </span>
               </th>
-              <th className="font-normal">{t("loadPrevious.column.name")}</th>
-              <th className="w-40 font-normal">
+              <th className="w-42.5 font-medium">
+                {t("loadPrevious.column.name")}
+              </th>
+              <th className="w-39.5 font-medium">
                 {t("loadPrevious.column.brand")}
               </th>
-              <th className="w-30 font-normal">
+              <th className="w-30.25 font-medium">
                 {t("loadPrevious.column.type")}
               </th>
-              <th className="w-35 font-normal">
+              <th className="w-37.25 font-medium">
                 {t("loadPrevious.column.platform")}
               </th>
-              <th className="w-27 font-normal">
+              <th className="font-medium">
                 {t("loadPrevious.column.createdDate")}
               </th>
             </tr>
@@ -99,7 +101,7 @@ export function CopySourceList({
                   )}
                   onClick={() => onSelect(record.campaignIdx)}
                 >
-                  <td className="text-center">
+                  <td className="pl-4">
                     <Checkbox
                       checked={isSelected}
                       aria-label={record.name}
@@ -129,8 +131,8 @@ export function CopySourceList({
         {records.map((record) => {
           const isSelected = record.campaignIdx === selectedIdx;
           return (
-            <li key={record.campaignIdx} className="rounded-lg border p-4">
-              <label className="flex cursor-pointer items-center gap-3 border-b pb-4">
+            <li key={record.campaignIdx} className="rounded-lg border">
+              <label className="flex h-14 cursor-pointer items-center gap-4 px-4 py-1">
                 <Checkbox
                   checked={isSelected}
                   onCheckedChange={() => onSelect(record.campaignIdx)}
@@ -139,7 +141,8 @@ export function CopySourceList({
                   {record.name}
                 </span>
               </label>
-              <dl className="flex flex-col gap-4 pt-4 ds-text-sm-5-normal">
+              <hr className="mx-4 border-border" />
+              <dl className="flex flex-col pt-2.5 pb-4 ds-text-sm-5-normal">
                 <CardRow label={t("loadPrevious.column.brand")}>
                   {record.brandName ?? "-"}
                 </CardRow>
@@ -169,8 +172,8 @@ interface CardRowProps {
 
 function CardRow({ label, children }: CardRowProps) {
   return (
-    <div className="flex items-center justify-between gap-4">
-      <dt className="ds-text-sm-5-medium">{label}</dt>
+    <div className="flex h-12 items-center justify-between gap-4 px-4">
+      <dt className="ds-text-sm-5-semibold">{label}</dt>
       <dd className="min-w-0 truncate">{children}</dd>
     </div>
   );

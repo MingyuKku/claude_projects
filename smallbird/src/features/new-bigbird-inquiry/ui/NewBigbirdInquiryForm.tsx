@@ -164,18 +164,16 @@ export function NewBigbirdInquiryForm({
                       <TableCell>
                         <label
                           htmlFor={`${id}-${campaign.id}`}
-                          className="block cursor-pointer truncate"
+                          className="line-clamp-2 cursor-pointer whitespace-normal"
                           title={campaign.name}
                         >
                           {campaign.name}
                         </label>
                       </TableCell>
-                      {/* 기간도 캠페인명처럼 한 줄 말줄임(Figma Table Base / Cell, MO에서 잘림) */}
-                      <TableCell
-                        className="truncate"
-                        title={campaign.periodLabel ?? undefined}
-                      >
-                        {campaign.periodLabel ?? "—"}
+                      <TableCell title={campaign.periodLabel ?? undefined}>
+                        <span className="line-clamp-2 whitespace-normal">
+                          {campaign.periodLabel ?? "—"}
+                        </span>
                       </TableCell>
                     </TableRow>
                   ))}

@@ -15,7 +15,8 @@ export function ProductStep() {
 
   if (campaignType === "PRESS") {
     return (
-      <Card className="min-h-110 justify-center ds-p-6">
+      // 시안 카드 높이가 기기별 고정값이라 토큰이 아닌 값으로 둠.
+      <Card className="min-h-54 justify-center ds-p-6 tablet:min-h-76.5 desktop:min-h-110">
         <EmptyState
           type="no-input"
           title={t("product.press.emptyTitle")}

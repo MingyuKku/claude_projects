@@ -30,7 +30,15 @@ describe("getRegisterRedirectPath", () => {
     ).toBeNull();
   });
 
-  it.each(["REVIEWING", "REJECTED", "IN_PROGRESS", "ENDED"] as const)(
+  it("반려면 수정 모드로 작성 화면에 머문다(스펙 §3 반려 후 수정)", () => {
+    expect(
+      getRegisterRedirectPath(
+        detailOf({ stage: "REJECTED", isDemoCompleted: false }),
+      ),
+    ).toBeNull();
+  });
+
+  it.each(["REVIEWING", "IN_PROGRESS", "ENDED"] as const)(
     "%s면 등록 내역으로 보낸다",
     (stage) => {
       expect(

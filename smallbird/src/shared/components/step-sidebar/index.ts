@@ -3,4 +3,5 @@ export type {
   StepSidebarIndicator,
   StepSidebarItem,
   StepSidebarItemState,
+  StepSidebarOverviewItem,
 } from "./StepSidebar";

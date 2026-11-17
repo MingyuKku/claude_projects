@@ -20,6 +20,7 @@ function renderComposer(
   props: {
     isFinished?: boolean;
     isClosed?: boolean;
+    isFromRealtime?: boolean;
     campaignIdx?: number | null;
   } = {},
 ) {
@@ -149,6 +150,153 @@ describe("일반 문의 입력창", () => {
     expect(serverApiV3.post).toHaveBeenNthCalledWith(1, "/help/thread", {
       isBoardType: true,
       campaignIdx: null,
+    });
+  });
+
+  it("실시간 상담이 끝난 기타 문의는 스레드를 만들지 않고 메시지만 보내며 서버가 돌려준 번호로 이동한다", async () => {
+    const user = userEvent.setup();
+    vi.mocked(serverApiV3.post).mockResolvedValue({
+      result: true,
+      threadIdx: 505,
+    });
+    const { router } = renderComposer(vi.fn(), {
+      isFinished: true,
+      isClosed: true,
+      isFromRealtime: true,
+      campaignIdx: null,
+    });
+    await user.type(screen.getByRole("textbox"), "상담 뒤 문의{Enter}");
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(
+        "/customer-center/bigbird/505",
+      ),
+    );
+    // POST /help/thread 없이 메시지 한 번만 보냄.
+    expect(serverApiV3.post).toHaveBeenCalledTimes(1);
+    expect(serverApiV3.post).toHaveBeenCalledWith(
+      "/help/thread/message",
+      expect.objectContaining({ threadIdx: 101, body: "상담 뒤 문의" }),
+      { headers: { "X-Device-Id": expect.any(String) } },
+    );
+  });
+
+  it("처음 글이 끝난 기타 문의 스레드에 그대로 쌓이면 다음 글부터는 스레드를 만들어 보낸다", async () => {
+    const user = userEvent.setup();
+    vi.mocked(serverApiV3.post)
+      // 첫 글: 스레드 생성 없이 같은 번호로 보냈고 서버가 그대로 받음
+      .mockResolvedValueOnce({ result: true, threadIdx: 101 })
+      // 다음 글: 기존처럼 스레드를 만들고 그 번호로 보냄
+      .mockResolvedValueOnce({
+        result: true,
+        data: { sequence: 9, threadIdx: 707 },
+      })
+      .mockResolvedValueOnce({ result: true, threadIdx: 707 });
+    const { router, onSent } = renderComposer(vi.fn(), {
+      isFinished: true,
+      isClosed: true,
+      isFromRealtime: true,
+      campaignIdx: null,
+    });
+    await user.type(screen.getByRole("textbox"), "첫 글{Enter}");
+    await waitFor(() => expect(onSent).toHaveBeenCalledOnce());
+    expect(serverApiV3.post).toHaveBeenCalledTimes(1);
+    expect(router.state.location.pathname).toBe("/customer-center/bigbird/101");
+
+    await user.type(screen.getByRole("textbox"), "다음 글{Enter}");
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(
+        "/customer-center/bigbird/707",
+      ),
+    );
+    expect(serverApiV3.post).toHaveBeenNthCalledWith(2, "/help/thread", {
+      isBoardType: true,
+      campaignIdx: null,
+    });
+    expect(serverApiV3.post).toHaveBeenNthCalledWith(
+      3,
+      "/help/thread/message",
+      expect.objectContaining({ threadIdx: 707, body: "다음 글" }),
+      { headers: { "X-Device-Id": expect.any(String) } },
+    );
+  });
+
+  it("실시간 종료 뒤 기타 문의에 첨부만 보내면 메시지 전송이 없어 기존처럼 스레드를 먼저 만들고 그 번호로 올린다", async () => {
+    const user = userEvent.setup();
+    vi.mocked(serverApiV3.post).mockResolvedValue({
+      result: true,
+      data: { sequence: 9, threadIdx: 808 },
+    });
+    const { router } = renderComposer(vi.fn(), {
+      isFinished: true,
+      isClosed: true,
+      isFromRealtime: true,
+      campaignIdx: null,
+    });
+    const input =
+      document.querySelector<HTMLInputElement>('input[type="file"]');
+    await user.upload(
+      input!,
+      new File(["x"], "사진.png", { type: "image/png" }),
+    );
+    await user.click(await screen.findByRole("button", { name: "전송" }));
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(
+        "/customer-center/bigbird/808",
+      ),
+    );
+    // 첨부만 보낸 글은 '처음 글'로 치지 않고 스레드를 먼저 만들어 그 번호(808)로 올림
+    expect(serverApiV3.post).toHaveBeenNthCalledWith(1, "/help/thread", {
+      isBoardType: true,
+      campaignIdx: null,
+    });
+    expect(useInquiryUploadStore.getState().jobs[808]).toBeDefined();
+    expect(useInquiryUploadStore.getState().jobs[101]).toBeUndefined();
+  });
+
+  it("실시간 연결에 실패한 기타 문의는 스레드를 만들지 않고 지금 스레드로 보낸다", async () => {
+    const user = userEvent.setup();
+    vi.mocked(serverApiV3.post).mockResolvedValue({
+      result: true,
+      threadIdx: 101,
+    });
+    const { router, onSent } = renderComposer(vi.fn(), {
+      isFinished: true,
+      isFromRealtime: true,
+      campaignIdx: null,
+    });
+    await user.type(screen.getByRole("textbox"), "연결 실패 뒤 문의{Enter}");
+    await waitFor(() => expect(onSent).toHaveBeenCalledOnce());
+    expect(serverApiV3.post).toHaveBeenCalledTimes(1);
+    expect(serverApiV3.post).toHaveBeenCalledWith(
+      "/help/thread/message",
+      expect.objectContaining({ threadIdx: 101, body: "연결 실패 뒤 문의" }),
+      { headers: { "X-Device-Id": expect.any(String) } },
+    );
+    expect(router.state.location.pathname).toBe("/customer-center/bigbird/101");
+  });
+
+  it("실시간에서 넘어오는 캠페인 문의는 지금처럼 스레드를 먼저 만든다", async () => {
+    const user = userEvent.setup();
+    vi.mocked(serverApiV3.post)
+      .mockResolvedValueOnce({
+        result: true,
+        data: { sequence: 9, threadIdx: 606 },
+      })
+      .mockResolvedValueOnce({ result: true, threadIdx: 606 });
+    const { router } = renderComposer(vi.fn(), {
+      isFinished: true,
+      isFromRealtime: true,
+      campaignIdx: 10,
+    });
+    await user.type(screen.getByRole("textbox"), "다시 문의{Enter}");
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(
+        "/customer-center/bigbird/606",
+      ),
+    );
+    expect(serverApiV3.post).toHaveBeenNthCalledWith(1, "/help/thread", {
+      isBoardType: true,
+      campaignIdx: 10,
     });
   });
 

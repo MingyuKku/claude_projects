@@ -1,6 +1,9 @@
+import { preload } from "react-dom";
+
 import { InfluencerSearchForm } from "@/features/search-influencer";
 import heroBackground from "@/shared/assets/img/home/hero-bg.jpg";
 import { WavyBackground } from "@/shared/components/wavy-background";
+import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 
 import { FeatureCards } from "./FeatureCards";
@@ -32,6 +35,12 @@ const FEATURE_CARDS_CLASS_NAME =
 // 순서는 CSS(order)로만 바꿈. DOM을 옮기면 textarea가 다시 마운트되어 포커스와 한글 조합이 끊김.
 export function HomeContent({ session }: HomeContentProps) {
   const { t } = useTranslation("pages/home");
+  // 배경 사진은 태블릿 이상에서만 보임. 모바일은 받아도 쓰지 않으므로 그 폭에서는 우선 요청하지 않음.
+  preload(heroBackground, {
+    as: "image",
+    fetchPriority: "high",
+    media: MEDIA_QUERY.tabletUp,
+  });
 
   return (
     <div

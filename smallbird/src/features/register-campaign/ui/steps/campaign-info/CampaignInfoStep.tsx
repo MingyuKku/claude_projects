@@ -23,6 +23,9 @@ export function CampaignInfoStep() {
   const patchStepDraft = useRegisterWizardStore(
     (state) => state.patchStepDraft,
   );
+  const isRevisionMode = useRegisterWizardStore(
+    (state) => state.isRevisionMode,
+  );
   const { openPanel } = useRegisterPanel();
 
   return (
@@ -36,10 +39,13 @@ export function CampaignInfoStep() {
             {campaignCode}
           </dd>
         </dl>
-        <Button variant="outline" onClick={() => openPanel("load-previous")}>
-          <Download aria-hidden />
-          {t("loadPrevious.title")}
-        </Button>
+        {/* 불러오기는 부가서비스(잠금)까지 덮어써서 수정 모드에서는 두지 않음. */}
+        {!isRevisionMode && (
+          <Button variant="outline" onClick={() => openPanel("load-previous")}>
+            <Download aria-hidden />
+            {t("loadPrevious.title")}
+          </Button>
+        )}
       </div>
       <div className="grid ds-gap-4 desktop:grid-cols-2 desktop:gap-6">
         <div className="flex min-w-0 flex-col ds-gap-4">
@@ -56,7 +62,10 @@ export function CampaignInfoStep() {
               />
             )}
           </FormField>
-          <CampaignTypeField />
+          {/* 반려 중에는 유형을 바꿀 수 없음(바꾸면 잠긴 부가서비스까지 비워져 서버가 거절함). */}
+          <fieldset disabled={isRevisionMode} className="contents">
+            <CampaignTypeField />
+          </fieldset>
         </div>
         <div className="flex min-w-0 flex-col ds-gap-4">
           <BrandSelect onClickManage={() => openPanel("brands")} />

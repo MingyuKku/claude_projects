@@ -1,10 +1,16 @@
 import { useSearchParams } from "react-router";
 
+import { useRefreshBigbirdMoneyBalance } from "@/entities/bigbird-money";
 import {
   ChargeHistory,
   LIST_QUERY_PARAMS,
   UsageHistory,
+  useReloadChargeHistory,
 } from "@/features/bigbird-money-history";
+import {
+  PaymentRequestedDialog,
+  usePaymentReturn,
+} from "@/features/charge-bigbird-money";
 import { useFilterScreen } from "@/shared/components/list-filter";
 import { StickyTabBar } from "@/shared/components/sticky-tab-bar";
 import { MEDIA_QUERY } from "@/shared/config";
@@ -14,11 +20,9 @@ import { cn } from "@/shared/lib/utils";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
 
 import { CHARGE_VIEWS, MONEY_PANELS, MONEY_TABS } from "../model/tabs";
-import { usePaymentReturn } from "../model/use-payment-return";
 import { useWithdrawnAlert } from "../model/use-withdrawn-alert";
 import { MoneySummary } from "./MoneySummary";
 import { PanelFrame } from "./PanelFrame";
-import { PaymentRequestedDialog } from "./PaymentRequestedDialog";
 import { useMoneySidePanel } from "./use-money-side-panel";
 import { WithdrawnDialog } from "./WithdrawnDialog";
 
@@ -67,7 +71,12 @@ export function MyPageMoneyPage() {
       ? requestedPanel
       : null;
   const activeId = searchParams.get("id");
-  const { isRequested, closeAlert } = usePaymentReturn();
+  const reloadHistory = useReloadChargeHistory();
+  const refreshBalance = useRefreshBigbirdMoneyBalance();
+  const { isRequested, closeAlert } = usePaymentReturn({
+    // 재조회에 실패하면 내역 목록이 자체 오류 상태를 보여 줌.
+    onReturned: () => Promise.all([reloadHistory(), refreshBalance()]),
+  });
   const withdrawn = useWithdrawnAlert();
 
   const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);

@@ -30,9 +30,10 @@ export function parseRegisterEntry(
 
 /**
  * 작성 경로에서 열 수 없는 캠페인이면 보낼 곳. 승인 요청 이후 상태와 작성을 마친 데모는 등록 내역(기본 정보)에서 봄.
- * 반려 캠페인의 "수정" 진입은 등록 내역 작업에서 예외로 더함.
+ * 반려 캠페인은 등록 내역의 "수정"으로 들어와 수정 모드로 엶.
  */
 export function getRegisterRedirectPath(detail: CampaignDetail) {
-  const isWritable = detail.stage === "DRAFT" && !detail.isDemoCompleted;
+  const isDraft = detail.stage === "DRAFT" && !detail.isDemoCompleted;
+  const isWritable = isDraft || detail.stage === "REJECTED";
   return isWritable ? null : getCampaignDetailPath(detail.campaignIdx);
 }

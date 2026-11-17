@@ -25,7 +25,8 @@
     "ds:tokens:check": "node scripts/design/tokens.mjs --check",
     "test:scripts": "node --test 'scripts/design/*.test.mjs'",
     "ai:check": "python3 convention/ai/render.py --check && python3 ai/scripts/render_agents.py --check",
-    "ai:review": "bash scripts/ai-review.sh --local"
+    "ai:review": "bash scripts/ai-review.sh --local",
+    "ai:skill-usage": "python3 ai/scripts/skill_usage.py"
   },
   "dependencies": {
     "@tanstack/react-table": "^8.21.3",

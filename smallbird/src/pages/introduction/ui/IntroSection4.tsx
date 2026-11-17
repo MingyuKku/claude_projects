@@ -2,7 +2,7 @@ import { Trans, useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
 
 import { createSpriteStyle } from "../lib/sprite-style";
-import { CONTAINER, REVEAL } from "../lib/tw";
+import { CONTAINER, LAZY_BG, REVEAL } from "../lib/tw";
 import { section4 } from "../model/data";
 
 interface Props {
@@ -59,6 +59,7 @@ export function IntroSection4({ className }: Props) {
                   aspect: %로 쓴 background-size 는 비율이 고정일 때만 성립함. */}
               <div
                 className={cn(
+                  LAZY_BG,
                   "relative h-[400px] w-[794px] flex-none overflow-hidden rounded-[4px] bg-[#fafafa] bg-no-repeat",
                   "[background-image:var(--s4-pc-img)] bg-size-(--s4-pc-size) bg-position-(--s4-pc-pos)",
                   "max-introtab:aspect-456/232 max-introtab:h-auto max-introtab:w-[66.279%] max-introtab:[background-image:var(--s4-tab-img)] max-introtab:bg-size-(--s4-tab-size) max-introtab:bg-position-(--s4-tab-pos)",
@@ -68,6 +69,7 @@ export function IntroSection4({ className }: Props) {
                 role="img"
                 aria-label={t(`section4.cards.${card.key}.label`)}
                 style={createSpriteStyle(index, card)}
+                data-lazy-bg=""
               >
                 {/* Safari 는 비디오 자체의 반경으로는 모서리를 자르지 않아 비디오를 감쌈.
                     크기·테두리·그림자는 디자인 값이며 화면별로 600 -> 320 -> 300 으로 줄어듦.

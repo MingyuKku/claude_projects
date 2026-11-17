@@ -210,6 +210,7 @@ export function CustomerCenterBigbirdPage() {
             inquiry={selected}
             onChangedMessage={refresh}
             myName={companyName ?? session.displayName}
+            myAvatarSrc={session.profileImageUrl ?? undefined}
             threadUserIdx={session.threadUserIdx}
             composer={
               isRealtimeWritable ? (

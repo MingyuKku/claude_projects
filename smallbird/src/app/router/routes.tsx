@@ -149,6 +149,12 @@ export const routes: RouteObject[] = [
                   (await import("@/pages/campaign-register"))
                     .CampaignRegisterPage,
               ),
+              page(
+                ROUTES.campaignDetail,
+                async () =>
+                  (await import("@/pages/campaign-register"))
+                    .CampaignDetailPage,
+              ),
             ]),
           ]
         : []),

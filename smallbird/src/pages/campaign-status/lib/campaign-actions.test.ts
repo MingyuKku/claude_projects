@@ -26,9 +26,9 @@ describe("getRowActions", () => {
     },
   );
 
-  it("작성을 마친 데모는 작성하기 대신 등록 내역을 열고 삭제는 그대로 된다", () => {
+  it("작성을 마친 데모도 작성하기·삭제다(작성 화면이 기본 정보로 보냄, 데모 시안 3.0.0)", () => {
     expect(actionsOf("DRAFT", { isDemoCompleted: true })).toEqual({
-      shortcut: "detail",
+      shortcut: "write",
       iconAction: "delete",
     });
   });

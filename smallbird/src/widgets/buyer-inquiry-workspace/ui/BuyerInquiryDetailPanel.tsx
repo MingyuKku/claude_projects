@@ -175,6 +175,17 @@ export function BuyerInquiryDetailPanel({
             <Row label={t("campaignType")} value={detail.campaignType} />
             <Row label={t("progressStatus")} value={detail.progressStatus} />
             <Row label={t("period")} value={period} />
+            {isBuyerMenu && detail.influencerNickname && (
+              // 요구명세서 24 I26: 공구 진행 인플루언서는 닉네임만 보임(플랫폼 아이디·표시 삭제). 진행 기간 바로 아래(사용자 요청 2026-11-13).
+              <div className="flex items-center justify-between gap-2">
+                <span className="shrink-0 text-xs leading-4 font-medium whitespace-nowrap text-muted-foreground">
+                  {t("influencer")}
+                </span>
+                <span className="min-w-0 truncate text-xs leading-4 font-medium">
+                  {detail.influencerNickname}
+                </span>
+              </div>
+            )}
             {detail.campaignCode && (
               <ClipboardButton
                 label={t("campaignCode")}
@@ -188,17 +199,6 @@ export function BuyerInquiryDetailPanel({
                 value={detail.shopCode}
                 {...copyProps}
               />
-            )}
-            {isBuyerMenu && detail.influencerNickname && (
-              // 요구명세서 24 I26: 공구 진행 인플루언서는 닉네임만 보임(플랫폼 아이디·표시 삭제).
-              <div className="flex items-center justify-between gap-2">
-                <span className="shrink-0 text-xs leading-4 font-medium whitespace-nowrap text-muted-foreground">
-                  {t("influencer")}
-                </span>
-                <span className="min-w-0 truncate text-xs leading-4 font-medium">
-                  {detail.influencerNickname}
-                </span>
-              </div>
             )}
             {isBuyerMenu && (
               // Figma 캠페인 바로가기(11315:50441). 캠페인 화면이 만들어지기 전까지 빅버드 문의 상세와 같이 비활성(사용자 결정

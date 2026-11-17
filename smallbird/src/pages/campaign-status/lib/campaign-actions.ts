@@ -20,9 +20,14 @@ const SHORTCUT_BY_STAGE = {
   ENDED: "result",
 } as const;
 
+/** Sub ID는 작성하기를 못 쓰지만 작성을 마친 데모는 조회할 수 있어 "등록 내역"으로 바꿈. */
+function toSubAccountShortcut(isDemoCompleted: boolean): ShortcutKind | null {
+  return isDemoCompleted ? "detail" : null;
+}
+
 /**
- * 진행 단계(와 데모 여부)로 정해지는 바로 가기·아이콘. 할당된 Sub ID는 "작성하기"·삭제를 쓰지 못해 숨김(사용자 결정, 스펙 P-3).
- * 모르는 진행 단계는 등록 내역으로 둠. 작성을 마친 데모는 "작성하기" 대신 "등록 내역"(조회만).
+ * 할당된 Sub ID는 "작성하기"·삭제를 쓰지 못해 숨김. 모르는 진행 단계는 등록 내역으로 둠.
+ * 작성을 마친 데모도 "작성하기"이고, 작성 화면이 기본 정보로 보냄.
  */
 export function getRowActions(
   campaign: Pick<CampaignSummary, "stage" | "isDemoCompleted">,
@@ -31,15 +36,14 @@ export function getRowActions(
   const stage = campaign.stage;
   const isDraft = stage === "DRAFT";
   const shortcut: ShortcutKind =
-    stage === null
-      ? "detail"
-      : isDraft && campaign.isDemoCompleted
-        ? "detail"
-        : SHORTCUT_BY_STAGE[stage];
+    stage === null ? "detail" : SHORTCUT_BY_STAGE[stage];
   const iconAction: IconActionKind = isDraft ? "delete" : "detail";
+  const isBlockedWrite = shortcut === "write" && isSubAccount;
 
   return {
-    shortcut: shortcut === "write" && isSubAccount ? null : shortcut,
+    shortcut: isBlockedWrite
+      ? toSubAccountShortcut(campaign.isDemoCompleted)
+      : shortcut,
     iconAction: iconAction === "delete" && isSubAccount ? null : iconAction,
   };
 }

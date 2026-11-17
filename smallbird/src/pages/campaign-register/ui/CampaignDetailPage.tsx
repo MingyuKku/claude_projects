@@ -1,0 +1,63 @@
+import { Navigate, useOutletContext, useParams } from "react-router";
+
+import {
+  getCampaignRegisterPath,
+  parseCampaignIdx,
+  useCampaignDetail,
+} from "@/entities/campaign";
+import { getSubscribedTypes, useSubscriptions } from "@/entities/subscription";
+import {
+  CampaignDetailContent,
+  CampaignDetailSidebar,
+} from "@/features/register-campaign";
+import { isApiError } from "@/shared/api";
+import { NotFoundError } from "@/shared/lib";
+
+import { RegisterShell } from "./RegisterShell";
+
+import type { SessionViewModel } from "@/entities/session";
+
+const NOT_FOUND_STATUS = 404;
+
+export function CampaignDetailPage() {
+  const { campaignIdx: campaignIdxParam } = useParams();
+  const campaignIdx = parseCampaignIdx(campaignIdxParam);
+  const session = useOutletContext<SessionViewModel>();
+  const { detail, error } = useCampaignDetail(campaignIdx);
+  // 구독 상태가 바뀌었을 수 있어 들어올 때마다 다시 읽음.
+  const subscriptions = useSubscriptions({
+    isEnabled: Boolean(detail?.isDemo),
+  });
+
+  if (campaignIdx === null) throw new NotFoundError();
+  if (error) {
+    if (isApiError(error) && error.status === NOT_FOUND_STATUS) {
+      throw new NotFoundError();
+    }
+    throw error;
+  }
+  if (!detail) return <RegisterShell />;
+
+  const isWritable = detail.stage === "DRAFT" && !detail.isDemoCompleted;
+  if (isWritable) {
+    return <Navigate to={getCampaignRegisterPath(campaignIdx)} replace />;
+  }
+
+  const canManage = session.authority !== "SUB";
+  const isPickSubscribed = subscriptions.data
+    ? getSubscribedTypes(subscriptions.data).has("pick")
+    : null;
+
+  return (
+    <RegisterShell
+      isDemo={detail.isDemo}
+      sidebar={<CampaignDetailSidebar detail={detail} canManage={canManage} />}
+    >
+      <CampaignDetailContent
+        detail={detail}
+        canManage={canManage}
+        isPickSubscribed={isPickSubscribed}
+      />
+    </RegisterShell>
+  );
+}

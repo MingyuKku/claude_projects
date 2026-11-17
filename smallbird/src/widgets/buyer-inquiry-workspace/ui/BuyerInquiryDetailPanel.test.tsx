@@ -75,6 +75,28 @@ function mountPanel(value: BuyerInquiryViewModel) {
   );
 }
 
+describe("구매자 문의 상세 패널의 캠페인 정보 순서", () => {
+  it("공구 진행 인플루언서는 진행 기간 아래, 캠페인 코드 위에 있다", async () => {
+    mountPanel(inquiry());
+    const labels = [
+      "진행 기간",
+      "공구 진행 인플루언서",
+      "캠페인 코드",
+      "공구샵 코드",
+    ];
+    const nodes = await Promise.all(
+      labels.map((text) => screen.findByText(text)),
+    );
+    nodes.slice(1).forEach((node, index) => {
+      // 앞 항목이 뒤 항목보다 문서에서 먼저 나옴
+      expect(
+        nodes[index]!.compareDocumentPosition(node) &
+          Node.DOCUMENT_POSITION_FOLLOWING,
+      ).toBeTruthy();
+    });
+  });
+});
+
 describe("구매자·인플루언서 문의 상세 패널의 캠페인 바로가기", () => {
   it("구매자 문의 상세에는 비활성 캠페인 바로가기 버튼이 있다", async () => {
     mountPanel(inquiry());

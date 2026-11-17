@@ -12,6 +12,8 @@ interface FocusShellProps {
   session: SessionViewModel | null;
   /** 헤더 제목. 모바일 헤더에도 보임(시안 `Header / Main / Mobile`). */
   title: string;
+  /** 제목 왼쪽 뱃지(데모 캠페인의 "DEMO"). */
+  titleBadge?: ReactNode;
   /** PC·TAB에서 LNB 자리(222px, 맨 위부터 전체 높이)에 놓이는 사이드바. 모바일(768 미만)에서는 숨김. */
   sidebar?: ReactNode;
   onBack: () => void;
@@ -24,6 +26,7 @@ interface FocusShellProps {
 export function FocusShell({
   session,
   title,
+  titleBadge,
   sidebar,
   onBack,
   children,
@@ -44,6 +47,7 @@ export function FocusShell({
       <div className="flex min-w-0 flex-1 flex-col">
         <AppHeader
           title={title}
+          titleBadge={titleBadge}
           isTitleVisibleOnMobile
           menuLabel={t("menu.open")}
           backLabel={tCommon("action.back")}
