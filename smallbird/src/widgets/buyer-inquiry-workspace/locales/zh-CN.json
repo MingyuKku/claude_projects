@@ -71,6 +71,7 @@
   "conversationError": "无法加载对话。",
   "noMessages": "暂无对话。",
   "questionDeleted": "该咨询已删除。",
+  "deletedMessage": "消息已删除。",
   "reply": {
     "placeholder": "请输入回复 (最多3,000字)",
     "submit": "回复",

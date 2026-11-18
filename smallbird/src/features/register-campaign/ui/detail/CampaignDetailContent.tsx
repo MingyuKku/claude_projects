@@ -106,14 +106,14 @@ export function CampaignDetailContent({
               <div className="flex min-w-65.5 flex-1 flex-col gap-2">
                 <p
                   className={cn(
-                    "flex items-center gap-2 ds-text-lg-7-semibold",
+                    "flex items-center gap-2 ds-text-lg-7-semibold ko:break-keep",
                     banner.className,
                   )}
                 >
                   <BannerIcon aria-hidden className="size-5 shrink-0" />
                   {t(`detail.banner.${banner.key}.title`)}
                 </p>
-                <p className="ds-text-sm-5-normal">
+                <p className="ds-text-sm-5-normal ko:break-keep">
                   {t(`detail.banner.${banner.key}.description`)}
                 </p>
               </div>

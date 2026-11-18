@@ -99,23 +99,25 @@ export function transformInquiryMessageToViewModel(
   /** 서버의 `isUserMessage` 대신 쓸 발신 판단. 인플루언서 문의처럼 서버 값이 Swagger와 반대인 대화에 씀. */
   isFromMe: (message: InquiryMessage) => boolean = (m) => m.isUserMessage,
 ): InquiryMessageViewModel {
-  const campaign = parseCampaignCard(message);
+  // 삭제된 메시지는 서버가 첨부 정보를 비워 주지만, 삭제 여부(deleteTime)를 먼저 보고 첨부·카드를 확실히 숨김.
+  const isDeleted = message.deleteTime !== null;
+  const campaign = isDeleted ? null : parseCampaignCard(message);
   return {
     id: message.messageIdx ?? fallback.id,
     // 캠페인 카드는 v2 호환으로 광고주가 보낸 auto 메시지(isUserMessage: false)로 저장됨. 내가 보낸 카드로 그림.
     isMine: isFromMe(message) || campaign !== null,
-    kind: toKind(message, campaign),
+    kind: isDeleted ? "text" : toKind(message, campaign),
     body: toPlainBody(message.body),
     createdAt: message.writeTime
       ? toDate(message.writeTime)
       : fallback.createdAt,
-    isDeleted: message.deleteTime !== null,
+    isDeleted,
     isRead: message.readTime !== null,
     isEdited: message.modifyTime !== null,
     senderId: message.identifier || null,
     campaign,
     attachment:
-      message.attachmentIdx === null
+      isDeleted || message.attachmentIdx === null
         ? null
         : {
             attachmentIdx: message.attachmentIdx,
@@ -457,17 +459,16 @@ export function transformQnaListToViewModel(
       writtenAt: toDate(inquiryInfo.writeTime),
       isDeleted: inquiryInfo.deleteTime != null,
     },
-    // 답변이 없으면 객체가 비어 있고, 지워진 답변은 보여 주지 않음.
+    // 답변이 없으면 객체가 비어 있음. 지워진 답변은 소프트삭제라 deleteTime과 함께 오고, 삭제 안내로 그림.
     reply:
-      replyInfo.replyIdx == null ||
-      replyInfo.body == null ||
-      replyInfo.deleteTime != null
+      replyInfo.replyIdx == null || replyInfo.body == null
         ? null
         : {
             replyIdx: replyInfo.replyIdx,
             body: toPlainBody(replyInfo.body),
             writtenAt: replyInfo.writeTime ? toDate(replyInfo.writeTime) : null,
             isRead: replyInfo.readTime != null,
+            isDeleted: replyInfo.deleteTime != null,
           },
   }));
 }

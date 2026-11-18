@@ -4,6 +4,7 @@ import {
   closeBigbirdInquiry,
   createBigbirdInquiry,
   createQnaReply,
+  deleteInquiryMessage,
   deleteQnaReply,
   editQnaReply,
   fetchBigbirdInquiryPage,
@@ -391,7 +392,7 @@ describe("구매자 문의 상세·대화·Q&A", () => {
     expect(detail.writerName).toBe("김하루");
   });
 
-  it("상품 Q&A는 답변이 비어 있으면 null, 읽힌 답변은 isRead, 지운 답변은 null이다", async () => {
+  it("상품 Q&A는 답변이 비어 있으면 null, 읽힌 답변은 isRead, 지운 답변은 isDeleted로 남는다", async () => {
     const inquiryInfo = (idx: number) => ({
       inquiryIdx: idx,
       body: `질문${idx}`,
@@ -443,8 +444,15 @@ describe("구매자 문의 상세·대화·Q&A", () => {
         body: "답변",
         writtenAt: new Date("2026-10-01T11:00"),
         isRead: true,
+        isDeleted: false,
       },
-      null,
+      {
+        replyIdx: 6,
+        body: "지운 답변",
+        writtenAt: null,
+        isRead: false,
+        isDeleted: true,
+      },
     ]);
   });
 
@@ -469,6 +477,89 @@ describe("구매자 문의 상세·대화·Q&A", () => {
     expect(serverApiV3.delete).toHaveBeenCalledWith("/help/reply/5");
     vi.mocked(serverApiV3.delete).mockResolvedValue({ result: false });
     await expect(deleteQnaReply(5)).rejects.toThrow();
+  });
+});
+
+describe("삭제 API 응답(소프트삭제, 2026-11-17)", () => {
+  const deletedMessage = {
+    messageIdx: 10234,
+    threadIdx: 2116,
+    body: "삭제된 메시지입니다",
+    userIdx: 5546,
+    attachmentIdx: null,
+    writeTime: "2026-11-18T10:02:11",
+    readTime: null,
+    modifyTime: null,
+    deleteTime: "2026-11-18T10:05:40",
+    identifier: "mgkang",
+    isUserMessage: true,
+    fileName: null,
+    fileSize: null,
+    fileType: null,
+    auto: false,
+  };
+
+  it("메시지 삭제는 삭제된 메시지를 그대로 돌려받는다", async () => {
+    vi.mocked(serverApiV3.delete).mockResolvedValue(deletedMessage);
+    const deleted = await deleteInquiryMessage(10234);
+    expect(serverApiV3.delete).toHaveBeenCalledWith(
+      "/help/thread/message/10234",
+    );
+    expect(deleted).toMatchObject({
+      messageIdx: 10234,
+      body: "삭제된 메시지입니다",
+      deleteTime: "2026-11-18T10:05:40",
+    });
+  });
+
+  it("실제 stage 응답처럼 identifier·isUserMessage가 null이어도 삭제된 메시지로 읽는다", async () => {
+    vi.mocked(serverApiV3.delete).mockResolvedValue({
+      messageIdx: 13767,
+      threadIdx: 2010,
+      body: "삭제된 메시지입니다",
+      userIdx: 6032,
+      attachmentIdx: null,
+      writeTime: "2026-11-18T11:30:22",
+      readTime: null,
+      modifyTime: null,
+      deleteTime: "2026-11-18T11:30:27",
+      identifier: null,
+      isUserMessage: null,
+      fileName: null,
+      fileSize: null,
+      fileType: null,
+      messageId: null,
+      auto: false,
+    });
+    expect(await deleteInquiryMessage(13767)).toEqual({
+      messageIdx: 13767,
+      body: "삭제된 메시지입니다",
+      deleteTime: "2026-11-18T11:30:27",
+    });
+  });
+
+  it("예전 { result: true } 응답이면 null이고, result false는 실패다", async () => {
+    vi.mocked(serverApiV3.delete).mockResolvedValue({ result: true });
+    expect(await deleteInquiryMessage(1)).toBeNull();
+    vi.mocked(serverApiV3.delete).mockResolvedValue({ result: false });
+    await expect(deleteInquiryMessage(1)).rejects.toThrow();
+  });
+
+  it("Q&A 답변 삭제는 삭제된 답변을 그대로 돌려받고, 예전 응답이면 null이다", async () => {
+    vi.mocked(serverApiV3.delete).mockResolvedValue({
+      replyIdx: 5,
+      body: "삭제된 메시지입니다",
+      writeTime: "2026-11-18 10:00",
+      deleteTime: "2026-11-18 10:05",
+      deleteId: "mgkang",
+    });
+    expect(await deleteQnaReply(5)).toMatchObject({
+      replyIdx: 5,
+      body: "삭제된 메시지입니다",
+      deleteTime: "2026-11-18 10:05",
+    });
+    vi.mocked(serverApiV3.delete).mockResolvedValue({ result: true });
+    expect(await deleteQnaReply(5)).toBeNull();
   });
 });
 

@@ -1,5 +1,5 @@
 import { tryit } from "radash";
-import { useId, useState } from "react";
+import { useEffect, useId, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { addBrand, useBrands } from "@/entities/brand";
@@ -11,6 +11,7 @@ import { Input } from "@/shared/ui/input";
 
 import { uploadCampaignFile } from "../../api/upload-campaign-file";
 import { checkImageFile, IMAGE_ACCEPT } from "../../model/file-rules";
+import { getUploadErrorKey } from "../../model/upload-error";
 import { useRegisterPanel } from "../../model/use-register-panel";
 import { useRegisterWizardStore } from "../../model/wizard-context";
 import { PanelLayout } from "./PanelLayout";
@@ -25,9 +26,8 @@ const FILE_ERROR_KEYS = {
   size: "toast.fileSize",
 } as const;
 
-// 브랜드 관리 > 브랜드 추가(시안 13320:115525·115811·115824). 브랜드명 한 칸(국문·영문 구분 없음)과 선택 이미지.
-// 이미지는 고르는 즉시 올리고(A-7) 받은 번호로 저장함. 저장하면 목록을 다시 읽고 새 브랜드를 1단계에 고른 채 닫음.
-// 실패하면 토스트를 띄우고 입력값을 그대로 둠(REQ-10-0020). "<"는 브랜드 관리 목록으로 돌아감.
+// 이미지는 고르기만 하고, 저장할 때 올려 받은 번호로 저장함. 저장하면 목록을 다시 읽고 새 브랜드를 1단계에 고른 채 닫음.
+// 실패하면 토스트를 띄우고 입력값을 그대로 둠. "<"는 브랜드 관리 목록으로 돌아감.
 export function AddBrandPanel() {
   const { t } = useTranslation("features/register-campaign");
   const imageLabelId = useId();
@@ -37,33 +37,59 @@ export function AddBrandPanel() {
     (state) => state.patchStepDraft,
   );
   const [name, setName] = useState("");
-  const [image, setImage] = useState<UploadedCampaignFile | null>(null);
-  const [isUploading, setIsUploading] = useState(false);
+  // 고른 파일과 미리보기 주소. 올린 뒤 저장이 실패해도 다시 올리지 않게 올린 결과를 들고 있음.
+  const [image, setImage] = useState<{
+    file: File;
+    previewUrl: string;
+  } | null>(null);
+  const [uploaded, setUploaded] = useState<UploadedCampaignFile | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  // 패널이 닫히면(저장·뒤로·닫기) 남은 미리보기 주소를 놓아 줌.
+  const previewUrlRef = useRef<string | null>(null);
+  useEffect(
+    () => () => {
+      if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+    },
+    [],
+  );
 
-  const canSave = name.trim().length > 0 && !isUploading && !isSaving;
+  const canSave = name.trim().length > 0 && !isSaving;
 
-  async function handlePickFile(file: File) {
+  function handlePickFile(file: File) {
     const ruleError = checkImageFile(file);
     if (ruleError) {
       toast.error(t(FILE_ERROR_KEYS[ruleError]));
       return;
     }
-    setIsUploading(true);
-    const [error, uploaded] = await tryit(uploadCampaignFile)(file);
-    setIsUploading(false);
-    if (error) {
-      toast.error(t("toast.saveFailed"));
-      return;
-    }
-    setImage(uploaded);
+    clearImage();
+    const previewUrl = URL.createObjectURL(file);
+    previewUrlRef.current = previewUrl;
+    setImage({ file, previewUrl });
+  }
+
+  function clearImage() {
+    if (previewUrlRef.current) URL.revokeObjectURL(previewUrlRef.current);
+    previewUrlRef.current = null;
+    setImage(null);
+    setUploaded(null);
   }
 
   async function handleSave() {
     setIsSaving(true);
+    let attachmentIdx = uploaded?.attachmentIdx ?? null;
+    if (image && !uploaded) {
+      const [uploadError, result] = await tryit(uploadCampaignFile)(image.file);
+      if (uploadError) {
+        setIsSaving(false);
+        toast.error(t(getUploadErrorKey(uploadError)));
+        return;
+      }
+      setUploaded(result);
+      attachmentIdx = result.attachmentIdx;
+    }
     const [error, created] = await tryit(addBrand)({
       name: name.trim(),
-      imageAttachmentIdx: image?.attachmentIdx ?? null,
+      imageAttachmentIdx: attachmentIdx,
     });
     setIsSaving(false);
     if (error) {
@@ -113,14 +139,14 @@ export function AddBrandPanel() {
           </p>
           <ThumbnailUpload
             aria-labelledby={imageLabelId}
-            imageUrl={image?.url}
+            imageUrl={image?.previewUrl}
             title={t("brands.image.title")}
             description={t("brands.image.description")}
             accept={IMAGE_ACCEPT}
             removeLabel={t("brands.image.remove")}
-            disabled={isUploading}
-            onPickFile={(file) => void handlePickFile(file)}
-            onRemove={() => setImage(null)}
+            disabled={isSaving}
+            onPickFile={handlePickFile}
+            onRemove={clearImage}
           />
         </div>
       </section>

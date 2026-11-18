@@ -1,7 +1,7 @@
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import { tryit } from "radash";
 import { useState } from "react";
-import { useLocation, useNavigate, useSearchParams } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { toast } from "sonner";
 
 import {
@@ -20,11 +20,7 @@ import { ScrollArea } from "@/shared/ui/scroll-area";
 
 import { STATUS_BADGE_VARIANT } from "../lib/format";
 import { INQUIRY_MENU, isQnaSource, toInquiryMenu } from "../model/menu";
-import {
-  getRealtimeInquiryIdx,
-  isOpenedByUser,
-} from "../model/realtime-inquiry-idx";
-import { useAcceptRealtimeOnOpen } from "../model/useAcceptRealtimeOnOpen";
+import { getRealtimeInquiryIdx } from "../model/realtime-inquiry-idx";
 import { BuyerConversation } from "./BuyerConversation";
 import { BuyerInquiryDetailPanel } from "./BuyerInquiryDetailPanel";
 import { BuyerReplyComposer } from "./BuyerReplyComposer";
@@ -67,17 +63,8 @@ export function BuyerInquiryPanels({
   const realtimeInquiryIdx = getRealtimeInquiryIdx(inquiry);
   // 종료 버튼은 목록 상태가 아니라 이 스레드가 실제로 실시간(boardType false·안 끝남)일 때만 보임.
   const { isRealtime: isThreadRealtime } = usePurchaserConversation(inquiry);
-  // 상담 중이면 상담 문서를 구독해 새 메시지·연결·종료를 받고, 이미 연결된 상담은 다시 수락하지 않음.
-  const { connection, isOtherDevice } = useConsultationSync(
-    inquiry,
-    onChangeStatus,
-  );
-  // 자동 선택으로 열린 첫 행은 수락하지 않고, 사용자가 직접 연 문의만 수락함.
-  const { state } = useLocation();
-  useAcceptRealtimeOnOpen(
-    isOpenedByUser(state) ? realtimeInquiryIdx : null,
-    connection,
-  );
+  // 상담 중이면 상담 문서를 구독해 새 메시지·연결·종료를 받음. 연결은 광고주가 첫 메시지를 보낼 때 이뤄져 열기만 해서는 수락하지 않음.
+  const { isOtherDevice } = useConsultationSync(inquiry, onChangeStatus);
 
   function setPanel(value: "detail" | null) {
     setSearchParams((params) => {

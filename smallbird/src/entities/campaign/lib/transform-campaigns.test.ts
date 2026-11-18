@@ -11,7 +11,7 @@ function item(overrides: Partial<CampaignListItem> = {}): CampaignListItem {
     status: "DRAFT",
     name: "비글로우 신제품 런칭 캠페인",
     brandName: "비글로우",
-    description: "MZ세대를 위한 비글로우 톤업크림",
+    productName: "비글로우 톤업크림",
     thumbnailUrl: "https://example.com/a.png",
     startDate: "2026-11-01",
     endDate: "2026-12-31",
@@ -48,7 +48,7 @@ describe("transformCampaignList", () => {
     const { records } = transformCampaignList(
       response([
         item({
-          description: "",
+          productName: "",
           thumbnailUrl: null,
           startDate: "",
           endDate: null,
@@ -57,7 +57,7 @@ describe("transformCampaignList", () => {
     );
 
     expect(records[0]).toMatchObject({
-      description: null,
+      productName: null,
       thumbnailUrl: null,
       startDate: null,
       endDate: null,
@@ -75,6 +75,14 @@ describe("transformCampaignList", () => {
       type: null,
       rawTypeText: "LIVE BRAND",
     });
+  });
+
+  it("이름이나 유형이 없는 항목은 빈 이름과 유형 없음으로 둔다", () => {
+    const { records } = transformCampaignList(
+      response([item({ name: null, serviceType: null, productType: null })]),
+    );
+
+    expect(records[0]).toMatchObject({ name: "", type: null, rawTypeText: "" });
   });
 
   it("전체 쪽 수는 건수를 한 쪽 개수로 나눠 올림한다", () => {

@@ -54,18 +54,27 @@ describe("toStepRequest", () => {
     );
   });
 
-  it("소개서는 파일 번호만 보내고 번호 없는 v2 영상 항목은 뺀다", () => {
+  it("소개서는 파일 번호를 보내고 번호 없는 v2 영상 항목은 주소를 보내며 올리기 전 파일은 뺀다", () => {
     const draft = createEmptyDraft();
     draft.intro.mainImage = { attachmentIdx: 1, url: "a", mediaType: "IMAGE" };
     draft.intro.detailMedia = [
       { attachmentIdx: 2, url: "b", mediaType: "VIDEO" },
       { attachmentIdx: null, url: "https://youtu.be/x", mediaType: "VIDEO" },
+      {
+        attachmentIdx: null,
+        url: "blob:http://localhost/pending",
+        mediaType: "IMAGE",
+        file: new File([""], "a.png"),
+      },
     ];
 
     const request = toStepRequest("intro", draft);
 
     expect(request.mainImage).toEqual({ attachmentIdx: 1 });
-    expect(request.detailMedia).toEqual([{ attachmentIdx: 2 }]);
+    expect(request.detailMedia).toEqual([
+      { attachmentIdx: 2 },
+      { url: "https://youtu.be/x" },
+    ]);
     expect(request.description).toBeNull();
   });
 });

@@ -30,11 +30,13 @@
     "saveFailed": "저장에 실패하였습니다. 다시 시도해 주세요.",
     "fileType": "JPG, PNG 파일만 올릴 수 있습니다.",
     "fileSize": "10MB 이하 파일만 올릴 수 있습니다.",
+    "videoSize": "500MB 이하 동영상만 올릴 수 있습니다.",
     "requestFailed": "요청에 실패했습니다. 잠시 후 다시 시도해 주세요.",
     "addressSearchFailed": "주소 검색을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
     "aiCompleted": "AI 생성이 완료되었습니다.",
     "aiFailed": "AI 생성에 실패했습니다. URL을 확인하고 다시 시도해 주세요.",
-    "fileCount": "최대 5개까지 올릴 수 있습니다."
+    "fileCount": "최대 5개까지 올릴 수 있습니다.",
+    "uploading": "파일을 올리는 중입니다. ({{done}}/{{total}})"
   },
   "dialog": {
     "requiredInfo": {
@@ -72,9 +74,7 @@
       "manage": "브랜드 관리"
     },
     "period": {
-      "startLabel": "캠페인 희망 시작 일자",
-      "label": "캠페인 기간",
-      "endLabel": "종료일",
+      "label": "캠페인 희망 시작 일자",
       "placeholder": "날짜를 선택해 주세요.",
       "help": "종료 날짜는 자동으로 30일 후로 세팅됩니다."
     }
@@ -240,7 +240,7 @@
   "addOns": {
     "noticeTitle": "부가서비스는 선택사항입니다.",
     "noticeText": "필요한 경우에만 선택하실 수 있으며, 선택하지 않아도 다음 단계로 진행할 수 있습니다.",
-    "AI_POSTING_GUIDE": {
+    "POSTING_GUIDE": {
       "name": "AI 포스팅 가이드",
       "price": "10,000원",
       "description": "캠페인 목적과 상품에 맞는 최적의 포스팅 가이드를 자동으로 생성해줍니다."
@@ -289,7 +289,13 @@
       "remove": "{{index}}번째 파일 삭제",
       "reorder": "{{index}}번째 파일 순서 바꾸기",
       "video": "동영상 {{index}}",
-      "image": "이미지 {{index}}"
+      "image": "이미지 {{index}}",
+      "play": "동영상 {{index}} 재생",
+      "reorderGuide": "순서를 바꾸려면 손잡이에서 Space 키로 집고 방향키로 옮긴 뒤 Space 키로 놓으세요.",
+      "pickedUp": "{{index}}번째 파일을 집었습니다.",
+      "moved": "{{index}}번째 위치로 이동했습니다.",
+      "dropped": "{{index}}번째 위치에 놓았습니다.",
+      "cancelled": "순서 바꾸기를 취소했습니다."
     },
     "description": {
       "label": "캠페인 설명",

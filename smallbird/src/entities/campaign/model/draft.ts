@@ -32,8 +32,11 @@ export interface CampaignAddress {
 export interface CampaignMedia {
   /** v2에서 만든 영상 주소만 있는 항목은 null(저장 요청에 보낼 수 없음). */
   attachmentIdx: number | null;
+  /** 올린 파일의 주소. 아직 올리지 않은 파일(`file`)은 미리보기용 `blob:` 주소. */
   url: string;
   mediaType: CampaignMediaType;
+  /** 고르기만 하고 아직 서버에 올리지 않은 파일. 있으면 5단계를 저장할 때 올리고 번호·주소로 바꿈. */
+  file?: File;
 }
 
 export interface CampaignInfoDraft {

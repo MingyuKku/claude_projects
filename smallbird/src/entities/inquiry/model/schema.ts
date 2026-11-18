@@ -30,6 +30,17 @@ export const inquiryMessageSchema = z.object({
 });
 export type InquiryMessage = z.infer<typeof inquiryMessageSchema>;
 
+/**
+ * 메시지 삭제 응답(`DELETE /v3/help/thread/message/{messageIdx}`). 삭제된 메시지 한 건을 돌려주지만 `identifier`·
+ * `isUserMessage`가 null로 오는 등 목록 응답과 모양이 달라, 화면이 쓰는 값만 읽음. 삭제 시각(`deleteTime`)이 있어야 삭제 응답으로 봄.
+ */
+export const deletedInquiryMessageSchema = z.object({
+  messageIdx: z.number(),
+  body: z.string(),
+  deleteTime: z.string(),
+});
+export type DeletedInquiryMessage = z.infer<typeof deletedInquiryMessageSchema>;
+
 /** `GET /v3/help/thread`의 스레드. 스레드 하나가 문의 1건. */
 export const inquiryThreadSchema = z.object({
   threadIdx: z.number(),
@@ -480,9 +491,23 @@ export const buyerInquiryDetailSchema = z.object({
 export type BuyerInquiryDetail = z.infer<typeof buyerInquiryDetailSchema>;
 
 /**
- * `POST /v3/help/qna` 상품 Q&A 상세. 시각은 "yyyy-MM-dd HH:mm" 문자열이고, 답변이 없으면 `replyInfo`가 `{}`라
- * 필드를 모두 선택으로 읽음.
+ * Q&A 답변. 시각은 "yyyy-MM-dd HH:mm" 문자열이고, 답변이 없으면 `{}`라 필드를 모두 선택으로 읽음. 삭제는 소프트삭제라
+ * `deleteTime`이 채워지고 본문은 서버가 "삭제된 메시지입니다"로 바꿔 줌(2026-11-17). 답변 삭제(`DELETE /v3/help/reply/{replyIdx}`)도
+ * 삭제된 답변을 이 모양 그대로 돌려줌.
  */
+export const qnaReplyInfoSchema = z.object({
+  replyIdx: z.number().nullish(),
+  body: z.string().nullish(),
+  readTime: z.string().nullish(),
+  writeTime: z.string().nullish(),
+  modifyTime: z.string().nullish(),
+  clientId: z.string().nullish(),
+  deleteTime: z.string().nullish(),
+  deleteId: z.string().nullish(),
+});
+export type QnaReplyInfo = z.infer<typeof qnaReplyInfoSchema>;
+
+/** `POST /v3/help/qna` 상품 Q&A 상세. */
 export const qnaDetailListSchema = z.object({
   result: z.boolean(),
   list: z.array(
@@ -501,16 +526,7 @@ export const qnaDetailListSchema = z.object({
         deleteTime: z.string().nullable(),
         deleteId: z.string().nullable(),
       }),
-      replyInfo: z.object({
-        replyIdx: z.number().nullish(),
-        body: z.string().nullish(),
-        readTime: z.string().nullish(),
-        writeTime: z.string().nullish(),
-        modifyTime: z.string().nullish(),
-        clientId: z.string().nullish(),
-        deleteTime: z.string().nullish(),
-        deleteId: z.string().nullish(),
-      }),
+      replyInfo: qnaReplyInfoSchema,
     }),
   ),
 });
@@ -588,5 +604,7 @@ export interface QnaItemViewModel {
     writtenAt: Date | null;
     /** 구매자가 읽은 답변은 서버가 수정·삭제를 거절함(409). */
     isRead: boolean;
+    /** 삭제된 답변(소프트삭제). 본문은 서버가 바꾼 값이라 화면은 삭제 안내를 그림. */
+    isDeleted: boolean;
   } | null;
 }

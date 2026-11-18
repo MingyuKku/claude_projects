@@ -71,6 +71,7 @@
   "conversationError": "Couldn't load the conversation.",
   "noMessages": "No messages.",
   "questionDeleted": "This inquiry was deleted.",
+  "deletedMessage": "Message deleted.",
   "reply": {
     "placeholder": "Enter a reply. (max 3,000 characters)",
     "submit": "Reply",

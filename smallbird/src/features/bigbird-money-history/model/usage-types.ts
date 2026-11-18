@@ -26,7 +26,7 @@ export const USAGE_DETAILS = [
   "contractPick",
   "contractRecruit",
   "aiManuscriptConfirm",
-  "aiPostingGuide",
+  "postingGuide",
 ] as const;
 
 export type UsageDetail = (typeof USAGE_DETAILS)[number];
@@ -35,7 +35,7 @@ export const SERVER_USAGE_DETAIL = {
   contractPick: "INFLUENCER_CONTRACT_PICK",
   contractRecruit: "INFLUENCER_CONTRACT_RECRUIT",
   aiManuscriptConfirm: "AI_MANUSCRIPT_CONFIRM",
-  aiPostingGuide: "AI_POSTING_GUIDE",
+  postingGuide: "POSTING_GUIDE",
 } as const satisfies Record<UsageDetail, string>;
 
 export interface UsageRecord {

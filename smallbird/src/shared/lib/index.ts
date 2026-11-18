@@ -47,3 +47,4 @@ export type { MockBrandRecord } from "./mock-brand-db";
 export { getMockFile, getMockFileUrl, registerMockFile } from "./mock-files";
 export type { MockFile } from "./mock-files";
 export { NotFoundError } from "./not-found-error";
+export { SortableGrid, SortableItem } from "./sortable";

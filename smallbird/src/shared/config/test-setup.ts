@@ -14,3 +14,6 @@ globalThis.ResizeObserver ??= class {
   unobserve() {}
   disconnect() {}
 };
+
+// 캠페인 등록 테스트는 서버 없이 전체 목으로 동작시킴(서버 API 연동은 api-mode를 목킹한 테스트가 따로 검증함).
+vi.stubEnv("VITE_CAMPAIGN_API", "mock");

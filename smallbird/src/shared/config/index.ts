@@ -1,4 +1,4 @@
-export { ENV } from "./env";
+export { ENV, isCampaignApiMock } from "./env";
 export { FILTER_PANEL, FILTER_PANEL_PARAM } from "./filter-panel";
 export { KEYBOARD_OPEN_SELECTOR, KEYBOARD_STATE_ATTRIBUTE } from "./keyboard";
 export { MEDIA_QUERY } from "./media-query";

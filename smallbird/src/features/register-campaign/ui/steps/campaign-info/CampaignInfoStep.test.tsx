@@ -133,15 +133,16 @@ describe("CampaignInfoStep", () => {
     );
   });
 
-  it("시작일이 있으면 라벨이 캠페인 기간으로 바뀌고 30일 뒤 종료일을 보인다", () => {
+  it("시작일을 골라도 라벨과 한 칸이 그대로고 종료일 칸은 없다", () => {
     renderStep(
       createDetail((draft) => {
         draft.info.startDate = "2026-12-01";
       }),
     );
 
-    expect(screen.getByText("캠페인 기간")).toBeInTheDocument();
-    expect(screen.getByText("2026.12.31")).toBeInTheDocument();
+    expect(screen.getByText("캠페인 희망 시작 일자")).toBeInTheDocument();
+    expect(screen.queryByText("캠페인 기간")).not.toBeInTheDocument();
+    expect(screen.queryByText("2026.12.31")).not.toBeInTheDocument();
   });
 
   it("시작일이 없으면 희망 시작 일자 한 칸이다", () => {

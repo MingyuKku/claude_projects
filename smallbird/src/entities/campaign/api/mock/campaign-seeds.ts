@@ -152,7 +152,7 @@ function fillInputs(record: MockCampaignRecord, seed: SeedInput) {
     ageGroups: ["AGE_20S", "AGE_30S"],
     topics: ["Beauty"],
   };
-  record.addOns = ["AI_POSTING_GUIDE"];
+  record.addOns = ["POSTING_GUIDE"];
   record.intro.notice = "제품 수령 후 7일 안에 게시해 주세요.";
   record.intro.contentHashtags = ["협찬", "체험단"];
   record.conditions = {

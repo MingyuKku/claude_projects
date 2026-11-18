@@ -102,7 +102,7 @@
 | 결제 수단 | 코드 `VBANK`, 그 밖(옛 카드 충전 `VCARD` 등)은 서버 값 | 무통장 입금 | 거래 상세 |
 | 사용 유형(구분) | `USE`·`REFUND`·`CHARGE`·`WITHDRAWAL`, 그 밖은 서버 값(회색 배지) | 사용·환급·충전·출금 | 사용 내역·필터·상세 |
 | 캠페인 유형 | `recruit`·`pick`, 그 밖은 서버 값 | 모집형·PICK형 | 사용 상세·카드 |
-| 사용 내역(세부 분류) | `INFLUENCER_CONTRACT_PICK`·`INFLUENCER_CONTRACT_RECRUIT`·`AI_MANUSCRIPT_CONFIRM`·`AI_POSTING_GUIDE`, 그 밖은 서버 `usageDetailName` | 인플루언서 계약비용(PICK형)·(모집형), 부가 서비스(AI 원고컨펌)·(AI 포스팅가이드) | 사용 내역·필터·상세 |
+| 사용 내역(세부 분류) | `INFLUENCER_CONTRACT_PICK`·`INFLUENCER_CONTRACT_RECRUIT`·`AI_MANUSCRIPT_CONFIRM`·`POSTING_GUIDE`, 그 밖은 서버 `usageDetailName` | 인플루언서 계약비용(PICK형)·(모집형), 부가 서비스(AI 원고컨펌)·(AI 포스팅가이드) | 사용 내역·필터·상세 |
 | 캠페인명·은행명 | 그대로 표시 | — / 신한은행 등 | 사용 내역·필터 / 거래 상세 |
 
 ## 7. 확인 리스트

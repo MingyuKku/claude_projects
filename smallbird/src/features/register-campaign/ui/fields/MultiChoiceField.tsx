@@ -10,7 +10,7 @@ interface MultiChoiceFieldProps<T extends string> {
   onChangeValue: (value: T[]) => void;
 }
 
-// 여러 개 고르는 테두리 토글(Figma Toggle Outlined, Pressed가 선택). 목록이 길면 줄바꿈함.
+// 여러 개 고르는 테두리 토글. 목록이 길면 줄바꿈함. 항상 하나 이상 선택된 상태라 마지막 하나는 해제할 수 없음.
 export function MultiChoiceField<T extends string>({
   label,
   value,
@@ -18,6 +18,7 @@ export function MultiChoiceField<T extends string>({
   onChangeValue,
 }: MultiChoiceFieldProps<T>) {
   function handleValueChange(next: string[]) {
+    if (next.length === 0) return;
     onChangeValue(
       options.flatMap((option) =>
         next.includes(option.value) ? [option.value] : [],

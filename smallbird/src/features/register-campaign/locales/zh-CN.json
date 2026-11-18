@@ -30,11 +30,13 @@
     "saveFailed": "保存失败，请重试。",
     "fileType": "仅可上传JPG、PNG文件。",
     "fileSize": "仅可上传10MB以下的文件。",
+    "videoSize": "仅可上传500MB以下的视频。",
     "requestFailed": "请求失败，请稍后重试。",
     "addressSearchFailed": "无法加载地址搜索，请稍后重试。",
     "aiCompleted": "AI生成已完成。",
     "aiFailed": "AI生成失败。请检查URL后重试。",
-    "fileCount": "最多可上传5个文件。"
+    "fileCount": "最多可上传5个文件。",
+    "uploading": "正在上传文件 ({{done}}/{{total}})"
   },
   "dialog": {
     "requiredInfo": {
@@ -72,9 +74,7 @@
       "manage": "品牌管理"
     },
     "period": {
-      "startLabel": "期望开始日期",
-      "label": "活动期间",
-      "endLabel": "结束日期",
+      "label": "期望开始日期",
       "placeholder": "请选择日期。",
       "help": "结束日期将自动设为30天后。"
     }
@@ -240,7 +240,7 @@
   "addOns": {
     "noticeTitle": "附加服务为可选项。",
     "noticeText": "仅在需要时选择，不选择也可进入下一步。",
-    "AI_POSTING_GUIDE": {
+    "POSTING_GUIDE": {
       "name": "AI发帖指南",
       "price": "10,000韩元",
       "description": "根据活动目的和产品自动生成最合适的发帖指南。"
@@ -289,7 +289,13 @@
       "remove": "删除第{{index}}个文件",
       "reorder": "调整第{{index}}个文件顺序",
       "video": "视频 {{index}}",
-      "image": "图片 {{index}}"
+      "image": "图片 {{index}}",
+      "play": "播放视频 {{index}}",
+      "reorderGuide": "在手柄上按空格键拾取，用方向键移动，再按空格键放下。",
+      "pickedUp": "已拾取第{{index}}个文件。",
+      "moved": "已移至第{{index}}位。",
+      "dropped": "已放在第{{index}}位。",
+      "cancelled": "已取消调整顺序。"
     },
     "description": {
       "label": "活动说明",

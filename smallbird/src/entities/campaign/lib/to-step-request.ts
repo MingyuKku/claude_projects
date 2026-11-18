@@ -25,6 +25,22 @@ function toAttachmentRequest(media: CampaignMedia) {
   return { attachmentIdx: media.attachmentIdx };
 }
 
+/** 파일 번호 또는 영상 주소(둘 다 있으면 서버는 번호를 우선함). */
+export type DetailMediaRequest =
+  { attachmentIdx: number | null } | { url: string };
+
+/**
+ * 상세 이미지/동영상 한 칸. 번호가 있으면 번호, 번호 없이 서버에서 온 영상 주소(v2)는 주소를 보냄. 아직 올리지 않은
+ * 파일(`file`)의 `blob:` 주소는 서버가 모르므로 보내지 않음.
+ */
+function toDetailMediaRequests(detailMedia: CampaignMedia[]) {
+  return detailMedia.flatMap((media): DetailMediaRequest[] => {
+    if (media.attachmentIdx !== null) return [toAttachmentRequest(media)];
+    if (media.file) return [];
+    return [{ url: media.url }];
+  });
+}
+
 const EMPTY_PRODUCT_REQUEST = {
   productName: null,
   quantityPerInfluencer: null,
@@ -85,10 +101,7 @@ const RAW_STEP_REQUEST_BUILDERS = {
   addOns: ({ addOns }: CampaignDraft) => ({ addOns }),
   intro: ({ intro }: CampaignDraft) => ({
     mainImage: intro.mainImage ? toAttachmentRequest(intro.mainImage) : null,
-    // v2 영상 주소 항목은 번호가 없어 보낼 수 없음(API가 videoUrl을 받지 않음).
-    detailMedia: intro.detailMedia
-      .filter((media) => media.attachmentIdx !== null)
-      .map(toAttachmentRequest),
+    detailMedia: toDetailMediaRequests(intro.detailMedia),
     description: textOrNull(intro.description),
     notice: textOrNull(intro.notice),
     titleHashtags: intro.titleHashtags,

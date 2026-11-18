@@ -1,17 +1,21 @@
 import { GripVertical, Play, Upload, X } from "lucide-react";
-import { tryit } from "radash";
 import { useId, useRef, useState } from "react";
 import { toast } from "sonner";
 
 import { useTranslation } from "@/shared/i18n";
+import { SortableGrid, SortableItem } from "@/shared/lib/sortable";
 import { cn } from "@/shared/lib/utils";
 
-import { uploadCampaignFile } from "../../../api/upload-campaign-file";
 import {
   checkDetailMediaFile,
   DETAIL_MEDIA_ACCEPT,
 } from "../../../model/file-rules";
+import {
+  createPendingMedia,
+  revokePendingMedia,
+} from "../../../model/pending-media";
 import { DETAIL_MEDIA_MAX_COUNT } from "../../../model/step-completion";
+import { DetailMediaPlayerDialog } from "./DetailMediaPlayerDialog";
 
 import type { CampaignMedia } from "@/entities/campaign";
 import type { ChangeEvent, DragEvent } from "react";
@@ -19,15 +23,18 @@ import type { ChangeEvent, DragEvent } from "react";
 const FILE_ERROR_KEYS = {
   type: "toast.fileType",
   size: "toast.fileSize",
+  videoSize: "toast.videoSize",
 } as const;
-
-/** 순서 바꾸기 드래그를 파일 드롭과 구분하는 데이터 형식. */
-const REORDER_DATA_TYPE = "application/x-bigbird-detail-media";
 
 interface DetailMediaFieldProps {
   value: CampaignMedia[];
   onChangeValue: (media: CampaignMedia[]) => void;
   disabled?: boolean;
+}
+
+// 같은 파일을 두 번 올리면 번호가 달라 겹치지 않음. 번호 없는 v2 항목은 주소로 구분함.
+function getMediaId(media: CampaignMedia) {
+  return String(media.attachmentIdx ?? media.url);
 }
 
 function isFileDrag(event: DragEvent) {
@@ -50,12 +57,14 @@ export function DetailMediaField({
   const labelId = useId();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [isFileDragging, setIsFileDragging] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [draggingIndex, setDraggingIndex] = useState<number | null>(null);
+  const [playingId, setPlayingId] = useState<string | null>(null);
+  const playingIndex = value.findIndex(
+    (media) => getMediaId(media) === playingId,
+  );
+  const playingMedia = value[playingIndex];
 
-  const isLocked = disabled || isUploading;
-
-  async function uploadFiles(files: File[]) {
+  // 고르기만 하고 올리지는 않음. 저장할 때 올림(draft-saver).
+  function addFiles(files: File[]) {
     const room = DETAIL_MEDIA_MAX_COUNT - value.length;
     if (files.length > room) toast.error(t("toast.fileCount"));
     const accepted: File[] = [];
@@ -68,44 +77,33 @@ export function DetailMediaField({
       accepted.push(file);
     }
     if (accepted.length === 0) return;
+    onChangeValue([...value, ...accepted.map(createPendingMedia)]);
+  }
 
-    setIsUploading(true);
-    const uploaded: CampaignMedia[] = [];
-    for (const file of accepted) {
-      const [error, result] = await tryit(uploadCampaignFile)(file);
-      if (error) {
-        toast.error(t("toast.saveFailed"));
-        continue;
-      }
-      uploaded.push(result);
-    }
-    setIsUploading(false);
-    if (uploaded.length > 0) onChangeValue([...value, ...uploaded]);
+  function removeMedia(index: number) {
+    revokePendingMedia(value[index]);
+    onChangeValue(value.filter((_, i) => i !== index));
   }
 
   function handleChangeFile(event: ChangeEvent<HTMLInputElement>) {
     const files = Array.from(event.target.files ?? []);
     // 같은 파일을 다시 골라도 change가 일어나도록 비움.
     event.target.value = "";
-    void uploadFiles(files);
+    addFiles(files);
   }
 
   function handleDropFiles(event: DragEvent) {
     if (!isFileDrag(event)) return;
     event.preventDefault();
     setIsFileDragging(false);
-    if (!isLocked) void uploadFiles(Array.from(event.dataTransfer.files));
+    if (!disabled) addFiles(Array.from(event.dataTransfer.files));
   }
 
-  function handleDropReorder(event: DragEvent, targetIndex: number) {
-    if (!event.dataTransfer.types.includes(REORDER_DATA_TYPE)) return;
-    event.preventDefault();
-    const fromIndex = Number(event.dataTransfer.getData(REORDER_DATA_TYPE));
-    setDraggingIndex(null);
+  function moveMedia(fromIndex: number, toIndex: number) {
     const moved = value[fromIndex];
-    if (fromIndex === targetIndex || !moved) return;
+    if (!moved) return;
     const next = value.filter((_, index) => index !== fromIndex);
-    next.splice(targetIndex, 0, moved);
+    next.splice(toIndex, 0, moved);
     onChangeValue(next);
   }
 
@@ -119,7 +117,7 @@ export function DetailMediaField({
       </p>
       <button
         type="button"
-        disabled={isLocked}
+        disabled={disabled}
         aria-labelledby={labelId}
         onClick={() => fileInputRef.current?.click()}
         onDragOver={(event) => {
@@ -161,74 +159,94 @@ export function DetailMediaField({
         onChange={handleChangeFile}
       />
       {value.length > 0 && (
-        <ul className="grid grid-cols-3 gap-2 desktop:grid-cols-5">
+        <SortableGrid
+          ids={value.map(getMediaId)}
+          onChangeOrder={moveMedia}
+          renderOverlay={(id) => {
+            const media = value.find((item) => getMediaId(item) === id);
+            if (!media) return null;
+            return (
+              <div className="relative size-full cursor-grabbing overflow-hidden rounded-md border shadow-lg">
+                <DetailMediaThumbnail media={media} label="" />
+              </div>
+            );
+          }}
+          announcements={{
+            instructions: t("intro.detailMedia.reorderGuide"),
+            pickedUp: (index) => t("intro.detailMedia.pickedUp", { index }),
+            moved: (index) => t("intro.detailMedia.moved", { index }),
+            dropped: (index) => t("intro.detailMedia.dropped", { index }),
+            cancelled: () => t("intro.detailMedia.cancelled"),
+          }}
+          className="grid grid-cols-3 gap-2 desktop:grid-cols-5"
+        >
           {value.map((media, index) => (
-            <li
-              // 같은 파일을 두 번 올리면 번호가 달라 겹치지 않음. 번호 없는 v2 항목은 주소로 구분함.
-              key={media.attachmentIdx ?? media.url}
-              onDragOver={(event) => {
-                if (event.dataTransfer.types.includes(REORDER_DATA_TYPE)) {
-                  event.preventDefault();
-                }
-              }}
-              onDrop={(event) => handleDropReorder(event, index)}
-              className={cn(
-                "group/media relative aspect-square overflow-hidden rounded-md border",
-                draggingIndex === index && "opacity-50",
-              )}
+            <SortableItem
+              key={getMediaId(media)}
+              id={getMediaId(media)}
+              disabled={disabled}
+              className="group/media relative aspect-square overflow-hidden rounded-md border"
             >
-              <DetailMediaThumbnail
-                media={media}
-                label={t(
-                  media.mediaType === "VIDEO"
-                    ? "intro.detailMedia.video"
-                    : "intro.detailMedia.image",
-                  { index: index + 1 },
-                )}
-              />
-              <span
-                aria-hidden
-                className="pointer-events-none absolute inset-0 bg-foreground/10 opacity-0 transition-opacity group-focus-within/media:opacity-100 group-hover/media:opacity-100"
-              />
-              {!isLocked && (
+              {({ handleProps }) => (
                 <>
+                  <DetailMediaThumbnail
+                    media={media}
+                    label={t(
+                      media.mediaType === "VIDEO"
+                        ? "intro.detailMedia.video"
+                        : "intro.detailMedia.image",
+                      { index: index + 1 },
+                    )}
+                  />
+                  {media.mediaType === "VIDEO" && (
+                    <button
+                      type="button"
+                      aria-label={t("intro.detailMedia.play", {
+                        index: index + 1,
+                      })}
+                      onClick={() => setPlayingId(getMediaId(media))}
+                      className="absolute inset-0 cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-inset"
+                    />
+                  )}
                   <span
-                    draggable
-                    role="img"
-                    aria-label={t("intro.detailMedia.reorder", {
-                      index: index + 1,
-                    })}
-                    onDragStart={(event) => {
-                      event.dataTransfer.setData(
-                        REORDER_DATA_TYPE,
-                        String(index),
-                      );
-                      event.dataTransfer.effectAllowed = "move";
-                      setDraggingIndex(index);
-                    }}
-                    onDragEnd={() => setDraggingIndex(null)}
-                    className="absolute top-1 left-1 flex size-5 cursor-grab items-center justify-center rounded-md border bg-background opacity-0 transition-opacity group-focus-within/media:opacity-100 group-hover/media:opacity-100"
-                  >
-                    <GripVertical aria-hidden className="size-3" />
-                  </span>
-                  <button
-                    type="button"
-                    aria-label={t("intro.detailMedia.remove", {
-                      index: index + 1,
-                    })}
-                    onClick={() =>
-                      onChangeValue(value.filter((_, i) => i !== index))
-                    }
-                    className="absolute top-1 right-1 flex size-5 cursor-pointer items-center justify-center rounded-md border bg-background opacity-0 transition-opacity outline-none group-focus-within/media:opacity-100 group-hover/media:opacity-100 focus-visible:ring-2 focus-visible:ring-primary"
-                  >
-                    <X aria-hidden className="size-4" />
-                  </button>
+                    aria-hidden
+                    className="pointer-events-none absolute inset-0 bg-foreground/10 opacity-0 transition-opacity group-focus-within/media:opacity-100 group-hover/media:opacity-100"
+                  />
+                  {!disabled && (
+                    <>
+                      <button
+                        type="button"
+                        {...handleProps}
+                        aria-label={t("intro.detailMedia.reorder", {
+                          index: index + 1,
+                        })}
+                        className="absolute top-1 left-1 flex size-5 cursor-grab items-center justify-center rounded-md border bg-background opacity-0 transition-opacity outline-none group-focus-within/media:opacity-100 group-hover/media:opacity-100 focus-visible:ring-2 focus-visible:ring-primary pointer-coarse:opacity-100"
+                      >
+                        <GripVertical aria-hidden className="size-3" />
+                      </button>
+                      <button
+                        type="button"
+                        aria-label={t("intro.detailMedia.remove", {
+                          index: index + 1,
+                        })}
+                        onClick={() => removeMedia(index)}
+                        className="absolute top-1 right-1 flex size-5 cursor-pointer items-center justify-center rounded-md border bg-background opacity-0 transition-opacity outline-none group-focus-within/media:opacity-100 group-hover/media:opacity-100 focus-visible:ring-2 focus-visible:ring-primary pointer-coarse:opacity-100"
+                      >
+                        <X aria-hidden className="size-4" />
+                      </button>
+                    </>
+                  )}
                 </>
               )}
-            </li>
+            </SortableItem>
           ))}
-        </ul>
+        </SortableGrid>
       )}
+      <DetailMediaPlayerDialog
+        url={playingMedia?.url ?? null}
+        title={t("intro.detailMedia.video", { index: playingIndex + 1 })}
+        onClose={() => setPlayingId(null)}
+      />
     </section>
   );
 }
@@ -243,7 +261,12 @@ function DetailMediaThumbnail({ media, label }: DetailMediaThumbnailProps) {
 
   if (media.mediaType !== "VIDEO") {
     return (
-      <img src={media.url} alt={label} className="size-full object-cover" />
+      <img
+        src={media.url}
+        alt={label}
+        draggable={false}
+        className="pointer-events-none size-full object-cover"
+      />
     );
   }
 

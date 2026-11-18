@@ -3,6 +3,7 @@ import { tryit } from "radash";
 import { CAMPAIGN_DRAFT_STEPS, saveCampaignStep } from "@/entities/campaign";
 import { readApiErrorReason } from "@/shared/api";
 
+import { uploadPendingIntroMedia } from "./pending-media";
 import { isStepChanged } from "./store";
 
 import type { RegisterWizardState, RegisterWizardStoreApi } from "./store";
@@ -11,7 +12,13 @@ import type { CampaignDraftStep } from "@/entities/campaign";
 // 단계별 저장(A-5.x). 바뀐 단계만 한 번에 하나씩 보내고, 보내는 동안 생긴 변경은 끝난 뒤 이어서 보냄(스펙 §3 저장).
 
 export type SaveResult =
-  { ok: true } | { ok: false; reason: string | undefined };
+  | { ok: true }
+  | {
+      ok: false;
+      reason: string | undefined;
+      /** 5단계 파일 올리기에서 실패함. 형식·용량 안내 문구를 고르려고 구분함. */
+      isUploadFailure?: boolean;
+    };
 
 /** 유형을 바꾸면 서버가 비우는 단계(A-5.1). */
 const STEPS_CLEARED_BY_TYPE_CHANGE: readonly CampaignDraftStep[] = [
@@ -22,21 +29,11 @@ const STEPS_CLEARED_BY_TYPE_CHANGE: readonly CampaignDraftStep[] = [
   "conditions",
 ];
 
-/**
- * 보낼 단계. 3단계는 연령대·주제가 비어 있으면 서버가 저장을 거절해(A-5.3) 건너뜀. 이때 고른 플랫폼·성별도 저장되지
- * 않음(백엔드 완화 요청 Q-16).
- */
+/** 보낼 단계: 마지막으로 저장한 값과 달라진 단계. */
 export function getChangedSteps(
   state: Pick<RegisterWizardState, "draft" | "savedDraft">,
 ): CampaignDraftStep[] {
-  const { influencer } = state.draft;
-  const isInfluencerSavable =
-    influencer.ageGroups.length > 0 && influencer.topics.length > 0;
-  return CAMPAIGN_DRAFT_STEPS.filter(
-    (step) =>
-      isStepChanged(state, step) &&
-      (step !== "influencer" || isInfluencerSavable),
-  );
+  return CAMPAIGN_DRAFT_STEPS.filter((step) => isStepChanged(state, step));
 }
 
 export interface DraftSaver {
@@ -54,9 +51,16 @@ export function createDraftSaver(
   async function saveChangedSteps(): Promise<SaveResult> {
     let hasSaved = false;
     for (;;) {
-      const state = store.getState();
+      let state = store.getState();
       const [step] = getChangedSteps(state);
       if (!step) break;
+      if (step === "intro") {
+        const uploaded = await uploadPendingIntroMedia(store);
+        if (!uploaded.ok) return { ...uploaded, isUploadFailure: true };
+        // 올리는 사이 파일을 지워 저장할 것이 없어졌을 수 있어 다시 판단함.
+        if (!isStepChanged(store.getState(), step)) continue;
+        state = store.getState();
+      }
       const snapshot = state.draft;
       const isTypeChanged =
         step === "info" &&

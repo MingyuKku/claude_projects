@@ -20,7 +20,7 @@
 - 구조: Feature-Sliced Design v2.1 (`app` → `pages` → `widgets` → `features` → `entities` → `shared`)
 - 라우팅: React Router (data mode, `app` 레이어에서 구성)
 - 상태: Zustand (클라이언트 UI), SWR (서버 캐시, Optimistic UI)
-- 검증·계약: Zod (OpenAPI 응답, 폼), OpenAPI 생성 타입
+- 검증·계약: Zod (OpenAPI 명세 기준 응답 스키마, 폼)
 - UI: shadcn/ui (Radix), Tailwind CSS v4, CVA, lucide-react
 - 디자인 연동: Figma REST(`scripts/design/figma.mjs`)가 기본, Figma MCP는 한두 노드의 상세·스크린샷용
 - 테스트: Vitest, React Testing Library
@@ -50,7 +50,7 @@ pnpm ai:skill-usage  # 이 PC 의 Claude Code 세션 기록에서 skill 별 사�
 ## 공통 컨벤션 및 개발 규칙
 
 - **의사소통 언어**: 사용자와의 대화·설명, 코드 주석, 커밋 메시지는 한국어, 심볼 이름은 영어를 사용합니다.
-- **구조와 격리**: 의존 방향은 FSD 단방향이고 슬라이스는 서로 격리됩니다. 규칙은 `.claude/rules/architecture.md`에, 집행은 ESLint에 있습니다. `shared/`·`entities/`를 수정하기 전에는 Grep으로 소비처를 확인합니다.
+- **구조와 격리**: 의존 방향은 FSD 단방향이고 슬라이스는 서로 격리됩니다. 규칙은 `.claude/rules/architecture.md`에, 집행은 ESLint에 있습니다. `shared/`·`entities/`를 수정하기 전에는 Grep으로 소비처를 확인하고, 사용자가 요청하지 않은 `shared/` 수정은 하기 전에 이유와 소비처를 보고해 확인받습니다.
 - **데이터 흐름**: OpenAPI 응답 → Zod 검증 → 트랜스포머 → SWR 훅 → UI. UI는 raw API 타입에 의존하지 않습니다. 타입은 Zod 스키마에서 추론하고 단언으로 맞추지 않습니다.
 - **다국어**: 지원 언어는 `ko`(기본)·`en`·`ja`·`zh-CN`이고, 화면에 보이는 문구는 모두 번역 키로 씁니다. 스펙 단위 화면 작업에서 `ko` 원문과 3개 언어 번역을 함께 작성하며, Figma가 한국어 기준이므로 번역은 한국어와 비슷한 길이로 간결하게 씁니다. 미확정 서비스 고유 용어는 `docs/glossary-questions.md`에 모아 일괄 확인하며, 답변 전까지 모든 언어에서 해당 용어의 한국어 원문을 유지합니다. 서버가 주는 상태·유형 같은 값은 코드(enum)로 받아 프론트가 번역 키로 보여 주고, 은행명·카테고리명처럼 DB에 쌓이는 목록 값은 그대로 표시합니다. 규칙은 `.claude/rules/i18n.md`에 있습니다.
 - **완료 기준**: 작업을 끝내기 전에 `pnpm verify`(typecheck·lint·i18n:check·ds:tokens:check·test·test:scripts)를 통과시키고, CSS·`index.html`·`public/`·Vite 설정·의존성을 바꿨으면 `pnpm build`도 통과시킵니다(그 밖의 번들 검사는 CI `build` job이 합니다). 실행하지 못한 검사가 있으면 그 사실을 명시합니다. 훅이 일부를 자동 실행하지만 최종 확인 책임은 에이전트에게 있습니다.

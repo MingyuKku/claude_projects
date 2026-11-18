@@ -18,6 +18,7 @@ import type {
   BuyerInquiryViewModel,
   InquiryMessageViewModel,
   QnaItemViewModel,
+  QnaReplyInfo,
 } from "@/entities/inquiry";
 
 interface QnaConversationProps {
@@ -36,7 +37,8 @@ export function QnaConversation({
 }: QnaConversationProps) {
   const { t } = useTranslation("widgets/buyer-inquiry-workspace");
   const { t: tCommon } = useTranslation();
-  const { items, isLoading, isError, mutate } = useQnaDetail(inquiry);
+  const { items, isLoading, isError, mutate, markReplyDeleted } =
+    useQnaDetail(inquiry);
   useRefreshListOnRead(
     inquiry.key,
     inquiry.hasUnread,
@@ -93,6 +95,7 @@ export function QnaConversation({
           <QnaReply
             item={item}
             onChanged={() => void mutate()}
+            onDeleted={(deleted) => void markReplyDeleted(deleted)}
             advertiserName={t("advertiser")}
             avatarSrc={myAvatarSrc}
           />
@@ -107,14 +110,22 @@ function QnaReply({
   advertiserName,
   avatarSrc,
   onChanged,
+  onDeleted,
 }: {
   item: QnaItemViewModel;
   advertiserName: string;
   avatarSrc?: string;
   onChanged: () => void;
+  /** 삭제 응답으로 그 답변만 삭제 표시로 바꿈(상세를 다시 받지 않음). */
+  onDeleted: (deleted: QnaReplyInfo) => void;
 }) {
+  const { t } = useTranslation("widgets/buyer-inquiry-workspace");
   const { reply } = item;
   if (!reply) return null;
+  if (reply.isDeleted)
+    return (
+      <ChatDivider className="self-center">{t("deletedMessage")}</ChatDivider>
+    );
   // 구매자 문의와 같은 말풍선·호버 수정·삭제를 쓰려고 답변을 메시지 모양으로 바꿈. 읽힌 답변은 버튼이 없음.
   const message: InquiryMessageViewModel = {
     id: reply.replyIdx,
@@ -139,7 +150,12 @@ function QnaReply({
       canModify={IS_BUYER_WRITE_ENABLED}
       onChanged={onChanged}
       onSubmitEdit={(body) => editQnaReply(reply.replyIdx, body)}
-      onConfirmDelete={() => deleteQnaReply(reply.replyIdx)}
+      onConfirmDelete={async () => {
+        const deleted = await deleteQnaReply(reply.replyIdx);
+        // 삭제된 답변을 못 받으면(예전 응답) 상세를 다시 받음.
+        if (deleted) onDeleted(deleted);
+        else onChanged();
+      }}
     />
   );
 }

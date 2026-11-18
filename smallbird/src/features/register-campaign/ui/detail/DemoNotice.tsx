@@ -37,12 +37,12 @@ export function DemoNotice({
   return (
     <div className="flex flex-wrap items-end justify-end gap-3 rounded-lg border bg-background ds-p-6">
       <div className="flex min-w-65.5 flex-1 flex-col gap-2">
-        <p className="flex items-center gap-2 ds-text-lg-7-semibold text-primary">
+        <p className="flex items-center gap-2 ds-text-lg-7-semibold text-primary ko:break-keep">
           <Info aria-hidden className="size-5 shrink-0" />
           {t("demo.detail.title")}
         </p>
         {isSubscribed !== null && (
-          <p className="ds-text-sm-5-normal">
+          <p className="ds-text-sm-5-normal ko:break-keep">
             {t(
               isSubscribed
                 ? "demo.detail.subscribedDescription"

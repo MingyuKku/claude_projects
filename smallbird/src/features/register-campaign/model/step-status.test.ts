@@ -108,6 +108,25 @@ describe("단계 필수값", () => {
     expect(isStepComplete("intro", draft)).toBe(false);
   });
 
+  it("소개서의 상품 상세 이미지/동영상은 1개 이상이어야 통과한다", () => {
+    const draft = draftWithInfo((value) => {
+      value.intro = {
+        mainImage: { attachmentIdx: 1, url: "a", mediaType: "IMAGE" },
+        detailMedia: [],
+        description: "설명",
+        notice: "유의사항",
+        titleHashtags: [],
+        contentHashtags: ["협찬"],
+      };
+      value.influencer.platform = "INSTAGRAM";
+    });
+    expect(isStepComplete("intro", draft)).toBe(false);
+    draft.intro.detailMedia = [
+      { attachmentIdx: 2, url: "b", mediaType: "VIDEO" },
+    ];
+    expect(isStepComplete("intro", draft)).toBe(true);
+  });
+
   it("진행 조건 유지기간은 1~999개월 정수다", () => {
     const draft = draftWithInfo((value) => {
       value.conditions.secondaryCopyright = false;

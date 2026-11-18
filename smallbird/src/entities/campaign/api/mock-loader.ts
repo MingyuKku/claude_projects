@@ -16,3 +16,9 @@ export async function loadCampaignDetailMock() {
   assertMockAvailable();
   return import("./mock/campaign-detail-mock");
 }
+
+/** 서버 연동 모드에서 서버에 없는 기능을 흉내 낼 그림자 저장소. 배포 빌드에는 없음. */
+export async function loadCampaignShadowMock() {
+  assertMockAvailable();
+  return import("./mock/campaign-shadow");
+}

@@ -92,6 +92,93 @@ describe("InfluencerStep", () => {
     ).toHaveLength(21);
   });
 
+  it("서버에 값이 없으면 시안의 기본 선택(인스타그램·여성·10대·뷰티)으로 보인다", () => {
+    render(
+      <RegisterWizardProvider detail={createDetail()}>
+        <InfluencerStep />
+      </RegisterWizardProvider>,
+    );
+
+    expect(screen.getByRole("radio", { name: "인스타그램" })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
+    expect(screen.getByRole("radio", { name: "여성" })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "10대" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "뷰티" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+  });
+
+  it("서버에 저장된 값이 있으면 기본 선택 대신 그 값으로 보인다", () => {
+    render(
+      <RegisterWizardProvider
+        detail={createDetail((draft) => {
+          draft.influencer = {
+            platform: "TIKTOK",
+            gender: "MALE",
+            ageGroups: ["AGE_40S"],
+            topics: ["Pet"],
+          };
+        })}
+      >
+        <InfluencerStep />
+      </RegisterWizardProvider>,
+    );
+
+    expect(screen.getByRole("radio", { name: "틱톡" })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
+    expect(screen.getByRole("radio", { name: "남성" })).toHaveAttribute(
+      "aria-checked",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "10대" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+    expect(screen.getByRole("button", { name: "40대" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+  });
+
+  it("연령대·포스팅 주제는 마지막 하나를 해제할 수 없다", async () => {
+    const user = userEvent.setup();
+    render(
+      <RegisterWizardProvider detail={createDetail()}>
+        <InfluencerStep />
+      </RegisterWizardProvider>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "10대" }));
+    await user.click(screen.getByRole("button", { name: "뷰티" }));
+
+    expect(screen.getByRole("button", { name: "10대" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "뷰티" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+
+    await user.click(screen.getByRole("button", { name: "20대" }));
+    await user.click(screen.getByRole("button", { name: "10대" }));
+    expect(screen.getByRole("button", { name: "10대" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+  });
+
   it("제목 해시태그 칸이 없는 플랫폼으로 바꾸면 입력해 둔 제목 해시태그를 지운다", async () => {
     const user = userEvent.setup();
     render(

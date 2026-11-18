@@ -19,7 +19,7 @@ export function transformCopySources(
   return {
     records: response.list.map((item) => ({
       campaignIdx: item.campaignIdx,
-      name: item.name,
+      name: item.name ?? "",
       brandName: item.brandName || null,
       campaignType: toKnownCode(CAMPAIGN_TYPES, item.campaignType),
       rawCampaignType: item.campaignType ?? null,

@@ -27,7 +27,7 @@ import type { ComponentProps, ReactNode } from "react";
 // Figma 디자인 시스템 Combobox(6777:61876). Size md 40 / sm 36, 오류 문구가 있으면 Destructive.
 // 열림 링은 PC 팝오버(tablet 이상)에만 둠. MO 하단 시트가 열린 동안에는 시안(11315:50999)에 링이 없음.
 export const comboboxTriggerVariants = cva(
-  "flex w-full items-center rounded-md border border-input bg-background px-3 text-left text-sm leading-5 text-foreground outline-none transition-colors hover:bg-accent focus-visible:bg-background focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-background tablet:data-[state=open]:ring-2 tablet:data-[state=open]:ring-primary tablet:data-[state=open]:ring-offset-2",
+  "flex w-full items-center rounded-md border border-input bg-background px-3 text-left text-sm leading-5 text-foreground outline-none transition-[color,background-color,border-color,box-shadow] hover:bg-accent focus-visible:bg-background focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-background tablet:data-[state=open]:ring-2 tablet:data-[state=open]:ring-primary tablet:data-[state=open]:ring-offset-2",
   {
     variants: {
       size: {

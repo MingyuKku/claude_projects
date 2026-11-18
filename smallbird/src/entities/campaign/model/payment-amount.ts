@@ -4,7 +4,7 @@ import type { CampaignAddOn, CampaignType } from "./input-codes";
 // 서버가 같은 규칙으로 다시 계산해 `expectedTotalAmount`와 비교하므로 화면과 목 서버가 이 함수 하나를 함께 씀.
 
 /** AI 포스팅 가이드 정액(원). */
-export const AI_POSTING_GUIDE_PRICE = 10_000;
+export const POSTING_GUIDE_PRICE = 10_000;
 /** 원고컨펌 인원당 단가(원). 모집형만 등록 때 결제하고, PICK형은 매칭 단계에서 결제함. */
 export const MANUSCRIPT_CONFIRM_PRICE_PER_PERSON = 5_000;
 
@@ -35,8 +35,8 @@ function toAddOnItem(
   serviceType: CampaignServiceType,
   headcount: number,
 ): CampaignPaymentItem | null {
-  if (addOn === "AI_POSTING_GUIDE") {
-    return { addOn, amount: AI_POSTING_GUIDE_PRICE };
+  if (addOn === "POSTING_GUIDE") {
+    return { addOn, amount: POSTING_GUIDE_PRICE };
   }
   if (serviceType === "RECRUIT") {
     return { addOn, amount: MANUSCRIPT_CONFIRM_PRICE_PER_PERSON * headcount };

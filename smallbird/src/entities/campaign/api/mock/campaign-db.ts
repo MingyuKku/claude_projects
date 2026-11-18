@@ -1,4 +1,5 @@
 import { ApiError } from "@/shared/api";
+import { isCampaignApiMock } from "@/shared/config";
 import { createMockStore, mockBrandDb } from "@/shared/lib";
 
 import { SEEDS, toSeedRecord } from "./campaign-seeds";
@@ -17,13 +18,17 @@ interface CampaignMockDb {
 
 const EDITABLE_STATUSES = ["DRAFT", "REJECTED"];
 
-export const campaignMockDb = createMockStore<CampaignMockDb>(
-  "bigbird:mock:campaign-db",
-  () => ({
-    nextCampaignIdx: SEEDS.length + 1,
-    campaigns: SEEDS.map(toSeedRecord),
-  }),
-);
+// 전체 목 모드는 시드가 있는 목 캠페인을 쓰고, 서버 연동 모드는 서버 캠페인에 덧씌울 상태(결제·승인·정책 동의·데모)만 담는
+// 비어 있는 저장소를 씀(campaign-shadow). 두 저장소가 섞이지 않게 키를 나눔.
+export const campaignMockDb = isCampaignApiMock()
+  ? createMockStore<CampaignMockDb>("bigbird:mock:campaign-db", () => ({
+      nextCampaignIdx: SEEDS.length + 1,
+      campaigns: SEEDS.map(toSeedRecord),
+    }))
+  : createMockStore<CampaignMockDb>("bigbird:mock:campaign-shadow-db", () => ({
+      nextCampaignIdx: 1,
+      campaigns: [],
+    }));
 
 export function findCampaignRecord(campaignIdx: number) {
   const record = campaignMockDb
@@ -128,9 +133,9 @@ export function toListItem(record: MockCampaignRecord): CampaignListItem {
     serviceType: record.serviceType,
     productType: record.productType,
     status: record.status,
-    name: record.info.name ?? "",
+    name: record.info.name,
     brandName: resolveBrand(record)?.name ?? null,
-    description: record.intro.description,
+    productName: record.product.productName,
     thumbnailUrl: record.intro.mainImage?.url ?? null,
     startDate: record.info.startDate,
     endDate: record.info.endDate,

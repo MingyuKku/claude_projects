@@ -16,8 +16,8 @@
 | 기능 전용 상태·로직·컴포넌트를 `shared/`에 둠 | B |
 | 기능 전용 변형을 `shared/ui/` 원본에 추가 (상위 컴포넌트에서 감싸야 함) | R |
 | 데이터를 소유하는 슬라이스(`entities/*`·`features/*`)에 Zod 스키마는 `model/schema.ts`(또는 `model/{대상}-schema.ts`), 트랜스포머는 `lib/`, fetcher·SWR 훅은 `api/` | R |
-| Zustand 스토어는 슬라이스의 `model/`(`features`·`widgets`)에 배치 | R |
-| 다른 슬라이스의 Zustand 스토어를 임포트 | B |
+| Zustand 스토어는 슬라이스의 `model/`(`features`·`widgets`, 여러 슬라이스가 공유하면 `entities`)에 배치 | R |
+| 같은 레이어의 다른 슬라이스 Zustand 스토어를 임포트 (아래 레이어 `entities`의 Public API로 쓰는 것은 허용) | B |
 | 슬라이스 전용 상수는 `model/constants.ts`, 공용은 `shared/config/`, 경로는 `ROUTES` | R |
 | 라우트 선언은 `app/router/routes.tsx`에만, 페이지는 `lazy`로 Public API 경유 | R |
 | 새 라이브러리는 `shared/lib/` 래퍼 경유 | R |
@@ -123,7 +123,7 @@ navigate(ROUTES.list);
 | --- | --- |
 | 화면(라우트) 추가·변경·삭제 시 같은 MR에서 `docs/pages.md`와 `specs/[<그룹>/]<feature>.md` 갱신 | B |
 | v2(`bigbird-client-fe`) 이전 작업은 `MIGRATION.md`에 "v2 동작 → v3 결정" 기록 | R |
-| 트랜스포머·상태 로직 훅·비즈니스 규칙 변경에 테스트, 버그 수정에 재현 테스트 | R, 회귀 위험이 큰 공통 로직이면 B |
+| 트랜스포머·상태 로직 훅·비즈니스 규칙 변경에 테스트, 버그 수정에 재현 테스트(순수 시각 표현만 고친 수정은 제외) | R, 회귀 위험이 큰 공통 로직이면 B |
 | `eslint-disable`, `@ts-ignore`, `@ts-expect-error`, 린트·Prettier·tsconfig 설정 완화로 실제 오류·검사 실패를 숨김 | B |
 | 린트·Prettier·tsconfig 설정 변경의 승인 근거를 찾지 못함 | 확인 필요 (미승인 완화가 확인되면 B) |
 | `shared/`·`entities/` 변경이 소비처의 타입·동작을 깨뜨림 | B |

@@ -30,11 +30,13 @@
     "saveFailed": "保存に失敗しました。もう一度お試しください。",
     "fileType": "JPG・PNGファイルのみアップロードできます。",
     "fileSize": "10MB以下のファイルのみアップロードできます。",
+    "videoSize": "500MB以下の動画のみアップロードできます。",
     "requestFailed": "リクエストに失敗しました。しばらくしてからもう一度お試しください。",
     "addressSearchFailed": "住所検索を読み込めませんでした。しばらくしてからもう一度お試しください。",
     "aiCompleted": "AI生成が完了しました。",
     "aiFailed": "AI生成に失敗しました。URLを確認してもう一度お試しください。",
-    "fileCount": "最大5件までアップロードできます。"
+    "fileCount": "最大5件までアップロードできます。",
+    "uploading": "ファイルをアップロード中 ({{done}}/{{total}})"
   },
   "dialog": {
     "requiredInfo": {
@@ -72,9 +74,7 @@
       "manage": "ブランド管理"
     },
     "period": {
-      "startLabel": "希望開始日",
-      "label": "キャンペーン期間",
-      "endLabel": "終了日",
+      "label": "希望開始日",
       "placeholder": "日付を選択してください。",
       "help": "終了日は自動で30日後に設定されます。"
     }
@@ -240,7 +240,7 @@
   "addOns": {
     "noticeTitle": "オプションは任意です。",
     "noticeText": "必要な場合のみ選択でき、選択しなくても次のステップに進めます。",
-    "AI_POSTING_GUIDE": {
+    "POSTING_GUIDE": {
       "name": "AI投稿ガイド",
       "price": "10,000ウォン",
       "description": "キャンペーンの目的と商品に合った最適な投稿ガイドを自動で作成します。"
@@ -289,7 +289,13 @@
       "remove": "{{index}}番目のファイルを削除",
       "reorder": "{{index}}番目のファイルを並べ替え",
       "video": "動画 {{index}}",
-      "image": "画像 {{index}}"
+      "image": "画像 {{index}}",
+      "play": "動画 {{index}} を再生",
+      "reorderGuide": "ハンドルでSpaceキーを押して選択し、矢印キーで移動、Spaceキーで確定します。",
+      "pickedUp": "{{index}}番目のファイルを選択しました。",
+      "moved": "{{index}}番目の位置に移動しました。",
+      "dropped": "{{index}}番目の位置に配置しました。",
+      "cancelled": "並べ替えをキャンセルしました。"
     },
     "description": {
       "label": "キャンペーン説明",

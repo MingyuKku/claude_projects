@@ -50,5 +50,10 @@
   },
   "error": {
     "list": "无法加载活动列表。"
+  },
+  "subscriptionRequired": {
+    "title": "需要订阅",
+    "description": "订阅已到期，无法继续撰写该活动。已填写的内容会保留，重新订阅后可继续撰写。",
+    "subscribe": "去订阅"
   }
 }

@@ -7,11 +7,13 @@ import { SWRConfig } from "swr";
 import { addBrand } from "@/entities/brand";
 import { createEmptyDraft } from "@/entities/campaign";
 
+import { uploadCampaignFile } from "../../api/upload-campaign-file";
 import { useRegisterWizardStore } from "../../model/wizard-context";
 import { RegisterWizardProvider } from "../RegisterWizardProvider";
 import { AddBrandPanel } from "./AddBrandPanel";
 import { BrandManagePanel } from "./BrandManagePanel";
 
+import type * as UploadApi from "../../api/upload-campaign-file";
 import type * as BrandEntity from "@/entities/brand";
 import type { CampaignDetail } from "@/entities/campaign";
 
@@ -24,7 +26,17 @@ vi.mock("@/entities/brand", async (importOriginal) => {
   return { ...original, addBrand: vi.fn(original.addBrand) };
 });
 
+vi.mock("../../api/upload-campaign-file", async (importOriginal) => {
+  const original = await importOriginal<typeof UploadApi>();
+  return {
+    ...original,
+    uploadCampaignFile: vi.fn(original.uploadCampaignFile),
+  };
+});
+
 beforeEach(() => {
+  vi.mocked(uploadCampaignFile).mockClear();
+  vi.mocked(addBrand).mockClear();
   window.sessionStorage.clear();
   vi.mocked(toast.error).mockClear();
 });
@@ -164,5 +176,59 @@ describe("AddBrandPanel", () => {
     expect(toast.error).toHaveBeenCalledWith(
       "JPG, PNG 파일만 올릴 수 있습니다.",
     );
+  });
+
+  it("이미지는 고를 때 올리지 않고, 저장할 때 올려 받은 번호로 브랜드를 만든다", async () => {
+    const user = userEvent.setup();
+    const { container } = renderPanel("add-brand", null);
+    const fileInput =
+      container.querySelector<HTMLInputElement>('input[type="file"]');
+    if (!fileInput) throw new Error("파일 입력이 없음");
+
+    await user.type(
+      screen.getByRole("textbox", { name: /브랜드명/ }),
+      "새 브랜드",
+    );
+    await user.upload(
+      fileInput,
+      new File(["x"], "logo.png", { type: "image/png" }),
+    );
+
+    expect(uploadCampaignFile).not.toHaveBeenCalled();
+
+    await user.click(screen.getByRole("button", { name: "저장" }));
+
+    await waitFor(() => expect(addBrand).toHaveBeenCalled());
+    expect(uploadCampaignFile).toHaveBeenCalledTimes(1);
+    expect(addBrand).toHaveBeenCalledWith({
+      name: "새 브랜드",
+      imageAttachmentIdx: expect.any(Number),
+    });
+  });
+
+  it("이미지 올리기에 실패하면 브랜드를 만들지 않고 안내한다", async () => {
+    const user = userEvent.setup();
+    vi.mocked(uploadCampaignFile).mockRejectedValueOnce(new Error("fail"));
+    const { container } = renderPanel("add-brand", null);
+    const fileInput =
+      container.querySelector<HTMLInputElement>('input[type="file"]');
+    if (!fileInput) throw new Error("파일 입력이 없음");
+
+    await user.type(
+      screen.getByRole("textbox", { name: /브랜드명/ }),
+      "새 브랜드",
+    );
+    await user.upload(
+      fileInput,
+      new File(["x"], "logo.png", { type: "image/png" }),
+    );
+    await user.click(screen.getByRole("button", { name: "저장" }));
+
+    await waitFor(() =>
+      expect(toast.error).toHaveBeenCalledWith(
+        "저장에 실패하였습니다. 다시 시도해 주세요.",
+      ),
+    );
+    expect(addBrand).not.toHaveBeenCalled();
   });
 });

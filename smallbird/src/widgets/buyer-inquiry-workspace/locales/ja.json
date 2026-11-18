@@ -71,6 +71,7 @@
   "conversationError": "会話を読み込めませんでした。",
   "noMessages": "会話がありません。",
   "questionDeleted": "削除されたお問い合わせです。",
+  "deletedMessage": "メッセージが削除されました。",
   "reply": {
     "placeholder": "返信を入力 (最大3,000文字)",
     "submit": "返信",

@@ -17,13 +17,15 @@ export function transformCampaignList(
     records: response.list.map((item) => ({
       id: String(item.campaignIdx),
       campaignIdx: item.campaignIdx,
-      name: item.name,
-      description: item.description || null,
+      name: item.name ?? "",
+      productName: item.productName || null,
       thumbnailUrl: item.thumbnailUrl || null,
       stage: toCampaignStage(item.status),
       rawStatus: item.status,
       type: toCampaignTypeFilter(item.serviceType, item.productType),
-      rawTypeText: `${item.serviceType} ${item.productType}`,
+      rawTypeText: [item.serviceType, item.productType]
+        .filter(Boolean)
+        .join(" "),
       startDate: item.startDate || null,
       endDate: item.endDate || null,
       isDemo: item.demo,

@@ -168,7 +168,7 @@ export function usePaymentFlow(steps: readonly RegisterStepDefinition[]) {
     setIsPaying(false);
     setDialog(null);
     const reason = readCampaignPaymentError(error)?.reason;
-    if (reason === "INCOMPLETE_DRAFT") {
+    if (reason === "INCOMPLETE_DRAFT" || reason === "INVALID_START_DATE") {
       await handleFailedPayment(error);
       return;
     }

@@ -4,10 +4,15 @@ import { createStore } from "zustand/vanilla";
 
 import { createEmptyDraft } from "@/entities/campaign";
 
+import { applyDraftDefaults } from "./draft-defaults";
+import { revokePendingIntroMedia } from "./pending-media";
+
+import type { UploadedCampaignFile } from "../api/upload-campaign-file";
 import type {
   CampaignDetail,
   CampaignDraft,
   CampaignDraftStep,
+  CampaignMedia,
   CampaignProductType,
   CampaignServiceType,
   CampaignType,
@@ -38,6 +43,12 @@ const IDLE_INTRO_AI: IntroAiState = {
   lastOutcome: null,
 };
 
+/** 5단계 파일을 올리는 진행. null이면 올리는 중 아님. */
+export interface UploadProgress {
+  done: number;
+  total: number;
+}
+
 type ObjectDraftStep = Exclude<CampaignDraftStep, "addOns">;
 
 export interface RegisterWizardState {
@@ -59,6 +70,7 @@ export interface RegisterWizardState {
   dialog: WizardDialog | null;
   introMode: IntroMode;
   introAi: IntroAiState;
+  uploadProgress: UploadProgress | null;
 }
 
 export interface RegisterWizardActions {
@@ -78,6 +90,9 @@ export interface RegisterWizardActions {
   replaceDraft: (draft: CampaignDraft) => void;
   /** 캠페인 유형을 바꾸고 2~7단계 입력값을 모두 비움(REQ-10-0022·0023). 1단계의 다른 값은 그대로. */
   changeCampaignType: (campaignType: CampaignType) => void;
+  /** 올리기 전 파일(`file`)을 올려서 받은 번호·주소로 바꿈. 그사이 지운 파일이면 아무것도 안 함. */
+  resolvePendingMedia: (file: File, uploaded: UploadedCampaignFile) => void;
+  setUploadProgress: (progress: UploadProgress | null) => void;
   /** 서버가 비운 단계(유형 변경, A-5.1)를 저장된 값에서도 비움. */
   markServerCleared: (steps: readonly CampaignDraftStep[]) => void;
   markPaymentVisited: () => void;
@@ -118,13 +133,16 @@ export function createRegisterWizardStore(detail: CampaignDetail) {
         productType: detail.productType ?? "BRAND",
         isDemo: detail.isDemo,
         isRevisionMode: detail.stage === "REJECTED",
-        draft: detail.draft,
+        draft: applyDraftDefaults(detail.draft, {
+          hasServerCampaignType: detail.rawCampaignType !== null,
+        }),
         savedDraft: detail.draft,
         hasVisitedPayment: false,
         isLeaveAllowed: false,
         dialog: null,
         introMode: getInitialIntroMode(detail.draft),
         introAi: IDLE_INTRO_AI,
+        uploadProgress: null,
         setStepDraft: (step, value) =>
           set((state) => ({ draft: { ...state.draft, [step]: value } })),
         patchStepDraft: (step, patch) =>
@@ -139,25 +157,49 @@ export function createRegisterWizardStore(detail: CampaignDetail) {
             savedDraft: { ...state.savedDraft, [step]: value },
           })),
         replaceDraft: (draft) =>
-          set({
-            draft,
-            savedDraft: draft,
-            introMode: getInitialIntroMode(draft),
-            introAi: IDLE_INTRO_AI,
+          set((state) => {
+            revokePendingIntroMedia(state.draft.intro);
+            return {
+              draft: applyDraftDefaults(draft),
+              savedDraft: draft,
+              introMode: getInitialIntroMode(draft),
+              introAi: IDLE_INTRO_AI,
+            };
           }),
         changeCampaignType: (campaignType) =>
           set((state) => {
+            revokePendingIntroMedia(state.draft.intro);
             const empty = createEmptyDraft();
             return {
-              draft: {
+              draft: applyDraftDefaults({
                 ...empty,
                 info: { ...state.draft.info, campaignType },
-              },
+              }),
               introMode: "AI",
               // 진행 중인 AI 생성 작업도 버림.
               introAi: IDLE_INTRO_AI,
             };
           }),
+        resolvePendingMedia: (file, uploaded) =>
+          set((state) => {
+            const { mainImage, detailMedia } = state.draft.intro;
+            const resolve = (media: CampaignMedia) => {
+              if (media.file !== file) return media;
+              URL.revokeObjectURL(media.url);
+              return uploaded;
+            };
+            return {
+              draft: {
+                ...state.draft,
+                intro: {
+                  ...state.draft.intro,
+                  mainImage: mainImage ? resolve(mainImage) : null,
+                  detailMedia: detailMedia.map(resolve),
+                },
+              },
+            };
+          }),
+        setUploadProgress: (uploadProgress) => set({ uploadProgress }),
         markServerCleared: (steps) =>
           set((state) => {
             const empty = createEmptyDraft();
@@ -191,6 +233,7 @@ export function createRegisterWizardStore(detail: CampaignDetail) {
                 },
               };
             }
+            revokePendingIntroMedia(state.draft.intro);
             return {
               draft: { ...state.draft, intro },
               introAi: {

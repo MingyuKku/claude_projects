@@ -29,7 +29,7 @@ export async function listCampaigns(
           (item.serviceType === codes.serviceType &&
             item.productType === codes.productType)) &&
         (!keyword ||
-          item.name.toLowerCase().includes(keyword) ||
+          (item.name ?? "").toLowerCase().includes(keyword) ||
           (item.brandName ?? "").toLowerCase().includes(keyword)),
     )
     .sort((a, b) => b.campaignIdx - a.campaignIdx);
@@ -57,7 +57,7 @@ export async function listCopySources(
         item.productType === query.productType &&
         item.campaignIdx !== query.excludeCampaignIdx &&
         (!keyword ||
-          item.name.toLowerCase().includes(keyword) ||
+          (item.name ?? "").toLowerCase().includes(keyword) ||
           (item.brandName ?? "").toLowerCase().includes(keyword)),
     )
     .sort((a, b) => b.campaignIdx - a.campaignIdx);

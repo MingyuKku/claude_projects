@@ -5,6 +5,10 @@ import useSWRInfinite from "swr/infinite";
 import { ApiError, deviceHeaders, isApiError, serverApiV3 } from "@/shared/api";
 import { ENV } from "@/shared/config";
 
+import {
+  applyDeletedMessage,
+  applyDeletedQnaReply,
+} from "../lib/apply-deleted";
 import { getAttachmentKind } from "../lib/attachment-rules";
 import {
   transformBuyerInquiryDetailToViewModel,
@@ -29,9 +33,11 @@ import {
   createInquiryThreadResultSchema,
   inquiryCampaignDetailSchema,
   inquiryCampaignListSchema,
+  deletedInquiryMessageSchema,
   inquiryUserSchema,
   purchaserQuestionInfoSchema,
   qnaDetailListSchema,
+  qnaReplyInfoSchema,
   replyResultSchema,
   sendInquiryMessageResultSchema,
   simpleResultSchema,
@@ -49,8 +55,10 @@ import type {
   BigbirdInquiryViewModel,
   BuyerInquirySource,
   BuyerInquiryViewModel,
+  DeletedInquiryMessage,
   InquirySourceType,
   InquiryThread,
+  QnaReplyInfo,
   RealtimeAlarm,
 } from "../model/schema";
 
@@ -223,7 +231,18 @@ export function useBigbirdInquiryDetail(
     },
     { revalidateOnFocus: true },
   );
-  return { messages: data, isLoading, isError: Boolean(error), mutate };
+  /** 삭제 응답으로 그 메시지만 삭제 표시로 바꿈(다시 받지 않음). */
+  const markDeleted = (deleted: DeletedInquiryMessage) =>
+    mutate((current) => current && applyDeletedMessage(current, deleted), {
+      revalidate: false,
+    });
+  return {
+    messages: data,
+    isLoading,
+    isError: Boolean(error),
+    mutate,
+    markDeleted,
+  };
 }
 
 const CAMPAIGN_TIMELINE_KEY = "campaign-timeline";
@@ -250,7 +269,18 @@ export function useCampaignTimeline(campaignIdx: number | null | undefined) {
     ([, idx]) => fetchCampaignTimeline(idx),
     { revalidateOnFocus: true },
   );
-  return { messages: data, isLoading, isError: Boolean(error), mutate };
+  /** 삭제 응답으로 그 메시지만 삭제 표시로 바꿈(다시 받지 않음). */
+  const markDeleted = (deleted: DeletedInquiryMessage) =>
+    mutate((current) => current && applyDeletedMessage(current, deleted), {
+      revalidate: false,
+    });
+  return {
+    messages: data,
+    isLoading,
+    isError: Boolean(error),
+    mutate,
+    markDeleted,
+  };
 }
 
 export async function fetchInquiryCampaignDetail(campaignIdx: number) {
@@ -361,19 +391,6 @@ export async function sendInquiryMessage({
   );
   return ensureSucceeded(sendInquiryMessageResultSchema.parse(response))
     .threadIdx;
-}
-
-/**
- * 구매자·인플루언서 실시간 요청 수락(`PUT /v3/help/inquiry/{inquiryIdx}/realtime/accept`). 서버가 계정 문서의
- * `msgResponseDate`를 써서 연결로 보이고 3분 매칭 실패를 막음(백엔드 흐름도 프론트팀 가이드 2026-11-03).
- */
-export async function acceptInquiryRealtime(inquiryIdx: number) {
-  const response = await serverApiV3.put(
-    `/help/inquiry/${inquiryIdx}/realtime/accept`,
-    undefined,
-    { headers: deviceHeaders() },
-  );
-  ensureSucceeded(simpleResultSchema.parse(response));
 }
 
 /**
@@ -732,6 +749,16 @@ export function usePurchaserConversation(inquiry: BuyerInquiryViewModel) {
     // 열어 둔 사이에 온 메시지는 탭으로 돌아올 때 다시 받아 보여 줌(앱 전체 기본은 꺼져 있음).
     { revalidateOnFocus: true },
   );
+  /** 삭제 응답으로 그 메시지만 삭제 표시로 바꿈(다시 받지 않음). */
+  const markDeleted = (deleted: DeletedInquiryMessage) =>
+    mutate(
+      (current) =>
+        current && {
+          ...current,
+          messages: applyDeletedMessage(current.messages, deleted),
+        },
+      { revalidate: false },
+    );
   return {
     messages: data?.messages,
     /** 이 문의의 스레드가 실시간 상담 중인지. 대화를 받기 전에는 false. */
@@ -741,6 +768,7 @@ export function usePurchaserConversation(inquiry: BuyerInquiryViewModel) {
     isLoading,
     isError: Boolean(error),
     mutate,
+    markDeleted,
   };
 }
 
@@ -762,7 +790,18 @@ export function useQnaDetail(inquiry: BuyerInquiryViewModel) {
     () => fetchQnaDetail(inquiryIdx),
     { revalidateOnFocus: true },
   );
-  return { items: data, isLoading, isError: Boolean(error), mutate };
+  /** 답변 삭제 응답으로 그 답변만 삭제 표시로 바꿈(다시 받지 않음). */
+  const markReplyDeleted = (deleted: QnaReplyInfo) =>
+    mutate((current) => current && applyDeletedQnaReply(current, deleted), {
+      revalidate: false,
+    });
+  return {
+    items: data,
+    isLoading,
+    isError: Boolean(error),
+    mutate,
+    markReplyDeleted,
+  };
 }
 
 /**
@@ -789,16 +828,33 @@ export async function editInquiryMessage(messageIdx: number, body: string) {
   ensureSucceeded(simpleResultSchema.parse(response));
 }
 
-/** 보낸 메시지 삭제(`DELETE /v3/help/thread/message/{messageIdx}`, 하드삭제). 수정과 같은 조건·오류 코드 */
-export async function deleteInquiryMessage(messageIdx: number) {
+/**
+ * 보낸 메시지 삭제(`DELETE /v3/help/thread/message/{messageIdx}`). 수정과 같은 조건·오류 코드. 2026-11-17부터 소프트삭제라 삭제된
+ * 메시지(본문 "삭제된 메시지입니다", 첨부 정보 null)를 그대로 돌려줌 → 호출한 쪽이 대화를 다시 받지 않고 그 자리만 바꿈.
+ * 예전 `{ result }`만 오는 응답이면 null이고, 이때는 대화를 다시 받아야 함.
+ */
+export async function deleteInquiryMessage(
+  messageIdx: number,
+): Promise<DeletedInquiryMessage | null> {
   const response = await serverApiV3.delete(
     `/help/thread/message/${messageIdx}`,
   );
+  const deleted = deletedInquiryMessageSchema.safeParse(response);
+  if (deleted.success) return deleted.data;
   ensureSucceeded(simpleResultSchema.parse(response));
+  return null;
 }
 
-/** Q&A 답변 삭제(`DELETE /v3/help/reply/{replyIdx}`). 구매자가 이미 읽은 답변은 409. */
-export async function deleteQnaReply(replyIdx: number) {
+/**
+ * Q&A 답변 삭제(`DELETE /v3/help/reply/{replyIdx}`). 구매자가 이미 읽은 답변은 409. 소프트삭제라 삭제된 답변을 그대로
+ * 돌려주고, 예전 `{ result }`만 오는 응답이면 null(상세를 다시 받아야 함).
+ */
+export async function deleteQnaReply(
+  replyIdx: number,
+): Promise<QnaReplyInfo | null> {
   const response = await serverApiV3.delete(`/help/reply/${replyIdx}`);
+  const deleted = qnaReplyInfoSchema.safeParse(response);
+  if (deleted.success && deleted.data.replyIdx != null) return deleted.data;
   ensureSucceeded(simpleResultSchema.parse(response));
+  return null;
 }

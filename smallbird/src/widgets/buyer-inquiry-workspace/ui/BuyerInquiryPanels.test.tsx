@@ -1,4 +1,4 @@
-import { cleanup, render, screen, waitFor } from "@testing-library/react";
+import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { useState } from "react";
 import { createMemoryRouter, RouterProvider } from "react-router";
@@ -7,7 +7,6 @@ import { SWRConfig } from "swr";
 import { serverApiV3 } from "@/shared/api";
 import { ROUTES } from "@/shared/config";
 
-import { OPENED_BY_USER_STATE } from "../model/realtime-inquiry-idx";
 import { BuyerInquiryPanels } from "./BuyerInquiryPanels";
 
 import type { BuyerInquiryViewModel } from "@/entities/inquiry";
@@ -173,11 +172,6 @@ function renderPanels(
   return router;
 }
 
-function renderPanelsForAccept(target: BuyerInquiryViewModel, state?: unknown) {
-  const router = renderPanels(77, target, undefined, state);
-  return { router, unmount: () => cleanup() };
-}
-
 describe("인플루언서 문의 상담 종료", () => {
   const influencer: BuyerInquiryViewModel = {
     ...inquiry,
@@ -213,26 +207,15 @@ describe("인플루언서 문의 상담 종료", () => {
     await waitFor(() => expect(onChangeStatus).toHaveBeenCalled());
   });
 
-  it("자동 선택으로 열린 실시간 문의는 수락하지 않고, 사용자가 직접 연 문의만 수락한다", async () => {
+  it("실시간 문의는 직접 열어도 수락(realtime/accept)을 보내지 않는다", async () => {
+    mockThread({ boardType: false });
+    vi.mocked(serverApiV3.put).mockReset();
     vi.mocked(serverApiV3.put).mockResolvedValue({ result: true });
-    const { unmount } = renderPanelsForAccept({
-      ...influencer,
-      inquiryIdx: 3001,
-    });
-    await screen.findByText("김하루");
+    // 예전에 "열면 수락"을 켜던 이동 표시가 붙어 있어도 열기만으로는 아무것도 보내지 않음.
+    renderPanels(77, influencer, undefined, { openedByUser: true });
+    // 실시간 상담 중으로 열렸는지(상담 종료 버튼)를 확인한 뒤 수락이 없었는지 봄.
+    await screen.findByRole("button", { name: "상담 종료" });
     expect(serverApiV3.put).not.toHaveBeenCalled();
-    unmount();
-    renderPanelsForAccept(
-      { ...influencer, inquiryIdx: 3002 },
-      OPENED_BY_USER_STATE,
-    );
-    await waitFor(() =>
-      expect(serverApiV3.put).toHaveBeenCalledWith(
-        "/help/inquiry/3002/realtime/accept",
-        undefined,
-        { headers: { "X-Device-Id": expect.any(String) } },
-      ),
-    );
   });
 
   it("목록 상태가 상담 중이어도 스레드가 일반(boardType true)이면 버튼이 없다", async () => {
@@ -358,23 +341,20 @@ describe("구매자 문의 오른쪽 패널", () => {
     expect(screen.queryByText(/campaignCode/)).not.toBeInTheDocument();
   });
 
-  it("삭제된 메시지는 삭제 표시 없이 대화에서 뺀다", async () => {
+  it("삭제된 메시지는 내용 대신 삭제 안내를 그 자리에 남긴다", async () => {
     vi.mocked(serverApiV3.get).mockImplementation(async (path: string) => {
       if (path !== "/help/thread") return detail;
       return threadOf([
         message(1, "배송이 언제 되나요?", false, "2026-10-01T10:00:00"),
         {
-          ...message(2, "지운 답변", true, "2026-10-01T10:01:00"),
+          ...message(2, "삭제된 메시지입니다", true, "2026-10-01T10:01:00"),
           deleteTime: "2026-10-01T10:02:00",
         },
       ]);
     });
     renderPanels();
     expect(await screen.findByText("배송이 언제 되나요?")).toBeInTheDocument();
-    expect(screen.queryByText("지운 답변")).not.toBeInTheDocument();
-    expect(
-      screen.queryByText("메시지가 삭제되었습니다."),
-    ).not.toBeInTheDocument();
+    expect(screen.getAllByText("삭제된 메시지입니다")).toHaveLength(1);
   });
 
   it("상세 정보를 문의 상세 API로 보여 준다", async () => {

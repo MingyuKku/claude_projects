@@ -1,4 +1,5 @@
 import { Plus } from "lucide-react";
+import { useState } from "react";
 import { useNavigate, useOutletContext } from "react-router";
 import { toast } from "sonner";
 
@@ -8,6 +9,7 @@ import {
   useCampaignPage,
   useCampaignScrollList,
 } from "@/entities/campaign";
+import { getSubscribedTypes, useSubscriptions } from "@/entities/subscription";
 import { EmptyState } from "@/shared/components/empty-state";
 import {
   FilterToolbar,
@@ -20,9 +22,11 @@ import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 
+import { isSubscriptionExpiredForWrite } from "../lib/subscription-guard";
 import { useStatusParams } from "../model/use-status-params";
 import { CampaignListSection } from "./CampaignListSection";
 import { StatusTabs } from "./StatusTabs";
+import { SubscriptionRequiredDialog } from "./SubscriptionRequiredDialog";
 
 import type { ShortcutKind } from "../lib/campaign-actions";
 import type { CampaignSummary } from "@/entities/campaign";
@@ -45,6 +49,12 @@ export function CampaignStatusPage() {
 
   // 할당된 Sub ID는 "+ 캠페인 등록하기"·"작성하기"·삭제를 쓰지 못함(스펙 P-3).
   const isSubAccount = session.authority === "SUB";
+  const [isSubscribeAlertOpen, setIsSubscribeAlertOpen] = useState(false);
+  // Sub ID는 구독 API가 403이라 읽지 않음("작성하기"도 못 씀).
+  const subscriptions = useSubscriptions({ isEnabled: !isSubAccount });
+  const subscribedTypes = subscriptions.data
+    ? getSubscribedTypes(subscriptions.data)
+    : null;
   // PC·TAB은 전체 탭에만, MO는 모든 탭 위에 둠(시안, 스펙 D-3).
   const canRegister = !isSubAccount && (!isTabletUp || params.tab === "all");
 
@@ -56,6 +66,10 @@ export function CampaignStatusPage() {
   function handleClickShortcut(campaign: CampaignSummary, kind: ShortcutKind) {
     switch (kind) {
       case "write":
+        if (isSubscriptionExpiredForWrite(campaign, subscribedTypes)) {
+          setIsSubscribeAlertOpen(true);
+          return;
+        }
         void navigate(getCampaignRegisterPath(campaign.campaignIdx));
         return;
       case "detail":
@@ -146,6 +160,11 @@ export function CampaignStatusPage() {
           onDeleted={handleReload}
         />
       </div>
+      <SubscriptionRequiredDialog
+        open={isSubscribeAlertOpen}
+        onClose={() => setIsSubscribeAlertOpen(false)}
+        onSubscribe={() => void navigate(ROUTES.mypageSubscribe)}
+      />
     </div>
   );
 }

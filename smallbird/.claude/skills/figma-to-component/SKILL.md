@@ -45,8 +45,8 @@ Figma 플러그인의 skill(`figma-design-to-code` 등)과 절차가 다르면 �
 5. **문구**: Figma 텍스트를 하드코딩하지 않고 슬라이스의 `locales/ko.json`에 키로 옮긴 뒤 `t()`로 연결하고, `en`·`ja`·`zh-CN` 번역도 같은 작업에서 씁니다. 서버 값 표시·미확정 고유 용어·간결한 번역 기준은 `.claude/rules/i18n.md`와 `i18n-translation.md`를 따릅니다.
 6. **마크업**: `<div>` 대신 의미에 맞는 태그(`header`, `nav`, `main`, `section`, `article`, `button`)를 씁니다.
 7. **시안 대조(완료 조건)**: 스크린샷 눈 비교로 끝내지 않습니다. `design-qa` skill의 일괄 도구(`references/workflow.md`)로 구현한 화면을 시안 프레임과 대조합니다. `screens.json`에 구현한 화면·기기를 적고 `qa.mjs prepare` → Playwright 측정 → `qa.mjs compare`를 돌려 나온 후보를 고칩니다. 고친 뒤 다시 `compare`까지 돌려 **상·중 차이 후보가 남지 않을 때까지** 반복합니다. 보고서(`report`)는 사용자가 원할 때만 만듭니다.
-   - 남은 후보는 오탐(구조만 다르고 화면 결과가 같음, 데이터 차이)·시안 불일치·토큰 밖 값 중 하나여야 하고, 그 판정을 완료 보고에 적습니다.
-   - 시안과 맞추려고 임의 값(`p-[18px]`)·인라인 스타일을 쓰지 않습니다. 토큰으로 안 맞는 값은 고치지 않고 보고합니다.
+   - 남은 후보는 오탐·시안 불일치·토큰 밖 값 중 하나여야 하고(오탐 기준은 `design-qa` skill "4. 판정"), 그 판정을 완료 보고에 적습니다.
+   - 시안과 맞추려고 임의 값(`p-[18px]`)·인라인 스타일을 쓰지 않습니다. 토큰으로 안 맞는 값과, 맞추려면 `shared/`나 토큰 원본(`figma-design-system.json`)을 바꿔야 하는 차이는 고치지 않고 보고해 확인받습니다(`.claude/rules/styling.md`).
    - 지정값으로 안 잡히는 것(아이콘 모양, 넘침)은 마지막에 `en`으로 한 번 캡처해 확인합니다.
    - 측정(`browser_run_code_unsafe`·`browser_evaluate`)은 메인 세션이 합니다. 구현을 `frontend-tech-lead` 서브에이전트에 맡겼다면 그 에이전트에는 측정 도구가 없으므로, 메인 세션이 측정·`compare`를 돌려 후보를 넘기고 서브에이전트는 그 후보로 고칩니다.
    - FIGMA_TOKEN·브라우저 MCP를 쓸 수 없으면 대조하지 못했다는 사실을 보고합니다(통과로 간주하지 않습니다).

@@ -23,7 +23,6 @@ import {
   STATUS_BADGE_VARIANT,
 } from "../lib/format";
 import { INQUIRY_MENU } from "../model/menu";
-import { OPENED_BY_USER_STATE } from "../model/realtime-inquiry-idx";
 import { BuyerFilterChips } from "./BuyerFilterChips";
 import { BuyerInquiryFilterDialog } from "./BuyerInquiryFilterDialog";
 
@@ -300,15 +299,12 @@ export function BuyerInquiryWorkspace({
             highlight={filters.keyword}
             isSelected={inquiry.key === selectedKey}
             onClickItem={() =>
-              void navigate(
-                {
-                  pathname: generatePath(INQUIRY_MENU[menu].threadRoute, {
-                    inquiryKey: inquiry.key,
-                  }),
-                  search: searchParams.toString(),
-                },
-                { state: OPENED_BY_USER_STATE },
-              )
+              void navigate({
+                pathname: generatePath(INQUIRY_MENU[menu].threadRoute, {
+                  inquiryKey: inquiry.key,
+                }),
+                search: searchParams.toString(),
+              })
             }
           />
         ))}

@@ -14,11 +14,11 @@ describe("calculateCampaignPayment", () => {
   it("PICK형은 AI 포스팅 가이드 10,000원만 결제하고 원고컨펌은 넣지 않는다", () => {
     const payment = calculateCampaignPayment({
       ...PICK,
-      addOns: ["AI_POSTING_GUIDE", "MANUSCRIPT_CONFIRM"],
+      addOns: ["POSTING_GUIDE", "MANUSCRIPT_CONFIRM"],
     });
 
     expect(payment).toEqual({
-      addOnItems: [{ addOn: "AI_POSTING_GUIDE", amount: 10_000 }],
+      addOnItems: [{ addOn: "POSTING_GUIDE", amount: 10_000 }],
       rewardAmount: null,
       totalAmount: 10_000,
     });
@@ -35,13 +35,13 @@ describe("calculateCampaignPayment", () => {
     const payment = calculateCampaignPayment({
       serviceType: "RECRUIT",
       campaignType: "PRODUCT_DELIVERY",
-      addOns: ["AI_POSTING_GUIDE", "MANUSCRIPT_CONFIRM"],
+      addOns: ["POSTING_GUIDE", "MANUSCRIPT_CONFIRM"],
       headcount: 20,
       rewardPerInfluencer: 30_000,
     });
 
     expect(payment.addOnItems).toEqual([
-      { addOn: "AI_POSTING_GUIDE", amount: 10_000 },
+      { addOn: "POSTING_GUIDE", amount: 10_000 },
       { addOn: "MANUSCRIPT_CONFIRM", amount: 100_000 },
     ]);
     expect(payment.rewardAmount).toBe(600_000);

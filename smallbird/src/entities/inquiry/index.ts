@@ -7,7 +7,6 @@ export {
   editInquiryMessage,
   editQnaReply,
   getAttachmentDownloadUrl,
-  acceptInquiryRealtime,
   sendInquiryMessage,
   uploadInquiryAttachment,
   useBigbirdInquiries,
@@ -118,7 +117,10 @@ export type {
   InquiryAttachment,
   InquiryCampaignDetailViewModel,
   InquiryCampaignViewModel,
+  DeletedInquiryMessage,
+  InquiryMessage,
   InquiryMessageKind,
   InquiryMessageViewModel,
+  QnaReplyInfo,
 } from "./model/schema";
 export { isOtherDeviceError } from "./lib/other-device";

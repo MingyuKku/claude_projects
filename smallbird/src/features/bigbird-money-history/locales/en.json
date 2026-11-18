@@ -80,7 +80,7 @@
       "contractPick": "Influencer contract fee (PICK)",
       "contractRecruit": "Influencer contract fee (Recruitment)",
       "aiManuscriptConfirm": "Add-on (AI Draft Review)",
-      "aiPostingGuide": "Add-on (AI Posting Guide)"
+      "postingGuide": "Add-on (AI Posting Guide)"
     }
   },
   "charge": {

@@ -212,6 +212,44 @@ describe("상품 Q&A 대화", () => {
     expect(toast.error).not.toHaveBeenCalled();
   });
 
+  it("삭제된 답변은 삭제 안내로 남고, 그 질문에는 다시 답할 수 있다", async () => {
+    vi.mocked(serverApiV3.post).mockResolvedValue(
+      qna({
+        replyIdx: 5,
+        body: "삭제된 메시지입니다",
+        writeTime: "2026-10-01 11:00",
+        deleteTime: "2026-10-01 12:00",
+      }),
+    );
+    renderQna();
+    expect(await screen.findByText("삭제된 메시지입니다")).toBeVisible();
+    expect(screen.getByRole("textbox")).toBeEnabled();
+  });
+
+  it("삭제 응답으로 그 답변만 삭제 안내로 바꾸고 상세를 다시 받지 않는다", async () => {
+    const user = userEvent.setup();
+    vi.mocked(serverApiV3.post).mockResolvedValue(qna(unread));
+    vi.mocked(serverApiV3.delete).mockResolvedValue({
+      replyIdx: 5,
+      body: "삭제된 메시지입니다",
+      writeTime: "2026-10-01 11:00",
+      deleteTime: "2026-10-01 12:00",
+      deleteId: "mgkang",
+    });
+    renderQna();
+    await user.click(await screen.findByText("내일 입고됩니다."));
+    await user.click(await screen.findByRole("button", { name: "삭제" }));
+    await user.click(
+      within(screen.getByRole("alertdialog")).getByRole("button", {
+        name: "삭제",
+      }),
+    );
+    expect(await screen.findByText("삭제된 메시지입니다")).toBeVisible();
+    expect(screen.queryByText("내일 입고됩니다.")).not.toBeInTheDocument();
+    // 상세를 다시 받지 않음(처음 한 번만 요청).
+    expect(serverApiV3.post).toHaveBeenCalledTimes(1);
+  });
+
   it("구매자가 읽은 답변에는 수정·삭제 버튼이 없다", async () => {
     vi.mocked(serverApiV3.post).mockResolvedValue(
       qna({ ...unread, readTime: "2026-10-01 12:00" }),

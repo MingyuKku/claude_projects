@@ -77,6 +77,7 @@ function PurchaserConversation({
     isLoading,
     isError,
     mutate,
+    markDeleted,
   } = usePurchaserConversation(inquiry);
   // 임시: 인플루언서 앱이 읽음을 서버에 알리지 않아 상대가 뒤에 답한 내 메시지를 읽은 것으로 봄(백엔드 확인 대기, 지울 때는 이 줄과 함수).
   const messages =
@@ -129,11 +130,10 @@ function PurchaserConversation({
     );
   }
   // 구매자 앱이 문의를 시작할 때 보내는 캠페인 JSON auto 메시지는 상세 패널과 내용이 겹쳐 숨깁니다.
-  // 삭제된 메시지는 "삭제됨" 표시 없이 자리째 뺌(REQ-24-0044 대신 사용자 결정 2026-10-29).
+  // 삭제된 메시지는 서버가 소프트삭제로 행을 돌려주므로 그 자리에 삭제 안내 칩으로 남김.
   const rows = groupAttachments(
     (shownMessages ?? []).filter(
-      (message) =>
-        message.kind !== "system" && !message.campaign && !message.isDeleted,
+      (message) => message.kind !== "system" && !message.campaign,
     ),
   );
   if (rows.length === 0) {
@@ -202,12 +202,17 @@ function PurchaserConversation({
                               IS_BUYER_WRITE_ENABLED && groupedText.id > 0
                             }
                             onChanged={() => void mutate()}
+                            onDeleted={(deleted) => void markDeleted(deleted)}
                             attachments={attachments}
                           />
                         )
                       : undefined
                   }
                 />
+              ) : row.message.isDeleted ? (
+                <ChatDivider className="self-center">
+                  {t("deletedMessage")}
+                </ChatDivider>
               ) : row.message.kind === "notice" ? (
                 <ChatDivider className="self-center">
                   {row.message.body}
@@ -226,6 +231,7 @@ function PurchaserConversation({
                     // 음수 id는 실시간 상담 Firestore 메시지라 REST 수정·삭제를 쓸 수 없음.
                     canModify={IS_BUYER_WRITE_ENABLED && row.message.id > 0}
                     onChanged={() => void mutate()}
+                    onDeleted={(deleted) => void markDeleted(deleted)}
                   />
                 </Fragment>
               )}

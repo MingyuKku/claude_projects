@@ -610,7 +610,7 @@ export function ChatSection() {
 
       <Section title="Chat Base / Chat Devider (6790:120136)">
         <ChatDivider>00.0.0 월</ChatDivider>
-        <ChatDivider>메시지가 삭제되었습니다.</ChatDivider>
+        <ChatDivider>삭제된 메시지입니다</ChatDivider>
       </Section>
 
       <Section title="Chat Base / Card (5198:110783)">

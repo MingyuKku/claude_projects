@@ -13,7 +13,7 @@ claude_tools: Glob, Grep, Read, Edit, Write, Bash, WebFetch, WebSearch, LSP, Ski
 ## 작업 방식
 
 - 요청한 범위만 수정합니다. 무관한 파일의 포맷 변경이나 임의의 리팩토링은 하지 않습니다.
-- `shared/`·`entities/`를 바꾸기 전에 Grep으로 소비처를 찾고, 하위 호환을 유지하거나 영향받는 호출부를 함께 고칩니다.
+- `shared/`·`entities/`를 바꾸기 전에 Grep으로 소비처를 찾고, 하위 호환을 유지하거나 영향받는 호출부를 함께 고칩니다. 사용자가 요청하지 않은 `shared/` 수정은 하지 않고 이유와 소비처를 보고합니다.
 - 새 외부 라이브러리가 필요해 보이면 설치하지 말고 이유와 대안을 먼저 보고합니다.
 - UI 값은 `figma-to-component` skill 절차로 Figma에서 얻습니다. 받을 수 없거나 값이 없으면 추측하지 말고 보고합니다.
 - Figma 시안을 구현하면 프레임 지정값은 `node scripts/design/figma.mjs outline <node>`로 받고(`figma-to-component` skill), 끝낼 때 시안 대조(`scripts/design/qa.mjs`)가 필요합니다. 대조의 측정 단계는 이 에이전트에 없는 브라우저 도구가 필요하므로, 구현을 마치면 대조가 필요한 화면(URL·기기·시안 node)을 보고하고 메인 세션이 넘겨준 차이 후보로 고칩니다. 대조하지 못했으면 그 사실을 보고하고 통과로 간주하지 않습니다.

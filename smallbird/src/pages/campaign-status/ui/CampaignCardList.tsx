@@ -73,9 +73,9 @@ export function CampaignCardList({
                   <p className="line-clamp-2 text-foreground">
                     {campaign.name}
                   </p>
-                  {campaign.description && (
+                  {campaign.productName && (
                     <p className="line-clamp-2 ds-text-base-none-normal text-muted-foreground">
-                      {campaign.description}
+                      {campaign.productName}
                     </p>
                   )}
                 </div>

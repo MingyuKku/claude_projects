@@ -12,6 +12,7 @@ import {
   transformBuyerInquiryToViewModel,
   transformInquiryCampaignDetailToViewModel,
   transformInquiryCampaignToViewModel,
+  transformInquiryMessageToViewModel,
   transformInquiryMessagesToViewModels,
   transformInquiryThreadToViewModel,
   transformRealtimeConsultationMessages,
@@ -724,5 +725,49 @@ describe("transformBigbirdInquiryDetailMessages", () => {
       message({ messageIdx: 3, body: "다시 문의합니다." }),
     ]);
     expect(views.map((view) => view.id)).toEqual([1, 3]);
+  });
+});
+
+describe("transformInquiryMessageToViewModel: 삭제된 메시지", () => {
+  const base = {
+    messageIdx: 1,
+    threadIdx: 10,
+    body: "삭제된 메시지입니다",
+    userIdx: 5,
+    attachmentIdx: null,
+    writeTime: "2026-11-18T10:00:00",
+    readTime: null,
+    modifyTime: null,
+    deleteTime: "2026-11-18T10:05:00",
+    identifier: "mgkang",
+    isUserMessage: true,
+    fileName: null,
+    fileSize: null,
+    fileType: null,
+    auto: false,
+  };
+
+  it("deleteTime이 있으면 첨부 정보가 남아 있어도 첨부를 숨기고 텍스트로 본다", () => {
+    const message = transformInquiryMessageToViewModel({
+      ...base,
+      attachmentIdx: 9,
+      fileName: "견적서.pdf",
+      fileSize: 100,
+      fileType: "application/pdf",
+    });
+    expect(message).toMatchObject({
+      isDeleted: true,
+      kind: "text",
+      attachment: null,
+    });
+  });
+
+  it("본문 문구가 아니라 deleteTime으로 삭제 여부를 가린다", () => {
+    const typed = transformInquiryMessageToViewModel({
+      ...base,
+      deleteTime: null,
+    });
+    expect(typed.isDeleted).toBe(false);
+    expect(typed.body).toBe("삭제된 메시지입니다");
   });
 });

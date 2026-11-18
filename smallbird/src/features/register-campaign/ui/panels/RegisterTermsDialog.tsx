@@ -12,13 +12,16 @@ import {
 } from "@/shared/ui/dialog";
 
 import { useAgreeTerms } from "../../model/use-agree-terms";
+import { useLastDefined } from "../../model/use-last-defined";
 import { useRegisterPanel } from "../../model/use-register-panel";
 import { TermsBox } from "./TermsBox";
 
 export function RegisterTermsDialog() {
   const { t } = useTranslation("features/register-campaign");
   const { t: tCommon } = useTranslation();
-  const { panel, termsKind, closePanel } = useRegisterPanel();
+  const { panel, termsKind: openedKind, closePanel } = useRegisterPanel();
+  // 닫는 즉시 약관 종류가 null이 되므로, 페이드아웃이 끝날 때까지 마지막 약관의 내용을 유지함.
+  const termsKind = useLastDefined(openedKind);
   const agreeTerms = useAgreeTerms();
 
   return (

@@ -11,7 +11,7 @@ paths:
 한 기능의 변경이 다른 기능을 깨뜨리지 않게 합니다.
 
 - `features/A`는 `features/B` 내부를 참조하지 않습니다. A의 상태(Zustand), 훅(SWR), 로직은 A 슬라이스 안에만 둡니다.
-- `shared/`·`entities/`의 컴포넌트, 훅, 유틸, 타입을 바꿀 때는 먼저 Grep으로 소비처를 찾습니다. 하위 호환(Optional props 등)을 유지하거나 영향받는 호출부를 함께 고치고, 변경 후 `pnpm typecheck`와 `pnpm test`를 다시 실행합니다.
+- `shared/`·`entities/`의 컴포넌트, 훅, 유틸, 타입을 바꿀 때는 먼저 Grep으로 소비처를 찾습니다. 사용자가 요청하지 않은 `shared/` 수정은 하기 전에 이유와 소비처를 보고해 확인받습니다. 하위 호환(Optional props 등)을 유지하거나 영향받는 호출부를 함께 고치고, 변경 후 `pnpm typecheck`와 `pnpm test`를 다시 실행합니다.
 - 요청과 무관한 포맷 변경·리팩토링은 하지 않습니다 (최소 변경).
 
 ## 새 라이브러리 도입

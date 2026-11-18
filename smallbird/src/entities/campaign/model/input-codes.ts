@@ -59,7 +59,7 @@ export type PostingTopic = (typeof POSTING_TOPICS)[number];
 
 /** 4단계 부가서비스. PICK형은 둘 다 고를 수 있고 등록 결제는 AI 포스팅 가이드만(원고컨펌은 매칭 때 결제). */
 export const CAMPAIGN_ADD_ONS = [
-  "AI_POSTING_GUIDE",
+  "POSTING_GUIDE",
   "MANUSCRIPT_CONFIRM",
 ] as const;
 export type CampaignAddOn = (typeof CAMPAIGN_ADD_ONS)[number];

@@ -1,5 +1,4 @@
-import { tryit } from "radash";
-import { useId, useState } from "react";
+import { useId } from "react";
 import { toast } from "sonner";
 
 import { FormField } from "@/shared/components/form-field";
@@ -7,8 +6,11 @@ import { TextField } from "@/shared/components/text-field";
 import { ThumbnailUpload } from "@/shared/components/thumbnail-upload";
 import { useTranslation } from "@/shared/i18n";
 
-import { uploadCampaignFile } from "../../../api/upload-campaign-file";
 import { checkImageFile, IMAGE_ACCEPT } from "../../../model/file-rules";
+import {
+  createPendingMedia,
+  revokePendingMedia,
+} from "../../../model/pending-media";
 import {
   INTRO_TEXT_MAX_LENGTH,
   needsTitleHashtags,
@@ -39,25 +41,27 @@ export function IntroFields({ disabled }: IntroFieldsProps) {
   const patchStepDraft = useRegisterWizardStore(
     (state) => state.patchStepDraft,
   );
-  const [isUploadingMainImage, setIsUploadingMainImage] = useState(false);
+  const isUploading = useRegisterWizardStore(
+    (state) => state.uploadProgress !== null,
+  );
 
   const patch = (value: Partial<CampaignIntroDraft>) =>
     patchStepDraft("intro", value);
 
-  async function handlePickMainImage(file: File) {
+  // 고르기만 하고 올리지는 않음. 저장할 때 올림(draft-saver).
+  function handlePickMainImage(file: File) {
     const ruleError = checkImageFile(file);
     if (ruleError) {
       toast.error(t(FILE_ERROR_KEYS[ruleError]));
       return;
     }
-    setIsUploadingMainImage(true);
-    const [error, uploaded] = await tryit(uploadCampaignFile)(file);
-    setIsUploadingMainImage(false);
-    if (error) {
-      toast.error(t("toast.saveFailed"));
-      return;
-    }
-    patch({ mainImage: uploaded });
+    revokePendingMedia(intro.mainImage);
+    patch({ mainImage: createPendingMedia(file) });
+  }
+
+  function handleRemoveMainImage() {
+    revokePendingMedia(intro.mainImage);
+    patch({ mainImage: null });
   }
 
   return (
@@ -81,15 +85,15 @@ export function IntroFields({ disabled }: IntroFieldsProps) {
             description={t("intro.mainImage.description")}
             accept={IMAGE_ACCEPT}
             removeLabel={t("intro.mainImage.remove")}
-            disabled={disabled || isUploadingMainImage}
-            onPickFile={(file) => void handlePickMainImage(file)}
-            onRemove={() => patch({ mainImage: null })}
+            disabled={disabled || isUploading}
+            onPickFile={handlePickMainImage}
+            onRemove={handleRemoveMainImage}
           />
         </section>
         <DetailMediaField
           value={intro.detailMedia}
           onChangeValue={(detailMedia) => patch({ detailMedia })}
-          disabled={disabled}
+          disabled={disabled || isUploading}
         />
       </div>
       <FormField

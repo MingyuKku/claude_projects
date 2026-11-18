@@ -71,6 +71,7 @@
   "conversationError": "대화를 불러오지 못했습니다.",
   "noMessages": "대화 내역이 없습니다.",
   "questionDeleted": "삭제된 문의입니다.",
+  "deletedMessage": "삭제된 메시지입니다",
   "reply": {
     "placeholder": "답변을 입력하세요. (최대 3,000자)",
     "submit": "답변 등록",

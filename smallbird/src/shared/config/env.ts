@@ -18,9 +18,17 @@ export const ENV = {
   googleClientId: import.meta.env.VITE_GOOGLE_CLIENT_ID,
   appleClientId: import.meta.env.VITE_APPLE_CLIENT_ID,
   domain: import.meta.env.VITE_DOMAIN,
+  // 캠페인 등록 API 소스. `mock`이면 서버 없이 전체를 목으로 응답하고(테스트·오프라인 개발), 비우면 서버가 있는 API는
+  // 서버로 보냄.
+  campaignApi: import.meta.env.VITE_CAMPAIGN_API,
   // 헬프데스크 Firebase 프로젝트(실시간 상담). 웹 설정 값은 공개되어도 됨.
   firebaseApiKey: import.meta.env.VITE_FIREBASE_API_KEY,
   firebaseAuthDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
   firebaseProjectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   firebaseAppId: import.meta.env.VITE_FIREBASE_APP_ID,
 } as const;
+
+/** 캠페인 등록 API(캠페인·브랜드·파일)를 서버 없이 전체 목으로 응답하는 모드(테스트·오프라인 개발). 아니면 서버가 있는 API는 서버로 보냄. */
+export function isCampaignApiMock() {
+  return ENV.campaignApi === "mock";
+}

@@ -161,31 +161,48 @@ describe("텍스트+첨부 묶음의 수정·삭제", () => {
     expect(toast).toHaveBeenCalled();
   });
 
-  it("삭제된 뒤에는 텍스트가 빠지고 첨부만 남은 행으로 바뀐다", async () => {
+  it("삭제된 뒤에는 텍스트 자리에 삭제 안내가 남고 첨부는 그대로 보인다", async () => {
     const user = userEvent.setup();
     mockThread(mineGrouped);
-    vi.mocked(serverApiV3.delete).mockImplementation(async () => {
-      // 삭제 뒤 다시 받은 대화: 텍스트에 삭제 시각이 붙음
-      mockThread([
-        { ...mineGrouped[0]!, deleteTime: "2026-10-01T10:01:00" },
-        mineGrouped[1]!,
-        mineGrouped[2]!,
-      ]);
-      return { result: true };
+    // 서버가 삭제된 메시지를 그대로 돌려줌(본문 고정 문구, 삭제 시각). 대화를 다시 받지 않고 그 자리만 바꿈.
+    vi.mocked(serverApiV3.delete).mockResolvedValue({
+      ...mineGrouped[0]!,
+      body: "삭제된 메시지입니다",
+      deleteTime: "2026-10-01T10:01:00",
     });
     renderConversation();
     await user.click(await screen.findByText("첨부 드립니다"));
+    const fetchedCount = vi.mocked(serverApiV3.get).mock.calls.length;
     await user.click(await screen.findByRole("button", { name: "삭제" }));
     await user.click(
       within(screen.getByRole("alertdialog")).getByRole("button", {
         name: "삭제",
       }),
     );
-    await waitFor(() =>
-      expect(screen.queryByText("첨부 드립니다")).not.toBeInTheDocument(),
-    );
+    expect(await screen.findByText("삭제된 메시지입니다")).toBeVisible();
+    expect(screen.queryByText("첨부 드립니다")).not.toBeInTheDocument();
     expect(screen.getByAltText("file-11.png")).toBeInTheDocument();
     expect(screen.getByAltText("file-12.png")).toBeInTheDocument();
+    expect(vi.mocked(serverApiV3.get).mock.calls.length).toBe(fetchedCount);
+  });
+
+  it("삭제된 메시지는 안내만 남기고 서버가 준 대체 문구는 보이지 않으며 다른 대화는 그대로다", async () => {
+    mockThread([
+      message(20, "안녕하세요", { userIdx: 77, time: "2026-10-01T10:00:00" }),
+      message(21, "삭제된 메시지입니다", {
+        time: "2026-10-01T10:01:00",
+        deleteTime: "2026-10-01T10:02:00",
+      }),
+      message(22, "다음 문의입니다", {
+        userIdx: 77,
+        time: "2026-10-01T10:03:00",
+      }),
+    ]);
+    renderConversation();
+    // 서버가 준 대체 본문이 아니라 번역된 삭제 안내 한 곳만 보임(본문 문자열로 가리지 않음).
+    expect(await screen.findAllByText("삭제된 메시지입니다")).toHaveLength(1);
+    expect(screen.getByText("안녕하세요")).toBeInTheDocument();
+    expect(screen.getByText("다음 문의입니다")).toBeInTheDocument();
   });
 
   it("수정하면 그 텍스트 메시지의 본문만 고친다", async () => {

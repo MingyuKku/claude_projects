@@ -134,7 +134,7 @@ describe("단계별 수정", () => {
         startDate: null,
       };
       value.product.productName = "앰플";
-      value.addOns = ["AI_POSTING_GUIDE"];
+      value.addOns = ["POSTING_GUIDE"];
     });
     await saveCampaignStep(campaignIdx, "product", draft);
     await saveCampaignStep(campaignIdx, "addOns", draft);

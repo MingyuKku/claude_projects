@@ -3,6 +3,7 @@ import { Navigate, useOutletContext, useParams } from "react-router";
 import {
   getCampaignRegisterPath,
   parseCampaignIdx,
+  isUnreadableCampaignError,
   useCampaignDetail,
 } from "@/entities/campaign";
 import { getSubscribedTypes, useSubscriptions } from "@/entities/subscription";
@@ -10,14 +11,11 @@ import {
   CampaignDetailContent,
   CampaignDetailSidebar,
 } from "@/features/register-campaign";
-import { isApiError } from "@/shared/api";
 import { NotFoundError } from "@/shared/lib";
 
 import { RegisterShell } from "./RegisterShell";
 
 import type { SessionViewModel } from "@/entities/session";
-
-const NOT_FOUND_STATUS = 404;
 
 export function CampaignDetailPage() {
   const { campaignIdx: campaignIdxParam } = useParams();
@@ -31,9 +29,7 @@ export function CampaignDetailPage() {
 
   if (campaignIdx === null) throw new NotFoundError();
   if (error) {
-    if (isApiError(error) && error.status === NOT_FOUND_STATUS) {
-      throw new NotFoundError();
-    }
+    if (isUnreadableCampaignError(error)) throw new NotFoundError();
     throw error;
   }
   if (!detail) return <RegisterShell />;

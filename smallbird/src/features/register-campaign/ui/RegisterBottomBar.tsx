@@ -41,6 +41,7 @@ export function RegisterBottomBar(props: RegisterBottomBarProps) {
   const { t } = useTranslation("features/register-campaign");
   const { preview } = props;
   const isDefault = props.variant === "default";
+  const nextLabelKey = getNextLabelKey(props);
 
   return (
     <div className="flex shrink-0 gap-2 bg-background p-4 tablet:justify-end tablet:gap-3 tablet:p-5">
@@ -78,8 +79,8 @@ export function RegisterBottomBar(props: RegisterBottomBarProps) {
         aria-busy={(isDefault && props.isPaying) || undefined}
         onClick={props.onClickNext}
       >
-        {t(getNextLabelKey(props))}
-        <ChevronRight aria-hidden />
+        {t(nextLabelKey)}
+        {nextLabelKey !== "action.complete" && <ChevronRight aria-hidden />}
       </Button>
     </div>
   );

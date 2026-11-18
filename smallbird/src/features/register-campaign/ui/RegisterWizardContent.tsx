@@ -11,6 +11,7 @@ import { useLeaveToOverview } from "../model/use-leave-to-overview";
 import { usePaymentFlow } from "../model/use-payment-flow";
 import { useRegisterPanel } from "../model/use-register-panel";
 import { useSaveBeforeLeave } from "../model/use-save-before-leave";
+import { useUploadGuard } from "../model/use-upload-guard";
 import {
   useSyncCurrentStep,
   useWizardNavigation,
@@ -52,6 +53,7 @@ export function RegisterWizardContent({
   const payment = usePaymentFlow(steps);
   useSyncCurrentStep();
   useSaveBeforeLeave();
+  useUploadGuard();
   useIntroGenerationNotice(currentStep);
   const hasIntroInput = useRegisterWizardStore((state) =>
     isStepStarted("intro", state.draft),

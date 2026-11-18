@@ -16,7 +16,6 @@ import {
   BuyerInquiryPanels,
   BuyerInquiryWorkspace,
   INQUIRY_MENU,
-  OPENED_BY_USER_STATE,
   toBuyerInquiryFilters,
   toBuyerStatusFilter,
 } from "@/widgets/buyer-inquiry-workspace";
@@ -87,7 +86,6 @@ function InquiryMenuPage({ menu }: { menu: InquiryMenu }) {
                 inquiryKey: target.key,
               })
             : ROUTES.customerCenterBuyer,
-          { state: OPENED_BY_USER_STATE },
         ),
     });
   }

@@ -48,6 +48,7 @@ import { BigbirdMessageComposer } from "./BigbirdMessageComposer";
 
 import type {
   BigbirdInquiryViewModel,
+  DeletedInquiryMessage,
   InquiryMessageViewModel,
 } from "@/entities/inquiry";
 import type { ReactNode } from "react";
@@ -74,8 +75,10 @@ interface BigbirdInquiryConversationProps {
 /** 연결 실패 안내 카드를 보여 주는 시간. 그 뒤 대화는 일반 문의처럼 이어감(사용자 결정 2026-10-29). */
 const FAILED_CARD_MS = 10_000;
 
-// 빅버드 문의는 항상 같은 빅버드 담당자와 하는 대화라 상대 아바타를 빅버드 로고(심볼)로 고정함. 로고가 원에 잘리지 않게 여백을 둠.
-const MANAGER_AVATAR_CLASS = "bg-background object-contain p-1.5";
+// 빅버드 문의는 항상 같은 빅버드 담당자와 하는 대화라 상대 아바타를 빅버드 로고(심볼)로 고정함. 로고가 원에 잘리지 않게 여백을 두고,
+// 테두리는 내 프로필 이미지와 같게 둠(rounded-[inherit]가 없으면 사각형 테두리가 원에 잘림).
+const MANAGER_AVATAR_CLASS =
+  "rounded-[inherit] border border-border bg-background object-contain p-1.5";
 
 function toAvatarProps(isMine: boolean, myAvatarSrc?: string) {
   return isMine
@@ -140,6 +143,13 @@ export function BigbirdInquiryConversation({
   const canRequestRealtime =
     !inquiry.isRealtime && onClickRealtime !== undefined;
   const endRef = useRef<HTMLDivElement>(null);
+
+  // 삭제 응답으로 그 자리만 바꿈. 같은 메시지가 들어 있는 캠페인 타임라인과 문의 상세 캐시를 모두 고침.
+  function handleDeletedMessage(deleted: DeletedInquiryMessage) {
+    void timeline.markDeleted(deleted);
+    void detail.markDeleted(deleted);
+  }
+
   // 일반·실시간 문의 모두 캠페인 카드를 표시하고, 운영 앱용 인사말 등 자동 안내만 숨김. 연결 안내는 구분선으로 보임.
   // 실시간 상담도 같은 대화창에 이어 보임: 일반 문의 내용(REST)에 상담 문서의 실시간 메시지를 합침.
   const history = timeline.messages ?? detail.messages ?? inquiry.messages;
@@ -323,6 +333,7 @@ export function BigbirdInquiryConversation({
           !inquiry.isFinished
         }
         onChanged={() => onChangedMessage?.()}
+        onDeleted={handleDeletedMessage}
         attachments={attachments}
       />
     );

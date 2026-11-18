@@ -1,8 +1,4 @@
-import {
-  getRealtimeInquiryIdx,
-  isOpenedByUser,
-  OPENED_BY_USER_STATE,
-} from "./realtime-inquiry-idx";
+import { getRealtimeInquiryIdx } from "./realtime-inquiry-idx";
 
 import type { BuyerInquiryViewModel } from "@/entities/inquiry";
 
@@ -27,14 +23,5 @@ describe("getRealtimeInquiryIdx", () => {
     expect(
       getRealtimeInquiryIdx(inquiry({ source: "campaignQna" })),
     ).toBeNull();
-  });
-});
-
-describe("isOpenedByUser", () => {
-  it("사용자가 직접 연 표시가 있을 때만 참", () => {
-    expect(isOpenedByUser(OPENED_BY_USER_STATE)).toBe(true);
-    expect(isOpenedByUser(null)).toBe(false);
-    expect(isOpenedByUser(undefined)).toBe(false);
-    expect(isOpenedByUser({ openedByUser: false })).toBe(false);
   });
 });

@@ -17,7 +17,7 @@ export {
   saveCampaignStep,
 } from "./api/campaign-detail-api";
 export {
-  AI_POSTING_GUIDE_PRICE,
+  POSTING_GUIDE_PRICE,
   calculateCampaignPayment,
 } from "./model/payment-amount";
 export type {
@@ -35,8 +35,12 @@ export {
   useCampaignScrollList,
   useRevalidateCampaignList,
 } from "./api/use-campaigns";
+export {
+  isUnreadableCampaignError,
+  isUnreadableCampaignReason,
+} from "./lib/unreadable-campaign";
 export { useCampaignTypeLabel } from "./lib/use-campaign-labels";
-export { toCampaignTypeFilter } from "./model/codes";
+export { getTypeFilterCodes, toCampaignTypeFilter } from "./model/codes";
 export {
   CAMPAIGN_PAGE_SIZE,
   CAMPAIGN_STAGES,

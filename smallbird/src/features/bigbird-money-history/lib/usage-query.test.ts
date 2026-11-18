@@ -13,7 +13,7 @@ describe("toUsageQuery", () => {
           dateFrom: "2026-10-01",
           dateTo: "2026-10-30",
           campaign: "123",
-          usage: "AI_POSTING_GUIDE",
+          usage: "POSTING_GUIDE",
         },
         10,
       ),
@@ -23,7 +23,7 @@ describe("toUsageQuery", () => {
       startDate: "2026-10-01",
       endDate: "2026-10-30",
       campaignIdx: 123,
-      usageDetailCode: "AI_POSTING_GUIDE",
+      usageDetailCode: "POSTING_GUIDE",
     });
   });
 

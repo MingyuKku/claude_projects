@@ -6,7 +6,10 @@ import { ApiError, serverApiV3 } from "@/shared/api";
 
 import { EditableChatMessage } from "./EditableChatMessage";
 
-import type { InquiryMessageViewModel } from "@/entities/inquiry";
+import type {
+  DeletedInquiryMessage,
+  InquiryMessageViewModel,
+} from "@/entities/inquiry";
 
 vi.mock("@/shared/api", async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>();
@@ -53,7 +56,11 @@ function message(
 
 function renderMessage(
   overrides: Partial<InquiryMessageViewModel> = {},
-  props: { canModify?: boolean; onChanged?: () => void } = {},
+  props: {
+    canModify?: boolean;
+    onChanged?: () => void;
+    onDeleted?: (deleted: DeletedInquiryMessage) => void;
+  } = {},
 ) {
   const onChanged = props.onChanged ?? vi.fn();
   render(
@@ -63,6 +70,7 @@ function renderMessage(
       time="10:00"
       canModify={props.canModify ?? true}
       onChanged={onChanged}
+      onDeleted={props.onDeleted}
     />,
   );
   return onChanged;
@@ -123,6 +131,53 @@ describe("EditableChatMessage", () => {
     expect(serverApiV3.delete).toHaveBeenCalledWith("/help/thread/message/7");
     expect(onChanged).toHaveBeenCalledOnce();
     expect(toast).toHaveBeenCalledWith("메시지가 삭제되었습니다.");
+  });
+
+  it("삭제 응답이 삭제된 메시지면 onDeleted로 그 자리만 바꾸고 대화를 다시 받지 않는다", async () => {
+    const user = userEvent.setup();
+    const deleted = {
+      messageIdx: 7,
+      threadIdx: 10,
+      body: "삭제된 메시지입니다",
+      userIdx: 5,
+      attachmentIdx: null,
+      writeTime: "2026-10-21T10:00:00",
+      readTime: null,
+      modifyTime: null,
+      deleteTime: "2026-10-21T10:05:00",
+      identifier: "mgkang",
+      isUserMessage: true,
+      fileName: null,
+      fileSize: null,
+      fileType: null,
+      auto: false,
+    };
+    vi.mocked(serverApiV3.delete).mockResolvedValue(deleted);
+    const onDeleted = vi.fn();
+    const onChanged = renderMessage({}, { onDeleted });
+    await user.click(screen.getByText("배송 문의드립니다"));
+    await user.click(screen.getByRole("button", { name: "삭제" }));
+    await user.click(screen.getByRole("button", { name: "삭제" }));
+    expect(onDeleted).toHaveBeenCalledWith(
+      expect.objectContaining({
+        messageIdx: 7,
+        deleteTime: deleted.deleteTime,
+      }),
+    );
+    expect(onChanged).not.toHaveBeenCalled();
+    expect(toast).toHaveBeenCalledWith("메시지가 삭제되었습니다.");
+  });
+
+  it("삭제 응답에 메시지가 없으면(예전 응답) onDeleted 대신 대화를 다시 받는다", async () => {
+    const user = userEvent.setup();
+    vi.mocked(serverApiV3.delete).mockResolvedValue({ result: true });
+    const onDeleted = vi.fn();
+    const onChanged = renderMessage({}, { onDeleted });
+    await user.click(screen.getByText("배송 문의드립니다"));
+    await user.click(screen.getByRole("button", { name: "삭제" }));
+    await user.click(screen.getByRole("button", { name: "삭제" }));
+    expect(onDeleted).not.toHaveBeenCalled();
+    expect(onChanged).toHaveBeenCalledOnce();
   });
 
   it("삭제가 실패하면 삭제 토스트 없이 실패 안내만 띄운다", async () => {

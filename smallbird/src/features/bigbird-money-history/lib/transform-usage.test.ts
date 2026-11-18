@@ -113,7 +113,7 @@ describe("transformUsageList", () => {
       listOf(
         { usageDetailCode: "INFLUENCER_CONTRACT_RECRUIT" },
         { usageDetailCode: "AI_MANUSCRIPT_CONFIRM" },
-        { usageDetailCode: "AI_POSTING_GUIDE" },
+        { usageDetailCode: "POSTING_GUIDE" },
         { usageDetailCode: "NEW_SERVICE", usageDetailName: "신규 서비스" },
         { usageDetailCode: null, usageDetailName: "매칭거절" },
       ),
@@ -123,7 +123,7 @@ describe("transformUsageList", () => {
     ).toEqual([
       ["contractRecruit", "인플루언서 계약비용(PICK형)"],
       ["aiManuscriptConfirm", "인플루언서 계약비용(PICK형)"],
-      ["aiPostingGuide", "인플루언서 계약비용(PICK형)"],
+      ["postingGuide", "인플루언서 계약비용(PICK형)"],
       [null, "신규 서비스"],
       [null, "매칭거절"],
     ]);

@@ -50,5 +50,10 @@
   },
   "error": {
     "list": "Couldn't load campaigns."
+  },
+  "subscriptionRequired": {
+    "title": "Subscription required",
+    "description": "Your subscription has expired, so you can't continue this campaign. Your entries are saved, and you can continue after you subscribe again.",
+    "subscribe": "Subscribe"
   }
 }

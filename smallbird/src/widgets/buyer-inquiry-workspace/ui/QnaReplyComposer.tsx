@@ -24,7 +24,10 @@ export function QnaReplyComposer({ inquiry }: QnaReplyComposerProps) {
   const { items, mutate } = useQnaDetail(inquiry);
   const [text, setText] = useState("");
   const [isBusy, setIsBusy] = useState(false);
-  const target = items?.filter((item) => !item.reply).at(-1);
+  // 삭제된 답변은 답변 없는 질문처럼 다시 답할 수 있음(하드삭제 때와 같은 동작). 서버가 거절하면 409 안내가 뜸.
+  const target = items
+    ?.filter((item) => !item.reply || item.reply.isDeleted)
+    .at(-1);
   const body = text.trim();
   const isDisabled = !IS_BUYER_WRITE_ENABLED || !target || isBusy;
   const canSend = !isDisabled && body.length > 0;

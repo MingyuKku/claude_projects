@@ -1,9 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useSWRConfig } from "swr";
 
 import { campaignDetailKey } from "@/entities/campaign";
 
 import { createDraftSaver } from "../model/draft-saver";
+import { revokePendingIntroMedia } from "../model/pending-media";
 import { createRegisterWizardStore } from "../model/store";
 import { RegisterWizardContext } from "../model/wizard-context";
 
@@ -30,6 +31,12 @@ export function RegisterWizardProvider({
     );
     return { store, saver };
   });
+
+  // 저장하지 못한 채 떠나면 올리기 전 파일의 미리보기 주소를 놓아 줌.
+  useEffect(
+    () => () => revokePendingIntroMedia(value.store.getState().draft.intro),
+    [value],
+  );
 
   return (
     <RegisterWizardContext value={value}>{children}</RegisterWizardContext>

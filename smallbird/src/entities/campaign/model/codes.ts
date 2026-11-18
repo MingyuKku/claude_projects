@@ -45,8 +45,8 @@ export function getTypeFilterCodes(filter: CampaignTypeFilter) {
 
 /** 서버 서비스·상품 코드를 조합 키로 바꿈. 모르는 코드면 null(화면이 서버 값을 그대로 보임). */
 export function toCampaignTypeFilter(
-  serviceType: string,
-  productType: string,
+  serviceType: string | null,
+  productType: string | null,
 ): CampaignTypeFilter | null {
   return (
     CAMPAIGN_TYPE_FILTERS.find((filter) => {

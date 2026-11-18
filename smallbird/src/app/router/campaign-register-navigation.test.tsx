@@ -1,10 +1,11 @@
-import { screen, waitFor } from "@testing-library/react";
+import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { createCampaign, fetchCampaignDetail } from "@/entities/campaign";
+import { serverApiV3 } from "@/shared/api";
 import { ROUTES } from "@/shared/config";
 
-import { renderRoute, resetSession } from "./test-utils";
+import { mockV3Get, renderRoute, resetSession } from "./test-utils";
 
 vi.mock("@/shared/api", async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
@@ -268,5 +269,78 @@ describe("데모 모드", () => {
     expect(
       screen.queryByRole("heading", { name: /결제 정보/ }),
     ).not.toBeInTheDocument();
+  });
+});
+
+describe("현황 바로 가기의 구독 만료 안내", () => {
+  const subscription = (productType: string) => ({
+    id: "s1",
+    productType,
+    productName: productType,
+    startedAt: "2026-11-01",
+    endsAt: "2026-12-01",
+    amount: 100000,
+    paymentMethod: "card",
+    isCancelScheduled: false,
+  });
+
+  function mockSubscriptions(productTypes: string[]) {
+    mockV3Get((path) =>
+      path === "/mypage/subscription/subscriptions"
+        ? Promise.resolve(productTypes.map(subscription))
+        : Promise.reject(new Error("unmocked")),
+    );
+  }
+
+  // 구독 목록을 요청하고 응답이 화면에 반영될 때까지 기다림(도착 전에는 막지 않아 알럿이 안 뜸).
+  async function waitForSubscriptions() {
+    await waitFor(() =>
+      expect(serverApiV3.get).toHaveBeenCalledWith(
+        "/mypage/subscription/subscriptions",
+      ),
+    );
+    await new Promise((resolve) => setTimeout(resolve, 50));
+  }
+
+  async function clickWriteOnRecruitDraft() {
+    const user = userEvent.setup();
+    const name = await screen.findByText("비글로우 신제품 런칭 캠페인");
+    const card = name.closest("li");
+    if (!card) throw new Error("campaign card not found");
+    await user.click(within(card).getByRole("button", { name: "작성하기" }));
+    return user;
+  }
+
+  it("구독이 끝난 서비스의 등록 중 캠페인은 이동하지 않고 구독 안내를 띄운다", async () => {
+    mockSubscriptions(["pick"]);
+    const router = await renderRoute(`${ROUTES.campaign}?tab=draft`);
+    await screen.findByText("비글로우 신제품 런칭 캠페인");
+    await waitForSubscriptions();
+    const user = await clickWriteOnRecruitDraft();
+
+    const dialog = await screen.findByRole("alertdialog");
+    expect(within(dialog).getByText("구독이 필요합니다")).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe(ROUTES.campaign);
+
+    await user.click(within(dialog).getByRole("button", { name: "구독하기" }));
+
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(ROUTES.mypageSubscribe),
+    );
+  });
+
+  it("구독 중이면 작성 화면으로 이동한다", async () => {
+    mockSubscriptions(["recruit"]);
+    const router = await renderRoute(`${ROUTES.campaign}?tab=draft`);
+    await screen.findByText("비글로우 신제품 런칭 캠페인");
+    await waitForSubscriptions();
+    await clickWriteOnRecruitDraft();
+
+    await waitFor(() =>
+      expect(router.state.location.pathname).toMatch(
+        new RegExp(`^${ROUTES.campaignRegister}/\\d+$`),
+      ),
+    );
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
   });
 });

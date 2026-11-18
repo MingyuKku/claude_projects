@@ -419,6 +419,56 @@ describe("텍스트+첨부 묶음의 수정·삭제", () => {
     expect(screen.getByRole("button", { name: "11.png" })).toBeInTheDocument();
   });
 
+  it("삭제 응답으로 그 메시지만 삭제 안내로 바꾸고 대화를 다시 받지 않는다", async () => {
+    const user = userEvent.setup();
+    const dto = (messageIdx: number, body: string, time: string) => ({
+      messageIdx,
+      threadIdx: 101,
+      body,
+      userIdx: 5971,
+      attachmentIdx: null,
+      writeTime: time,
+      readTime: null,
+      modifyTime: null,
+      deleteTime: null,
+      identifier: "mgkang",
+      isUserMessage: true,
+      fileName: null,
+      fileSize: null,
+      fileType: null,
+      auto: false,
+    });
+    const first = dto(10, "지울 메시지", "2026-10-19T10:00:00");
+    get.mockResolvedValue({
+      result: true,
+      data: {
+        messages: [first, dto(11, "남길 메시지", "2026-10-19T10:01:00")],
+      },
+    });
+    del.mockResolvedValue({
+      ...first,
+      body: "삭제된 메시지입니다",
+      deleteTime: "2026-10-19T10:05:00",
+    });
+    renderConversation(
+      inquiry({ isRealtime: false, realtimePhase: null }),
+      undefined,
+      vi.fn(),
+    );
+    await user.click(await screen.findByText("지울 메시지"));
+    const fetchedCount = get.mock.calls.length;
+    await user.click(await screen.findByRole("button", { name: "삭제" }));
+    await user.click(
+      within(screen.getByRole("alertdialog")).getByRole("button", {
+        name: "삭제",
+      }),
+    );
+    expect(await screen.findByText("삭제된 메시지입니다")).toBeVisible();
+    expect(screen.queryByText("지울 메시지")).not.toBeInTheDocument();
+    expect(screen.getByText("남길 메시지")).toBeInTheDocument();
+    expect(get.mock.calls.length).toBe(fetchedCount);
+  });
+
   it("종료된 문의에서는 툴바가 없다", async () => {
     const user = userEvent.setup();
     renderConversation(

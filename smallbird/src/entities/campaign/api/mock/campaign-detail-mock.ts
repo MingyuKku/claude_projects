@@ -159,6 +159,14 @@ function resolveMedia(
   };
 }
 
+/** `http(s)://`로 시작하는 255자 이내 영상 주소만 받고 동영상으로 저장함. */
+function resolveVideoUrl(url: string) {
+  if (!/^https?:\/\/\S+$/.test(url) || url.length > 255) {
+    throw invalidField("detailMedia");
+  }
+  return { attachmentIdx: null, url, mediaType: "VIDEO" };
+}
+
 async function saveIntro(
   record: MockCampaignRecord,
   body: CampaignStepRequests["intro"],
@@ -169,9 +177,10 @@ async function saveIntro(
   const mainImage = body.mainImage
     ? resolveMedia(record, body.mainImage.attachmentIdx)
     : null;
-  const detailMedia = body.detailMedia.map((media) =>
-    resolveMedia(record, media.attachmentIdx),
-  );
+  const detailMedia = body.detailMedia.map((media) => {
+    if ("url" in media) return resolveVideoUrl(media.url);
+    return resolveMedia(record, media.attachmentIdx);
+  });
   updateCampaignRecord(record.campaignIdx, (target) => {
     target.intro = { ...body, mainImage, detailMedia };
   });

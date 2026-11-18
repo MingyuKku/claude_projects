@@ -67,7 +67,7 @@ describe("transformCampaignDetail", () => {
       ageGroups: ["AGE_20S", "AGE_60S"],
       topics: ["Beauty", "Unknown"],
     };
-    response.addOns = ["AI_POSTING_GUIDE", "RECEIPT_REVIEW"];
+    response.addOns = ["POSTING_GUIDE", "RECEIPT_REVIEW"];
 
     const detail = transformCampaignDetail(response);
 
@@ -81,7 +81,7 @@ describe("transformCampaignDetail", () => {
       ageGroups: ["AGE_20S"],
       topics: ["Beauty"],
     });
-    expect(detail.draft.addOns).toEqual(["AI_POSTING_GUIDE"]);
+    expect(detail.draft.addOns).toEqual(["POSTING_GUIDE"]);
   });
 
   it("비어 있는 글자 칸은 빈 문자열, 아직 없는 정책 동의·결제는 기본값으로 읽는다", () => {

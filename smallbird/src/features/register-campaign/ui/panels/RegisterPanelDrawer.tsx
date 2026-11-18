@@ -2,6 +2,7 @@ import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
 import { Sheet, SheetContent, SheetTitle } from "@/shared/ui/sheet";
 
+import { useLastDefined } from "../../model/use-last-defined";
 import { useRegisterPanel } from "../../model/use-register-panel";
 import { RegisterPanelContent } from "./RegisterPanelContent";
 
@@ -19,11 +20,13 @@ export function RegisterPanelDrawer() {
   const { t } = useTranslation("features/register-campaign");
   const { panel: openedPanel, closePanel } = useRegisterPanel();
   // 약관 전문은 드로어가 아니라 가운데 다이얼로그(RegisterTermsDialog).
-  const panel = openedPanel === "terms" ? null : openedPanel;
+  const openPanel = openedPanel === "terms" ? null : openedPanel;
+  // 닫는 즉시 openPanel이 null이 되므로, 슬라이드아웃이 끝날 때까지 마지막 패널의 내용과 폭을 유지함.
+  const panel = useLastDefined(openPanel);
 
   return (
     <Sheet
-      open={panel !== null}
+      open={openPanel !== null}
       onOpenChange={(isOpen) => !isOpen && closePanel()}
     >
       <SheetContent

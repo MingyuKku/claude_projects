@@ -3,6 +3,8 @@ import { z } from "zod";
 
 import { CAMPAIGN_TYPES, createEmptyDraft } from "@/entities/campaign";
 
+import { applyDraftDefaults } from "./draft-defaults";
+
 import type {
   CampaignDraft,
   CampaignDraftStep,
@@ -141,9 +143,10 @@ export function isStepComplete(step: CampaignDraftStep, draft: CampaignDraft) {
   return STEP_CHECKERS[step](draft);
 }
 
-const EMPTY_DRAFT = createEmptyDraft();
+// 기본 선택만 채워진 초안. 기본 선택은 사용자가 입력한 값이 아니라서 "입력을 시작함"의 기준으로 씀.
+const EMPTY_DRAFT = applyDraftDefaults(createEmptyDraft());
 
-/** 한 칸이라도 입력을 시작한 단계(빈 초안과 다름). */
+/** 한 칸이라도 입력을 시작한 단계(기본 선택만 있는 초안과 다름). */
 export function isStepStarted(step: CampaignDraftStep, draft: CampaignDraft) {
   return !isEqual(draft[step], EMPTY_DRAFT[step]);
 }

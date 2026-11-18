@@ -30,11 +30,13 @@
     "saveFailed": "Failed to save. Please try again.",
     "fileType": "Only JPG and PNG files can be uploaded.",
     "fileSize": "Only files up to 10MB can be uploaded.",
+    "videoSize": "Only videos up to 500MB can be uploaded.",
     "requestFailed": "Request failed. Please try again later.",
     "addressSearchFailed": "Couldn't load address search. Please try again later.",
     "aiCompleted": "AI generation is complete.",
     "aiFailed": "AI generation failed. Check the URL and try again.",
-    "fileCount": "You can upload up to 5 files."
+    "fileCount": "You can upload up to 5 files.",
+    "uploading": "Uploading files ({{done}}/{{total}})"
   },
   "dialog": {
     "requiredInfo": {
@@ -72,9 +74,7 @@
       "manage": "Manage brands"
     },
     "period": {
-      "startLabel": "Preferred start date",
-      "label": "Campaign period",
-      "endLabel": "End date",
+      "label": "Preferred start date",
       "placeholder": "Select a date.",
       "help": "The end date is set 30 days later automatically."
     }
@@ -241,7 +241,7 @@
   "addOns": {
     "noticeTitle": "Add-ons are optional.",
     "noticeText": "Choose them only if needed. You can move on without selecting any.",
-    "AI_POSTING_GUIDE": {
+    "POSTING_GUIDE": {
       "name": "AI Posting Guide",
       "price": "10,000 KRW",
       "description": "Automatically creates the best posting guide for your campaign goals and product."
@@ -290,7 +290,13 @@
       "remove": "Remove file {{index}}",
       "reorder": "Reorder file {{index}}",
       "video": "Video {{index}}",
-      "image": "Image {{index}}"
+      "image": "Image {{index}}",
+      "play": "Play video {{index}}",
+      "reorderGuide": "Press Space on the handle to pick up, arrow keys to move, Space to drop.",
+      "pickedUp": "Picked up file {{index}}.",
+      "moved": "Moved to position {{index}}.",
+      "dropped": "Dropped at position {{index}}.",
+      "cancelled": "Reorder cancelled."
     },
     "description": {
       "label": "Campaign description",

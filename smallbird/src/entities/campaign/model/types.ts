@@ -10,7 +10,7 @@ export interface CampaignSummary {
   id: string;
   campaignIdx: number;
   name: string;
-  description: string | null;
+  productName: string | null;
   thumbnailUrl: string | null;
   /** 모르는 코드면 null이고 배지는 `rawStatus`를 그대로 보임. */
   stage: CampaignStage | null;
@@ -48,6 +48,7 @@ export interface CopySourceQuery {
 
 export interface CopySourceCampaign {
   campaignIdx: number;
+  /** 입력 전이면 빈 문자열. */
   name: string;
   brandName: string | null;
   /** 모르는 코드(구매리뷰형 등 v2 캠페인)면 null이고 표시는 `rawCampaignType`. */

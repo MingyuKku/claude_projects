@@ -107,9 +107,9 @@ export function CampaignTable({
                       text={campaign.name}
                       className="ds-text-sm-none-medium"
                     />
-                    {campaign.description && (
+                    {campaign.productName && (
                       <FullTextHint
-                        text={campaign.description}
+                        text={campaign.productName}
                         className="ds-text-sm-5-normal text-muted-foreground"
                       />
                     )}

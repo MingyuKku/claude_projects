@@ -11,7 +11,7 @@ paths:
 | 상태                                    | 도구                      | 위치                                 |
 | :-------------------------------------- | :------------------------ | :----------------------------------- |
 | 로컬 UI (모달, 포커스)                  | `useState` / `useReducer` | 컴포넌트                             |
-| 글로벌 클라이언트 UI (세션, 필터, 테마) | Zustand                   | 슬라이스의 `model/` (`features`·`widgets`) |
+| 글로벌 클라이언트 UI (세션, 필터, 테마) | Zustand                   | 슬라이스의 `model/` (`features`·`widgets`, 여러 슬라이스가 공유하면 `entities`) |
 | 서버 데이터 · 캐시                      | SWR                       | `entities/*/api/`, `features/*/api/` |
 | URL 상태 (페이지, 검색어, 탭)           | router searchParams       | 페이지                               |
 
@@ -19,7 +19,8 @@ paths:
 
 ## Zustand
 
-- 스토어는 슬라이스 내부(`model/`)에 둡니다. 다른 슬라이스의 스토어를 임포트하지 않습니다(슬라이스 격리).
+- 스토어는 슬라이스 내부(`model/`)에 둡니다. 같은 레이어의 다른 슬라이스 스토어를 임포트하지 않습니다(슬라이스 격리).
+- 여러 `features`·`widgets`가 같은 스토어를 써야 하면 아래 레이어인 `entities/{domain}/model/`로 내리고 Public API(`index.ts`)로 내보내 씁니다(`architecture.md` "공유가 필요하면 아래 레이어로").
 - 액션은 상태와 같은 스토어에 정의하고, 컴포넌트에서는 필요한 값만 selector로 구독합니다.
 - `devtools`에는 스토어 이름을 지정합니다.
 

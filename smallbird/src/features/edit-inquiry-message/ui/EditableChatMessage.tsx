@@ -18,7 +18,10 @@ import {
 } from "@/shared/ui/alert-dialog";
 import { Button } from "@/shared/ui/button";
 
-import type { InquiryMessageViewModel } from "@/entities/inquiry";
+import type {
+  DeletedInquiryMessage,
+  InquiryMessageViewModel,
+} from "@/entities/inquiry";
 import type { MessageSize } from "@/shared/components/chat-message";
 import type { ReactNode } from "react";
 
@@ -38,9 +41,14 @@ interface EditableChatMessageProps {
   attachments?: ReactNode;
   /** 이 대화에서 메시지 수정·삭제를 허용하는지(REST 대화만. 실시간 상담은 Firestore라 허용하지 않습니다). */
   canModify: boolean;
-  /** 수정·삭제가 끝나거나 서버 상태와 어긋났을 때 대화를 다시 받습니다. */
+  /** 수정이 끝나거나 서버 상태와 어긋났을 때(읽힌 메시지 409 등) 대화를 다시 받습니다. */
   onChanged: () => void;
-  /** 수정 저장·삭제 확인을 다른 API로 처리하는 대화(상품 Q&A 답변). 없으면 문의 메시지 API를 씁니다. */
+  /**
+   * 삭제 API가 삭제된 메시지를 돌려주면 대화를 다시 받지 않고 그 자리만 바꾸도록 알립니다. 없거나 응답을 못 받으면
+   * `onChanged`로 대화를 다시 받습니다.
+   */
+  onDeleted?: (deleted: DeletedInquiryMessage) => void;
+  /** 수정 저장·삭제 확인을 다른 API로 처리하는 대화(상품 Q&A 답변). 없으면 문의 메시지 API를 씁니다. 삭제 뒤 화면 갱신도 이 함수가 맡습니다. */
   onSubmitEdit?: (body: string) => Promise<void>;
   onConfirmDelete?: () => Promise<void>;
 }
@@ -70,8 +78,9 @@ export function EditableChatMessage({
   attachments,
   canModify,
   onChanged,
+  onDeleted,
   onSubmitEdit = (body) => editInquiryMessage(message.id, body),
-  onConfirmDelete = () => deleteInquiryMessage(message.id),
+  onConfirmDelete,
 }: EditableChatMessageProps) {
   const { t } = useTranslation("features/edit-inquiry-message");
   const [isEditing, setIsEditing] = useState(false);
@@ -81,13 +90,19 @@ export function EditableChatMessage({
   const side = message.isMine ? "me" : "other";
   const editedLabel = message.isEdited ? t("edited") : undefined;
 
-  async function run(action: () => Promise<void>, onSucceeded?: () => void) {
+  async function confirmDelete() {
+    if (onConfirmDelete) return onConfirmDelete();
+    const deleted = await deleteInquiryMessage(message.id);
+    if (deleted && onDeleted) onDeleted(deleted);
+    else onChanged();
+  }
+
+  async function run(action: () => Promise<void>, onSucceeded: () => void) {
     setIsBusy(true);
     try {
       await action();
       setIsEditing(false);
-      onChanged();
-      onSucceeded?.();
+      onSucceeded();
     } catch (error) {
       console.error("메시지 수정·삭제 실패", error);
       // 읽힌 메시지(409)는 서버 상태와 화면이 어긋난 것이라 안내 없이 대화를 다시 받아 수정·삭제 버튼이 사라지게 합니다.
@@ -108,7 +123,7 @@ export function EditableChatMessage({
       setIsEditing(false);
       return;
     }
-    void run(() => onSubmitEdit(body));
+    void run(() => onSubmitEdit(body), onChanged);
   }
 
   if (!canModify || !isModifiable(message)) {
@@ -206,7 +221,7 @@ export function EditableChatMessage({
             <AlertDialogAction
               onClick={() =>
                 // 삭제가 끝나면 공통 토스트로 알림(REQ-24-0045, REQ-34-0031). 수정에는 띄우지 않음.
-                void run(onConfirmDelete, () => toast(t("deleted")))
+                void run(confirmDelete, () => toast(t("deleted")))
               }
             >
               {t("delete")}
