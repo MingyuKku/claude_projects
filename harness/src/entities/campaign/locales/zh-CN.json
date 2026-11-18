@@ -1,0 +1,16 @@
+{
+  "stage": {
+    "DRAFT": "注册中",
+    "REVIEWING": "待审批",
+    "REJECTED": "已驳回",
+    "IN_PROGRESS": "进行中",
+    "ENDED": "已结束"
+  },
+  "type": {
+    "recruitBrand": "招募型品牌型",
+    "recruitGroupBuy": "招募型团购型",
+    "pickBrand": "PICK型品牌型",
+    "pickGroupBuy": "PICK型团购型"
+  },
+  "demo": "DEMO"
+}

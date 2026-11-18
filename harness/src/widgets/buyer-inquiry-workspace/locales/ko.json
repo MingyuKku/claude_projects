@@ -1,0 +1,92 @@
+{
+  "listTitle": "문의 목록",
+  "all": "전체",
+  "waiting": "답변 대기",
+  "consulting": "상담 중",
+  "done": "답변 완료",
+  "status": {
+    "consulting": "실시간 상담 중",
+    "waiting": "답변 대기",
+    "done": "답변 완료"
+  },
+  "source": {
+    "purchaser": "구매자 문의",
+    "qna": "상품 Q&A",
+    "influencer": "인플루언서 문의",
+    "campaignQna": "캠페인 Q&A"
+  },
+  "empty": "문의사항이 존재하지 않습니다.",
+  "loadError": "문의 목록을 불러오지 못했습니다.",
+  "unknownWriter": "이름 없음",
+  "conversation": "대화",
+  "detail": "상세 정보",
+  "backToList": "문의 목록으로 돌아가기",
+  "closeDetail": "상세 정보 닫기",
+  "advertiser": "광고주",
+  "messagePlaceholder": "문의 내용을 입력하세요. (최대 3,000자)",
+  "send": "전송",
+  "orderInfo": "주문/상품 정보",
+  "orderNumber": "주문번호",
+  "campaignInfo": "캠페인 정보",
+  "filter": {
+    "action": "필터",
+    "title": "필터 검색 설정",
+    "source": "문의 유형",
+    "campaign": "캠페인",
+    "campaignPlaceholder": "캠페인을 선택하세요.",
+    "influencer": "인플루언서",
+    "influencerPlaceholder": "인플루언서를 선택하세요.",
+    "influencerSearchPlaceholder": "인플루언서를 검색하세요.",
+    "campaignFallback": "캠페인 {{idx}}",
+    "influencerFallback": "인플루언서 {{idx}}",
+    "removeChip": "{{name}} 조건 해제",
+    "registrationDate": "등록일",
+    "datePlaceholder": "날짜를 선택하세요.",
+    "reset": "초기화",
+    "apply": "적용하기",
+    "all": "전체",
+    "sourceType": {
+      "ALL": "전체",
+      "PURCHASER_QUESTION": "구매자 문의",
+      "PRODUCT_QNA": "상품 Q&A",
+      "INFLUENCER_QUESTION": "인플루언서 문의",
+      "CAMPAIGN_QNA": "캠페인 Q&A"
+    }
+  },
+  "searchEmpty": "‘{{keyword}}’에 대한 결과가 없습니다.",
+  "searchPlaceholder": "원하는 조건을 입력해 보세요.",
+  "orderDate": "주문일",
+  "paymentAmount": "결제 금액",
+  "campaignType": "캠페인 유형",
+  "progressStatus": "진행 상태",
+  "period": "진행 기간",
+  "campaignCode": "캠페인 코드",
+  "shopCode": "공구샵 코드",
+  "influencer": "공구 진행 인플루언서",
+  "campaignShortcut": "캠페인 바로가기",
+  "detailError": "상세 정보를 불러오지 못했습니다.",
+  "copied": "클립보드에 복사가 완료되었습니다.",
+  "copyFailed": "복사하지 못했습니다.",
+  "won": "{{amount}}원",
+  "conversationError": "대화를 불러오지 못했습니다.",
+  "noMessages": "대화 내역이 없습니다.",
+  "questionDeleted": "삭제된 문의입니다.",
+  "deletedMessage": "삭제된 메시지입니다",
+  "reply": {
+    "placeholder": "답변을 입력하세요. (최대 3,000자)",
+    "submit": "답변 등록",
+    "failed": "처리하지 못했습니다. 다시 시도해 주세요.",
+    "exists": "이미 답변이 등록된 문의입니다."
+  },
+  "card": {
+    "campaignInquiry": "{{label}} 문의",
+    "unread": "읽지 않은 메시지"
+  },
+  "realtime": {
+    "started": "실시간 상담이 시작되었습니다.",
+    "ended": "실시간 상담이 종료되었습니다.",
+    "end": "상담 종료",
+    "endFailed": "상담을 종료하지 못했습니다. 다시 시도해 주세요.",
+    "otherDevice": "현재 다른 상담원이 해당 문의를 처리 중이므로 상담이 종료된 후 다시 이용해 주세요."
+  }
+}

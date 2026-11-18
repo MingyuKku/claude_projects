@@ -1,0 +1,8 @@
+{
+  "title": "상품 선택",
+  "billing": {
+    "monthly": "월간 결제",
+    "yearly": "연간 결제",
+    "discount": "{{rate}}%할인"
+  }
+}

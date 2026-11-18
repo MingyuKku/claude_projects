@@ -1,0 +1,10 @@
+<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+<circle cx="12" cy="12" r="12" fill="url(#point_gradient)"/>
+<path transform="translate(9 8)" d="M0 9V0H3.66114C5.78821 0 7 1.25552 7 3.03315C7 4.83564 5.76243 6.0663 3.60958 6.0663H1.9337V9H0ZM1.9337 4.56215H3.30018C4.44751 4.56215 5.00184 3.94061 5.00184 3.03315C5.00184 2.13812 4.44751 1.52901 3.30018 1.52901H1.9337V4.56215Z" fill="white"/>
+<defs>
+<linearGradient id="point_gradient" x1="12" y1="0" x2="12" y2="24" gradientUnits="userSpaceOnUse">
+<stop stop-color="#3B82F6"/>
+<stop offset="1" stop-color="#2563EB"/>
+</linearGradient>
+</defs>
+</svg>

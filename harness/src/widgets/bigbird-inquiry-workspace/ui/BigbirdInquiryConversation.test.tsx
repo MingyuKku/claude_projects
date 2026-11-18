@@ -1,0 +1,620 @@
+import { act, render, screen, waitFor, within } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
+import { MemoryRouter } from "react-router";
+import { SWRConfig } from "swr";
+
+import { useInquiryUploadStore } from "@/entities/inquiry";
+
+import { BigbirdInquiryConversation } from "./BigbirdInquiryConversation";
+
+import type { BigbirdInquiryViewModel } from "@/entities/inquiry";
+
+// 상담 문서 구독은 네트워크 경계라 응답을 주지 않는 것으로 대신함(대화 목록은 로딩 상태).
+const get = vi.hoisted(() => vi.fn());
+const del = vi.hoisted(() => vi.fn());
+vi.mock("@/shared/api", () => ({
+  getFirestoreDb: async () => ({}),
+  serverApiV3: { get, delete: del },
+  isApiError: () => false,
+}));
+vi.mock("firebase/firestore", () => ({
+  doc: () => ({}),
+  onSnapshot: () => () => {},
+}));
+
+// 기타 문의 대화(상세 API)는 기본으로 빈 대화를 줌.
+beforeEach(() => {
+  get.mockResolvedValue({ result: true, data: { messages: [] } });
+});
+
+// Radix ScrollArea가 쓰는 브라우저 API가 jsdom에 없어 이 파일에서만 채움.
+beforeAll(() => {
+  globalThis.ResizeObserver = class {
+    observe() {}
+    unobserve() {}
+    disconnect() {}
+  };
+});
+
+function inquiry(
+  overrides: Partial<BigbirdInquiryViewModel> = {},
+): BigbirdInquiryViewModel {
+  return {
+    threadIdx: 101,
+    sequence: 7,
+    campaignIdx: null,
+    isRealtime: true,
+    isFinished: false,
+    status: "waiting",
+    realtimePhase: "requesting",
+    createdAt: new Date("2026-10-19T10:00:00"),
+    messages: [],
+    ...overrides,
+  };
+}
+
+function renderConversation(
+  value: BigbirdInquiryViewModel,
+  onClickRealtime?: () => void,
+  onChangedMessage?: () => void,
+) {
+  render(
+    <SWRConfig value={{ provider: () => new Map() }}>
+      <MemoryRouter>
+        <BigbirdInquiryConversation
+          inquiry={value}
+          myName="김빅링크"
+          threadUserIdx={5971}
+          onClickRealtime={onClickRealtime}
+          onChangedMessage={onChangedMessage}
+        />
+      </MemoryRouter>
+    </SWRConfig>,
+  );
+}
+
+describe("실시간 상담 대화", () => {
+  it("연결 대기 중에는 요청 중 카드를 보여 주고 입력·상담 종료는 비활성이다", () => {
+    renderConversation(inquiry());
+    expect(screen.getByText("상담 요청 중")).toBeInTheDocument();
+    expect(
+      screen.getByText(
+        "상담원 연결은 고객 문의 상황에 따라 최대 3분이 소요될 수 있습니다.",
+      ),
+    ).toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toBeDisabled();
+    expect(screen.getByRole("button", { name: "전송" })).toBeDisabled();
+    expect(screen.getByRole("button", { name: "상담 종료" })).toBeDisabled();
+  });
+
+  it("연결 실패 카드는 버튼 없이 안내만 하고 10초 뒤 사라지며, 입력은 일반 문의로 보낸다", () => {
+    vi.useFakeTimers();
+    try {
+      renderConversation(
+        inquiry({ status: "failed", realtimePhase: "failed" }),
+      );
+      expect(screen.getByText("실시간 상담 불가")).toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "재시도" }),
+      ).not.toBeInTheDocument();
+      expect(screen.getByRole("textbox")).toBeEnabled();
+      act(() => {
+        vi.advanceTimersByTime(10_000);
+      });
+      expect(screen.queryByText("실시간 상담 불가")).not.toBeInTheDocument();
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+  it("상담 중에는 안내 카드가 없다", () => {
+    renderConversation(
+      inquiry({ status: "consulting", realtimePhase: "connected" }),
+    );
+    expect(screen.queryByText("상담 요청 중")).not.toBeInTheDocument();
+    // 헤더 배지는 목록 탭의 "상담 중"이 아니라 "실시간 상담중"(REQ-23-0018)
+    expect(screen.getByText("실시간 상담중")).toBeInTheDocument();
+    expect(screen.queryByText("상담 중")).not.toBeInTheDocument();
+  });
+
+  it("종료된 상담은 완료 카드와 입력창이 있고 상담 종료는 비활성이다", () => {
+    renderConversation(
+      inquiry({ isFinished: true, status: "done", realtimePhase: "finished" }),
+    );
+    expect(screen.getByText("완료된 상담")).toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toBeEnabled();
+    expect(screen.getByRole("button", { name: "상담 종료" })).toBeDisabled();
+  });
+
+  it("열린 일반 문의에는 입력창이 있고 상담 종료 버튼은 없다", () => {
+    renderConversation(
+      inquiry({ isRealtime: false, realtimePhase: null, status: "waiting" }),
+    );
+    expect(
+      screen.queryByRole("button", { name: "상담 종료" }),
+    ).not.toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toBeEnabled();
+  });
+
+  it("열린 일반 문의의 실시간 상담하기 버튼을 누르면 실시간 상담을 요청한다", async () => {
+    const onClickRealtime = vi.fn();
+    renderConversation(
+      inquiry({ isRealtime: false, realtimePhase: null, status: "waiting" }),
+      onClickRealtime,
+    );
+
+    await userEvent.click(
+      screen.getByRole("button", { name: "실시간 상담하기" }),
+    );
+
+    expect(onClickRealtime).toHaveBeenCalledOnce();
+  });
+
+  it("실시간 상담 중인 문의에는 실시간 상담하기 버튼이 없다", () => {
+    renderConversation(inquiry(), vi.fn());
+    expect(
+      screen.queryByRole("button", { name: "실시간 상담하기" }),
+    ).not.toBeInTheDocument();
+  });
+
+  it("답변 완료·종료된 일반 문의에도 실시간 상담하기 버튼이 있다", async () => {
+    const onClickRealtime = vi.fn();
+    renderConversation(
+      inquiry({
+        isRealtime: false,
+        realtimePhase: null,
+        isFinished: true,
+        status: "done",
+      }),
+      onClickRealtime,
+    );
+    await userEvent.click(
+      screen.getByRole("button", { name: "실시간 상담하기" }),
+    );
+    expect(onClickRealtime).toHaveBeenCalledOnce();
+  });
+
+  it("종료된 일반 문의도 입력창이 있고 완료된 상담 안내는 뜨지 않는다", () => {
+    renderConversation(
+      inquiry({
+        isRealtime: false,
+        realtimePhase: null,
+        isFinished: true,
+        status: "done",
+      }),
+    );
+    // 일반 문의가 답변 완료·종료된 것만으로는 안내가 뜨지 않음.
+    expect(screen.queryByText("완료된 상담")).not.toBeInTheDocument();
+    expect(screen.getByRole("textbox")).toBeEnabled();
+  });
+
+  describe("완료된 상담 안내", () => {
+    const message = (
+      id: number,
+      body: string,
+      kind: "text" | "notice" = "text",
+    ) => ({
+      id,
+      isMine: false,
+      kind,
+      body,
+      createdAt: new Date(`2026-10-19T10:0${id}:00`),
+      isDeleted: false,
+      isRead: false,
+      isEdited: false,
+      senderId: null,
+      campaign: null,
+      attachment: null,
+    });
+    const general = {
+      isRealtime: false,
+      realtimePhase: null,
+      status: "done" as const,
+    };
+
+    it("실시간 종료 안내가 대화의 마지막이면 보인다", () => {
+      renderConversation(
+        inquiry({
+          ...general,
+          messages: [
+            message(1, "문의합니다"),
+            message(2, "상담이 종료되었습니다.", "notice"),
+          ],
+        }),
+      );
+      expect(screen.getByText("완료된 상담")).toBeInTheDocument();
+    });
+
+    it("실시간이 다시 시작돼 진행 중이면 마지막 메시지가 예전 종료 안내여도 안 보인다", () => {
+      renderConversation(
+        inquiry({
+          isRealtime: true,
+          isFinished: false,
+          realtimePhase: "requesting",
+          status: "waiting",
+          messages: [
+            message(1, "문의합니다"),
+            message(2, "상담이 종료되었습니다.", "notice"),
+          ],
+        }),
+      );
+      expect(screen.queryByText("완료된 상담")).not.toBeInTheDocument();
+    });
+
+    it("종료 안내 뒤에 일반 메시지가 오면 마지막 상담이 일반이라 안 보인다", () => {
+      renderConversation(
+        inquiry({
+          ...general,
+          messages: [
+            message(1, "상담이 종료되었습니다.", "notice"),
+            message(2, "다시 문의합니다"),
+          ],
+        }),
+      );
+      expect(screen.queryByText("완료된 상담")).not.toBeInTheDocument();
+    });
+
+    it("완료 카드의 닫기를 누르면 그 카드가 사라진다", async () => {
+      renderConversation(
+        inquiry({
+          isFinished: true,
+          status: "done",
+          realtimePhase: "finished",
+        }),
+      );
+      expect(screen.getByText("완료된 상담")).toBeInTheDocument();
+
+      await userEvent.click(screen.getByRole("button", { name: "닫기" }));
+
+      expect(screen.queryByText("완료된 상담")).not.toBeInTheDocument();
+    });
+
+    it("요청 중 카드에는 닫기 버튼이 없다", () => {
+      renderConversation(
+        inquiry({ status: "waiting", realtimePhase: "requesting" }),
+      );
+      expect(screen.getByText("상담 요청 중")).toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "닫기" }),
+      ).not.toBeInTheDocument();
+    });
+
+    it("연결 실패 카드에는 닫기 버튼이 없다", () => {
+      renderConversation(
+        inquiry({ status: "failed", realtimePhase: "failed" }),
+      );
+      expect(screen.getByText("실시간 상담 불가")).toBeInTheDocument();
+      expect(
+        screen.queryByRole("button", { name: "닫기" }),
+      ).not.toBeInTheDocument();
+    });
+  });
+});
+
+describe("첨부 메시지", () => {
+  const fileMessage = (id: number, name: string) => ({
+    id,
+    isMine: true,
+    kind: "image" as const,
+    body: `https://cdn/${name}`,
+    createdAt: new Date("2026-10-19T10:00:00"),
+    isDeleted: false,
+    isRead: false,
+    isEdited: false,
+    senderId: null,
+    campaign: null,
+    attachment: {
+      attachmentIdx: id,
+      fileName: name,
+      fileSize: 1,
+      fileType: "image",
+    },
+  });
+
+  it("연달아 보낸 첨부를 한 줄 썸네일로 보여 주고, 누르면 뷰어에서 넘겨 볼 수 있다", async () => {
+    const user = userEvent.setup();
+    // 상세 응답 전에는 뷰모델에 담긴 메시지를 보여 줌.
+    get.mockReturnValue(new Promise(() => {}));
+    renderConversation(
+      inquiry({
+        isRealtime: false,
+        realtimePhase: null,
+        messages: [
+          fileMessage(1, "a.png"),
+          fileMessage(2, "b.png"),
+          fileMessage(3, "c.png"),
+        ],
+      }),
+    );
+    // 세 장이 한 묶음(이름 줄 하나)이다.
+    expect(screen.getAllByText("김빅링크")).toHaveLength(1);
+    await user.click(screen.getByRole("button", { name: "b.png" }));
+    const dialog = await screen.findByRole("dialog");
+    expect(dialog).toHaveTextContent("이미지 다운로드");
+    expect(
+      screen.getAllByRole("img", { name: "b.png" }).length,
+    ).toBeGreaterThan(0);
+    await user.click(screen.getByRole("button", { name: "다음" }));
+    expect(
+      screen.getAllByRole("img", { name: "c.png" }).length,
+    ).toBeGreaterThan(0);
+    expect(screen.getByRole("link", { name: "다운로드" })).toHaveAttribute(
+      "href",
+      expect.stringContaining("/v3/help/file/download/image/3"),
+    );
+    await user.click(screen.getByRole("button", { name: "닫기" }));
+    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
+  });
+});
+
+describe("빅버드 머니 출금 요청 카드", () => {
+  const withdrawalMessage = (
+    id: number,
+    status: "requested" | "approved" | "rejected",
+    amount: number,
+  ) => ({
+    id,
+    isMine: status === "requested",
+    kind: "withdrawalCard" as const,
+    body: "{}",
+    createdAt: new Date("2026-11-05T14:30:00"),
+    isDeleted: false,
+    isRead: false,
+    isEdited: false,
+    senderId: null,
+    campaign: null,
+    attachment: null,
+    withdrawal: {
+      status,
+      amount,
+      applicantName: "홍길동",
+      applicantId: "advertiser01",
+      bankName: "국민은행",
+      accountNumber: "110-123-456789",
+      accountHolder: "홍길동",
+      requestedAt: new Date("2026-11-05T14:30:00"),
+    },
+  });
+
+  it("거절 카드는 사유가 있을 때만 거절 사유 줄을 보인다", () => {
+    get.mockReturnValue(new Promise(() => {}));
+    const rejected = withdrawalMessage(1, "rejected", 500000);
+    const noReason = withdrawalMessage(2, "rejected", 600000);
+    renderConversation(
+      inquiry({
+        isRealtime: false,
+        realtimePhase: null,
+        messages: [
+          {
+            ...rejected,
+            withdrawal: {
+              ...rejected.withdrawal,
+              rejectReason: "통장 사본과 신청자 명의가 일치하지 않습니다.",
+            },
+          },
+          noReason,
+        ],
+      }),
+      undefined,
+      vi.fn(),
+    );
+    expect(
+      screen.getByText("통장 사본과 신청자 명의가 일치하지 않습니다."),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("거절 사유")).toHaveLength(1);
+  });
+
+  it("출금 요청 메시지를 상태별 카드로 그리고 수정·삭제 툴바는 두지 않는다", () => {
+    get.mockReturnValue(new Promise(() => {}));
+    renderConversation(
+      inquiry({
+        isRealtime: false,
+        realtimePhase: null,
+        messages: [
+          withdrawalMessage(1, "requested", 500000),
+          withdrawalMessage(2, "approved", 700000),
+        ],
+      }),
+      undefined,
+      vi.fn(),
+    );
+    expect(screen.getByText("500,000원")).toBeInTheDocument();
+    expect(screen.getByText("승인 요청")).toBeInTheDocument();
+    expect(screen.getByText("700,000원")).toBeInTheDocument();
+    expect(screen.getByText("승인 완료")).toBeInTheDocument();
+    expect(screen.getByText("요청이 승인되었습니다.")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "삭제" }),
+    ).not.toBeInTheDocument();
+  });
+});
+
+describe("텍스트+첨부 묶음의 수정·삭제", () => {
+  const base = {
+    isMine: true,
+    isDeleted: false,
+    isRead: false,
+    isEdited: false,
+    senderId: null,
+    campaign: null,
+  };
+  const messages = [
+    {
+      ...base,
+      id: 10,
+      kind: "text" as const,
+      body: "첨부 드립니다",
+      createdAt: new Date("2026-10-19T10:00:00"),
+      attachment: null,
+    },
+    ...[11, 12].map((id) => ({
+      ...base,
+      id,
+      kind: "image" as const,
+      body: `https://cdn/${id}.png`,
+      createdAt: new Date("2026-10-19T10:00:03"),
+      attachment: {
+        attachmentIdx: id,
+        fileName: `${id}.png`,
+        fileSize: 1,
+        fileType: "image",
+      },
+    })),
+  ];
+
+  beforeEach(() => {
+    // jsdom에는 matchMedia가 없어 터치 기기(hover 없음)로 흉내 냄. 툴바가 말풍선 탭으로 열림.
+    vi.stubGlobal(
+      "matchMedia",
+      vi.fn().mockImplementation((query: string) => ({
+        matches: query === "(hover: none)",
+        addEventListener: vi.fn(),
+        removeEventListener: vi.fn(),
+      })),
+    );
+    get.mockReturnValue(new Promise(() => {}));
+    del.mockReset();
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("묶인 내 텍스트에 수정·삭제 툴바가 뜨고 삭제하면 그 텍스트 메시지만 삭제를 요청한다", async () => {
+    const user = userEvent.setup();
+    del.mockResolvedValue({ result: true });
+    const onChangedMessage = vi.fn();
+    renderConversation(
+      inquiry({ isRealtime: false, realtimePhase: null, messages }),
+      undefined,
+      onChangedMessage,
+    );
+    await user.click(screen.getByText("첨부 드립니다"));
+    expect(await screen.findByRole("button", { name: "수정" })).toBeVisible();
+    await user.click(screen.getByRole("button", { name: "삭제" }));
+    await user.click(
+      within(screen.getByRole("alertdialog")).getByRole("button", {
+        name: "삭제",
+      }),
+    );
+    await waitFor(() =>
+      expect(del).toHaveBeenCalledWith("/help/thread/message/10"),
+    );
+    expect(del).toHaveBeenCalledOnce();
+    expect(onChangedMessage).toHaveBeenCalled();
+    expect(screen.getByRole("button", { name: "11.png" })).toBeInTheDocument();
+  });
+
+  it("삭제 응답으로 그 메시지만 삭제 안내로 바꾸고 대화를 다시 받지 않는다", async () => {
+    const user = userEvent.setup();
+    const dto = (messageIdx: number, body: string, time: string) => ({
+      messageIdx,
+      threadIdx: 101,
+      body,
+      userIdx: 5971,
+      attachmentIdx: null,
+      writeTime: time,
+      readTime: null,
+      modifyTime: null,
+      deleteTime: null,
+      identifier: "mgkang",
+      isUserMessage: true,
+      fileName: null,
+      fileSize: null,
+      fileType: null,
+      auto: false,
+    });
+    const first = dto(10, "지울 메시지", "2026-10-19T10:00:00");
+    get.mockResolvedValue({
+      result: true,
+      data: {
+        messages: [first, dto(11, "남길 메시지", "2026-10-19T10:01:00")],
+      },
+    });
+    del.mockResolvedValue({
+      ...first,
+      body: "삭제된 메시지입니다",
+      deleteTime: "2026-10-19T10:05:00",
+    });
+    renderConversation(
+      inquiry({ isRealtime: false, realtimePhase: null }),
+      undefined,
+      vi.fn(),
+    );
+    await user.click(await screen.findByText("지울 메시지"));
+    const fetchedCount = get.mock.calls.length;
+    await user.click(await screen.findByRole("button", { name: "삭제" }));
+    await user.click(
+      within(screen.getByRole("alertdialog")).getByRole("button", {
+        name: "삭제",
+      }),
+    );
+    expect(await screen.findByText("삭제된 메시지입니다")).toBeVisible();
+    expect(screen.queryByText("지울 메시지")).not.toBeInTheDocument();
+    expect(screen.getByText("남길 메시지")).toBeInTheDocument();
+    expect(get.mock.calls.length).toBe(fetchedCount);
+  });
+
+  it("종료된 문의에서는 툴바가 없다", async () => {
+    const user = userEvent.setup();
+    renderConversation(
+      inquiry({
+        isRealtime: false,
+        isFinished: true,
+        realtimePhase: null,
+        messages,
+      }),
+      undefined,
+      vi.fn(),
+    );
+    await user.click(screen.getByText("첨부 드립니다"));
+    expect(
+      screen.queryByRole("button", { name: "삭제" }),
+    ).not.toBeInTheDocument();
+  });
+});
+
+describe("첨부 업로드 진행", () => {
+  afterEach(() => {
+    useInquiryUploadStore.setState({ jobs: {} });
+  });
+  const files = [new File(["1"], "1.png"), new File(["2"], "2.png")];
+
+  it("업로드 중에는 진행 줄을 보여 주고, 실패하면 남은 개수와 다시 시도를 보여 준다", async () => {
+    const user = userEvent.setup();
+    const retry = vi.fn();
+    useInquiryUploadStore.setState({
+      jobs: { 101: { files, sentCount: 1, status: "uploading" } },
+    });
+    renderConversation(inquiry({ isRealtime: false, realtimePhase: null }));
+    expect(await screen.findByText("첨부 업로드 중 (1/2)")).toBeInTheDocument();
+
+    useInquiryUploadStore.setState({
+      jobs: { 101: { files, sentCount: 1, status: "failed" } },
+      retry,
+    });
+    expect(
+      await screen.findByText("첨부 1개를 보내지 못했습니다."),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "다시 시도" }));
+    expect(retry).toHaveBeenCalledWith(101);
+  });
+
+  it("다른 문의의 업로드는 이 문의 화면에 보이지 않는다", () => {
+    useInquiryUploadStore.setState({
+      jobs: { 999: { files, sentCount: 0, status: "uploading" } },
+    });
+    renderConversation(inquiry({ isRealtime: false, realtimePhase: null }));
+    expect(screen.queryByText(/첨부 업로드 중/)).not.toBeInTheDocument();
+  });
+});
+
+describe("대화 불러오기", () => {
+  it("대화를 받지 못하면 빈 대화 대신 오류와 다시 시도를 보이고, 다시 시도하면 다시 받는다", async () => {
+    get.mockRejectedValue(new Error("network"));
+    renderConversation(inquiry({ isRealtime: false, realtimePhase: null }));
+
+    expect(
+      await screen.findByText("대화를 불러오지 못했습니다."),
+    ).toBeInTheDocument();
+    const callCount = get.mock.calls.length;
+    await userEvent.click(screen.getByRole("button", { name: "다시 시도" }));
+    expect(get.mock.calls.length).toBeGreaterThan(callCount);
+  });
+});

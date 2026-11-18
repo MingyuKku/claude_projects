@@ -1,0 +1,47 @@
+{
+  "segment": {
+    "label": "Select plan"
+  },
+  "count": {
+    "unit": "times",
+    "value": "{{value}}",
+    "tooltip": "{{value}}"
+  },
+  "quota": {
+    "search": "Influencer searches",
+    "proposal": "Influencer proposals",
+    "used": "Used",
+    "remaining": "Left"
+  },
+  "status": {
+    "title": "Usage"
+  },
+  "filter": {
+    "metric": "Metric",
+    "year": "Year",
+    "month": "Month",
+    "granularity": "Period",
+    "monthly": "Monthly",
+    "daily": "Daily"
+  },
+  "metric": {
+    "campaignCount": "Campaigns created",
+    "searchCount": "Influencer searches",
+    "proposalCount": "Proposals sent",
+    "matchCount": "Matches made"
+  },
+  "chart": {
+    "monthly": "Monthly usage",
+    "daily": "Daily usage",
+    "prev": "Previous",
+    "next": "Next"
+  },
+  "empty": {
+    "title": "No usage yet.",
+    "description": "Subscribe to a plan."
+  },
+  "breakdown": {
+    "brand": "{{product}} Brand",
+    "groupBuy": "{{product}} Group Buy"
+  }
+}

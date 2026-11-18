@@ -1,0 +1,16 @@
+{
+  "stage": {
+    "DRAFT": "Drafting",
+    "REVIEWING": "Pending",
+    "REJECTED": "Rejected",
+    "IN_PROGRESS": "Active",
+    "ENDED": "Ended"
+  },
+  "type": {
+    "recruitBrand": "Recruitment Brand",
+    "recruitGroupBuy": "Recruitment Group Buy",
+    "pickBrand": "PICK Brand",
+    "pickGroupBuy": "PICK Group Buy"
+  },
+  "demo": "DEMO"
+}

@@ -1,0 +1,32 @@
+{
+  "title": "订阅付费商品",
+  "won": "{{amount}}韩元",
+  "column": {
+    "name": "服务名称",
+    "startedAt": "会员开始",
+    "endsAt": "会员结束",
+    "amount": "支付金额",
+    "method": "支付方式",
+    "action": "订阅管理"
+  },
+  "action": {
+    "cancel": "取消订阅",
+    "cancelScheduled": "待取消"
+  },
+  "empty": {
+    "title": "没有订阅付费的商品。"
+  },
+  "cancelDialog": {
+    "title": "取消订阅",
+    "description": "确定要取消订阅吗？在付费期限结束的{{endsAt}}之前仍可继续使用。",
+    "confirm": "取消订阅",
+    "completed": {
+      "title": "取消订阅完成",
+      "description": "订阅已取消。期待再次见到您！"
+    }
+  },
+  "error": {
+    "alreadyCanceled": "该订阅已取消。",
+    "notFound": "找不到订阅信息。"
+  }
+}

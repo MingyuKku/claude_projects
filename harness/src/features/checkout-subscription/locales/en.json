@@ -1,0 +1,69 @@
+{
+  "product": {
+    "title": "Selected plan",
+    "serviceType": "Service type",
+    "fee": "Fee",
+    "start": "Start",
+    "startValue": {
+      "monthly": "Starts now, for 1 month",
+      "yearly": "Starts now, for 1 year"
+    }
+  },
+  "method": {
+    "title": "Payment method",
+    "card": "Card",
+    "required": "Required",
+    "defaultCard": "Default card"
+  },
+  "installment": {
+    "label": "{{card}} installments",
+    "lumpSum": "Lump sum",
+    "months": "{{months}} months"
+  },
+  "changeDefault": {
+    "title": "Change default card",
+    "description": "Payments are made with the default card only. Change your default card to the selected one?",
+    "action": "Set as default"
+  },
+  "notice": {
+    "title": "Notice",
+    "agree": "I have read the notices below and agree to recurring payments and auto-renewal.",
+    "items": {
+      "1": "Your subscription starts on payment. Cancellation and refunds follow each plan's policy."
+    },
+    "renewal": {
+      "monthly": "Plans renew automatically every month, with monthly recurring payments.",
+      "yearly": "Plans renew automatically every year, with yearly recurring payments."
+    }
+  },
+  "summary": {
+    "title": "Payment summary",
+    "product": "Plan",
+    "amount": "Amount",
+    "pay": "Pay",
+    "cancel": "Cancel"
+  },
+  "price": {
+    "won": "{{amount}} KRW",
+    "fee": {
+      "monthly": "{{amount}} KRW/mo",
+      "yearly": "{{amount}} KRW/yr"
+    }
+  },
+  "completed": {
+    "title": "Payment complete",
+    "description": "Your subscription payment is complete."
+  },
+  "error": {
+    "noBillingCard": "No registered card. Please add a card.",
+    "cardsLoadFailed": "Failed to load card information.",
+    "alreadySubscribed": "You already subscribe to this plan.",
+    "productNotAvailable": "This plan isn't available right now.",
+    "cardLimitExceeded": "You can register up to 2 cards.",
+    "cardRegisterFailed": "Couldn't register the card. Please try again.",
+    "paymentFailed": "Payment failed. Please try again.",
+    "cardNotFound": "This card was already deleted or doesn't exist.",
+    "invalidInstallment": "This installment period isn't available. Choose another.",
+    "installmentNotAllowedCard": "Debit cards can't pay in installments. Choose lump sum."
+  }
+}

@@ -1,0 +1,15 @@
+{
+  "action": {
+    "delete": "删除活动"
+  },
+  "dialog": {
+    "title": "删除活动",
+    "description": "此操作无法撤销。数据将被永久删除且无法恢复。确定要删除该活动吗？",
+    "confirm": "删除"
+  },
+  "toast": {
+    "deleted": "活动已删除。",
+    "notDeletable": "该活动当前无法删除。",
+    "failed": "删除失败，请稍后重试。"
+  }
+}

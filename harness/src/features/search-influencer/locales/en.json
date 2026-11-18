@@ -1,0 +1,17 @@
+{
+  "query": {
+    "placeholder": "e.g. Skincare launch, women in 20s, Instagram"
+  },
+  "platform": {
+    "label": "Platform",
+    "instagram": "Instagram",
+    "naver": "Naver",
+    "tiktok": "TikTok",
+    "facebook": "Facebook"
+  },
+  "submit": "Find influencers",
+  "expand": {
+    "open": "Expand",
+    "close": "Collapse"
+  }
+}

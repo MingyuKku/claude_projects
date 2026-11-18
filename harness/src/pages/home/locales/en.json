@@ -1,0 +1,22 @@
+{
+  "title": "Home",
+  "hero": {
+    "title": "Describe your product and\nAI finds the right influencers",
+    "subtitle": "AI quickly recommends influencers that fit your brand and goals"
+  },
+  "card": {
+    "comingSoon": "Coming soon",
+    "recommend": {
+      "title": "Influencer picks",
+      "description": "AI recommends the best influencers based on data."
+    },
+    "campaign": {
+      "title": "Run campaigns",
+      "description": "Recruit, manage, and settle campaigns in one place."
+    },
+    "pricing": {
+      "title": "Pricing",
+      "description": "Compare campaign products and subscription plans at a glance."
+    }
+  }
+}

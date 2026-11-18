@@ -1,0 +1,133 @@
+import { Download, X } from "lucide-react";
+
+import excelIcon from "@/shared/assets/img/chat/file-excel.svg";
+import pdfIcon from "@/shared/assets/img/chat/file-pdf.svg";
+import pptIcon from "@/shared/assets/img/chat/file-ppt.svg";
+import txtIcon from "@/shared/assets/img/chat/file-txt.svg";
+import wordIcon from "@/shared/assets/img/chat/file-word.svg";
+import { cn } from "@/shared/lib/utils";
+import { Button } from "@/shared/ui/button";
+
+// Figma File List Base / Thumbnail(5219:126850) Type=File: 36px 파일 아이콘 + 이름·용량 + 오른쪽 버튼.
+// 오른쪽 버튼은 받은 파일이면 다운로드, 입력창에서 아직 안 보낸 파일이면 빼기(x).
+// 형식 아이콘은 디자인 시스템 New Icons / PDF·Word·Excel·TXT(7080:81538·81539·81567·81542).
+// PowerPoint 아이콘은 시안에 없어 같은 모양에 "PPT" 글자(Pretendard Medium 윤곽선)와 #C43E1C로 임시로 만듦.
+const ICON_BY_EXTENSION: Record<string, string> = {
+  pdf: pdfIcon,
+  txt: txtIcon,
+  doc: wordIcon,
+  docx: wordIcon,
+  xls: excelIcon,
+  xlsx: excelIcon,
+  ppt: pptIcon,
+  pptx: pptIcon,
+};
+
+// Figma 파일 이름은 "파일명파일..."처럼 앞 5자만 보임(REQ-23-0009, 11315:49623). 확장자는 시안에 없어 이름 전체
+// (확장자 포함)를 기준으로 자르고, 형식은 앞의 아이콘이 알려 줌. 전체 이름은 title과 내려받는 이름에 남김.
+// macOS에서 올린 한글 이름은 자모가 분리(NFD)되어 와서, 합쳐(NFC) 세지 않으면 2글자만 보임.
+const MAX_NAME_LENGTH = 5;
+
+function toDisplayName(name: string) {
+  const characters = Array.from(name.normalize("NFC"));
+  return characters.length <= MAX_NAME_LENGTH
+    ? characters.join("")
+    : `${characters.slice(0, MAX_NAME_LENGTH).join("")}...`;
+}
+
+function toIconSrc(name: string) {
+  const extension = name.split(".").pop()?.toLowerCase() ?? "";
+  return ICON_BY_EXTENSION[extension] ?? pdfIcon;
+}
+
+interface FileItemProps {
+  name: string;
+  sizeLabel: string;
+  /** 파일 형식 아이콘. 없으면 파일 이름의 확장자로 고르고, 모르는 확장자는 PDF 아이콘. */
+  iconSrc?: string;
+  downloadLabel?: string;
+  onClickDownload?: () => void;
+  /** 있으면 다운로드 버튼을 이 주소로 가는 링크로 그림(브라우저가 내려받음). */
+  downloadHref?: string;
+  /** 있으면 다운로드 대신 빼기 버튼을 그림. */
+  onClickRemove?: () => void;
+  removeLabel?: string;
+  className?: string;
+  "data-preview-state"?: string;
+}
+
+export function FileItem({
+  name,
+  sizeLabel,
+  iconSrc,
+  downloadLabel,
+  onClickDownload,
+  downloadHref,
+  onClickRemove,
+  removeLabel,
+  className,
+  ...props
+}: FileItemProps) {
+  function renderAction() {
+    if (onClickRemove)
+      return (
+        <Button
+          type="button"
+          variant="ghost-foreground"
+          size="icon-xs"
+          aria-label={removeLabel}
+          onClick={onClickRemove}
+        >
+          <X />
+        </Button>
+      );
+    if (downloadHref)
+      return (
+        <Button variant="ghost-foreground" size="icon-xs" asChild>
+          <a href={downloadHref} download={name} aria-label={downloadLabel}>
+            <Download />
+          </a>
+        </Button>
+      );
+    return (
+      <Button
+        type="button"
+        variant="ghost-foreground"
+        size="icon-xs"
+        aria-label={downloadLabel}
+        onClick={onClickDownload}
+      >
+        <Download />
+      </Button>
+    );
+  }
+
+  return (
+    <div
+      className={cn(
+        "flex w-62.5 items-center gap-2 rounded-lg border border-border bg-card p-4 hover:bg-accent/50",
+        className,
+      )}
+      {...props}
+    >
+      <div className="flex min-w-0 flex-1 items-center gap-2">
+        <img
+          src={iconSrc ?? toIconSrc(name)}
+          alt=""
+          aria-hidden="true"
+          className="size-9 shrink-0"
+        />
+        <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+          <p
+            title={name}
+            className="truncate text-sm leading-none font-medium text-card-foreground"
+          >
+            {toDisplayName(name)}
+          </p>
+          <p className="text-xs leading-5 text-muted-foreground">{sizeLabel}</p>
+        </div>
+      </div>
+      {renderAction()}
+    </div>
+  );
+}

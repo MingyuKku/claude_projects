@@ -1,0 +1,92 @@
+{
+  "listTitle": "Inquiry list",
+  "all": "All",
+  "waiting": "Waiting",
+  "consulting": "Consulting",
+  "done": "Answered",
+  "status": {
+    "consulting": "Live chat",
+    "waiting": "Waiting",
+    "done": "Answered"
+  },
+  "source": {
+    "purchaser": "Buyer Q&A",
+    "qna": "Product Q&A",
+    "influencer": "Influencer Q&A",
+    "campaignQna": "Campaign Q&A"
+  },
+  "empty": "No inquiries yet.",
+  "loadError": "Couldn't load inquiries.",
+  "unknownWriter": "No name",
+  "conversation": "Conversation",
+  "detail": "Details",
+  "backToList": "Back to inquiries",
+  "closeDetail": "Close details",
+  "advertiser": "Advertiser",
+  "messagePlaceholder": "Enter your message (up to 3,000 characters)",
+  "send": "Send",
+  "orderInfo": "Order / Product",
+  "orderNumber": "Order no.",
+  "campaignInfo": "Campaign",
+  "filter": {
+    "action": "Filter",
+    "title": "Filter Settings",
+    "source": "Inquiry Type",
+    "campaign": "Campaign",
+    "campaignPlaceholder": "Select a campaign",
+    "influencer": "Influencer",
+    "influencerPlaceholder": "Select an influencer",
+    "influencerSearchPlaceholder": "Search influencers",
+    "campaignFallback": "Campaign {{idx}}",
+    "influencerFallback": "Influencer {{idx}}",
+    "removeChip": "Remove {{name}}",
+    "registrationDate": "Date",
+    "datePlaceholder": "Select a date",
+    "reset": "Reset",
+    "apply": "Apply",
+    "all": "All",
+    "sourceType": {
+      "ALL": "All",
+      "PURCHASER_QUESTION": "Buyer Q&A",
+      "PRODUCT_QNA": "Product Q&A",
+      "INFLUENCER_QUESTION": "Influencer Q&A",
+      "CAMPAIGN_QNA": "Campaign Q&A"
+    }
+  },
+  "searchEmpty": "No results for '{{keyword}}'.",
+  "searchPlaceholder": "Enter a search term",
+  "orderDate": "Order date",
+  "paymentAmount": "Payment",
+  "campaignType": "Campaign type",
+  "progressStatus": "Status",
+  "period": "Period",
+  "campaignCode": "Campaign code",
+  "shopCode": "Shop code",
+  "influencer": "Influencer",
+  "campaignShortcut": "Go to campaign",
+  "detailError": "Couldn't load details.",
+  "copied": "Copied to clipboard.",
+  "copyFailed": "Couldn't copy.",
+  "won": "{{amount}} KRW",
+  "conversationError": "Couldn't load the conversation.",
+  "noMessages": "No messages.",
+  "questionDeleted": "This inquiry was deleted.",
+  "deletedMessage": "Message deleted.",
+  "reply": {
+    "placeholder": "Enter a reply. (max 3,000 characters)",
+    "submit": "Reply",
+    "failed": "Something went wrong. Please try again.",
+    "exists": "This inquiry already has a reply."
+  },
+  "card": {
+    "campaignInquiry": "{{label}} inquiry",
+    "unread": "Unread message"
+  },
+  "realtime": {
+    "started": "Live chat started.",
+    "ended": "Live chat ended.",
+    "end": "End chat",
+    "endFailed": "Couldn't end the chat. Please try again.",
+    "otherDevice": "Another agent is handling this inquiry. Please try again after it ends."
+  }
+}

@@ -1,0 +1,41 @@
+{
+  "title": "Company info",
+  "form": {
+    "companyName": "Company name",
+    "contact": "Contact number",
+    "businessNumber": "Business registration number",
+    "businessFile": "Business registration certificate",
+    "mailorderNumber": "Mail-order number",
+    "mailorderFile": "Mail-order business report",
+    "category": "Company category",
+    "url": "Company URL",
+    "placeholder": {
+      "companyName": "Enter company name",
+      "contact": "Enter contact number",
+      "businessNumber": "Enter business registration number",
+      "mailorderNumber": "Enter mail-order number",
+      "category": "Select",
+      "url": "Enter URL"
+    }
+  },
+  "file": {
+    "upload": "Upload",
+    "uploadFor": "Upload {{label}}",
+    "registered": "Registered",
+    "error": {
+      "extension": "Only JPG, PNG and PDF files are allowed.",
+      "size": "Max file size is 10MB.",
+      "download": "Couldn't download the file. Please try again."
+    },
+    "none": "No file",
+    "download": "Download {{name}}",
+    "placeholder": "Upload a file"
+  },
+  "inform": {
+    "required": "Fill in all required fields to save.",
+    "file": "Only JPG, PNG and PDF files up to 10MB are allowed."
+  },
+  "view": {
+    "register": "Register"
+  }
+}

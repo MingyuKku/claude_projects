@@ -1,0 +1,48 @@
+{
+  "composer": "Live chat message",
+  "composerPlaceholder": "Enter your message. (up to 3,000 characters)",
+  "send": "Send",
+  "connected": "Live chat connected.",
+  "lock": {
+    "title": "A chat is already in progress.",
+    "description": "Another agent is handling this inquiry. Please try again after it ends.",
+    "cancel": "Cancel",
+    "confirm": "OK"
+  },
+  "requestFailed": "Couldn't request a chat. Please try again shortly.",
+  "sendFailed": "Couldn't send the message. Please try again.",
+  "endFailed": "Couldn't end the chat. Please try again.",
+  "retryFailed": "Couldn't request the chat again.",
+  "cancelFailed": "Couldn't cancel the request. Please try again.",
+  "closed": "This chat has already ended.",
+  "closing": "The chat is ending.",
+  "notConnected": "You can send messages after an agent connects.",
+  "lockLost": "Another account is handling this chat.",
+  "alreadyConnected": "An agent is already connected.",
+  "failed": "Couldn't check the chat.",
+  "lockCheckFailed": "Couldn't check the chat status. We'll try again shortly.",
+  "idle": {
+    "advertiserWarning": {
+      "title": "Live chat auto-end",
+      "description": "Live chat will end automatically if there are no new messages within 10 minutes"
+    },
+    "advertiserClosed": {
+      "title": "Live chat auto-end",
+      "description": "Live chat ended automatically because there were no further messages"
+    },
+    "operatorDelay": {
+      "title": "Connecting to live chat",
+      "description": "The agent is handling other chats, so replies are delayed. Please wait a moment."
+    },
+    "operatorUnavailable": {
+      "title": "Live chat delayed",
+      "description": "No agent is available right now. Leave a message and we will reply soon."
+    },
+    "cancel": "Cancel",
+    "confirm": "OK"
+  },
+  "hours": {
+    "title": "Live chat",
+    "description": "Live chat is available weekdays from 10 AM to 6 PM. Outside these hours, please leave a message."
+  }
+}

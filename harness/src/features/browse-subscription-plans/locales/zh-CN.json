@@ -1,0 +1,8 @@
+{
+  "title": "选择套餐",
+  "billing": {
+    "monthly": "按月支付",
+    "yearly": "按年支付",
+    "discount": "省{{rate}}%"
+  }
+}

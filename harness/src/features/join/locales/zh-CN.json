@@ -1,0 +1,107 @@
+{
+  "header": "注册",
+  "next": "下一步",
+  "dev": {
+    "skipCert": "[DEV] 跳过身份验证",
+    "skipStep": "[DEV] 跳到下一步"
+  },
+  "cert": {
+    "header": "身份验证",
+    "title": "使用服务前，<br />企业负责人需完成身份验证。",
+    "button": "通过 PASS 验证",
+    "failFallback": "验证时发生错误",
+    "exists": "该信息已注册",
+    "noticeTitle": "请注意！",
+    "notice": {
+      "privacy": "此验证仅用于身份确认，您的个人信息不会用于其他目的。",
+      "passApp": "是否已安装 PASS 应用？身份验证需要使用。"
+    },
+    "popupBlocked": {
+      "title": "弹窗已被拦截",
+      "message": "请在浏览器中允许弹窗后重试。"
+    }
+  },
+  "info": {
+    "title": "1. 填写账号信息",
+    "passwordPlaceholder": "含字母和数字，至少8位",
+    "checkLabel": "确认密码",
+    "checkPlaceholder": "确认密码",
+    "idHint": "使用字母、数字、下划线、点，6-20位",
+    "empty": "未输入内容。",
+    "passwordHint": "字母、数字、符号组合，8-20位",
+    "passwordMismatch": "不一致，请重新输入。",
+    "passwordMatch": "密码一致。",
+    "idCheckError": "确认账号时发生错误",
+    "idStatus": {
+      "wrong": "该账号已被使用",
+      "possible": "该账号可用",
+      "needCheck": "需要确认账号是否重复"
+    },
+    "passwordError": {
+      "format": "字母、数字、符号组合，8-20位",
+      "containsId": "不可包含账号",
+      "repeated": "不可重复或连续使用相同字符"
+    },
+    "serverPasswordError": {
+      "containsId": "不可包含账号",
+      "containsPersonalInfo": "不可包含个人信息",
+      "fallback": "该密码无法使用，请再次确认规则"
+    }
+  },
+  "company": {
+    "title": "2. 公司信息",
+    "name": "公司名称",
+    "contact": "负责人联系方式",
+    "noDashPlaceholder": "无需输入“-”",
+    "email": "邮箱",
+    "emailPlaceholder": "输入邮箱",
+    "emailFormatError": "邮箱格式不正确。",
+    "emailDuplicate": "已有账号使用该邮箱。",
+    "emailCheckError": "确认邮箱时发生错误",
+    "emailStatus": {
+      "possible": "该邮箱可用",
+      "needCheck": "需要确认邮箱是否重复"
+    },
+    "registration": "营业执照",
+    "registrationNumber": "营业执照号码",
+    "mailorderFile": "通信销售申报证",
+    "mailorderNumber": "通信销售编号",
+    "mailorderYear": "通信销售申报编号 年份",
+    "mailorderRegion": "通信销售申报编号 地区",
+    "mailorderSerial": "通信销售申报编号 序号",
+    "regionPlaceholder": "韩文",
+    "regionHint": "编号含韩文时才填写韩文",
+    "classification": "公司分类",
+    "categoryPlaceholder": "大类",
+    "url": "公司网址",
+    "urlError": "网址格式不正确。"
+  },
+  "upload": {
+    "pick": "选择{{label}}文件",
+    "placeholder": "请上传图片。",
+    "button": "上传",
+    "error": {
+      "extension": "只能选择图片或 PDF 文件",
+      "size": "文件大小不能超过 5MB",
+      "upload": "文件上传出错"
+    }
+  },
+  "terms": {
+    "title": "3. 同意条款",
+    "all": "同意全部条款。",
+    "view": "查看",
+    "agree": "同意",
+    "submit": "欢迎加入",
+    "joinFailed": "注册失败",
+    "item": {
+      "service": {
+        "label": "（必选）同意服务条款",
+        "title": "同意服务条款"
+      },
+      "privacy": {
+        "label": "（必选）隐私政策",
+        "title": "隐私政策"
+      }
+    }
+  }
+}

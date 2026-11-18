@@ -1,0 +1,16 @@
+{
+  "stage": {
+    "DRAFT": "등록 중",
+    "REVIEWING": "승인 대기",
+    "REJECTED": "승인 반려",
+    "IN_PROGRESS": "진행 중",
+    "ENDED": "종료"
+  },
+  "type": {
+    "recruitBrand": "모집형 브랜드형",
+    "recruitGroupBuy": "모집형 공구형",
+    "pickBrand": "PICK형 브랜드형",
+    "pickGroupBuy": "PICK형 공구형"
+  },
+  "demo": "DEMO"
+}

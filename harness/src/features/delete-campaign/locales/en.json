@@ -1,0 +1,15 @@
+{
+  "action": {
+    "delete": "Delete campaign"
+  },
+  "dialog": {
+    "title": "Delete campaign",
+    "description": "This can't be undone. The data will be permanently deleted and can't be recovered. Delete this campaign?",
+    "confirm": "Delete"
+  },
+  "toast": {
+    "deleted": "Campaign deleted.",
+    "notDeletable": "This campaign can't be deleted.",
+    "failed": "Couldn't delete. Try again later."
+  }
+}

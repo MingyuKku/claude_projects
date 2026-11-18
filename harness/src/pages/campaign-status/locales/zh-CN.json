@@ -1,0 +1,59 @@
+{
+  "tab": {
+    "all": "全部",
+    "draft": "注册中",
+    "review": "待审批/驳回",
+    "active": "进行中",
+    "ended": "已结束"
+  },
+  "filter": {
+    "type": {
+      "label": "活动类型",
+      "placeholder": "全部活动类型"
+    }
+  },
+  "action": {
+    "register": "注册活动",
+    "registerShort": "注册",
+    "detail": "注册详情"
+  },
+  "list": {
+    "label": "活动列表"
+  },
+  "column": {
+    "stage": "进度",
+    "name": "活动名称",
+    "type": "活动类型",
+    "period": "活动期间",
+    "shortcut": "快捷入口",
+    "action": "更多"
+  },
+  "shortcut": {
+    "write": "继续填写",
+    "detail": "注册详情",
+    "rejectReason": "驳回原因",
+    "manage": "活动管理",
+    "result": "查看结果"
+  },
+  "empty": {
+    "account": {
+      "title": "暂无已注册的活动。",
+      "description": "注册活动，与网红一起开始吧。"
+    },
+    "tab": {
+      "all": "暂无已注册的活动。",
+      "draft": "暂无注册中的活动。",
+      "review": "暂无待审批或被驳回的活动。",
+      "active": "暂无进行中的活动。",
+      "ended": "暂无已结束的活动。"
+    }
+  },
+  "error": {
+    "list": "无法加载活动列表。"
+  },
+  "subscriptionRequired": {
+    "title": "需要订阅",
+    "description": "订阅已到期，无法继续撰写该活动。已填写的内容会保留，重新订阅后可继续撰写。",
+    "subscribe": "去订阅"
+  }
+}

@@ -1,0 +1,107 @@
+{
+  "header": "Sign up",
+  "next": "Next",
+  "dev": {
+    "skipCert": "[DEV] Skip verification",
+    "skipStep": "[DEV] Skip to next step"
+  },
+  "cert": {
+    "header": "Verify identity",
+    "title": "To use the service, the company contact<br />must verify their identity.",
+    "button": "Verify with PASS",
+    "failFallback": "Verification error occurred",
+    "exists": "Already registered",
+    "noticeTitle": "Wait!",
+    "notice": {
+      "privacy": "This verification is only for identity confirmation. Your personal information is not used for other purposes.",
+      "passApp": "Is the PASS app installed? It's required for verification."
+    },
+    "popupBlocked": {
+      "title": "Pop-up blocked",
+      "message": "Allow pop-ups in your browser and try again."
+    }
+  },
+  "info": {
+    "title": "1. Account info",
+    "passwordPlaceholder": "8+ characters, letters and numbers",
+    "checkLabel": "Confirm password",
+    "checkPlaceholder": "Confirm password",
+    "idHint": "6–20 characters: letters, numbers, underscores, periods.",
+    "empty": "Nothing entered.",
+    "passwordHint": "8–20 characters with letters, numbers and symbols.",
+    "passwordMismatch": "Doesn't match. Re-enter.",
+    "passwordMatch": "Passwords match.",
+    "idCheckError": "Error checking ID",
+    "idStatus": {
+      "wrong": "ID already in use",
+      "possible": "ID available",
+      "needCheck": "Check ID availability"
+    },
+    "passwordError": {
+      "format": "8–20 characters with letters, numbers and symbols.",
+      "containsId": "Must not contain your ID",
+      "repeated": "No repeated or sequential characters"
+    },
+    "serverPasswordError": {
+      "containsId": "Must not contain your ID",
+      "containsPersonalInfo": "Must not contain personal info",
+      "fallback": "This password can't be used. Check the rules again."
+    }
+  },
+  "company": {
+    "title": "2. Company info",
+    "name": "Company name",
+    "contact": "Contact number",
+    "noDashPlaceholder": "Numbers only",
+    "email": "Email",
+    "emailPlaceholder": "Enter email",
+    "emailFormatError": "Invalid email format.",
+    "emailDuplicate": "An account already uses this email.",
+    "emailCheckError": "Error checking email",
+    "emailStatus": {
+      "possible": "Email available",
+      "needCheck": "Check email availability"
+    },
+    "registration": "Business registration certificate",
+    "registrationNumber": "Business registration number",
+    "mailorderFile": "Mail-order business report",
+    "mailorderNumber": "Mail-order number",
+    "mailorderYear": "Mail-order report number year",
+    "mailorderRegion": "Mail-order report number region",
+    "mailorderSerial": "Mail-order report number serial",
+    "regionPlaceholder": "Korean",
+    "regionHint": "Enter Korean only if the number contains Korean",
+    "classification": "Company category",
+    "categoryPlaceholder": "Category",
+    "url": "Company URL",
+    "urlError": "Invalid URL format."
+  },
+  "upload": {
+    "pick": "Select {{label}} file",
+    "placeholder": "Upload an image.",
+    "button": "Upload",
+    "error": {
+      "extension": "Only image or PDF files can be selected",
+      "size": "Files must be 5MB or smaller",
+      "upload": "File upload error"
+    }
+  },
+  "terms": {
+    "title": "3. Terms",
+    "all": "I agree to all.",
+    "view": "View",
+    "agree": "Agree",
+    "submit": "Welcome",
+    "joinFailed": "Sign-up failed",
+    "item": {
+      "service": {
+        "label": "(Required) Agree to Terms of Service",
+        "title": "Terms of Service"
+      },
+      "privacy": {
+        "label": "(Required) Privacy Policy",
+        "title": "Privacy Policy"
+      }
+    }
+  }
+}

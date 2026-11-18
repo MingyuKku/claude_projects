@@ -1,0 +1,59 @@
+{
+  "tab": {
+    "all": "All",
+    "draft": "Drafting",
+    "review": "Pending/Rejected",
+    "active": "Active",
+    "ended": "Ended"
+  },
+  "filter": {
+    "type": {
+      "label": "Campaign type",
+      "placeholder": "All types"
+    }
+  },
+  "action": {
+    "register": "Register campaign",
+    "registerShort": "Register",
+    "detail": "Registration details"
+  },
+  "list": {
+    "label": "Campaigns"
+  },
+  "column": {
+    "stage": "Status",
+    "name": "Campaign",
+    "type": "Type",
+    "period": "Period",
+    "shortcut": "Shortcut",
+    "action": "More"
+  },
+  "shortcut": {
+    "write": "Continue",
+    "detail": "Details",
+    "rejectReason": "Reason",
+    "manage": "Manage",
+    "result": "Results"
+  },
+  "empty": {
+    "account": {
+      "title": "No campaigns yet.",
+      "description": "Register a campaign to start with influencers."
+    },
+    "tab": {
+      "all": "No campaigns yet.",
+      "draft": "No campaigns being drafted.",
+      "review": "No pending or rejected campaigns.",
+      "active": "No active campaigns.",
+      "ended": "No ended campaigns."
+    }
+  },
+  "error": {
+    "list": "Couldn't load campaigns."
+  },
+  "subscriptionRequired": {
+    "title": "Subscription required",
+    "description": "Your subscription has expired, so you can't continue this campaign. Your entries are saved, and you can continue after you subscribe again.",
+    "subscribe": "Subscribe"
+  }
+}

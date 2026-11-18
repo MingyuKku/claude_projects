@@ -1,0 +1,104 @@
+import { FullTextHint } from "@/shared/components/full-text-hint";
+import { useTranslation } from "@/shared/i18n";
+import { EMPTY_VALUE, orEmptyValue } from "@/shared/lib";
+import { Button } from "@/shared/ui/button";
+
+import { useMoneyFormat } from "../lib/use-money-format";
+import { useUsageLabels } from "../lib/use-usage-labels";
+import { CampaignThumbnail } from "./CampaignThumbnail";
+import { UsageAmount } from "./UsageAmount";
+import { UsageTypeBadge } from "./UsageTypeBadge";
+
+import type { UsageRecord } from "../model/usage-types";
+
+interface UsageCardListProps {
+  records: UsageRecord[];
+  onClickDetail: (record: UsageRecord) => void;
+}
+
+// 값이 없는 항목도 행을 숨기지 않고 값은 "-"로 보임.
+export function UsageCardList({ records, onClickDetail }: UsageCardListProps) {
+  const { t } = useTranslation("features/bigbird-money-history");
+  const { formatDateTime, formatWon } = useMoneyFormat();
+  const labels = useUsageLabels();
+
+  return (
+    <ul
+      aria-label={t("usage.list.label")}
+      className="grid grid-cols-1 gap-3 tablet:grid-cols-2"
+    >
+      {records.map((record) => {
+        const rows = [
+          {
+            key: "type",
+            value:
+              record.type || record.typeText ? (
+                <UsageTypeBadge record={record} />
+              ) : (
+                EMPTY_VALUE
+              ),
+          },
+          {
+            key: "date",
+            value: orEmptyValue(
+              formatDateTime(record.usedAt, record.usedAtText),
+            ),
+          },
+          {
+            key: "campaignName",
+            value: (
+              <div className="flex min-w-0 items-center gap-3">
+                <CampaignThumbnail record={record} />
+                <FullTextHint
+                  text={orEmptyValue(record.campaignName)}
+                  lines={2}
+                  className="min-w-0 flex-1"
+                />
+              </div>
+            ),
+          },
+          { key: "usage", value: orEmptyValue(labels.usageDetail(record)) },
+          {
+            key: "amount",
+            value:
+              record.amount === null ? (
+                EMPTY_VALUE
+              ) : (
+                <UsageAmount amount={record.amount} />
+              ),
+          },
+          {
+            key: "remaining",
+            value: orEmptyValue(formatWon(record.remainingAmount)),
+          },
+        ] as const;
+
+        return (
+          <li key={record.id} className="flex flex-col gap-2">
+            <div className="flex items-center justify-end gap-2">
+              <Button
+                variant="outline-foreground"
+                size="sm"
+                onClick={() => onClickDetail(record)}
+              >
+                {t("usage.action.detail")}
+              </Button>
+            </div>
+            <dl className="grid flex-1 grid-cols-[minmax(6.25rem,7rem)_minmax(0,1fr)] overflow-hidden rounded-lg border">
+              {rows.map(({ key, value }) => (
+                <div key={key} className="contents">
+                  <dt className="flex min-h-12 items-center border-b bg-muted/40 px-4 text-sm leading-6 font-medium text-muted-foreground [div:last-child>&]:border-b-0">
+                    {t(`usage.column.${key}`)}
+                  </dt>
+                  <dd className="flex min-h-12 min-w-0 items-center border-b px-4 py-2 text-sm leading-5 break-all text-foreground [div:last-child>&]:border-b-0">
+                    {value}
+                  </dd>
+                </div>
+              ))}
+            </dl>
+          </li>
+        );
+      })}
+    </ul>
+  );
+}

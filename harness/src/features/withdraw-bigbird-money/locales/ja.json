@@ -1,0 +1,60 @@
+{
+  "title": "ビッグバードマネーの出金",
+  "won": "{{amount}}ウォン",
+  "notice": {
+    "fullOnly": "全額出金のみ可能です。",
+    "corporate": "法人事業者は、事業者登録証の商号と口座名義が同一である必要があります。",
+    "personal": "個人事業者は、代表者名と口座名義が同一である必要があります。",
+    "processing": "出金リクエスト後、営業日基準で1〜2日以内に処理されます。",
+    "reflected": "出金完了後、残高にすぐ反映されます。"
+  },
+  "field": {
+    "bank": {
+      "label": "出金銀行",
+      "placeholder": "銀行を選択"
+    },
+    "accountNumber": {
+      "label": "出金口座番号",
+      "placeholder": "口座番号を入力"
+    },
+    "accountHolder": {
+      "label": "出金口座名義",
+      "placeholder": "口座名義を入力"
+    },
+    "bankBook": {
+      "label": "通帳コピー",
+      "placeholder": "通帳コピーをアップロード",
+      "upload": "アップロード",
+      "uploadFor": "{{label}}をアップロード"
+    }
+  },
+  "next": "次へ",
+  "confirm": {
+    "amount": "出金額",
+    "bank": "出金銀行",
+    "accountNumber": "出金口座番号",
+    "accountHolder": "口座名義",
+    "method": "処理方法",
+    "methodValue": "入力した口座へ出金",
+    "bankBook": "通帳コピー",
+    "bankBookDownload": "{{name}}をダウンロード",
+    "expected": "出金後の残高",
+    "notice": "入力した口座への出金リクエストを受け付けます。",
+    "submit": "全額出金をリクエスト"
+  },
+  "error": {
+    "invalidBank": "銀行を選択し直してください。",
+    "invalidAccountNumber": "口座番号を数字のみで入力してください。",
+    "invalidAccountHolder": "口座名義を入力してください。",
+    "bankBookRequired": "通帳コピーを添付してください。",
+    "fileExtension": "JPG・PNG・PDFのみアップロードできます。",
+    "fileSize": "最大10MBまでです。",
+    "bankList": "銀行一覧を読み込めませんでした。"
+  },
+  "toast": {
+    "zeroBalance": "出金できるビッグバードマネーがありません。",
+    "pending": "処理中の出金があります。完了後にもう一度お試しください。",
+    "balanceChanged": "残高が変わりました。出金額を確認してください。",
+    "failed": "出金リクエストに失敗しました。しばらくしてからお試しください。"
+  }
+}

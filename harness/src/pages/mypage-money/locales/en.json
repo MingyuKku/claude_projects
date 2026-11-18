@@ -1,0 +1,21 @@
+{
+  "title": "Bigbird Money",
+  "tabs": {
+    "charge": "Charge/Withdraw",
+    "usage": "Usage"
+  },
+  "views": {
+    "balance": "Charge",
+    "history": "Details"
+  },
+  "charge": {
+    "action": "Charge"
+  },
+  "withdraw": {
+    "action": "Withdraw"
+  },
+  "withdrawn": {
+    "title": "Withdrawal request received",
+    "description": "Your withdrawal request was received on {{requestedAt}}.\nYou can find the details on your statement."
+  }
+}

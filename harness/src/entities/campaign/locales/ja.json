@@ -1,0 +1,16 @@
+{
+  "stage": {
+    "DRAFT": "登録中",
+    "REVIEWING": "承認待ち",
+    "REJECTED": "差し戻し",
+    "IN_PROGRESS": "進行中",
+    "ENDED": "終了"
+  },
+  "type": {
+    "recruitBrand": "募集型ブランド型",
+    "recruitGroupBuy": "募集型共同購入型",
+    "pickBrand": "PICK型ブランド型",
+    "pickGroupBuy": "PICK型共同購入型"
+  },
+  "demo": "DEMO"
+}

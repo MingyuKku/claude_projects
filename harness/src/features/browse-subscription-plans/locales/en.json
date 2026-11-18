@@ -1,0 +1,8 @@
+{
+  "title": "Select plan",
+  "billing": {
+    "monthly": "Monthly",
+    "yearly": "Yearly",
+    "discount": "{{rate}}% off"
+  }
+}

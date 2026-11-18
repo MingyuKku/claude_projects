@@ -1,0 +1,12 @@
+{
+  "chargeStatus": {
+    "paid": "已到账",
+    "withdrawn": "已提现",
+    "pending": "等待中",
+    "canceled": "未到账取消"
+  },
+  "balance": {
+    "title": "Bigbird 余额",
+    "unit": "韩元"
+  }
+}

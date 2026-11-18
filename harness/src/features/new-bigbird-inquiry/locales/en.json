@@ -1,0 +1,13 @@
+{
+  "typeLabel": "Select inquiry type",
+  "campaignType": "Campaign inquiry",
+  "campaignDescription": "Ask about campaign progress, performance, settlement, and related topics.",
+  "otherType": "Other inquiry",
+  "otherDescription": "Ask about policies, the system, account usage, and other topics.",
+  "campaignListLabel": "Select a campaign",
+  "campaignName": "Campaign name",
+  "submit": "Submit inquiry",
+  "campaignPeriod": "Period",
+  "select": "Select",
+  "noCampaign": "No campaigns found."
+}

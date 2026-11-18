@@ -1,0 +1,107 @@
+{
+  "header": "会員登録",
+  "next": "次へ",
+  "dev": {
+    "skipCert": "[DEV] 本人認証をスキップ",
+    "skipStep": "[DEV] 次のステップへスキップ"
+  },
+  "cert": {
+    "header": "本人認証",
+    "title": "サービスのご利用には<br />企業担当者の本人認証が必要です。",
+    "button": "PASSで本人認証",
+    "failFallback": "認証中にエラーが発生しました",
+    "exists": "すでに登録済みの情報です",
+    "noticeTitle": "ご確認ください",
+    "notice": {
+      "privacy": "本人確認のための認証であり、会員様の個人情報を他の目的には利用しません。",
+      "passApp": "PASSアプリはインストールされていますか？本人認証に必要です。"
+    },
+    "popupBlocked": {
+      "title": "ポップアップがブロックされました",
+      "message": "ブラウザでポップアップのブロックを解除してから、もう一度お試しください。"
+    }
+  },
+  "info": {
+    "title": "1. 登録情報の入力",
+    "passwordPlaceholder": "英字・数字を含む8文字以上",
+    "checkLabel": "パスワード確認",
+    "checkPlaceholder": "パスワード確認",
+    "idHint": "英字・数字・アンダースコア・ピリオドで6〜20文字",
+    "empty": "未入力です。",
+    "passwordHint": "英字・数字・記号を組み合わせて8〜20文字",
+    "passwordMismatch": "一致しません。再入力してください。",
+    "passwordMatch": "パスワードが一致します。",
+    "idCheckError": "ID確認中にエラーが発生しました",
+    "idStatus": {
+      "wrong": "すでに使用中のIDです",
+      "possible": "使用可能なIDです",
+      "needCheck": "IDの重複確認が必要です"
+    },
+    "passwordError": {
+      "format": "英字・数字・記号を組み合わせて8〜20文字",
+      "containsId": "IDを含むパスワードは不可",
+      "repeated": "同一・連続した数字や文字の繰り返し不可"
+    },
+    "serverPasswordError": {
+      "containsId": "IDを含むパスワードは不可",
+      "containsPersonalInfo": "個人情報を含むパスワードは不可",
+      "fallback": "このパスワードは使用できません。条件をもう一度ご確認ください"
+    }
+  },
+  "company": {
+    "title": "2. 会社情報",
+    "name": "会社名",
+    "contact": "担当者連絡先",
+    "noDashPlaceholder": "ハイフンなしで入力",
+    "email": "メールアドレス",
+    "emailPlaceholder": "メールアドレスを入力",
+    "emailFormatError": "メールアドレスの形式が正しくありません。",
+    "emailDuplicate": "このメールアドレスを使用中のアカウントがあります。",
+    "emailCheckError": "メールアドレス確認中にエラーが発生しました",
+    "emailStatus": {
+      "possible": "使用可能なメールアドレスです",
+      "needCheck": "メールアドレスの重複確認が必要です"
+    },
+    "registration": "事業者登録証",
+    "registrationNumber": "事業者登録番号",
+    "mailorderFile": "通信販売業申告証",
+    "mailorderNumber": "通信販売番号",
+    "mailorderYear": "通信販売申告番号 年度",
+    "mailorderRegion": "通信販売申告番号 地域",
+    "mailorderSerial": "通信販売申告番号 連番",
+    "regionPlaceholder": "韓国語",
+    "regionHint": "番号に韓国語がある場合のみ韓国語で入力",
+    "classification": "会社分類",
+    "categoryPlaceholder": "大分類",
+    "url": "会社URL",
+    "urlError": "URLの形式が正しくありません。"
+  },
+  "upload": {
+    "pick": "{{label}}のファイルを選択",
+    "placeholder": "画像をアップロードしてください。",
+    "button": "アップロード",
+    "error": {
+      "extension": "画像またはPDFファイルのみ選択できます",
+      "size": "ファイルサイズは5MB以下のみアップロードできます",
+      "upload": "ファイルのアップロードでエラーが発生しました"
+    }
+  },
+  "terms": {
+    "title": "3. 規約への同意",
+    "all": "すべての項目に同意します。",
+    "view": "表示",
+    "agree": "同意",
+    "submit": "ようこそ",
+    "joinFailed": "登録に失敗しました",
+    "item": {
+      "service": {
+        "label": "（必須）利用規約に同意",
+        "title": "利用規約への同意"
+      },
+      "privacy": {
+        "label": "（必須）プライバシーポリシー",
+        "title": "プライバシーポリシー"
+      }
+    }
+  }
+}

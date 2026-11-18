@@ -1,0 +1,8 @@
+{
+  "title": "プラン選択",
+  "billing": {
+    "monthly": "月払い",
+    "yearly": "年払い",
+    "discount": "{{rate}}%OFF"
+  }
+}

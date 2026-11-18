@@ -1,0 +1,8 @@
+{
+  "title": "Subscription",
+  "tabs": {
+    "plans": "Subscription",
+    "usage": "Usage",
+    "payments": "Payments"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "title": "首页",
+  "hero": {
+    "title": "输入产品信息，\nAI为您找到合适的网红",
+    "subtitle": "AI根据品牌和目标快速推荐合适的网红"
+  },
+  "card": {
+    "comingSoon": "准备中",
+    "recommend": {
+      "title": "网红推荐",
+      "description": "基于AI数据推荐最合适的网红。"
+    },
+    "campaign": {
+      "title": "广告活动登记/运营",
+      "description": "从招募、管理到结算，一站式解决。"
+    },
+    "pricing": {
+      "title": "资费说明",
+      "description": "一目了然地比较广告活动产品和订阅套餐。"
+    }
+  }
+}

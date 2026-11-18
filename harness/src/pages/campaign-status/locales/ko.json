@@ -1,0 +1,59 @@
+{
+  "tab": {
+    "all": "전체",
+    "draft": "등록 중",
+    "review": "승인 대기/반려",
+    "active": "진행 중",
+    "ended": "종료"
+  },
+  "filter": {
+    "type": {
+      "label": "캠페인 유형",
+      "placeholder": "전체 캠페인 유형"
+    }
+  },
+  "action": {
+    "register": "캠페인 등록하기",
+    "registerShort": "캠페인 등록",
+    "detail": "등록 내역"
+  },
+  "list": {
+    "label": "캠페인 목록"
+  },
+  "column": {
+    "stage": "진행 단계",
+    "name": "캠페인 명",
+    "type": "캠페인 유형",
+    "period": "캠페인 기간",
+    "shortcut": "바로 가기",
+    "action": "더보기"
+  },
+  "shortcut": {
+    "write": "작성하기",
+    "detail": "등록 내역",
+    "rejectReason": "반려 사유",
+    "manage": "캠페인 관리",
+    "result": "결과 확인"
+  },
+  "empty": {
+    "account": {
+      "title": "등록된 캠페인이 없습니다.",
+      "description": "새 캠페인을 등록해 인플루언서와 함께 시작해 보세요."
+    },
+    "tab": {
+      "all": "등록된 캠페인이 없습니다.",
+      "draft": "등록 중인 캠페인이 없습니다.",
+      "review": "승인 대기 중이거나 반려된 캠페인이 없습니다.",
+      "active": "진행 중인 캠페인이 없습니다.",
+      "ended": "종료된 캠페인이 없습니다."
+    }
+  },
+  "error": {
+    "list": "캠페인 목록을 불러오지 못했습니다."
+  },
+  "subscriptionRequired": {
+    "title": "구독이 필요합니다",
+    "description": "구독이 만료되어 이 캠페인을 이어서 작성할 수 없습니다. 입력한 내용은 보관되어 있으며, 다시 구독하면 이어서 작성할 수 있습니다.",
+    "subscribe": "구독하기"
+  }
+}

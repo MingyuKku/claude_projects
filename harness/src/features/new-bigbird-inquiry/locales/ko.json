@@ -1,0 +1,13 @@
+{
+  "typeLabel": "문의 유형 선택",
+  "campaignType": "캠페인 문의",
+  "campaignDescription": "캠페인 진행, 성과, 정산 등 캠페인 관련 문의를 진행합니다.",
+  "otherType": "기타 문의",
+  "otherDescription": "정책, 시스템, 이용 문의 등 기타 문의를 진행합니다.",
+  "campaignListLabel": "캠페인 선택",
+  "campaignName": "캠페인명",
+  "submit": "문의하기",
+  "campaignPeriod": "기간",
+  "select": "선택",
+  "noCampaign": "캠페인 내역이 존재하지 않습니다."
+}

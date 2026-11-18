@@ -1,0 +1,4 @@
+# 이미지에는 빌드된 dist 와 nginx 설정만 들어간다. 나머지(.env*, node_modules, .git 등)는 빌드 컨텍스트에서 뺀다.
+*
+!dist
+!deploy/nginx

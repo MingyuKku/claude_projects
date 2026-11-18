@@ -1,0 +1,244 @@
+import { normalizeFirestoreTime } from "../model/firestore-time";
+
+import type {
+  BigbirdInquiryStatus,
+  BigbirdInquiryViewModel,
+  RealtimeConsultation,
+  RealtimePhase,
+} from "../model/schema";
+
+/** 상담 요청 뒤 운영자가 연결되기를 기다리는 시간(요구명세서 REQ-23-0020 3분). */
+export const REALTIME_CONNECT_TIMEOUT_MS = 3 * 60 * 1000;
+
+/**
+ * 연결 뒤 상대 응답을 기다리는 시간(REQ-23-0021). 마지막 메시지 뒤 이만큼 지나면 안내하고, 두 번째 값이 지나면
+ * 광고주 차례일 때는 자동 종료, 운영 차례일 때는 지연 안내만 함. 새 메시지가 오면 다시 셈.
+ */
+export const REALTIME_IDLE_WARNING_MS = 5 * 60 * 1000;
+export const REALTIME_IDLE_LIMIT_MS = 10 * 60 * 1000;
+
+/**
+ * Firestore에 쓰는 `YYYY-MM-DD HH:mm:ss`(로컬 시각)를 ms로. 비었거나 잘못된 값은 null. 트랜잭션이 읽는 원본 문서의
+ * 시각은 서버가 쓴 Timestamp일 수 있어(2026-11-02 stage) 그것도 읽음.
+ */
+export function parseWriteTime(value: unknown) {
+  const normalized = normalizeFirestoreTime(value);
+  if (typeof normalized !== "string" || !normalized) return null;
+  const time = new Date(normalized.replace(" ", "T")).getTime();
+  return Number.isNaN(time) ? null : time;
+}
+
+/**
+ * 상담 문서만으로 본 연결 여부: 요청 시각(`matchRequestedAt`)이 있고 `acceptedAt`이 그와 같거나 늦으면 연결됨.
+ * 서버가 끝내거나 일반 문의로 돌리면 `matchRequestedAt`이 비고 `acceptedAt`·`endReason`은 남으며, 같은 문서를 재요청에
+ * 다시 쓰므로(마켓 실측 2026-11-04) 요청 시각이 없으면 연결 아님. 요청 시각이 없는 옛 문서는 수락을 한 번 더 보냄
+ * (탭 기록으로 중복 방지). 둘 다 같은 형식의 문자열로 정규화돼 있어 사전순 비교가 시각순과 같음.
+ */
+export function isConsultationConnected(
+  consultation: Pick<RealtimeConsultation, "acceptedAt" | "matchRequestedAt">,
+): boolean {
+  const { acceptedAt, matchRequestedAt } = consultation;
+  return Boolean(
+    acceptedAt && matchRequestedAt && acceptedAt >= matchRequestedAt,
+  );
+}
+
+/**
+ * 3분 매칭 실패 안내 박스를 보일지. 서버가 일반 문의로 돌린 문서(`endReason` MATCH_TIMEOUT, `matchRequestedAt` 빔)이고, 실패
+ * 시각 뒤에 운영 상담원이 보낸 일반 메시지(auto·광고주 메시지 아님)가 아직 없을 때. 실패 시각은 `waitDeadline`, 없으면 서버
+ * 자동 안내(auto) 중 마지막 메시지의 시각. 둘 다 없으면 시각을 알 수 없어 박스를 유지함. 상담 문서 메시지에는 삭제 표시가 없어
+ * 삭제 여부는 보지 못함.
+ *
+ * 일반 문의로 이어진 뒤 광고주가 보낸 메시지는 상담 문서가 아니라 REST 대화에 있어 `conversation`으로 받음. 실패 시각 뒤에
+ * 광고주가 직접 보낸 메시지(캠페인 카드 제외)가 있으면 이미 일반 문의가 시작된 것이라 박스를 걷음.
+ */
+export function isMatchFailureShown(
+  consultation:
+    | Pick<
+        RealtimeConsultation,
+        "endReason" | "matchRequestedAt" | "waitDeadline" | "messages"
+      >
+    | undefined,
+  conversation: Pick<
+    BigbirdInquiryViewModel["messages"][number],
+    "isMine" | "campaign" | "createdAt"
+  >[] = [],
+): boolean {
+  if (
+    !consultation ||
+    consultation.endReason !== "MATCH_TIMEOUT" ||
+    consultation.matchRequestedAt
+  )
+    return false;
+  const failedAt =
+    consultation.waitDeadline ??
+    consultation.messages.filter((message) => message.auto).at(-1)?.created;
+  if (!failedAt) return true;
+  const failedAtTime = parseWriteTime(failedAt);
+  const hasAdvertiserMessage =
+    failedAtTime !== null &&
+    conversation.some(
+      (message) =>
+        message.isMine &&
+        !message.campaign &&
+        message.createdAt.getTime() > failedAtTime,
+    );
+  if (hasAdvertiserMessage) return false;
+  return !consultation.messages.some(
+    (message) =>
+      !message.auto &&
+      message.isUserMessage === false &&
+      message.created > failedAt,
+  );
+}
+
+// 시간 초과로 끝난 사유: 연결 대기 3분(MATCH_TIMEOUT)과 연결 뒤 무응답 5·10분(INACTIVITY_TIMEOUT). 그 밖의 종료는 정상 종료임(사용자 결정 2026-11-12).
+const TIMEOUT_END_REASONS = ["MATCH_TIMEOUT", "INACTIVITY_TIMEOUT"];
+
+/**
+ * "완료된 상담" 카드를 상담 문서의 종료 사유로 보일지. 운영이 직접 종료한 상담은 서버가 종료 안내(notice) 메시지를 남기지 않고
+ * 상담 문서의 `finishTime`도 비운 채 `endReason`(RESPONDER_FINISHED 등)만 써서 대화만으로는 알 수 없음(2026-11-12 실제 흐름 확인).
+ * 스레드가 종료됐고(REST) 종료 사유가 시간 초과가 아니면 정상 종료로 봄. 종료된 스레드에는 메시지가 더 붙지 않아(새 스레드가 생김)
+ * 종료 뒤 메시지는 따로 보지 않음.
+ */
+export function isConsultationCompletedShown(
+  consultation: Pick<RealtimeConsultation, "endReason"> | undefined,
+  isThreadFinished: boolean,
+): boolean {
+  if (!isThreadFinished || !consultation?.endReason) return false;
+  return !TIMEOUT_END_REASONS.includes(consultation.endReason);
+}
+
+const PHASE_STATUS: Record<RealtimePhase, BigbirdInquiryStatus> = {
+  requesting: "waiting",
+  connected: "consulting",
+  // 연결 실패 뒤에는 일반 문의로 이어가므로 답변 대기로 보임(사용자 결정 2026-10-29).
+  failed: "waiting",
+  finished: "done",
+};
+
+interface PhaseInput {
+  isFinished: boolean;
+  isConnect: boolean;
+  /** 연결을 요청한 시각. */
+  requestedAt: Date;
+  now: number;
+}
+
+/**
+ * 종료 여부(`finishTime`)가 먼저. `isConnect`는 연결 여부(호출하는 쪽이 `msgResponseDate`로 계산한 값).
+ *
+ * ponytail: 요청 실패는 서버·Firestore에 저장되지 않아 "요청 시각 + 3분이 지나도 연결되지 않음"으로 계산함.
+ * 재시도할 때 새 요청 시각을 담을 필드가 정해지면 `requestedAt`을 그 값으로 바꿈.
+ */
+export function getRealtimePhase({
+  isFinished,
+  isConnect,
+  requestedAt,
+  now,
+}: PhaseInput): RealtimePhase {
+  if (isFinished) return "finished";
+  if (isConnect) return "connected";
+  if (now - requestedAt.getTime() >= REALTIME_CONNECT_TIMEOUT_MS)
+    return "failed";
+  return "requesting";
+}
+
+/** 연결 대기가 끝나는 시각. 대기 중이 아니면 null. 이 시각에 화면을 다시 계산해야 함. */
+export function getConnectDeadline(
+  inquiry: Pick<
+    BigbirdInquiryViewModel,
+    "realtimePhase" | "createdAt" | "connectDeadlineAt"
+  >,
+): number | null {
+  return inquiry.realtimePhase === "requesting"
+    ? (inquiry.connectDeadlineAt ??
+        inquiry.createdAt.getTime() + REALTIME_CONNECT_TIMEOUT_MS)
+    : null;
+}
+
+// 캠페인 카드는 요청 때 쓰는 auto 메시지라 대화 차례 계산에서 뺌.
+function isCampaignCardMessage(
+  message: RealtimeConsultation["messages"][number],
+) {
+  return message.auto && message.body.trimStart().startsWith("{");
+}
+
+/**
+ * 연결된 상담에서 지금 누구의 답을 기다리는지와 그 시작 시각. 마지막 메시지가 광고주 것이면 운영 차례,
+ * 운영 것(연결 안내 포함)이면 광고주 차례. 메시지가 없으면 연결 시각(`seqResponseDate`)부터 광고주 차례.
+ */
+export function getIdleTurn(
+  consultation: RealtimeConsultation,
+): BigbirdInquiryViewModel["idleTurn"] {
+  const last = consultation.messages
+    .filter((message) => !isCampaignCardMessage(message))
+    .at(-1);
+  if (last) {
+    const since = parseWriteTime(last.created);
+    if (since === null) return null;
+    return {
+      waitingFor: last.isUserMessage ? "operator" : "advertiser",
+      since,
+    };
+  }
+  const connectedAt = parseWriteTime(consultation.seqResponseDate);
+  return connectedAt === null
+    ? null
+    : { waitingFor: "advertiser", since: connectedAt };
+}
+
+/**
+ * REST 문의에 Firestore 상담 문서의 진행 상태를 합침. 문서를 아직 받지 못했고 종료되지도 않았다면
+ * 연결됐는지 알 수 없어 그대로 둠(상태를 추측하지 않음).
+ */
+export function applyRealtimeConsultation(
+  inquiry: BigbirdInquiryViewModel,
+  consultation: RealtimeConsultation | undefined,
+  now: number,
+  /** 요청자 계정 문서(`threadUserIdx/{내}`)의 `msgResponseDate`(ms). 없으면 null. */
+  responseAt: number | null = null,
+): BigbirdInquiryViewModel {
+  if (!inquiry.isRealtime) return inquiry;
+  if (!consultation && !inquiry.isFinished) return inquiry;
+  // 서버가 쓰는 요청 시각(`matchRequestedAt`)이 먼저, 없으면 대기 마감 - 3분, 그것도 없으면 REST의 생성 시각.
+  const matchRequestedAt = parseWriteTime(consultation?.matchRequestedAt);
+  const deadline = parseWriteTime(consultation?.waitDeadline);
+  const requestedAt =
+    matchRequestedAt !== null
+      ? new Date(matchRequestedAt)
+      : deadline === null
+        ? inquiry.createdAt
+        : new Date(deadline - REALTIME_CONNECT_TIMEOUT_MS);
+  const isFinished = inquiry.isFinished || consultation?.finishTime != null;
+  // 연결 = 같은 상담 문서의 `acceptedAt` ≥ 요청 시각(백엔드 흐름도 프론트팀 가이드 3번, 2026-11-03). `isConnect`는 서버가
+  // 요청 직후부터 true라 쓰지 않음.
+  // ponytail: `acceptedAt`이 없는 문서(stage 반영 전·예전 문서)는 요청 이후 계정 문서 `msgResponseDate`가 생기거나 바뀐
+  // 것으로 근사함. 계정 문서는 사용자당 하나라 동시에 열린 다른 상담의 수락과 섞일 수 있음. 반영이 끝나면 이 분기를 지움.
+  const acceptedAt = parseWriteTime(consultation?.acceptedAt);
+  const connectedAt = acceptedAt ?? responseAt;
+  const isConnect =
+    connectedAt !== null && connectedAt >= requestedAt.getTime();
+  // 취소·만료가 기록된 요청은 마감 시각 전에도 실패. 같은 문서를 재요청에 다시 쓰고 이전 사이클 값이 남으므로(마켓 실측
+  // 2026-11-04) 이번 요청 시각 이후에 기록된 것만 인정함.
+  const endedAt = [consultation?.canceledAt, consultation?.expiredAt].map(
+    parseWriteTime,
+  );
+  const isDead =
+    !isFinished &&
+    !isConnect &&
+    endedAt.some((time) => time !== null && time >= requestedAt.getTime());
+  const phase = isDead
+    ? "failed"
+    : getRealtimePhase({ isFinished, isConnect, requestedAt, now });
+  return {
+    ...inquiry,
+    realtimePhase: phase,
+    isFinished: phase === "finished",
+    status: PHASE_STATUS[phase],
+    connectDeadlineAt: requestedAt.getTime() + REALTIME_CONNECT_TIMEOUT_MS,
+    idleTurn:
+      phase === "connected" && consultation ? getIdleTurn(consultation) : null,
+    isRetryable: phase === "failed" && !consultation?.canceledAt,
+  };
+}

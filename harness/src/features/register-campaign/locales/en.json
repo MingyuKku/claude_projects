@@ -1,0 +1,538 @@
+{
+  "step": {
+    "campaignInfo": "Campaign info",
+    "product": "Product info",
+    "influencer": "Influencer criteria",
+    "addOns": "Add-ons",
+    "intro": "캠페인 소개서",
+    "conditions": "Campaign terms",
+    "policy": "Policy consent",
+    "payment": "Payment"
+  },
+  "nav": {
+    "label": "Registration steps",
+    "open": "Open steps",
+    "indicator": {
+      "editing": "In progress",
+      "warning": "Required fields missing"
+    }
+  },
+  "action": {
+    "saveDraft": "Save draft",
+    "previous": "Previous",
+    "next": "Next",
+    "pay": "Pay",
+    "preview": "Preview",
+    "complete": "Complete"
+  },
+  "toast": {
+    "saved": "Saved.",
+    "saveFailed": "Failed to save. Please try again.",
+    "fileType": "Only JPG and PNG files can be uploaded.",
+    "fileSize": "Only files up to 10MB can be uploaded.",
+    "videoSize": "Only videos up to 500MB can be uploaded.",
+    "requestFailed": "Request failed. Please try again later.",
+    "addressSearchFailed": "Couldn't load address search. Please try again later.",
+    "aiCompleted": "AI generation is complete.",
+    "aiFailed": "AI generation failed. Check the URL and try again.",
+    "fileCount": "You can upload up to 5 files.",
+    "uploading": "Uploading files ({{done}}/{{total}})"
+  },
+  "dialog": {
+    "requiredInfo": {
+      "title": "Required fields missing",
+      "description": "Fill in all fields on this page to register the campaign."
+    },
+    "notEditable": {
+      "title": "Can't be edited",
+      "description": "This campaign is under review or approved and can't be edited. Going to registration details.",
+      "demoDescription": "A completed 데모 캠페인 can't be edited. Going to basic info."
+    }
+  },
+  "info": {
+    "code": {
+      "label": "Campaign code"
+    },
+    "name": {
+      "label": "Campaign name",
+      "placeholder": "Enter a campaign name."
+    },
+    "type": {
+      "label": "Campaign type",
+      "PRODUCT_DELIVERY": "제품발송형",
+      "PRESS": "기자단형",
+      "STORE_VISIT": "매장방문형"
+    },
+    "typeChange": {
+      "title": "Change campaign type",
+      "description": "Changing the type resets the info you've entered. Fields for the new type will appear.",
+      "confirm": "Change"
+    },
+    "brand": {
+      "label": "Brand",
+      "placeholder": "Select a brand.",
+      "manage": "Manage brands"
+    },
+    "period": {
+      "label": "Preferred start date",
+      "placeholder": "Select a date.",
+      "help": "The end date is set 30 days later automatically."
+    }
+  },
+  "brands": {
+    "title": "Manage brands",
+    "listTitle": "Registered brands",
+    "count_one": "<em>{{count}}</em> brand",
+    "count_other": "<em>{{count}}</em> brands",
+    "add": "Add brand",
+    "empty": "No brands registered.",
+    "delete": "Delete",
+    "deleteLabel": "Delete {{name}}",
+    "deleteDialog": {
+      "title": "Delete brand",
+      "description": "Delete this brand? Deleted data can't be recovered."
+    },
+    "addTitle": "Add brand",
+    "name": {
+      "label": "Brand name",
+      "placeholder": "Enter a brand name."
+    },
+    "image": {
+      "label": "Brand image",
+      "title": "Upload a brand image.",
+      "description": "A default profile is used if none is uploaded.",
+      "remove": "Remove brand image"
+    },
+    "save": "Save"
+  },
+  "loadPrevious": {
+    "title": "Load previous campaign",
+    "listTitle": "Campaigns",
+    "load": "Load campaign",
+    "search": {
+      "label": "Search campaigns",
+      "placeholder": "Search by campaign or brand name.",
+      "submit": "Search",
+      "placeholderShort": "Search campaign or brand"
+    },
+    "emptySearch": "No results for ‘{{keyword}}’.",
+    "empty": "No campaigns registered.",
+    "column": {
+      "select": "Select",
+      "name": "Campaign name",
+      "brand": "Brand",
+      "type": "Type",
+      "platform": "Platform",
+      "createdDate": "Created"
+    },
+    "overwrite": {
+      "title": "Load campaign",
+      "description": "Loading a saved campaign replaces what you're writing now. Continue?",
+      "confirm": "Load"
+    }
+  },
+  "platform": {
+    "INSTAGRAM": "Instagram",
+    "NAVER_BLOG": "Blog",
+    "FACEBOOK": "Facebook",
+    "YOUTUBE": "YouTube",
+    "TIKTOK": "TikTok",
+    "X": "X"
+  },
+  "unit": {
+    "won": "KRW",
+    "count": "ea"
+  },
+  "address": {
+    "search": "Find address",
+    "detail": "Enter detailed address"
+  },
+  "product": {
+    "contactPlaceholder": "Enter a contact for the return.",
+    "delivery": {
+      "nameLabel": "Product name and quantity",
+      "namePlaceholder": "Enter the product name.",
+      "quantityLabel": "Quantity per person",
+      "quantityPlaceholder": "Enter the quantity per person.",
+      "priceLabel": "Product price",
+      "pricePlaceholder": "Enter the price per item."
+    },
+    "return": {
+      "label": "Product return",
+      "no": "No return",
+      "yes": "Return",
+      "notice": "Enter the return address in case a selected creator cancels the campaign.",
+      "addressLabel": "Return shipping address",
+      "addressPlaceholder": "Enter the return address.",
+      "feeLabel": "Return shipping fee",
+      "feePlaceholder": "Enter the return shipping fee.",
+      "contactLabel": "Return contact"
+    },
+    "rental": {
+      "label": "Rental product",
+      "general": "Regular",
+      "rental": "Rental",
+      "noticePrice": "Products priced at 1,000,000 KRW or more can run as rental products.",
+      "noticeReturn": "The advertiser handles product retrieval directly.",
+      "addressLabel": "Rental return address",
+      "feeLabel": "Retrieval shipping fee",
+      "feePlaceholder": "Enter the retrieval shipping fee.",
+      "contactLabel": "Retrieval contact"
+    },
+    "store": {
+      "nameLabel": "Store name",
+      "namePlaceholder": "Enter the store name.",
+      "benefitLabel": "Visit benefits and quantity",
+      "benefitPlaceholder": "Describe the benefits and quantity offered on visit.",
+      "addressLabel": "Store address",
+      "addressPlaceholder": "Enter the store address.",
+      "couponLabel": "Visit coupon code",
+      "couponPlaceholder": "Enter the visit coupon code."
+    },
+    "press": {
+      "noticeTitle": "Enter details in the next step.",
+      "noticeAbout": "기자단형 campaigns cover a brand or service through reporting and articles, not product delivery, store visits or purchases.",
+      "noticeGuide": "Article guides such as topics, keywords and references can be described in the '캠페인 소개서' step.",
+      "emptyTitle": "No sponsorship details are needed for 기자단형.",
+      "emptyDescription": "Enter the article direction and guide<br/>in the next step, '캠페인 소개서'."
+    }
+  },
+  "influencer": {
+    "platform": "Platform",
+    "gender": {
+      "label": "Preferred gender",
+      "FEMALE": "Female",
+      "MALE": "Male",
+      "ALL": "All"
+    },
+    "ageGroup": {
+      "label": "Preferred age (multiple)",
+      "AGE_10S": "10s",
+      "AGE_20S": "20s",
+      "AGE_30S": "30s",
+      "AGE_40S": "40s",
+      "AGE_50S_PLUS": "50s+"
+    },
+    "topic": {
+      "label": "Posting topics (multiple)",
+      "DigitalAppliances": "Digital & Appliances",
+      "Education": "Education",
+      "SportsLeisure": "Sports & Leisure",
+      "MarketTools": "Market & Group Buy",
+      "Beauty": "Beauty",
+      "LivingHealth": "Living & Health",
+      "TravelCulture": "Travel & Culture",
+      "AgeProfession": "Age & Occupation",
+      "FoodCooking": "Food & Cooking",
+      "DailyLife": "Daily Life",
+      "Region": "Local",
+      "BookPublication": "Books & Publishing",
+      "PregnancyParenting": "Pregnancy & Parenting",
+      "Hobby": "Hobbies",
+      "Fashion": "Fashion",
+      "Food": "Groceries",
+      "FurnitureInterior": "Furniture & Interior",
+      "Pet": "Pets",
+      "ASMR": "ASMR",
+      "Review": "Reviews",
+      "All": "All"
+    }
+  },
+  "addOns": {
+    "noticeTitle": "Add-ons are optional.",
+    "noticeText": "Choose them only if needed. You can move on without selecting any.",
+    "POSTING_GUIDE": {
+      "name": "AI Posting Guide",
+      "price": "10,000 KRW",
+      "description": "Automatically creates the best posting guide for your campaign goals and product."
+    },
+    "MANUSCRIPT_CONFIRM": {
+      "name": "원고컨펌",
+      "price": "5,000 KRW per recruited influencer",
+      "description": "Review drafts written by influencers before posting and request changes. AI draft review is included."
+    }
+  },
+  "intro": {
+    "mode": {
+      "ai": {
+        "title": "AI 캠페인 소개서",
+        "description": "AI creates a guide from your product info."
+      },
+      "manual": {
+        "title": "Write it yourself",
+        "description": "Write your own to explain in more detail."
+      }
+    },
+    "ai": {
+      "urlLabel": "Product/service URL",
+      "urlPlaceholder": "Enter a URL.",
+      "urlHelp": "We analyze the URL and campaign info for brand and product details to create the product introduction.",
+      "generate": "Generate",
+      "resultTitle": "AI result",
+      "regenerate": "Regenerate",
+      "loading": {
+        "title": "Generating AI 캠페인 소개서",
+        "description": "You can check the 캠페인 소개서 once it's done.",
+        "caption": "It may take up to 5 minutes."
+      }
+    },
+    "mainImage": {
+      "label": "Main image",
+      "title": "Upload the main image shown at the top of the page.",
+      "description": "JPG, PNG, up to 10MB (1200 x 630 recommended)",
+      "remove": "Remove main image"
+    },
+    "detailMedia": {
+      "label": "Product images/videos",
+      "title": "Upload product images/videos.",
+      "description": "Up to 5 files",
+      "drop": "Drag and drop product images/videos.",
+      "remove": "Remove file {{index}}",
+      "reorder": "Reorder file {{index}}",
+      "video": "Video {{index}}",
+      "image": "Image {{index}}",
+      "play": "Play video {{index}}",
+      "reorderGuide": "Press Space on the handle to pick up, arrow keys to move, Space to drop.",
+      "pickedUp": "Picked up file {{index}}.",
+      "moved": "Moved to position {{index}}.",
+      "dropped": "Dropped at position {{index}}.",
+      "cancelled": "Reorder cancelled."
+    },
+    "description": {
+      "label": "Campaign description",
+      "placeholder": "Describe the campaign and what you expect from influencers."
+    },
+    "notice": {
+      "label": "Notes",
+      "placeholder": "Enter notes for the campaign."
+    },
+    "hashtag": {
+      "single": "Required hashtags (keywords)",
+      "title": "Required title hashtags",
+      "content": "Required body hashtags",
+      "placeholder": "Type a keyword and press Enter",
+      "remove": "Remove {{keyword}}"
+    }
+  },
+  "conditions": {
+    "period": {
+      "label": "Posting period",
+      "months_one": "{{count}} month",
+      "months_other": "{{count}} months",
+      "direct": "Custom",
+      "unit": "months",
+      "placeholder": "Enter a period.",
+      "rangeError": "Enter 1–999 months."
+    },
+    "copyright": {
+      "label": "2차 저작권 use",
+      "use": "Use",
+      "notUse": "Don't use"
+    }
+  },
+  "policy": {
+    "all": "Agree to all",
+    "items": {
+      "service": "Agree to Terms of Service",
+      "privacy": "Agree to Privacy Policy",
+      "operation": "Agree to campaign operation policy",
+      "reward": "Agree to 리워드 and payment policy"
+    },
+    "terms": {
+      "service": "Terms of Service",
+      "privacy": "Privacy Policy"
+    },
+    "agree": "Agree"
+  },
+  "payment": {
+    "won": "{{amount}} KRW",
+    "campaignSummary": {
+      "title": "Campaign summary",
+      "serviceType": "Service type",
+      "campaignType": "Campaign type",
+      "reward": "리워드",
+      "rewardValue": "Product provided (worth {{amount}} KRW)",
+      "period": "Campaign period",
+      "periodValue": "{{start}} - {{end}} ({{days}} days)"
+    },
+    "paymentSummary": {
+      "title": "Payment summary",
+      "addOnItems": "Add-on services",
+      "addOnAmount": "Add-on amount",
+      "total": "Total",
+      "notice": "Payment is made with Bigbird Money only.",
+      "demoNotice": "No real payment is made in demo mode, and the amount may change when you register a real campaign."
+    },
+    "method": {
+      "title": "Payment method",
+      "bigbirdMoney": "Bigbird Money",
+      "required": "Required"
+    },
+    "terms": {
+      "title": "Terms"
+    },
+    "dialog": {
+      "required": {
+        "title": "Required fields missing",
+        "description": "Some fields are empty, so you can't pay. Fill in all required fields in the marked steps."
+      },
+      "insufficientBalance": {
+        "title": "Insufficient balance",
+        "description": "Your Bigbird Money balance is too low. Top up and try again."
+      },
+      "completed": {
+        "title": "Payment complete",
+        "description": "Your payment is complete."
+      },
+      "failed": {
+        "title": "Payment failed",
+        "description": "Payment failed. Please try again later."
+      },
+      "invalidStartDate": {
+        "title": "Check start date",
+        "description": "The desired start date has passed. Choose a new start date."
+      },
+      "subscriptionRequired": {
+        "title": "Subscription required",
+        "description": "Your PICK subscription is missing or expired. Subscribe and try again.",
+        "subscribe": "Subscribe"
+      },
+      "demoConfirm": {
+        "title": "Complete demo",
+        "description": "Complete this demo campaign? After that, you can only change it by converting it to a real campaign or loading it into a new one."
+      }
+    }
+  },
+  "detail": {
+    "title": "Overview",
+    "edit": "Edit",
+    "cancelApproval": "Cancel approval request",
+    "requestReapproval": "Request re-approval",
+    "banner": {
+      "reviewing": {
+        "title": "This campaign is under review.",
+        "description": "Our team is reviewing your campaign. To make changes, cancel the approval request first."
+      },
+      "rejected": {
+        "title": "Some items need changes.",
+        "description": "Check the reason, fix the marked items, and request re-approval."
+      },
+      "approved": {
+        "title": "This campaign is approved.",
+        "description": "You can view the confirmed campaign details."
+      }
+    },
+    "section": {
+      "info": "Campaign info",
+      "product": "Product info",
+      "influencer": "Influencer criteria",
+      "addOns": "Add-on services",
+      "intro": "캠페인 소개서",
+      "conditions": "Conditions",
+      "policy": "Policy consent",
+      "payment": "Payment info"
+    },
+    "info": {
+      "name": "Campaign name",
+      "code": "Campaign code",
+      "type": "Campaign type",
+      "brand": "Brand",
+      "period": "Period",
+      "brandImage": "Brand image"
+    },
+    "product": {
+      "type": "Sponsorship type",
+      "nameAndQuantity": "Product / quantity",
+      "nameAndQuantityValue_one": "{{name}} / {{count}} ea",
+      "nameAndQuantityValue_other": "{{name}} / {{count}} ea",
+      "price": "Product price",
+      "returnRequired": "Return pickup",
+      "returned": "Pickup",
+      "notReturned": "No pickup",
+      "returnFee": "Return shipping fee",
+      "returnContact": "Return contact",
+      "returnAddress": "Return address",
+      "rentalReturn": "대여 상품 pickup",
+      "rentalFee": "대여 상품 shipping fee",
+      "rentalContact": "대여 상품 contact",
+      "rentalAddress": "대여 상품 address",
+      "coupon": "Visit coupon code",
+      "storeName": "Store name",
+      "storeAddress": "Store address",
+      "benefit": "Benefits or experience"
+    },
+    "influencer": {
+      "platform": "Platform",
+      "ageGroups": "Age groups",
+      "gender": "Gender",
+      "topics": "Posting topics"
+    },
+    "addOns": {
+      "applied": "Applied",
+      "notApplied": "Not applied"
+    },
+    "intro": {
+      "hashtag": {
+        "title": "Required hashtags (title)",
+        "content": "Required hashtags (body)"
+      },
+      "images": "Main / product images",
+      "mainBadge": "Main"
+    },
+    "conditions": {
+      "period": "Posting period",
+      "periodValue_one": "{{count}} month or more",
+      "periodValue_other": "{{count}} months or more",
+      "copyright": "2차 저작권 use",
+      "copyrightUsed": "Used (incl. commercial use)"
+    },
+    "policy": {
+      "required": "Required consents",
+      "allAgreed": "All agreed"
+    },
+    "payment": {
+      "amount": "Amount",
+      "method": "Method",
+      "methodValue": "Bigbird Money",
+      "paidAt": "Paid on"
+    },
+    "toast": {
+      "refunded": "Your refund is complete."
+    },
+    "dialog": {
+      "cancel": {
+        "title": "Cancel approval request",
+        "description": "If you cancel, the full amount is refunded to Bigbird Money and the campaign goes back to draft. Your entries are kept, and paying again resubmits the request.\n\nRefund method: Bigbird Money\nRefund amount: {{amount}} KRW",
+        "confirm": "Cancel request"
+      },
+      "reapproval": {
+        "title": "Re-approval requested.",
+        "description": "Your changes have been sent to our team again. You can run the campaign once it's approved."
+      }
+    }
+  },
+  "revision": {
+    "lockedAmount": "This affects the payment amount, so it can't be changed.",
+    "lockedCompleted": "You've already agreed and paid, so this can't be changed."
+  },
+  "demo": {
+    "notice": "You're writing a campaign in demo mode. No real payment or approval request is made.",
+    "detail": {
+      "title": "This campaign was written in demo mode.",
+      "unsubscribedDescription": "Subscribe to a plan to convert this demo into a real campaign.",
+      "subscribedDescription": "You can convert this demo into a real campaign.",
+      "subscribe": "Subscribe",
+      "convert": "Convert to real campaign"
+    },
+    "dialog": {
+      "convert": {
+        "title": "Convert to real campaign",
+        "description": "Convert this demo campaign into a real campaign?",
+        "confirm": "Convert"
+      }
+    },
+    "toast": {
+      "subscriptionRequired": "A PICK subscription is required. Subscribe and try again."
+    }
+  }
+}

@@ -1,0 +1,15 @@
+dist
+coverage
+pnpm-lock.yaml
+src/shared/api/generated
+src/shared/ui
+# 생성 파일과 AI 설정 원본은 Prettier 가 건드리지 않는다 (render.py --check 와 어긋난다).
+AGENTS.md
+CLAUDE.md
+.claude
+.codex
+.agents
+ai
+convention
+# 문서 표의 칸 맞춤 공백만으로 검사가 실패하지 않게 마크다운은 검사하지 않는다. (팀 합의, 2026-10-14)
+*.md

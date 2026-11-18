@@ -1,0 +1,33 @@
+import { useTranslation } from "@/shared/i18n";
+import { Badge } from "@/shared/ui/badge";
+
+import type { UsageRecord, UsageType } from "../model/usage-types";
+import type { ComponentProps } from "react";
+
+const VARIANT_BY_TYPE = {
+  use: "gray",
+  refund: "green",
+  charge: "blue",
+  withdraw: "red",
+} as const satisfies Record<UsageType, ComponentProps<typeof Badge>["variant"]>;
+
+interface UsageTypeBadgeProps {
+  record: Pick<UsageRecord, "type" | "typeText">;
+}
+
+// 모르는 서버 값(환불 등)은 값을 그대로 회색 배지로 보임.
+export function UsageTypeBadge({ record }: UsageTypeBadgeProps) {
+  const { t } = useTranslation("features/bigbird-money-history");
+
+  // 구분을 알 수 없고 서버 값도 없으면 빈 배지를 그리지 않음.
+  if (!record.type && !record.typeText) return null;
+
+  return (
+    <Badge
+      variant={record.type ? VARIANT_BY_TYPE[record.type] : "gray"}
+      size="sm"
+    >
+      {record.type ? t(`usage.type.${record.type}`) : record.typeText}
+    </Badge>
+  );
+}

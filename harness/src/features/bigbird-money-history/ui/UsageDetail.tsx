@@ -1,0 +1,103 @@
+import { useTranslation } from "@/shared/i18n";
+import { cn } from "@/shared/lib/utils";
+
+import { useMoneyFormat } from "../lib/use-money-format";
+import { useUsageLabels } from "../lib/use-usage-labels";
+import { DetailPanel } from "./DetailPanel";
+import { UsageTypeBadge } from "./UsageTypeBadge";
+
+import type { UsageRecord } from "../model/usage-types";
+
+interface UsageDetailProps {
+  record: UsageRecord;
+  onClose: () => void;
+  /** TAB·MO는 제목 앞에 뒤로 버튼도 둠. */
+  hasBackButton?: boolean;
+}
+
+function ContractTarget({ record }: { record: UsageRecord }) {
+  const { contractTarget } = record;
+  // 대상이 없으면(충전·출금, 모집형·부가 서비스) 빈칸.
+  if (!contractTarget) return "";
+  const handle = contractTarget.influencerId.replace(/^@?/, "@");
+  return (
+    <span className="flex flex-col">
+      <span>{contractTarget.name}</span>
+      {contractTarget.influencerId && (
+        <span className="text-muted-foreground">{handle}</span>
+      )}
+    </span>
+  );
+}
+
+// 일자·금액 라벨은 유형별이고 모르는 유형은 사용 라벨.
+// 금액은 목록과 달리 음수만 "-"를 붙임.
+export function UsageDetail({
+  record,
+  onClose,
+  hasBackButton,
+}: UsageDetailProps) {
+  const { t } = useTranslation("features/bigbird-money-history");
+  const { formatDateTime, formatWon } = useMoneyFormat();
+  const labels = useUsageLabels();
+  const labelType = record.type ?? "use";
+
+  return (
+    <DetailPanel
+      title={t("usage.detail.title")}
+      hasBackButton={hasBackButton}
+      onClose={onClose}
+      rows={[
+        {
+          key: "type",
+          label: t("usage.detail.type"),
+          value: <UsageTypeBadge record={record} />,
+        },
+        {
+          key: "date",
+          label: t(`usage.detail.date.${labelType}`),
+          value: formatDateTime(record.usedAt, record.usedAtText),
+        },
+        {
+          key: "campaignName",
+          label: t("usage.detail.campaignName"),
+          value: record.campaignName,
+        },
+        {
+          key: "campaignType",
+          label: t("usage.detail.campaignType"),
+          value: labels.campaignType(record),
+        },
+        {
+          key: "campaignCode",
+          label: t("usage.detail.campaignCode"),
+          value: record.campaignCode,
+        },
+        {
+          key: "usage",
+          label: t("usage.detail.usage"),
+          value: labels.usageDetail(record),
+        },
+        {
+          key: "contractTarget",
+          label: t("usage.detail.contractTarget"),
+          value: <ContractTarget record={record} />,
+        },
+        {
+          key: "amount",
+          label: t(`usage.detail.amount.${labelType}`),
+          value: (
+            <span className={cn(record.amount !== null && "font-semibold")}>
+              {formatWon(record.amount)}
+            </span>
+          ),
+        },
+        {
+          key: "remaining",
+          label: t("usage.detail.remaining"),
+          value: formatWon(record.remainingAmount),
+        },
+      ]}
+    />
+  );
+}

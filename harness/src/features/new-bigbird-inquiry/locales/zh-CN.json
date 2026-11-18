@@ -1,0 +1,13 @@
+{
+  "typeLabel": "选择咨询类型",
+  "campaignType": "活动咨询",
+  "campaignDescription": "咨询活动进度、效果、结算等相关问题。",
+  "otherType": "其他咨询",
+  "otherDescription": "咨询政策、系统、使用方法等其他问题。",
+  "campaignListLabel": "选择活动",
+  "campaignName": "活动名称",
+  "submit": "提交咨询",
+  "campaignPeriod": "期间",
+  "select": "选择",
+  "noCampaign": "暂无活动记录。"
+}

@@ -1,0 +1,32 @@
+{
+  "title": "Subscription products",
+  "won": "{{amount}} KRW",
+  "column": {
+    "name": "Service",
+    "startedAt": "Membership start",
+    "endsAt": "Membership end",
+    "amount": "Amount",
+    "method": "Payment method",
+    "action": "Manage subscription"
+  },
+  "action": {
+    "cancel": "Cancel plan",
+    "cancelScheduled": "Ending"
+  },
+  "empty": {
+    "title": "No paid subscription products."
+  },
+  "cancelDialog": {
+    "title": "Cancel subscription",
+    "description": "Cancel your subscription? It stays active until the end of the paid period on {{endsAt}}.",
+    "confirm": "Cancel subscription",
+    "completed": {
+      "title": "Subscription canceled",
+      "description": "Your subscription has been canceled. See you again!"
+    }
+  },
+  "error": {
+    "alreadyCanceled": "This subscription is already canceled.",
+    "notFound": "Subscription not found."
+  }
+}

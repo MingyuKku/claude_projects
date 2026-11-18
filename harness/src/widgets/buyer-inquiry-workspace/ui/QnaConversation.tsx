@@ -1,0 +1,161 @@
+import { LoaderCircle } from "lucide-react";
+
+import { deleteQnaReply, editQnaReply, useQnaDetail } from "@/entities/inquiry";
+import { EditableChatMessage } from "@/features/edit-inquiry-message";
+import {
+  ChatDivider,
+  ChatMessage,
+  MY_AVATAR_CLASS_NAME,
+} from "@/shared/components/chat-message";
+import { EmptyState } from "@/shared/components/empty-state";
+import { useTranslation } from "@/shared/i18n";
+
+import { formatDividerDate, formatMessageTime } from "../lib/format";
+import { IS_BUYER_WRITE_ENABLED } from "../model/constants";
+import { useRefreshListOnRead } from "../model/useRefreshListOnRead";
+
+import type {
+  BuyerInquiryViewModel,
+  InquiryMessageViewModel,
+  QnaItemViewModel,
+  QnaReplyInfo,
+} from "@/entities/inquiry";
+
+interface QnaConversationProps {
+  inquiry: BuyerInquiryViewModel;
+  /** 안 읽은 문의의 상세를 받아 읽음 처리된 뒤 목록을 다시 받을 때 부름(파란 점 갱신). */
+  onRead?: () => void;
+  /** 내 답변 말풍선의 프로필 이미지(광고주가 등록한 이미지). 없으면 기본 프로필. */
+  myAvatarSrc?: string;
+}
+
+/** 상품 Q&A: 질문마다 광고주 답변 하나. 답변 입력은 구매자 문의처럼 하단 고정 입력창(QnaReplyComposer), 수정·삭제는 호버 버튼. */
+export function QnaConversation({
+  inquiry,
+  onRead,
+  myAvatarSrc,
+}: QnaConversationProps) {
+  const { t } = useTranslation("widgets/buyer-inquiry-workspace");
+  const { t: tCommon } = useTranslation();
+  const { items, isLoading, isError, mutate, markReplyDeleted } =
+    useQnaDetail(inquiry);
+  useRefreshListOnRead(
+    inquiry.key,
+    inquiry.hasUnread,
+    items !== undefined,
+    onRead,
+  );
+  const writerName = inquiry.writerName ?? t("unknownWriter");
+
+  if (isLoading) {
+    return (
+      <LoaderCircle
+        role="status"
+        aria-label={tCommon("status.loading")}
+        className="m-auto size-6 animate-spin text-muted-foreground"
+      />
+    );
+  }
+  if (isError || !items) {
+    return (
+      <EmptyState
+        type="no-message"
+        title={t("conversationError")}
+        className="flex-1"
+      />
+    );
+  }
+  if (items.length === 0) {
+    return (
+      <EmptyState
+        type="no-message"
+        title={t("noMessages")}
+        className="flex-1"
+      />
+    );
+  }
+
+  return (
+    <ol className="flex flex-col gap-6">
+      {items.map((item) => (
+        <li key={item.inquiryIdx} className="flex flex-col gap-3 tablet:gap-4">
+          <ChatDivider className="self-center">
+            {formatDividerDate(item.question.writtenAt)}
+          </ChatDivider>
+          <ChatMessage
+            name={writerName}
+            side="other"
+            message={
+              item.question.isDeleted
+                ? t("questionDeleted")
+                : item.question.body
+            }
+            time={formatMessageTime(item.question.writtenAt)}
+          />
+          <QnaReply
+            item={item}
+            onChanged={() => void mutate()}
+            onDeleted={(deleted) => void markReplyDeleted(deleted)}
+            advertiserName={t("advertiser")}
+            avatarSrc={myAvatarSrc}
+          />
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function QnaReply({
+  item,
+  advertiserName,
+  avatarSrc,
+  onChanged,
+  onDeleted,
+}: {
+  item: QnaItemViewModel;
+  advertiserName: string;
+  avatarSrc?: string;
+  onChanged: () => void;
+  /** 삭제 응답으로 그 답변만 삭제 표시로 바꿈(상세를 다시 받지 않음). */
+  onDeleted: (deleted: QnaReplyInfo) => void;
+}) {
+  const { t } = useTranslation("widgets/buyer-inquiry-workspace");
+  const { reply } = item;
+  if (!reply) return null;
+  if (reply.isDeleted)
+    return (
+      <ChatDivider className="self-center">{t("deletedMessage")}</ChatDivider>
+    );
+  // 구매자 문의와 같은 말풍선·호버 수정·삭제를 쓰려고 답변을 메시지 모양으로 바꿈. 읽힌 답변은 버튼이 없음.
+  const message: InquiryMessageViewModel = {
+    id: reply.replyIdx,
+    isMine: true,
+    kind: "text",
+    body: reply.body,
+    createdAt: reply.writtenAt ?? item.question.writtenAt,
+    isDeleted: false,
+    isRead: reply.isRead,
+    isEdited: false,
+    senderId: null,
+    campaign: null,
+    attachment: null,
+  };
+  return (
+    <EditableChatMessage
+      message={message}
+      name={advertiserName}
+      avatarSrc={avatarSrc}
+      avatarClassName={MY_AVATAR_CLASS_NAME}
+      time={reply.writtenAt ? formatMessageTime(reply.writtenAt) : ""}
+      canModify={IS_BUYER_WRITE_ENABLED}
+      onChanged={onChanged}
+      onSubmitEdit={(body) => editQnaReply(reply.replyIdx, body)}
+      onConfirmDelete={async () => {
+        const deleted = await deleteQnaReply(reply.replyIdx);
+        // 삭제된 답변을 못 받으면(예전 응답) 상세를 다시 받음.
+        if (deleted) onDeleted(deleted);
+        else onChanged();
+      }}
+    />
+  );
+}
