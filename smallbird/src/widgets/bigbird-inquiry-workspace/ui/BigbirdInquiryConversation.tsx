@@ -45,6 +45,7 @@ import {
 } from "../lib/format";
 import { mergeConversationMessages } from "../lib/merge-messages";
 import { BigbirdMessageComposer } from "./BigbirdMessageComposer";
+import { WithdrawalRequestCard } from "./WithdrawalRequestCard";
 
 import type {
   BigbirdInquiryViewModel,
@@ -292,6 +293,15 @@ export function BigbirdInquiryConversation({
     if (message.isDeleted) {
       return (
         <ChatDivider className="self-center">{t("deletedMessage")}</ChatDivider>
+      );
+    }
+    if (message.withdrawal) {
+      return (
+        <ChatMessage
+          name={name}
+          side={side}
+          card={<WithdrawalRequestCard {...message.withdrawal} />}
+        />
       );
     }
     if (message.campaign) {

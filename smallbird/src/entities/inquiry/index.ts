@@ -122,5 +122,6 @@ export type {
   InquiryMessageKind,
   InquiryMessageViewModel,
   QnaReplyInfo,
+  WithdrawalCardViewModel,
 } from "./model/schema";
 export { isOtherDeviceError } from "./lib/other-device";

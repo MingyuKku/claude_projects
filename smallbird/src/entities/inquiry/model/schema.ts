@@ -193,6 +193,26 @@ export const campaignCardSchema = z.object({
 export type CampaignCard = z.infer<typeof campaignCardSchema>;
 
 /**
+ * 빅버드 머니 출금 요청 카드. 출금을 요청하면 서버가 기타 문의 채팅에 이 JSON 문자열을 body로 한 메시지를 올리고, 운영의
+ * 승인·거절이 `status`를 바꿈(`POST /v3/mypage/bigbird-money/withdraw`). `rejectReason`은 사유를 적어 거절한 카드에만 있고,
+ * 사유 없이 거절한 예전 카드나 요청 중·승인 카드에는 키 자체가 없음.
+ */
+export const withdrawalCardSchema = z.object({
+  type: z.literal("BIGBIRD_MONEY_WITHDRAWAL"),
+  withdrawalIdx: z.number(),
+  status: z.enum(["PENDING", "APPROVED", "REJECTED"]),
+  amount: z.number(),
+  requesterName: z.string(),
+  requesterHandle: z.string(),
+  bankName: z.string(),
+  accountNumber: z.string(),
+  accountHolder: z.string(),
+  /** "yyyy-MM-dd HH:mm:ss" */
+  requestedAt: z.string(),
+  rejectReason: z.string().nullish(),
+});
+
+/**
  * 기존 헬프데스크 Firestore `sequence/{sequence}`의 상담 문서. 일반 문의로 만든 문서(백엔드가 씀)와 실시간 문서가
  * 같은 경로를 쓰고, 일반 문서에는 `sequence`·`threadIdx`·`isConnect`가 없고 `finishTime`이 Timestamp이며 메시지의
  * `isUserMessage`가 null일 수 있음(2026-10-29 dev 확인). 그래서 이 필드들은 없어도 읽을 수 있어야 함.
@@ -260,13 +280,33 @@ export type BigbirdInquiryStatus = "waiting" | "consulting" | "done" | "failed";
 export type RealtimePhase = "requesting" | "connected" | "failed" | "finished";
 
 export type InquiryMessageKind =
-  "text" | "campaignCard" | "image" | "video" | "file" | "system" | "notice";
+  | "text"
+  | "campaignCard"
+  | "withdrawalCard"
+  | "image"
+  | "video"
+  | "file"
+  | "system"
+  | "notice";
 
 export interface InquiryAttachment {
   attachmentIdx: number;
   fileName: string | null;
   fileSize: number | null;
   fileType: string | null;
+}
+
+export interface WithdrawalCardViewModel {
+  status: "requested" | "approved" | "rejected";
+  amount: number;
+  applicantName: string;
+  applicantId: string;
+  bankName: string;
+  accountNumber: string;
+  accountHolder: string;
+  requestedAt: Date;
+  /** 사유를 적어 거절한 카드에만 있음. */
+  rejectReason?: string;
 }
 
 export interface InquiryMessageViewModel {
@@ -285,6 +325,8 @@ export interface InquiryMessageViewModel {
   /** 보낸 계정 id(v2가 내 말풍선 위에 보여 주던 값). 모르면 null입니다. */
   senderId: string | null;
   campaign: CampaignCard | null;
+  /** 출금 요청 카드 메시지일 때만 있음. */
+  withdrawal?: WithdrawalCardViewModel | null;
   attachment: InquiryAttachment | null;
 }
 

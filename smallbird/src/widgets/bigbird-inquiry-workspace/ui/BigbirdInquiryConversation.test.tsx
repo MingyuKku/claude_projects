@@ -346,6 +346,88 @@ describe("첨부 메시지", () => {
   });
 });
 
+describe("빅버드 머니 출금 요청 카드", () => {
+  const withdrawalMessage = (
+    id: number,
+    status: "requested" | "approved" | "rejected",
+    amount: number,
+  ) => ({
+    id,
+    isMine: status === "requested",
+    kind: "withdrawalCard" as const,
+    body: "{}",
+    createdAt: new Date("2026-11-05T14:30:00"),
+    isDeleted: false,
+    isRead: false,
+    isEdited: false,
+    senderId: null,
+    campaign: null,
+    attachment: null,
+    withdrawal: {
+      status,
+      amount,
+      applicantName: "홍길동",
+      applicantId: "advertiser01",
+      bankName: "국민은행",
+      accountNumber: "110-123-456789",
+      accountHolder: "홍길동",
+      requestedAt: new Date("2026-11-05T14:30:00"),
+    },
+  });
+
+  it("거절 카드는 사유가 있을 때만 거절 사유 줄을 보인다", () => {
+    get.mockReturnValue(new Promise(() => {}));
+    const rejected = withdrawalMessage(1, "rejected", 500000);
+    const noReason = withdrawalMessage(2, "rejected", 600000);
+    renderConversation(
+      inquiry({
+        isRealtime: false,
+        realtimePhase: null,
+        messages: [
+          {
+            ...rejected,
+            withdrawal: {
+              ...rejected.withdrawal,
+              rejectReason: "통장 사본과 신청자 명의가 일치하지 않습니다.",
+            },
+          },
+          noReason,
+        ],
+      }),
+      undefined,
+      vi.fn(),
+    );
+    expect(
+      screen.getByText("통장 사본과 신청자 명의가 일치하지 않습니다."),
+    ).toBeInTheDocument();
+    expect(screen.getAllByText("거절 사유")).toHaveLength(1);
+  });
+
+  it("출금 요청 메시지를 상태별 카드로 그리고 수정·삭제 툴바는 두지 않는다", () => {
+    get.mockReturnValue(new Promise(() => {}));
+    renderConversation(
+      inquiry({
+        isRealtime: false,
+        realtimePhase: null,
+        messages: [
+          withdrawalMessage(1, "requested", 500000),
+          withdrawalMessage(2, "approved", 700000),
+        ],
+      }),
+      undefined,
+      vi.fn(),
+    );
+    expect(screen.getByText("500,000원")).toBeInTheDocument();
+    expect(screen.getByText("승인 요청")).toBeInTheDocument();
+    expect(screen.getByText("700,000원")).toBeInTheDocument();
+    expect(screen.getByText("승인 완료")).toBeInTheDocument();
+    expect(screen.getByText("요청이 승인되었습니다.")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "삭제" }),
+    ).not.toBeInTheDocument();
+  });
+});
+
 describe("텍스트+첨부 묶음의 수정·삭제", () => {
   const base = {
     isMine: true,

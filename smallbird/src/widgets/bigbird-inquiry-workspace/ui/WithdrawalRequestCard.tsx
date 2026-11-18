@@ -41,9 +41,7 @@ function Pieces({ items }: { items: string[] }) {
   );
 }
 
-// Figma 26/10/30 "빅버드 머니 출금 요청 > 기타문의 채팅 case 추가"(11430:200465 요청·200466 승인·200467 거절).
-// 백엔드 API가 없어 데이터는 props로만 받음. 대화 안 배치(요청은 내 쪽, 승인·거절은 빅버드 쪽)는 부모가 정함.
-// MO(11430:200425)는 대화 폭 전체, 넓은 화면은 380px.
+// 데이터는 props로만 받고, 대화 안 배치(요청은 내 쪽, 승인·거절은 빅버드 쪽)는 부모가 정함. MO는 대화 폭 전체, 넓은 화면은 380px.
 export function WithdrawalRequestCard({
   status,
   amount,

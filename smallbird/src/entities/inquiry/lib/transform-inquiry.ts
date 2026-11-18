@@ -1,4 +1,4 @@
-import { campaignCardSchema } from "../model/schema";
+import { campaignCardSchema, withdrawalCardSchema } from "../model/schema";
 import { REALTIME_END_NOTICES } from "./consultation-write";
 
 import type {
@@ -23,6 +23,7 @@ import type {
   QnaDetailList,
   QnaItemViewModel,
   RealtimeConsultation,
+  WithdrawalCardViewModel,
 } from "../model/schema";
 
 // ponytail: 시간대 없는 `yyyy-MM-ddTHH:mm:ss`를 브라우저 지역 시간으로 읽음(KST 가정).
@@ -49,6 +50,36 @@ function parseCampaignCard(
   try {
     const parsed = campaignCardSchema.safeParse(JSON.parse(message.body));
     return parsed.success ? parsed.data : null;
+  } catch {
+    return null;
+  }
+}
+
+const WITHDRAWAL_STATUS = {
+  PENDING: "requested",
+  APPROVED: "approved",
+  REJECTED: "rejected",
+} as const;
+
+function parseWithdrawalCard(
+  message: Pick<InquiryMessage, "body">,
+): WithdrawalCardViewModel | null {
+  if (!message.body.startsWith("{")) return null;
+  try {
+    const parsed = withdrawalCardSchema.safeParse(JSON.parse(message.body));
+    if (!parsed.success) return null;
+    const card = parsed.data;
+    return {
+      status: WITHDRAWAL_STATUS[card.status],
+      amount: card.amount,
+      applicantName: card.requesterName,
+      applicantId: card.requesterHandle,
+      bankName: card.bankName,
+      accountNumber: card.accountNumber,
+      accountHolder: card.accountHolder,
+      requestedAt: toDate(card.requestedAt),
+      rejectReason: card.rejectReason || undefined,
+    };
   } catch {
     return null;
   }
@@ -102,11 +133,16 @@ export function transformInquiryMessageToViewModel(
   // 삭제된 메시지는 서버가 첨부 정보를 비워 주지만, 삭제 여부(deleteTime)를 먼저 보고 첨부·카드를 확실히 숨김.
   const isDeleted = message.deleteTime !== null;
   const campaign = isDeleted ? null : parseCampaignCard(message);
+  const withdrawal = isDeleted ? null : parseWithdrawalCard(message);
+  const kind = withdrawal ? "withdrawalCard" : toKind(message, campaign);
   return {
     id: message.messageIdx ?? fallback.id,
     // 캠페인 카드는 v2 호환으로 광고주가 보낸 auto 메시지(isUserMessage: false)로 저장됨. 내가 보낸 카드로 그림.
-    isMine: isFromMe(message) || campaign !== null,
-    kind: isDeleted ? "text" : toKind(message, campaign),
+    // 출금 요청 카드는 요청 중에는 내 쪽, 승인·거절 뒤에는 빅버드 쪽에 그림(시안).
+    isMine: withdrawal
+      ? withdrawal.status === "requested"
+      : isFromMe(message) || campaign !== null,
+    kind: isDeleted ? "text" : kind,
     body: toPlainBody(message.body),
     createdAt: message.writeTime
       ? toDate(message.writeTime)
@@ -116,6 +152,7 @@ export function transformInquiryMessageToViewModel(
     isEdited: message.modifyTime !== null,
     senderId: message.identifier || null,
     campaign,
+    withdrawal,
     attachment:
       isDeleted || message.attachmentIdx === null
         ? null

@@ -771,3 +771,109 @@ describe("transformInquiryMessageToViewModel: 삭제된 메시지", () => {
     expect(typed.body).toBe("삭제된 메시지입니다");
   });
 });
+
+describe("transformInquiryMessageToViewModel: 빅버드 머니 출금 요청 카드", () => {
+  const card = (status: string) => ({
+    type: "BIGBIRD_MONEY_WITHDRAWAL",
+    withdrawalIdx: 12345,
+    status,
+    amount: 500000,
+    requesterName: "홍길동",
+    requesterHandle: "advertiser01",
+    bankName: "국민은행",
+    accountNumber: "110-123-456789",
+    accountHolder: "홍길동",
+    requestedAt: "2026-11-05 14:30:00",
+  });
+  const message = (body: string, overrides = {}) => ({
+    messageIdx: 1,
+    threadIdx: 10,
+    body,
+    userIdx: 5,
+    attachmentIdx: null,
+    writeTime: "2026-11-05T14:30:01",
+    readTime: null,
+    modifyTime: null,
+    deleteTime: null,
+    identifier: "advertiser01",
+    isUserMessage: true,
+    fileName: null,
+    fileSize: null,
+    fileType: null,
+    auto: false,
+    ...overrides,
+  });
+
+  it("body의 JSON 카드를 출금 요청 카드로 읽고 요청 중이면 내 쪽에 둔다", () => {
+    const result = transformInquiryMessageToViewModel(
+      message(JSON.stringify(card("PENDING"))),
+    );
+    expect(result.kind).toBe("withdrawalCard");
+    expect(result.isMine).toBe(true);
+    expect(result.withdrawal).toEqual({
+      status: "requested",
+      amount: 500000,
+      applicantName: "홍길동",
+      applicantId: "advertiser01",
+      bankName: "국민은행",
+      accountNumber: "110-123-456789",
+      accountHolder: "홍길동",
+      requestedAt: new Date("2026-11-05T14:30:00"),
+    });
+  });
+
+  it.each([
+    ["APPROVED", "approved"],
+    ["REJECTED", "rejected"],
+  ])("%s는 %s로 읽고 빅버드 쪽에 둔다", (status, expected) => {
+    // 서버가 보낸 사람을 광고주로 줘도 승인·거절 카드는 빅버드 쪽(시안).
+    const result = transformInquiryMessageToViewModel(
+      message(JSON.stringify(card(status))),
+    );
+    expect(result.withdrawal?.status).toBe(expected);
+    expect(result.isMine).toBe(false);
+  });
+
+  it("거절 카드의 rejectReason을 읽고, 사유가 없거나 빈 값이면 비워 둔다", () => {
+    const reason = "통장 사본과 신청자 명의가 일치하지 않아 거절되었습니다.";
+    expect(
+      transformInquiryMessageToViewModel(
+        message(JSON.stringify({ ...card("REJECTED"), rejectReason: reason })),
+      ).withdrawal?.rejectReason,
+    ).toBe(reason);
+    expect(
+      transformInquiryMessageToViewModel(
+        message(JSON.stringify(card("REJECTED"))),
+      ).withdrawal?.rejectReason,
+    ).toBeUndefined();
+    expect(
+      transformInquiryMessageToViewModel(
+        message(JSON.stringify({ ...card("REJECTED"), rejectReason: "" })),
+      ).withdrawal?.rejectReason,
+    ).toBeUndefined();
+  });
+
+  it("카드 모양이 아닌 JSON·알 수 없는 상태는 일반 텍스트로 둔다", () => {
+    expect(
+      transformInquiryMessageToViewModel(message('{"type":"OTHER"}')).kind,
+    ).toBe("text");
+    expect(
+      transformInquiryMessageToViewModel(
+        message(JSON.stringify(card("CANCELED"))),
+      ).withdrawal,
+    ).toBeNull();
+    expect(transformInquiryMessageToViewModel(message("{깨진 JSON")).kind).toBe(
+      "text",
+    );
+  });
+
+  it("삭제된 메시지는 카드를 그리지 않는다", () => {
+    const result = transformInquiryMessageToViewModel(
+      message(JSON.stringify(card("PENDING")), {
+        deleteTime: "2026-11-05T15:00:00",
+      }),
+    );
+    expect(result.withdrawal).toBeNull();
+    expect(result.kind).toBe("text");
+  });
+});
