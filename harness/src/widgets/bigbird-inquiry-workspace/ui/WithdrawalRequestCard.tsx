@@ -18,7 +18,7 @@ const BADGE_VARIANT = {
 interface WithdrawalRequestCardProps {
   status: WithdrawalRequestStatus;
   amount: number;
-  applicantName: string;
+  applicantName?: string;
   applicantId: string;
   bankName: string;
   accountNumber: string;
@@ -76,10 +76,12 @@ export function WithdrawalRequestCard({
       details={[
         {
           label: t("withdrawal.applicant"),
-          value: t("withdrawal.applicantValue", {
-            name: applicantName,
-            id: applicantId,
-          }),
+          value: applicantName
+            ? t("withdrawal.applicantValue", {
+                name: applicantName,
+                id: applicantId,
+              })
+            : `@${applicantId}`,
         },
         {
           label: t("withdrawal.account"),

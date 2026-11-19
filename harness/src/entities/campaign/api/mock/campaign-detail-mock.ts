@@ -29,7 +29,7 @@ import type {
   CampaignCreatedResponse,
   CampaignDetailResponse,
 } from "../../model/detail-schema";
-import type { CampaignDraftStep } from "../../model/draft";
+import type { CampaignSavedStep } from "../../model/draft";
 import type { MockCampaignRecord } from "./campaign-record";
 
 // 캠페인 생성(A-1)·상세(A-3)·단계별 수정(A-5.x)·불러오기(A-8)의 목. 서버가 하는 검사(수정 가능 상태, 반려 중 잠금,
@@ -113,9 +113,9 @@ async function saveProduct(
 }
 
 /** 연령대·주제는 저장 때도 필수(A-5.3, Q-16). */
-async function saveInfluencer(
+async function saveCreator(
   record: MockCampaignRecord,
-  body: CampaignStepRequests["influencer"],
+  body: CampaignStepRequests["creator"],
 ) {
   if (body.ageGroups.length === 0) throw invalidField("ageGroups");
   if (body.topics.length === 0) throw invalidField("topics");
@@ -201,34 +201,22 @@ async function saveConditions(
   });
 }
 
-/** 반려 중에는 정책 동의도 잠금(프론트 요청, A-5). */
-async function savePolicy(
-  record: MockCampaignRecord,
-  body: CampaignStepRequests["policy"],
-) {
-  if (record.status === "REJECTED") throw lockedField(["agreements"]);
-  updateCampaignRecord(record.campaignIdx, (target) => {
-    target.policy = { agreements: { ...body.agreements } };
-  });
-}
-
 const STEP_SAVERS: {
-  [S in CampaignDraftStep]: (
+  [S in CampaignSavedStep]: (
     record: MockCampaignRecord,
     body: CampaignStepRequests[S],
   ) => Promise<unknown>;
 } = {
   info: saveInfo,
   product: saveProduct,
-  influencer: saveInfluencer,
+  creator: saveCreator,
   addOns: saveAddOns,
   intro: saveIntro,
   conditions: saveConditions,
-  policy: savePolicy,
 };
 
 /** 단계별 수정(A-5.x). 1단계만 `{endDate}`를 돌려주고 나머지는 본문 없음. */
-export async function saveCampaignStep<S extends CampaignDraftStep>(
+export async function saveCampaignStep<S extends CampaignSavedStep>(
   campaignIdx: number,
   step: S,
   body: CampaignStepRequests[S],

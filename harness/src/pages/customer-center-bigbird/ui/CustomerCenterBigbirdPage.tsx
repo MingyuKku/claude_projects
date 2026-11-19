@@ -12,6 +12,7 @@ import {
 import { toast } from "sonner";
 
 import {
+  matchesInquiryStatusFilter,
   useBigbirdInquiries,
   useInquiryCampaigns,
   useInquiryUserName,
@@ -73,8 +74,8 @@ export function CustomerCenterBigbirdPage() {
   // 목록의 상태 탭과 어긋나지 않게 같은 필터를 적용한 첫 문의를 고름.
   const selectedThreadIdx =
     threadIdx === undefined
-      ? inquiries?.find(
-          (inquiry) => status === "all" || inquiry.status === status,
+      ? inquiries?.find((inquiry) =>
+          matchesInquiryStatusFilter(inquiry.status, status),
         )?.threadIdx
       : Number(threadIdx);
   const selected = inquiries?.find(

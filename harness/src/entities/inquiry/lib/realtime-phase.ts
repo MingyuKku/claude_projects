@@ -110,7 +110,8 @@ export function isConsultationCompletedShown(
 }
 
 const PHASE_STATUS: Record<RealtimePhase, BigbirdInquiryStatus> = {
-  requesting: "waiting",
+  // 서버도 수락 전 요청을 REQUESTED(상담 요청 중)로 주므로 목록·헤더 배지가 같음.
+  requesting: "requested",
   connected: "consulting",
   // 연결 실패 뒤에는 일반 문의로 이어가므로 답변 대기로 보임(사용자 결정 2026-10-29).
   failed: "waiting",

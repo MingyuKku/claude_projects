@@ -49,7 +49,7 @@ const infoSchema = z.object({
 
 const deliveryBaseSchema = z.object({
   productName: requiredText,
-  quantityPerInfluencer: positiveAmount,
+  quantityPerCreator: positiveAmount,
   productPrice: positiveAmount,
 });
 const returnSchema = z.object({
@@ -88,7 +88,7 @@ function isProductComplete({ info, product }: CampaignDraft) {
   }
 }
 
-const influencerSchema = z.object({
+const creatorSchema = z.object({
   platform: z.string(),
   gender: z.string(),
   ageGroups: z.array(z.string()).min(1),
@@ -107,10 +107,10 @@ const introSchema = z.object({
   contentHashtags: z.array(z.string()).min(1),
 });
 
-function isIntroComplete({ influencer, intro }: CampaignDraft) {
+function isIntroComplete({ creator, intro }: CampaignDraft) {
   if (!introSchema.safeParse(intro).success) return false;
   return (
-    !needsTitleHashtags(influencer.platform) || intro.titleHashtags.length > 0
+    !needsTitleHashtags(creator.platform) || intro.titleHashtags.length > 0
   );
 }
 
@@ -129,8 +129,7 @@ const STEP_CHECKERS: Record<
 > = {
   info: ({ info }) => infoSchema.safeParse(info).success,
   product: isProductComplete,
-  influencer: ({ influencer }) =>
-    influencerSchema.safeParse(influencer).success,
+  creator: ({ creator }) => creatorSchema.safeParse(creator).success,
   // 부가서비스는 선택사항이라 늘 통과함.
   addOns: () => true,
   intro: isIntroComplete,
@@ -154,7 +153,7 @@ export function isStepStarted(step: CampaignDraftStep, draft: CampaignDraft) {
 /** 유형을 바꾸면 비우는 단계(2~7단계). */
 const STEPS_RESET_BY_TYPE_CHANGE: readonly CampaignDraftStep[] = [
   "product",
-  "influencer",
+  "creator",
   "addOns",
   "intro",
   "conditions",

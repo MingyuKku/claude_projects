@@ -31,7 +31,7 @@ function inquiry(
     brandName: null,
     campaignName: null,
     shopName: null,
-    influencerNickname: null,
+    creatorNickname: null,
     ...overrides,
   };
 }
@@ -48,7 +48,7 @@ describe("getBuyerCardText", () => {
       kind: "campaign",
       brandName: "빅버드",
       campaignName: "스킨케어 세트",
-      influencerNickname: null,
+      creatorNickname: null,
     });
   });
 
@@ -62,7 +62,7 @@ describe("getBuyerCardText", () => {
       kind: "campaign",
       brandName: "브랜드",
       campaignName: "캠페인",
-      influencerNickname: null,
+      creatorNickname: null,
     });
   });
 
@@ -71,7 +71,7 @@ describe("getBuyerCardText", () => {
       kind: "campaign",
       brandName: null,
       campaignName: "캠페인",
-      influencerNickname: null,
+      creatorNickname: null,
     });
     expect(getBuyerCardText(inquiry({ campaignIdx: 99 }), [campaign])).toEqual({
       kind: "preview",
@@ -108,7 +108,7 @@ describe("formatDividerDate", () => {
   );
 });
 
-describe("getBuyerCardText: 인플루언서 닉네임", () => {
+describe("getBuyerCardText: 크리에이터 닉네임", () => {
   it("서버가 준 닉네임을 카드 정보에 실어 준다", () => {
     expect(
       getBuyerCardText(
@@ -116,7 +116,7 @@ describe("getBuyerCardText: 인플루언서 닉네임", () => {
           ...inquiry(),
           brandName: "엘지",
           campaignName: "냉장고",
-          influencerNickname: "gang33431",
+          creatorNickname: "gang33431",
         },
         [],
       ),
@@ -124,7 +124,7 @@ describe("getBuyerCardText: 인플루언서 닉네임", () => {
       kind: "campaign",
       brandName: "엘지",
       campaignName: "냉장고",
-      influencerNickname: "gang33431",
+      creatorNickname: "gang33431",
     });
   });
 });

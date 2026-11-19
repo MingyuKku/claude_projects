@@ -50,7 +50,7 @@ const inquiry: BuyerInquiryViewModel = {
   brandName: null,
   campaignName: null,
   shopName: null,
-  influencerNickname: null,
+  creatorNickname: null,
 };
 
 function qna(replyInfo: Record<string, unknown>) {

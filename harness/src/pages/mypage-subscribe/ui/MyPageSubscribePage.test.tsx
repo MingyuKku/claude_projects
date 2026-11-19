@@ -109,12 +109,12 @@ const MASTER_SESSION: SessionViewModel = {
   profileImageUrl: null,
   permissions: {
     campaign: true,
-    influencerMatching: true,
-    influencerMarket: true,
+    creatorMatching: true,
+    creatorMarket: true,
     commerce: true,
     bigbirdMoney: true,
     purchaserQuestion: true,
-    influencerQuestion: true,
+    creatorQuestion: true,
   },
 };
 

@@ -1,7 +1,7 @@
 /** 카카오톡 상담 채널. 문의 패널과 계정 잠금 안내가 함께 씀. */
 export const KAKAO_CHAT_URL = "http://pf.kakao.com/_FvvFj/chat";
 
-/** 회원 백엔드가 쓰는 서비스 번호(client=1, brands=2, influencer=3, market=4). */
+/** 회원 백엔드가 쓰는 서비스 번호(client=1, brands=2, creator=3, market=4). */
 export const SERVICE_INDEX = 1;
 
 /**

@@ -143,7 +143,7 @@ type DocumentKey = readonly [
 ];
 
 /**
- * 상담 문서 하나를 있는 그대로 구독함(구매자·인플루언서 문의의 연결 판단·변경 신호용). `sequence`가 없으면 구독하지 않음.
+ * 상담 문서 하나를 있는 그대로 구독함(구매자·크리에이터 문의의 연결 판단·변경 신호용). `sequence`가 없으면 구독하지 않음.
  * 문서를 읽지 못하면(없음·권한) `isError`이고, 다른 기기가 방을 쥐어 권한이 막힌 경우는 `isOtherDevice`.
  */
 export function useConsultationDocument(

@@ -35,14 +35,17 @@ const START_ID_BASE = -3_000_000;
 
 /**
  * 상담 문서에서 상담마다 시작·종료 줄을 뽑음. 문서 하나에 같은 스레드의 상담이 여러 번 쌓이므로 요청 안내(auto)로 상담을
- * 나눔. 시작은 연결된 상담에만 한 번, 종료는 연결된 상담의 종료 안내(auto)가 있을 때만 한 번 둠.
+ * 나눔. 시작은 연결된 상담에만 한 번, 종료는 연결된 상담에 한 번 둠.
  * - 연결: 요청자가 아닌 쪽(`isUserMessage === false`)의 첫 글 시각. 마지막 상담은 문서의 `acceptedAt`이 더 빠르면 그 시각
  *   (문서는 마지막 상담의 수락 시각만 가짐).
- * - 종료: 요청 뒤 첫 종료 안내(auto)의 시각. 안내가 없는 상담(진행 중·안내 없이 끝남)은 종료 줄이 없음.
+ * - 종료: 요청 뒤 첫 종료 안내(auto)의 시각. 안내 없이 끝난 마지막 상담은 `threadFinishedAt`(시작보다 이르면 무시)을 종료로 봄.
+ *   안내도 종료 시각도 없는 상담(진행 중)은 종료 줄이 없음.
  * 요청 안내가 없는 옛 문서는 상담을 나눌 수 없어 줄이 없음.
  */
 export function deriveRealtimeLines(
   consultation: RealtimeConsultation,
+  /** 이 실시간 스레드가 끝난 시각(ms, REST `finishTime`). 없으면 null. */
+  threadFinishedAt: number | null = null,
 ): RealtimeLine[] {
   const entries = consultation.messages
     .map((message) => ({ message, at: parseWriteTime(message.created) }))
@@ -90,6 +93,15 @@ export function deriveRealtimeLines(
   ) {
     last.startAt = Math.min(acceptedAt, last.startAt ?? acceptedAt);
   }
+  // 종료 안내(auto) 없이 끝난 상담(앱에서 종료한 경우 등)은 스레드가 끝난 시각을 종료로 봄. 마지막 상담에만 적용함.
+  if (
+    last &&
+    last.startAt !== null &&
+    last.endAt === null &&
+    threadFinishedAt !== null &&
+    threadFinishedAt >= last.startAt
+  )
+    last.endAt = threadFinishedAt;
 
   return sessions.flatMap((session) => {
     if (session.startAt === null) return [];

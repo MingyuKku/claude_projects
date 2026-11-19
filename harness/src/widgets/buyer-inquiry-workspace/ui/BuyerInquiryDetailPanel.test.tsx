@@ -56,7 +56,7 @@ function inquiry(
     brandName: null,
     campaignName: null,
     shopName: null,
-    influencerNickname: null,
+    creatorNickname: null,
     ...overrides,
   };
 }
@@ -76,11 +76,11 @@ function mountPanel(value: BuyerInquiryViewModel) {
 }
 
 describe("구매자 문의 상세 패널의 캠페인 정보 순서", () => {
-  it("공구 진행 인플루언서는 진행 기간 아래, 캠페인 코드 위에 있다", async () => {
+  it("공구 진행 크리에이터는 진행 기간 아래, 캠페인 코드 위에 있다", async () => {
     mountPanel(inquiry());
     const labels = [
       "진행 기간",
-      "공구 진행 인플루언서",
+      "공구 진행 크리에이터",
       "캠페인 코드",
       "공구샵 코드",
     ];
@@ -97,7 +97,7 @@ describe("구매자 문의 상세 패널의 캠페인 정보 순서", () => {
   });
 });
 
-describe("구매자·인플루언서 문의 상세 패널의 캠페인 바로가기", () => {
+describe("구매자·크리에이터 문의 상세 패널의 캠페인 바로가기", () => {
   it("구매자 문의 상세에는 비활성 캠페인 바로가기 버튼이 있다", async () => {
     mountPanel(inquiry());
     expect(await screen.findByText("캠페인 코드")).toBeInTheDocument();
@@ -107,8 +107,8 @@ describe("구매자·인플루언서 문의 상세 패널의 캠페인 바로가
     ).toBeDisabled();
   });
 
-  it("인플루언서 문의 상세에는 캠페인 바로가기가 없다", async () => {
-    mountPanel(inquiry({ key: "influencer-601", source: "influencer" }));
+  it("크리에이터 문의 상세에는 캠페인 바로가기가 없다", async () => {
+    mountPanel(inquiry({ key: "creator-601", source: "creator" }));
     expect(await screen.findByText("캠페인 코드")).toBeInTheDocument();
     expect(
       screen.queryByRole("button", { name: "캠페인 바로가기" }),

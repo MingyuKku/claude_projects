@@ -32,10 +32,10 @@ describe("IntroductionPage 언어", () => {
     render(<IntroductionPage />);
 
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "Influencer marketing,start smarter with data",
+      "Creator marketing,start smarter with data",
     );
     expect(document.title).toBe(
-      "Bigbird — Influencer marketing, now more accurate with data",
+      "Bigbird — Creator marketing, now more accurate with data",
     );
   });
 

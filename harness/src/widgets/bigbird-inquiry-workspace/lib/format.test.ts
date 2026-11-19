@@ -73,6 +73,17 @@ describe("getOtherInquiryPreview", () => {
   });
 });
 
+describe("getInquiryTitleKey: 출금 문의", () => {
+  it("출금 문의면 기타 문의 대신 출금 문의 제목을 쓴다", () => {
+    expect(
+      getInquiryTitleKey({ ...inquiry([]), isWithdrawalInquiry: true }),
+    ).toEqual({ key: "inquiryTitle.withdrawal" });
+    expect(
+      getInquiryTitleKey({ ...inquiry([]), isWithdrawalInquiry: false }),
+    ).toEqual({ key: "inquiryTitle.other" });
+  });
+});
+
 describe("getInquiryTitleKey", () => {
   const card = message({
     kind: "campaignCard",

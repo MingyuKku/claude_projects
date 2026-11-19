@@ -72,7 +72,7 @@ function parseWithdrawalCard(
     return {
       status: WITHDRAWAL_STATUS[card.status],
       amount: card.amount,
-      applicantName: card.requesterName,
+      applicantName: card.requesterName || undefined,
       applicantId: card.requesterHandle,
       bankName: card.bankName,
       accountNumber: card.accountNumber,
@@ -92,7 +92,7 @@ function toProductName(brandName: string, productName: string) {
 
 // 문서는 image 경로로 올라가 서버가 fileType을 image로 줄 수 있어 파일 이름으로 먼저 가림.
 const DOCUMENT_EXTENSION = /\.(pdf|txt|docx?|xlsx?|pptx?)$/i;
-// 인플루언서 문의는 타임라인의 fileType이 비어 오므로(stage 2026-11-03) 파일 이름 확장자로도 가림.
+// 크리에이터 문의는 타임라인의 fileType이 비어 오므로(stage 2026-11-03) 파일 이름 확장자로도 가림.
 const IMAGE_EXTENSION = /\.(jpe?g|png|gif|bmp|webp)$/i;
 const VIDEO_EXTENSION = /\.(mp4|avi|mov|wmv|flv|mpe?g)$/i;
 
@@ -127,7 +127,7 @@ function toKind(
 export function transformInquiryMessageToViewModel(
   message: InquiryMessage,
   fallback: { id: number; createdAt: Date } = { id: -1, createdAt: new Date() },
-  /** 서버의 `isUserMessage` 대신 쓸 발신 판단. 인플루언서 문의처럼 서버 값이 Swagger와 반대인 대화에 씀. */
+  /** 서버의 `isUserMessage` 대신 쓸 발신 판단. 크리에이터 문의처럼 서버 값이 Swagger와 반대인 대화에 씀. */
   isFromMe: (message: InquiryMessage) => boolean = (m) => m.isUserMessage,
 ): InquiryMessageViewModel {
   // 삭제된 메시지는 서버가 첨부 정보를 비워 주지만, 삭제 여부(deleteTime)를 먼저 보고 첨부·카드를 확실히 숨김.
@@ -230,14 +230,13 @@ export function transformRealtimeConsultationMessages(
   );
 }
 
-const THREAD_STATUS: Record<
-  BigbirdInquiryListItem["status"],
-  BigbirdInquiryStatus
-> = {
-  WAITING: "waiting",
-  IN_PROGRESS: "consulting",
-  ANSWERED: "done",
-};
+// 서버가 새 상태를 추가해도 목록이 사라지지 않게 모르는 값은 unknown으로 두고 서버 값을 그대로 보임.
+const THREAD_STATUS = new Map<string, BigbirdInquiryStatus>([
+  ["WAITING", "waiting"],
+  ["REQUESTED", "requested"],
+  ["IN_PROGRESS", "consulting"],
+  ["ANSWERED", "done"],
+]);
 
 export function transformInquiryThreadToViewModel(
   thread: InquiryThread,
@@ -249,7 +248,8 @@ export function transformInquiryThreadToViewModel(
     campaignIdx: thread.campaignIdx,
     isRealtime: !thread.boardType,
     isFinished: thread.finishTime !== null,
-    status: THREAD_STATUS[thread.status],
+    status: THREAD_STATUS.get(thread.status) ?? "unknown",
+    statusCode: thread.status,
     realtimePhase: null,
     createdAt: toDate(thread.created),
     messages: transformInquiryMessagesToViewModels(
@@ -277,9 +277,16 @@ export function transformBigbirdInquiryListItemToViewModel(
     campaignIdx: item.campaignIdx,
     brandName: item.brandName,
     productName: item.productName,
+    // 서버 필드(`isWithdrawalInquiry`·`withdrawalInquiry`) 중 있는 값을 쓰고, 둘 다 없으면 출금 문의에만 채워지던 title로 판정함.
+    // 출금 스레드는 캠페인이 없는 기타 문의라 캠페인 문의의 title은 보지 않음.
+    isWithdrawalInquiry:
+      item.isWithdrawalInquiry ??
+      item.withdrawalInquiry ??
+      (item.campaignIdx === null && Boolean(item.title?.trim())),
     isRealtime: item.boardType === false,
     isFinished: item.finishTime !== null,
-    status: THREAD_STATUS[item.status],
+    status: THREAD_STATUS.get(item.status) ?? "unknown",
+    statusCode: item.status,
     realtimePhase: null,
     createdAt: toDate(item.created),
     messages: [],
@@ -403,19 +410,17 @@ function toListDate(value: string | null): Date | null {
   return value === null ? null : new Date(value.replace(" ", "T"));
 }
 
-const BUYER_STATUS = {
-  WAITING: "waiting",
-  IN_PROGRESS: "consulting",
-  ANSWERED: "done",
-} as const satisfies Record<
-  BuyerInquiry["status"],
-  BuyerInquiryViewModel["status"]
->;
+const BUYER_STATUS = new Map<string, BuyerInquiryViewModel["status"]>([
+  ["WAITING", "waiting"],
+  ["REQUESTED", "requested"],
+  ["IN_PROGRESS", "consulting"],
+  ["ANSWERED", "done"],
+]);
 
 const BUYER_SOURCE = {
   PURCHASER_QUESTION: "purchaser",
   PRODUCT_QNA: "qna",
-  INFLUENCER_QUESTION: "influencer",
+  INFLUENCER_QUESTION: "creator",
   CAMPAIGN_QNA: "campaignQna",
 } as const satisfies Record<
   BuyerInquiry["sourceType"],
@@ -430,7 +435,8 @@ export function transformBuyerInquiryToViewModel(
     key: `${source}-${inquiry.inquiryIdx}`,
     inquiryIdx: inquiry.inquiryIdx,
     source,
-    status: BUYER_STATUS[inquiry.status],
+    status: BUYER_STATUS.get(inquiry.status) ?? "unknown",
+    statusCode: inquiry.status,
     campaignIdx: inquiry.campaignIdx,
     orderNumber: inquiry.orderNumber,
     writerName: inquiry.writerName,
@@ -445,7 +451,7 @@ export function transformBuyerInquiryToViewModel(
     brandName: inquiry.brandName || null,
     campaignName: inquiry.campaignName || null,
     shopName: inquiry.shopName || null,
-    influencerNickname: inquiry.influencerNickname || null,
+    creatorNickname: inquiry.influencerNickname || null,
   };
 }
 
@@ -465,7 +471,7 @@ export function transformBuyerInquiryDetailToViewModel(
     progressStatus: detail.progressStatus,
     progressStartDate: detail.progressStartDate,
     progressEndDate: detail.progressEndDate,
-    influencerNickname: detail.influencerNickname || null,
+    creatorNickname: detail.influencerNickname || null,
     imageUrl: detail.mainImageUrl,
     name:
       toProductName(detail.brandName ?? "", detail.productName ?? "") || null,

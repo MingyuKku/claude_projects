@@ -114,8 +114,8 @@
       "title": "子账号权限",
       "name": {
         "campaign": "广告活动",
-        "influencerMatching": "网红匹配",
-        "influencerMarket": "网红市场",
+        "creatorMatching": "创作者匹配",
+        "creatorMarket": "创作者市场",
         "commerce": "电商管理",
         "buyerInquiry": "买家咨询",
         "bigbirdMoney": "Bigbird 余额"

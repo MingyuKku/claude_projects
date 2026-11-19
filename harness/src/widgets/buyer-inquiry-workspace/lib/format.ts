@@ -40,8 +40,10 @@ export function formatListDate(value: Date) {
 
 export const STATUS_BADGE_VARIANT = {
   waiting: "blue",
+  requested: "yellow",
   consulting: "green",
   done: "gray",
+  unknown: "gray",
 } satisfies Record<BuyerInquiryViewModel["status"], ChatListBadge["variant"]>;
 
 const PREVIEW_LENGTH = 10;
@@ -59,12 +61,12 @@ export type BuyerCardText =
       kind: "campaign";
       brandName: string | null;
       campaignName: string;
-      influencerNickname: string | null;
+      creatorNickname: string | null;
     }
   | { kind: "preview"; text: string };
 
 /**
- * 목록 카드 첫 줄(Figma 26/10/29 11315:50439, 요구명세서 24 I4): 회색 브랜드명 + "캠페인명 인플루언서 닉네임 문의". 구매자 문의·상품 Q&A는 모두 캠페인에서
+ * 목록 카드 첫 줄(Figma 26/10/29 11315:50439, 요구명세서 24 I4): 회색 브랜드명 + "캠페인명 크리에이터 닉네임 문의". 구매자 문의·상품 Q&A는 모두 캠페인에서
  * 오므로 이름은 서버 값을 먼저, 없으면 캠페인 목록에서 찾음. 캠페인명을 못 찾으면(데이터 누락) 문의 내용 앞부분.
  */
 export function getBuyerCardText(
@@ -82,6 +84,6 @@ export function getBuyerCardText(
     kind: "campaign",
     brandName,
     campaignName,
-    influencerNickname: inquiry.influencerNickname,
+    creatorNickname: inquiry.creatorNickname,
   };
 }

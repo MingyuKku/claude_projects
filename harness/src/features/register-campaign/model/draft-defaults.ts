@@ -14,7 +14,7 @@ export function applyDraftDefaults(
   draft: CampaignDraft,
   { hasServerCampaignType = false }: { hasServerCampaignType?: boolean } = {},
 ): CampaignDraft {
-  const { info, influencer, conditions } = draft;
+  const { info, creator, conditions } = draft;
   return {
     ...draft,
     // 서버가 모르는 유형(v2)이면 채우지 않아 유형이 바뀐 것으로 처리되지 않게 함.
@@ -24,15 +24,14 @@ export function applyDraftDefaults(
         info.campaignType ??
         (hasServerCampaignType ? null : DEFAULT_PRODUCT_TYPE),
     },
-    influencer: {
-      platform: influencer.platform ?? DEFAULT_PLATFORM,
-      gender: influencer.gender ?? DEFAULT_GENDER,
+    creator: {
+      platform: creator.platform ?? DEFAULT_PLATFORM,
+      gender: creator.gender ?? DEFAULT_GENDER,
       ageGroups:
-        influencer.ageGroups.length > 0
-          ? influencer.ageGroups
+        creator.ageGroups.length > 0
+          ? creator.ageGroups
           : [...DEFAULT_AGE_GROUPS],
-      topics:
-        influencer.topics.length > 0 ? influencer.topics : [...DEFAULT_TOPICS],
+      topics: creator.topics.length > 0 ? creator.topics : [...DEFAULT_TOPICS],
     },
     conditions: {
       ...conditions,

@@ -1,9 +1,9 @@
 {
   "seo": {
-    "title": "Bigbird — 网红营销，用数据更精准",
-    "description": "Bigbird 根据广告主的商品和活动目的匹配网红，从内容执行、监测到效果分析一站式衔接。",
+    "title": "Bigbird — 创作者营销，用数据更精准",
+    "description": "Bigbird 根据广告主的商品和活动目的匹配创作者，从内容执行、监测到效果分析一站式衔接。",
     "siteName": "Bigbird",
-    "ogImageAlt": "从匹配到合作，轻松与网红合作"
+    "ogImageAlt": "从匹配到合作，轻松与创作者合作"
   },
   "header": {
     "guide": "使用指南",
@@ -11,7 +11,7 @@
   },
   "hero": {
     "title": {
-      "line1": "网红营销，",
+      "line1": "创作者营销，",
       "line2": "现在用数据",
       "line3": "更精准地开始"
     },
@@ -20,16 +20,16 @@
     "downloadName": "빅버드 서비스 소개서.pdf"
   },
   "section1": {
-    "title": "连接品牌与网红的\n广告主专属营销平台",
-    "description": "Bigbird 根据广告主的商品和活动目的匹配网红，从内容执行、监测到效果分析一站式衔接。",
+    "title": "连接品牌与创作者的\n广告主专属营销平台",
+    "description": "Bigbird 根据广告主的商品和活动目的匹配创作者，从内容执行、监测到效果分析一站式衔接。",
     "cards": {
       "advertiser": {
         "title": "广告主平台",
-        "description": "管理活动委托、网红选定、\n活动进展和效果分析。"
+        "description": "管理活动委托、创作者选定、\n活动进展和效果分析。"
       },
-      "influencer": {
-        "title": "网红平台",
-        "description": "网红可参与活动，\n制作并登记内容。"
+      "creator": {
+        "title": "创作者平台",
+        "description": "创作者可参与活动，\n制作并登记内容。"
       },
       "buyer": {
         "title": "买家平台",
@@ -40,36 +40,36 @@
   "section2": {
     "awardsAlt": "2015年 中小企业厅长奖，专利厅专利注册",
     "title": "主要品牌和机构选择了 Bigbird",
-    "description": "凭借与主要品牌的合作与成果，提供值得信赖的网红营销体验。",
+    "description": "凭借与主要品牌的合作与成果，提供值得信赖的创作者营销体验。",
     "partners": {
-      "samsung": "三星电子无线事业部网红营销\n入选 '삼성피켓' 共同运营方",
+      "samsung": "三星电子无线事业部创作者营销\n入选 '삼성피켓' 共同运营方",
       "aws": "2020 创业跳跃套餐\n亚马逊最终入选",
       "google": "2020 创业跳跃套餐\n谷歌最终入选"
     }
   },
   "section3": {
     "title": "众多品牌与 Bigbird 同行",
-    "description": "Bigbird 围绕品牌活动、团购、直播电商、消费者数据分析等各种广告目的，开展了网红营销。",
+    "description": "Bigbird 围绕品牌活动、团购、直播电商、消费者数据分析等各种广告目的，开展了创作者营销。",
     "brandsLabel": "与 Bigbird 合作的品牌"
   },
   "section4": {
-    "title": "网红营销所需的流程，\n<accent>一处管理</accent>",
-    "description": "寻找符合活动目的的网红，从 SNS 渠道执行到效果确认，\n轻松管理广告主所需的全部流程。",
+    "title": "创作者营销所需的流程，\n<accent>一处管理</accent>",
+    "description": "寻找符合活动目的的创作者，从 SNS 渠道执行到效果确认，\n轻松管理广告主所需的全部流程。",
     "cards": {
       "authentic": {
-        "label": "真实网红匹配",
-        "title": "不看粉丝数，\n寻找真实的网红",
-        "description": "不只看粉丝数，还分析内容反响和影响力，找到适合广告主商品的网红"
+        "label": "真实创作者匹配",
+        "title": "不看粉丝数，\n寻找真实的创作者",
+        "description": "不只看粉丝数，还分析内容反响和影响力，找到适合广告主商品的创作者"
       },
       "target": {
-        "label": "目标网红分析",
+        "label": "目标创作者分析",
         "title": "更细分地\n寻找适合商品的目标",
-        "description": "基于大类和中类分析网红，找到适合广告主商品的目标网红群体"
+        "description": "基于大类和中类分析创作者，找到适合广告主商品的目标创作者群体"
       },
       "evaluation": {
-        "label": "按活动类型评估网红",
-        "title": "按活动目的\n评估网红",
-        "description": "根据品牌知名度、团购、直播电商等活动目的，评估并选定合适的网红"
+        "label": "按活动类型评估创作者",
+        "title": "按活动目的\n评估创作者",
+        "description": "根据品牌知名度、团购、直播电商等活动目的，评估并选定合适的创作者"
       },
       "channel": {
         "label": "按 SNS 渠道执行活动",
@@ -77,9 +77,9 @@
         "description": "可在 Instagram、Naver 博客、Facebook、YouTube、TikTok 等符合活动目的的渠道开展营销"
       },
       "global": {
-        "label": "全球网红平台",
-        "title": "不止国内，\n连接全球网红",
-        "description": "基于各国语言分析和网红数据，可扩展到海外网红营销"
+        "label": "全球创作者平台",
+        "title": "不止国内，\n连接全球创作者",
+        "description": "基于各国语言分析和创作者数据，可扩展到海外创作者营销"
       }
     }
   },
@@ -90,34 +90,34 @@
       "brand": {
         "badge": "브랜드형",
         "title": "提升品牌知名度，\n自然形成病毒式传播",
-        "description": "匹配适合广告主商品的网红，\n开展品牌内容和病毒式话题营销",
+        "description": "匹配适合广告主商品的创作者，\n开展品牌内容和病毒式话题营销",
         "items": {
           "basic": {
             "title": "베이직형",
-            "description": "以合理的费用与大量网红一起开展扩散型病毒式活动"
+            "description": "以合理的费用与大量创作者一起开展扩散型病毒式活动"
           },
           "premium": {
             "title": "프리미엄형",
-            "description": "面向广告疲劳度低的真实网红，开展高端品牌活动"
+            "description": "面向广告疲劳度低的真实创作者，开展高端品牌活动"
           }
         }
       },
       "groupBuy": {
         "badge": "공구형",
-        "title": "借助网红粉丝力量，\n连接到购买转化",
-        "description": "与拥有高购买可能性粉丝的网红一起开展团购、\n开放市场和直播电商",
+        "title": "借助创作者粉丝力量，\n连接到购买转化",
+        "description": "与拥有高购买可能性粉丝的创作者一起开展团购、\n开放市场和直播电商",
         "items": {
           "openMarket": {
             "title": "오픈마켓형",
-            "description": "与大量网红开展团购，并通过买家平台衔接支付和销售管理"
+            "description": "与大量创作者开展团购，并通过买家平台衔接支付和销售管理"
           },
           "performance": {
             "title": "퍼포먼스형",
-            "description": "与拥有高购买可能性忠实粉丝的网红，开展以购买转化为核心的团购活动"
+            "description": "与拥有高购买可能性忠实粉丝的创作者，开展以购买转化为核心的团购活动"
           },
           "liveCommerce": {
             "title": "라이브커머스형",
-            "description": "通过网红直播，衔接商品评测、实时互动和购买转化"
+            "description": "通过创作者直播，衔接商品评测、实时互动和购买转化"
           }
         }
       }
@@ -143,8 +143,8 @@
             "description": "分析 Galaxy Tab 的主要用户群和购买可能性高的消费者类型"
           },
           "matching": {
-            "title": "目标网红匹配",
-            "description": "匹配粉丝中包含主要用户群、购买可能性高的消费者的目标网红"
+            "title": "目标创作者匹配",
+            "description": "匹配粉丝中包含主要用户群、购买可能性高的消费者的目标创作者"
           }
         }
       },
@@ -152,28 +152,28 @@
         "heading": "공구형 活动案例",
         "cards": {
           "collect": {
-            "title": "收集目标网红",
+            "title": "收集目标创作者",
             "description": "按 SNS 渠道收集团购相关话题标签和关键词的大数据"
           },
           "select": {
-            "title": "按广告主筛选网红",
-            "description": "基于人工智能，匹配适合广告主商品类型的最佳网红"
+            "title": "按广告主筛选创作者",
+            "description": "基于人工智能，匹配适合广告主商品类型的最佳创作者"
           },
           "explore": {
             "title": "寻找高忠诚度买家",
-            "description": "通过拥有厚实粉丝群的网红营销，带来高销售效率"
+            "description": "通过拥有厚实粉丝群的创作者营销，带来高销售效率"
           },
           "purchase": {
             "title": "开展团购",
-            "description": "开展网红直播电商和网红团购"
+            "description": "开展创作者直播电商和创作者团购"
           }
         }
       }
     }
   },
   "banner": {
-    "title": "在寻找适合品牌的网红吗？",
-    "description": "为您推荐符合品牌目标和商品特性的网红"
+    "title": "在寻找适合品牌的创作者吗？",
+    "description": "为您推荐符合品牌目标和商品特性的创作者"
   },
   "contact": {
     "title": "引进咨询",

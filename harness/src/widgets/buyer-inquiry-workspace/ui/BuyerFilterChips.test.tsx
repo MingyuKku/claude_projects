@@ -57,10 +57,7 @@ beforeEach(() => {
   });
 });
 
-function renderWorkspace(
-  search: string,
-  menu: "buyer" | "influencer" = "buyer",
-) {
+function renderWorkspace(search: string, menu: "buyer" | "creator" = "buyer") {
   const router = createMemoryRouter(
     [
       {
@@ -95,8 +92,8 @@ function renderWorkspace(
 }
 
 describe("구매자 목록 적용된 필터 칩", () => {
-  it("적용한 캠페인·인플루언서를 이름으로 칩에 보여 주고 필터 버튼을 활성 색으로 바꾼다", async () => {
-    renderWorkspace("?campaignIdx=10&influencerThreadUserIdx=5");
+  it("적용한 캠페인·크리에이터를 이름으로 칩에 보여 주고 필터 버튼을 활성 색으로 바꾼다", async () => {
+    renderWorkspace("?campaignIdx=10&creatorThreadUserIdx=5");
     expect(
       await screen.findByRole("button", {
         name: "빅버드 스킨케어 캠페인 조건 해제",
@@ -132,9 +129,9 @@ describe("구매자 목록 적용된 필터 칩", () => {
     ).not.toBeInTheDocument();
   });
 
-  it("캠페인 없이 문의 유형만 골라도 칩이 보이고, 인플루언서 문의 메뉴는 캠페인 Q&A 칩도 보인다", async () => {
+  it("캠페인 없이 문의 유형만 골라도 칩이 보이고, 크리에이터 문의 메뉴는 캠페인 Q&A 칩도 보인다", async () => {
     const user = userEvent.setup();
-    const router = renderWorkspace("?source=campaignQna", "influencer");
+    const router = renderWorkspace("?source=campaignQna", "creator");
     expect(
       await screen.findByRole("button", { name: "캠페인 Q&A 조건 해제" }),
     ).toBeInTheDocument();
@@ -157,21 +154,21 @@ describe("구매자 목록 적용된 필터 칩", () => {
     expect(screen.queryByText(/조건 해제/)).not.toBeInTheDocument();
   });
 
-  it("이름을 아직 모르면 번호로 대신하고, 인플루언서 칩의 ×는 그 조건만 푼다", async () => {
+  it("이름을 아직 모르면 번호로 대신하고, 크리에이터 칩의 ×는 그 조건만 푼다", async () => {
     vi.mocked(serverApiV3.get).mockResolvedValue({ result: true, list: [] });
     const user = userEvent.setup();
-    const router = renderWorkspace("?campaignIdx=10&influencerThreadUserIdx=5");
+    const router = renderWorkspace("?campaignIdx=10&creatorThreadUserIdx=5");
     await user.click(
-      await screen.findByRole("button", { name: "인플루언서 5 조건 해제" }),
+      await screen.findByRole("button", { name: "크리에이터 5 조건 해제" }),
     );
     await waitFor(() =>
       expect(router.state.location.search).toBe("?campaignIdx=10"),
     );
   });
 
-  it("캠페인 칩의 ×는 그 캠페인에 묶인 인플루언서 조건까지 함께 푼다", async () => {
+  it("캠페인 칩의 ×는 그 캠페인에 묶인 크리에이터 조건까지 함께 푼다", async () => {
     const user = userEvent.setup();
-    const router = renderWorkspace("?campaignIdx=10&influencerThreadUserIdx=5");
+    const router = renderWorkspace("?campaignIdx=10&creatorThreadUserIdx=5");
     await user.click(
       await screen.findByRole("button", {
         name: "빅버드 스킨케어 캠페인 조건 해제",

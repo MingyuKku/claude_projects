@@ -72,9 +72,9 @@ export function ProductDeliveryFields() {
                 aria-label={t("product.delivery.quantityLabel")}
                 unit={t("unit.count")}
                 placeholder={t("product.delivery.quantityPlaceholder")}
-                value={product.quantityPerInfluencer}
-                onChangeValue={(quantityPerInfluencer) =>
-                  patch({ quantityPerInfluencer })
+                value={product.quantityPerCreator}
+                onChangeValue={(quantityPerCreator) =>
+                  patch({ quantityPerCreator })
                 }
               />
             </div>

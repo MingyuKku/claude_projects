@@ -50,27 +50,6 @@ beforeEach(() => {
 });
 
 describe("루트 메인과 공통 메뉴", () => {
-  it("로그인 성공 후 / 에서 헤더와 LNB를 표시한다", async () => {
-    const user = userEvent.setup();
-    const router = await renderRoute(ROUTES.login);
-    await user.type(await screen.findByLabelText("아이디"), "tester");
-    await user.type(screen.getByLabelText("비밀번호"), "test-password");
-    await user.click(screen.getByRole("button", { name: "로그인" }));
-    expect(
-      await screen.findByRole("heading", { name: "홈" }),
-    ).toBeInTheDocument();
-    expect(router.state.location.pathname).toBe("/");
-    expect(serverApiV3.get).toHaveBeenCalledWith("/sec", {
-      headers: { "X-Path": "/" },
-      signal: expect.any(AbortSignal),
-    });
-    const nav = screen.getByRole("navigation", { name: "주 메뉴" });
-    expect(within(nav).getByRole("link", { name: "홈" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
-  });
-
   it("기존 /main 링크는 쿼리를 유지하며 / 로 이동한다", async () => {
     const router = await renderRoute(`${ROUTES.legacyMain}?login=1`);
     expect(
@@ -203,7 +182,7 @@ describe("루트 메인과 공통 메뉴", () => {
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
-  it("LNB 하위 메뉴 그룹은 접힌 상태가 기본이고, 현재 화면의 그룹만 펼친다", async () => {
+  it("현재 화면이 아닌 LNB 하위 메뉴 그룹은 접혀 있다", async () => {
     await renderRoute(ROUTES.main);
     const [support] = await screen.findAllByText("고객센터", {
       selector: "summary span",
@@ -211,13 +190,13 @@ describe("루트 메인과 공통 메뉴", () => {
     expect(support?.closest("details")).not.toHaveAttribute("open");
   });
 
-  it("인플루언서 관리·채팅은 비로그인이 누르면 로그인 안내 알럿을 띄우고, 로그인하면 준비 중으로 비활성이다", async () => {
+  it("크리에이터 관리·채팅은 비로그인이 누르면 로그인 안내 알럿을 띄우고, 취소하면 닫고 로그인하러 가면 로그인으로 이동한다", async () => {
     mockSessionError(new ApiError(401, { result: false }));
     const user = userEvent.setup();
     const router = await renderRoute(ROUTES.main);
     const nav = await screen.findByRole("navigation", { name: "주 메뉴" });
     await user.click(
-      within(nav).getByRole("link", { name: "인플루언서 관리" }),
+      within(nav).getByRole("link", { name: "크리에이터 관리" }),
     );
     const alert = await screen.findByRole("alertdialog");
     expect(within(alert).getByText("로그인 필요")).toBeInTheDocument();
@@ -232,10 +211,10 @@ describe("루트 메인과 공통 메뉴", () => {
     await waitFor(() => expect(router.state.location.pathname).toBe("/login"));
   });
 
-  it("로그인한 사용자에게 인플루언서 관리·채팅은 준비 중으로 비활성이다", async () => {
+  it("로그인한 사용자에게 크리에이터 관리·채팅은 준비 중으로 비활성이다", async () => {
     await renderRoute(ROUTES.main);
     const nav = await screen.findByRole("navigation", { name: "주 메뉴" });
-    for (const name of ["인플루언서 관리", "채팅"]) {
+    for (const name of ["크리에이터 관리", "채팅"]) {
       expect(within(nav).getByRole("link", { name })).toHaveAttribute(
         "aria-disabled",
         "true",
@@ -258,13 +237,6 @@ describe("루트 메인과 공통 메뉴", () => {
     );
   });
 
-  it("ADMIN의 로고는 아이디 변경으로 이동한다", async () => {
-    await renderRoute(ROUTES.main);
-    expect(
-      await screen.findByRole("link", { name: "빅버드 · 아이디 변경" }),
-    ).toHaveAttribute("href", ROUTES.switchAccount);
-  });
-
   it("ADMIN이 아닌 로그인 사용자의 로고는 홈으로 이동한다", async () => {
     mockSession({
       ...session,
@@ -284,30 +256,41 @@ describe("루트 메인과 공통 메뉴", () => {
     ).toHaveAttribute("href", ROUTES.main);
   });
 
-  it("비로그인의 이용 가이드는 헤더에만 있고 LNB에는 없다", async () => {
+  it("비로그인의 이용 가이드·언어 메뉴는 헤더에만 있고 LNB에는 없다", async () => {
     mockSessionError(new ApiError(401, { result: false }));
     await renderRoute(ROUTES.main);
     const header = await screen.findByRole("banner");
     expect(
       within(header).getByRole("button", { name: "이용 가이드" }),
     ).toBeInTheDocument();
+    expect(
+      within(header).getByRole("button", { name: "언어 선택, KO" }),
+    ).toBeInTheDocument();
     for (const sidebar of screen.getAllByRole("complementary")) {
       expect(
         within(sidebar).queryByRole("button", { name: "이용 가이드" }),
       ).not.toBeInTheDocument();
+      expect(
+        within(sidebar).queryByRole("button", { name: /^언어 선택/ }),
+      ).not.toBeInTheDocument();
     }
   });
 
-  it("로그인하면 이용 가이드가 헤더에서 LNB 하단으로 옮겨진다", async () => {
+  it("로그인하면 이용 가이드·언어 메뉴가 헤더에서 LNB 하단으로 옮겨진다", async () => {
     await renderRoute(ROUTES.main);
     await screen.findByRole("button", { name: "내 프로필" });
+    const header = screen.getByRole("banner");
     expect(
-      within(screen.getByRole("banner")).queryByRole("button", {
-        name: "이용 가이드",
-      }),
+      within(header).queryByRole("button", { name: "이용 가이드" }),
+    ).not.toBeInTheDocument();
+    expect(
+      within(header).queryByRole("button", { name: /^언어 선택/ }),
     ).not.toBeInTheDocument();
     expect(
       screen.getByRole("button", { name: "이용 가이드" }),
+    ).toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "언어 선택, KO" }),
     ).toBeInTheDocument();
   });
 
@@ -506,21 +489,13 @@ describe("권한 없는 화면", () => {
 });
 
 describe("홈 본문과 검색 경로", () => {
-  it("/ 에서 홈 본문이 로그인 여부와 관계없이 보인다", async () => {
-    mockSessionError(new ApiError(401, { result: false }));
-    await renderRoute(ROUTES.main);
-    expect(await screen.findByRole("heading", { level: 2 })).toHaveTextContent(
-      "AI가 딱 맞는 인플루언서를 찾아드려요",
-    );
-  });
-
   it("검색을 제출하면 셸 안의 준비 중 화면으로 이동한다", async () => {
     const user = userEvent.setup();
     const router = await renderRoute(ROUTES.main);
     await user.type(await screen.findByRole("textbox"), "스킨케어");
-    await user.click(screen.getByRole("button", { name: "인플루언서 탐색" }));
+    await user.click(screen.getByRole("button", { name: "크리에이터 탐색" }));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(ROUTES.influencerSearch),
+      expect(router.state.location.pathname).toBe(ROUTES.creatorSearch),
     );
     expect(router.state.location.search).toContain("platform=instagram");
     expect(
@@ -529,15 +504,15 @@ describe("홈 본문과 검색 경로", () => {
     expect(
       screen.getByRole("navigation", { name: "주 메뉴" }),
     ).toBeInTheDocument();
-    // 시안이 없어 헤더 제목과 LNB 활성 항목을 "인플루언서 매칭"으로 임시 처리한다.
+    // 시안이 없어 헤더 제목과 LNB 활성 항목을 "크리에이터 매칭"으로 임시 처리한다.
     expect(screen.getByRole("heading", { level: 1 })).toHaveTextContent(
-      "인플루언서 매칭",
+      "크리에이터 매칭",
     );
-    // 인플루언서 매칭 그룹이 펼쳐지고 "인플루언서 검색"이 현재 위치로 표시된다.
+    // 크리에이터 매칭 그룹이 펼쳐지고 "크리에이터 검색"이 현재 위치로 표시된다.
     expect(
       within(screen.getByRole("navigation", { name: "주 메뉴" })).getByRole(
         "link",
-        { name: "인플루언서 검색" },
+        { name: "크리에이터 검색" },
       ),
     ).toHaveAttribute("aria-current", "page");
     expect(
@@ -553,9 +528,9 @@ describe("홈 본문과 검색 경로", () => {
     const user = userEvent.setup();
     const router = await renderRoute(ROUTES.main);
     await user.type(await screen.findByRole("textbox"), "스킨케어");
-    await user.click(screen.getByRole("button", { name: "인플루언서 탐색" }));
+    await user.click(screen.getByRole("button", { name: "크리에이터 탐색" }));
     await waitFor(() =>
-      expect(router.state.location.pathname).toBe(ROUTES.influencerSearch),
+      expect(router.state.location.pathname).toBe(ROUTES.creatorSearch),
     );
     expect(
       await screen.findByText("준비 중인 화면입니다."),

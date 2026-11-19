@@ -51,7 +51,7 @@ function inquiry(
     brandName: null,
     campaignName: null,
     shopName: null,
-    influencerNickname: null,
+    creatorNickname: null,
     ...overrides,
   };
 }
@@ -64,8 +64,8 @@ function renderWorkspace(
     [
       {
         path:
-          props.menu === "influencer"
-            ? ROUTES.customerCenterInfluencerThread
+          props.menu === "creator"
+            ? ROUTES.customerCenterCreatorThread
             : ROUTES.customerCenterBuyerThread,
         element: (
           <BuyerInquiryWorkspace
@@ -128,12 +128,21 @@ describe("구매자 문의 목록", () => {
 
   it.each([
     ["consulting", "실시간 상담 중"],
+    ["requested", "상담 요청 중"],
     ["done", "답변 완료"],
   ] as const)("%s 문의 카드에도 상태 배지(%s)를 붙인다", (status, label) => {
     renderWorkspace({ inquiries: [inquiry({ status })] });
     // 탭에도 비슷한 이름이 있어 카드(li) 안에서만 찾음.
     const card = screen.getByText("구매자 문의").closest("li");
     expect(within(card!).getByText(label)).toBeInTheDocument();
+  });
+
+  it("모르는 상태는 번역하지 않고 서버 값을 배지에 그대로 보인다", () => {
+    renderWorkspace({
+      inquiries: [inquiry({ status: "unknown", statusCode: "SOMETHING_NEW" })],
+    });
+    const card = screen.getByText("구매자 문의").closest("li");
+    expect(within(card!).getByText("SOMETHING_NEW")).toBeInTheDocument();
   });
 
   it("상태 탭 순서는 전체·답변 대기·상담 중·답변 완료다", () => {
@@ -166,26 +175,26 @@ describe("구매자 문의 목록", () => {
     expect(router.state.location.search).toBe("?status=waiting");
   });
 
-  it("인플루언서 문의 메뉴는 인플루언서 경로로 이동하고 필터 유형이 인플루언서 문의·캠페인 Q&A다", async () => {
+  it("크리에이터 문의 메뉴는 크리에이터 경로로 이동하고 필터 유형이 크리에이터 문의·캠페인 Q&A다", async () => {
     const user = userEvent.setup();
     const router = renderWorkspace(
       {
-        menu: "influencer",
+        menu: "creator",
         inquiries: [
           inquiry({
-            key: "influencer-601",
+            key: "creator-601",
             inquiryIdx: 601,
-            source: "influencer",
+            source: "creator",
             orderNumber: null,
           }),
         ],
       },
-      ROUTES.customerCenterInfluencer,
+      ROUTES.customerCenterCreator,
     );
-    expect(screen.getByText("인플루언서 문의")).toBeInTheDocument();
+    expect(screen.getByText("크리에이터 문의")).toBeInTheDocument();
     await user.click(screen.getByRole("button", { name: /@김하루/ }));
     expect(router.state.location.pathname).toBe(
-      "/customer-center/influencer/influencer-601",
+      "/customer-center/creator/creator-601",
     );
     await user.click(screen.getByRole("button", { name: "필터" }));
     const dialog = screen.getByRole("dialog");

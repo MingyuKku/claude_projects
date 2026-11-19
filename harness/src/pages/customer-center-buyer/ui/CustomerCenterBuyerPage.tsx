@@ -28,9 +28,9 @@ export function CustomerCenterBuyerPage() {
   return <InquiryMenuPage menu="buyer" />;
 }
 
-/** 인플루언서 문의(REQ-34-0001): 구매자 문의와 같은 화면에 인플루언서 문의·캠페인 Q&A를 보여 줌. */
-export function CustomerCenterInfluencerPage() {
-  return <InquiryMenuPage menu="influencer" />;
+/** 크리에이터 문의(REQ-34-0001): 구매자 문의와 같은 화면에 크리에이터 문의·캠페인 Q&A를 보여 줌. */
+export function CustomerCenterCreatorPage() {
+  return <InquiryMenuPage menu="creator" />;
 }
 
 function InquiryMenuPage({ menu }: { menu: InquiryMenu }) {
@@ -54,7 +54,7 @@ function InquiryMenuPage({ menu }: { menu: InquiryMenu }) {
     INQUIRY_MENU[menu].sources,
     handleRealtimeAlarm,
   );
-  const isInfluencer = menu === "influencer";
+  const isCreator = menu === "creator";
   // 문의를 고르지 않고 들어오면 지금 탭(서버가 걸러 준 목록)의 첫 문의를 보여 줌(빅버드 문의와 같음).
   const selectedInquiry =
     inquiryKey === undefined
@@ -92,7 +92,7 @@ function InquiryMenuPage({ menu }: { menu: InquiryMenu }) {
 
   return (
     <>
-      <title>{t(isInfluencer ? "influencerTitle" : "title")}</title>
+      <title>{t(isCreator ? "creatorTitle" : "title")}</title>
       <BuyerInquiryWorkspace
         menu={menu}
         inquiries={inquiries}

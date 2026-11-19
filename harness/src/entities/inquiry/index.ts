@@ -19,7 +19,7 @@ export {
   usePurchaserConversation,
   useQnaDetail,
   useBuyerInquiries,
-  useBuyerInfluencerOptions,
+  useBuyerCreatorOptions,
   useInquiryCampaignDetail,
   useInquiryCampaigns,
 } from "./api/inquiry-api";
@@ -47,6 +47,10 @@ export { AttachmentTextField } from "./ui/AttachmentTextField";
 export { ConversationFiles } from "./ui/ConversationFiles";
 export { InquiryUploadStatus } from "./ui/InquiryUploadStatus";
 export { groupAttachments } from "./lib/group-attachments";
+export {
+  isRealtimeInquiryStatus,
+  matchesInquiryStatusFilter,
+} from "./lib/inquiry-status";
 export { markReadByLaterReply } from "./lib/mark-read-by-later-reply";
 export { showConnectNotice } from "./lib/show-connect-notice";
 export type { ConversationRow } from "./lib/group-attachments";

@@ -171,7 +171,7 @@ function DefaultTypeField({
   const submit = isWide ? (
     <Button size="sm">
       <Search />
-      인플루언서 탐색
+      크리에이터 탐색
     </Button>
   ) : (
     <Button size="icon-sm" aria-label="검색">

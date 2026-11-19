@@ -41,7 +41,7 @@ export function BuyerInquiryDetailPanel({
   const campaign = campaigns?.find(
     (item) => item.campaignIdx === inquiry.campaignIdx,
   );
-  // Figma 인플루언서 문의 상세(PC 10819:40984·TAB 10819:40998)는 주문/상품 정보·공구샵 코드·공구 진행 인플루언서가 없음.
+  // Figma 크리에이터 문의 상세(PC 10819:40984·TAB 10819:40998)는 주문/상품 정보·공구샵 코드·공구 진행 크리에이터가 없음.
   // MO 시안(10819:40238)에는 남아 있으나 PC·TAB 기준으로 둠(디자인 확인 필요).
   const isBuyerMenu = toInquiryMenu(inquiry.source) === "buyer";
 
@@ -151,8 +151,8 @@ export function BuyerInquiryDetailPanel({
       {(detail.campaignCode || detail.campaignType || period) && (
         <Section
           title={t("campaignInfo")}
-          // 배너 높이는 Figma Container(11315:50441)의 Thumbnail 73(구매자·인플루언서 문의 모두). 컨테이너는 289로 고정하지 않고 내용에
-          // 맡김: 캠페인명이 두 줄이거나 공구 진행 인플루언서 줄이 있어도 넘치지 않고, 기본 내용이면 289가 됨.
+          // 배너 높이는 Figma Container(11315:50441)의 Thumbnail 73(구매자·크리에이터 문의 모두). 컨테이너는 289로 고정하지 않고 내용에
+          // 맡김: 캠페인명이 두 줄이거나 공구 진행 크리에이터 줄이 있어도 넘치지 않고, 기본 내용이면 289가 됨.
           contentClassName="gap-2 tablet:gap-3"
         >
           {/* 캠페인을 목록에서 못 찾거나 이미지가 없어도 배너 자리는 남깁니다. */}
@@ -175,14 +175,14 @@ export function BuyerInquiryDetailPanel({
             <Row label={t("campaignType")} value={detail.campaignType} />
             <Row label={t("progressStatus")} value={detail.progressStatus} />
             <Row label={t("period")} value={period} />
-            {isBuyerMenu && detail.influencerNickname && (
-              // 요구명세서 24 I26: 공구 진행 인플루언서는 닉네임만 보임(플랫폼 아이디·표시 삭제). 진행 기간 바로 아래(사용자 요청 2026-11-13).
+            {isBuyerMenu && detail.creatorNickname && (
+              // 요구명세서 24 I26: 공구 진행 크리에이터는 닉네임만 보임(플랫폼 아이디·표시 삭제). 진행 기간 바로 아래(사용자 요청 2026-11-13).
               <div className="flex items-center justify-between gap-2">
                 <span className="shrink-0 text-xs leading-4 font-medium whitespace-nowrap text-muted-foreground">
-                  {t("influencer")}
+                  {t("creator")}
                 </span>
                 <span className="min-w-0 truncate text-xs leading-4 font-medium">
-                  {detail.influencerNickname}
+                  {detail.creatorNickname}
                 </span>
               </div>
             )}
@@ -202,7 +202,7 @@ export function BuyerInquiryDetailPanel({
             )}
             {isBuyerMenu && (
               // Figma 캠페인 바로가기(11315:50441). 캠페인 화면이 만들어지기 전까지 빅버드 문의 상세와 같이 비활성(사용자 결정
-              // 2026-11-06). 인플루언서 문의 상세에는 두지 않음.
+              // 2026-11-06). 크리에이터 문의 상세에는 두지 않음.
               <Button
                 variant="outline-foreground"
                 size="sm"

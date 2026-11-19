@@ -5,6 +5,8 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
   DropdownMenuTrigger,
 } from "./dropdown-menu";
 
@@ -46,5 +48,44 @@ describe("DropdownMenu", () => {
     const trigger = renderMenu();
     fireEvent.keyDown(trigger, { key: "Enter" });
     expect(screen.getByRole("menuitem", { name: "항목" })).toBeInTheDocument();
+  });
+});
+
+describe("DropdownMenuRadioItem 선택 표시 위치", () => {
+  function renderRadioMenu(indicatorPosition?: "start" | "end") {
+    render(
+      <DropdownMenu defaultOpen>
+        <DropdownMenuTrigger>메뉴</DropdownMenuTrigger>
+        <DropdownMenuContent>
+          <DropdownMenuRadioGroup value="a">
+            <DropdownMenuRadioItem value="a" indicatorPosition={indicatorPosition}>
+              가
+            </DropdownMenuRadioItem>
+            <DropdownMenuRadioItem value="b" indicatorPosition={indicatorPosition}>
+              나
+            </DropdownMenuRadioItem>
+          </DropdownMenuRadioGroup>
+        </DropdownMenuContent>
+      </DropdownMenu>,
+    );
+    return screen.getByRole("menuitemradio", { name: "가" });
+  }
+
+  it("기본은 왼쪽 점이고 항목에 왼쪽 여백을 둔다", () => {
+    const selected = renderRadioMenu();
+    expect(selected).toHaveAttribute("aria-checked", "true");
+    expect(selected).toHaveClass("pl-8.5");
+    expect(selected.querySelector("svg.lucide-circle")).toBeInTheDocument();
+  });
+
+  it("end이면 선택된 항목에만 오른쪽 체크를 그리고 왼쪽 여백을 두지 않는다", () => {
+    const selected = renderRadioMenu("end");
+    expect(selected).not.toHaveClass("pl-8.5");
+    expect(selected.querySelector("svg.lucide-check")).toBeInTheDocument();
+    expect(
+      screen
+        .getByRole("menuitemradio", { name: "나" })
+        .querySelector("svg"),
+    ).not.toBeInTheDocument();
   });
 });

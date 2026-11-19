@@ -19,9 +19,9 @@ const deduction: UsageRecord = {
   campaignType: "pick",
   campaignTypeText: "pick",
   usageDetail: "contractPick",
-  usageDetailText: "인플루언서 계약비용(PICK형)",
+  usageDetailText: "크리에이터 계약비용(PICK형)",
   amount: -50000,
-  contractTarget: { name: "김하루", influencerId: "haru_beauty" },
+  contractTarget: { name: "김하루", creatorId: "haru_beauty" },
   remainingAmount: 1250000,
 };
 const refund: UsageRecord = {
@@ -234,7 +234,7 @@ describe("UsageDetail", () => {
     render(<UsageDetail record={deduction} onClose={vi.fn()} />);
 
     expect(screen.getByText("PICK형")).toBeInTheDocument();
-    expect(screen.getByText("인플루언서 계약비용(PICK형)")).toBeInTheDocument();
+    expect(screen.getByText("크리에이터 계약비용(PICK형)")).toBeInTheDocument();
     expect(screen.getByText("김하루")).toBeInTheDocument();
     expect(screen.getByText("@haru_beauty")).toBeInTheDocument();
   });

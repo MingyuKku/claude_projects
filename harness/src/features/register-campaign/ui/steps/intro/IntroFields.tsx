@@ -36,7 +36,7 @@ export function IntroFields({ disabled }: IntroFieldsProps) {
   const mainImageLabelId = useId();
   const intro = useRegisterWizardStore((state) => state.draft.intro);
   const platform = useRegisterWizardStore(
-    (state) => state.draft.influencer.platform,
+    (state) => state.draft.creator.platform,
   );
   const patchStepDraft = useRegisterWizardStore(
     (state) => state.patchStepDraft,

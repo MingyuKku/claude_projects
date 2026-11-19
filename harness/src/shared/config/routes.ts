@@ -16,9 +16,9 @@ export const ROUTES = {
   customerCenterBuyer: "/customer-center/buyer",
   // 구매자 문의도 목록과 대화가 한 화면. `inquiryKey`는 출처를 담은 임시 키.
   customerCenterBuyerThread: "/customer-center/buyer/:inquiryKey?",
-  // 인플루언서 문의는 구매자 문의와 같은 화면(인플루언서 문의·캠페인 Q&A).
-  customerCenterInfluencer: "/customer-center/influencer",
-  customerCenterInfluencerThread: "/customer-center/influencer/:inquiryKey?",
+  // 크리에이터 문의는 구매자 문의와 같은 화면(크리에이터 문의·캠페인 Q&A).
+  customerCenterCreator: "/customer-center/creator",
+  customerCenterCreatorThread: "/customer-center/creator/:inquiryKey?",
   // 캠페인 현황과 개설. 개설은 서비스·상품만 고르는 화면이고 등록(마법사)과는 다름.
   campaign: "/campaign",
   campaignCreate: "/campaign/new",
@@ -33,7 +33,7 @@ export const ROUTES = {
   // 이니시스 결제창의 `closeUrl`. 결제 서버에 경로로 보내 결제창 안에서 열리고, 결제창을 닫기만 함.
   inicisClose: "/inicis/close",
   legacyMain: "/main",
-  influencerSearch: "/influencers/search",
+  creatorSearch: "/creators/search",
   find: "/find",
   findEmailSent: "/find/email-sent",
   join: "/join",

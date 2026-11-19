@@ -79,7 +79,7 @@
     "usageDetail": {
       "contractPick": "クリエイター契約費用(PICK型)",
       "contractRecruit": "クリエイター契約費用(募集型)",
-      "aiManuscriptConfirm": "付加サービス(AI原稿チェック)",
+      "manuscriptConfirm": "付加サービス(AI原稿チェック)",
       "postingGuide": "付加サービス(AI投稿ガイド)"
     }
   },

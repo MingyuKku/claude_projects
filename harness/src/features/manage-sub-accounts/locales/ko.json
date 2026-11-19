@@ -114,8 +114,8 @@
       "title": "Sub ID 권한부여",
       "name": {
         "campaign": "캠페인",
-        "influencerMatching": "인플루언서 매칭",
-        "influencerMarket": "인플루언서 마켓",
+        "creatorMatching": "크리에이터 매칭",
+        "creatorMarket": "크리에이터 마켓",
         "commerce": "커머스 관리",
         "buyerInquiry": "구매자 문의",
         "bigbirdMoney": "빅버드 머니"

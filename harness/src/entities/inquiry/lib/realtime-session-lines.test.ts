@@ -13,7 +13,7 @@ const END = "상담이 종료되었습니다.";
 
 const at = (time: string) => new Date(`2026-11-06T${time}`).getTime();
 
-// 상담 문서의 메시지. 요청자(인플루언서)는 isUserMessage true, 응답자(광고주)는 false.
+// 상담 문서의 메시지. 요청자(크리에이터)는 isUserMessage true, 응답자(광고주)는 false.
 function doc(
   messages: [
     created: string,
@@ -38,6 +38,43 @@ function doc(
 }
 
 describe("deriveRealtimeLines", () => {
+  it("종료 안내가 없어도 스레드 종료 시각이 있으면 마지막 연결된 상담의 종료로 본다", () => {
+    const connected = doc([
+      ["16:51:25", "안녕 광고주야", "requester"],
+      ["16:52:01", REQUEST, "auto"],
+      ["16:52:46", "안녕 난 광고주", "responder"],
+    ]);
+    expect(deriveRealtimeLines(connected, at("16:54:16"))).toEqual([
+      { kind: "start", at: at("16:52:46") },
+      { kind: "end", at: at("16:54:16") },
+    ]);
+    // 종료 시각이 없으면(진행 중) 시작 줄만
+    expect(deriveRealtimeLines(connected, null)).toEqual([
+      { kind: "start", at: at("16:52:46") },
+    ]);
+  });
+
+  it("서버의 종료 안내가 있으면 그 시각을 쓰고, 연결 전이거나 시작보다 이른 종료 시각은 쓰지 않는다", () => {
+    const withNotice = doc([
+      ["16:52:01", REQUEST, "auto"],
+      ["16:52:46", "안녕 난 광고주", "responder"],
+      ["16:54:16", END, "auto"],
+    ]);
+    expect(deriveRealtimeLines(withNotice, at("16:59:00"))).toEqual([
+      { kind: "start", at: at("16:52:46") },
+      { kind: "end", at: at("16:54:16") },
+    ]);
+    const notConnected = doc([["16:52:01", REQUEST, "auto"]]);
+    expect(deriveRealtimeLines(notConnected, at("16:54:16"))).toEqual([]);
+    const early = doc([
+      ["16:52:01", REQUEST, "auto"],
+      ["16:52:46", "안녕 난 광고주", "responder"],
+    ]);
+    expect(deriveRealtimeLines(early, at("16:50:00"))).toEqual([
+      { kind: "start", at: at("16:52:46") },
+    ]);
+  });
+
   it("한 문서에 상담이 여러 번 쌓여도 상담마다 시작·종료를 한 번씩, 자기 시각에 둔다", () => {
     // stage 2145 문서와 같은 흐름: 첫 상담(요청→응답→종료) 뒤 재요청이 수락돼 진행 중.
     const lines = deriveRealtimeLines(
@@ -146,7 +183,7 @@ describe("deriveRealtimeLines", () => {
 
   it.each([
     ["광고주가 끝낸 경우(앱이 남기는 문구)", "실시간 상담이 종료되었습니다."],
-    ["인플루언서·서버가 끝낸 경우", END],
+    ["크리에이터·서버가 끝낸 경우", END],
   ])("%s 종료 안내가 와도 종료 줄은 한 번이다", (_, body) => {
     const lines = deriveRealtimeLines(
       doc([

@@ -1,8 +1,8 @@
 import type {
   CampaignAddress,
   CampaignDraft,
-  CampaignDraftStep,
   CampaignMedia,
+  CampaignSavedStep,
 } from "../model/draft";
 
 // 단계별 수정(A-5.x) 요청 본문. 서버는 단계 단위로 덮어써서 보내지 않거나 null인 칸을 비우므로, 입력 전 값은 null로 보냄.
@@ -63,7 +63,7 @@ function toProductRequest({ info, product }: CampaignDraft) {
     return {
       ...EMPTY_PRODUCT_REQUEST,
       productName: textOrNull(product.productName),
-      quantityPerInfluencer: product.quantityPerInfluencer,
+      quantityPerInfluencer: product.quantityPerCreator,
       productPrice: product.productPrice,
       ...(product.returnRequired && {
         returnAddress: toAddressRequest(product.returnAddress),
@@ -97,7 +97,7 @@ const RAW_STEP_REQUEST_BUILDERS = {
     startDate: info.startDate,
   }),
   product: toProductRequest,
-  influencer: ({ influencer }: CampaignDraft) => ({ ...influencer }),
+  creator: ({ creator }: CampaignDraft) => ({ ...creator }),
   addOns: ({ addOns }: CampaignDraft) => ({ addOns }),
   intro: ({ intro }: CampaignDraft) => ({
     mainImage: intro.mainImage ? toAttachmentRequest(intro.mainImage) : null,
@@ -107,20 +107,24 @@ const RAW_STEP_REQUEST_BUILDERS = {
     titleHashtags: intro.titleHashtags,
     contentHashtags: intro.contentHashtags,
   }),
-  conditions: ({ conditions }: CampaignDraft) => ({ ...conditions }),
-  policy: ({ policy }: CampaignDraft) => ({ agreements: { ...policy } }),
-} satisfies Record<CampaignDraftStep, (draft: CampaignDraft) => object>;
+  conditions: ({ conditions }: CampaignDraft) => ({
+    headcount: conditions.headcount,
+    rewardPerInfluencer: conditions.rewardPerCreator,
+    postingPeriodMonths: conditions.postingPeriodMonths,
+    secondaryCopyright: conditions.secondaryCopyright,
+  }),
+} satisfies Record<CampaignSavedStep, (draft: CampaignDraft) => object>;
 
 export type CampaignStepRequests = {
-  [S in CampaignDraftStep]: ReturnType<(typeof RAW_STEP_REQUEST_BUILDERS)[S]>;
+  [S in CampaignSavedStep]: ReturnType<(typeof RAW_STEP_REQUEST_BUILDERS)[S]>;
 };
 
 // 단계 키와 반환 타입을 짝지은 모양으로 다시 적어야 제네릭 `step`으로 꺼낸 함수의 반환 타입이 맞춰짐.
 const STEP_REQUEST_BUILDERS: {
-  [S in CampaignDraftStep]: (draft: CampaignDraft) => CampaignStepRequests[S];
+  [S in CampaignSavedStep]: (draft: CampaignDraft) => CampaignStepRequests[S];
 } = RAW_STEP_REQUEST_BUILDERS;
 
-export function toStepRequest<S extends CampaignDraftStep>(
+export function toStepRequest<S extends CampaignSavedStep>(
   step: S,
   draft: CampaignDraft,
 ): CampaignStepRequests[S] {

@@ -75,7 +75,7 @@ describe("transformCampaignDetail", () => {
     expect(detail.rawStatus).toBe("ARCHIVED");
     expect(detail.draft.info.campaignType).toBeNull();
     expect(detail.rawCampaignType).toBe("PURCHASE_REVIEW");
-    expect(detail.draft.influencer).toEqual({
+    expect(detail.draft.creator).toEqual({
       platform: null,
       gender: null,
       ageGroups: ["AGE_20S"],

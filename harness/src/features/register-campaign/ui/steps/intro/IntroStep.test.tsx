@@ -37,7 +37,7 @@ function renderManualIntro(platform: CampaignPlatform | null) {
   render(
     <RegisterWizardProvider
       detail={createDetail((draft) => {
-        draft.influencer.platform = platform;
+        draft.creator.platform = platform;
         draft.intro.description = "기존 설명";
       })}
     >

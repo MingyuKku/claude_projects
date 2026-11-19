@@ -44,12 +44,12 @@ export const logoutResponseSchema = z.object({ result: z.literal(true) });
 /** LNB 메뉴 접근 권한. 권한이 없는 Sub ID에게도 메뉴는 보이고 흐리게 비활성함(스펙 `main.md`). */
 export interface MenuPermissions {
   campaign: boolean;
-  influencerMatching: boolean;
-  influencerMarket: boolean;
+  creatorMatching: boolean;
+  creatorMarket: boolean;
   commerce: boolean;
   bigbirdMoney: boolean;
   purchaserQuestion: boolean;
-  influencerQuestion: boolean;
+  creatorQuestion: boolean;
 }
 
 export interface SessionViewModel {

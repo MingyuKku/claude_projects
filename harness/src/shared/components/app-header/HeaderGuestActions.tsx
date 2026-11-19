@@ -1,40 +1,31 @@
-import { FileQuestionMark, User } from "lucide-react";
+import { User } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 
-// 모바일은 Button md(40), desktop은 Button sm(36) 크기.
-const GUEST_BUTTON =
-  "cursor-pointer desktop:h-9 desktop:min-w-16 desktop:gap-1 desktop:px-2";
+import type { ReactNode } from "react";
 
 interface HeaderGuestActionsProps {
-  guideLabel: string;
+  // 로그인 버튼 앞에 놓는 요소(이용 가이드·언어 메뉴)
+  children?: ReactNode;
   loginLabel: string;
-  onClickGuide?: () => void;
   onClickLogin?: () => void;
   className?: string;
 }
 
 export function HeaderGuestActions({
-  guideLabel,
+  children,
   loginLabel,
-  onClickGuide,
   onClickLogin,
   className,
 }: HeaderGuestActionsProps) {
   return (
-    <div className={cn("flex items-center gap-1.5 desktop:gap-3", className)}>
-      <Button
-        variant="ghost-muted"
-        className={GUEST_BUTTON}
-        onClick={onClickGuide}
-      >
-        <FileQuestionMark />
-        {guideLabel}
-      </Button>
+    <div className={cn("flex items-center gap-2 tablet:gap-3", className)}>
+      {children}
       <Button
         variant="secondary"
-        className={GUEST_BUTTON}
+        size="sm"
+        className="cursor-pointer"
         onClick={onClickLogin}
       >
         <User />

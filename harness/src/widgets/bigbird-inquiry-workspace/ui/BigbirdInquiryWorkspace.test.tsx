@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import { MemoryRouter } from "react-router";
 
 import { BigbirdInquiryWorkspace } from "./BigbirdInquiryWorkspace";
@@ -89,6 +89,30 @@ describe("BigbirdInquiryWorkspace 무한 스크롤", () => {
     ).not.toBeInTheDocument();
   });
 
+  it("상담 중 탭에는 서버가 함께 준 상담 요청 중 문의도 걸러 내지 않고 보인다", () => {
+    render(
+      <MemoryRouter initialEntries={["/?status=consulting"]}>
+        <BigbirdInquiryWorkspace
+          threadUserIdx={undefined}
+          inquiries={[
+            { ...done, threadIdx: 1, status: "requested", isFinished: false },
+            { ...done, threadIdx: 2, status: "waiting", isFinished: false },
+          ]}
+          isLoading={false}
+          isError={false}
+          onClickRefresh={() => {}}
+          isPanelOpen={false}
+          panelLabel="대화"
+        >
+          <p>패널 내용</p>
+        </BigbirdInquiryWorkspace>
+      </MemoryRouter>,
+    );
+    const items = screen.getAllByRole("listitem");
+    expect(items).toHaveLength(1);
+    expect(within(items[0]!).getByText("상담 요청 중")).toBeInTheDocument();
+  });
+
   it("다음 쪽을 받지 못하면 불러 둔 목록을 남기고 아래에 다시 시도를 보인다", () => {
     renderList("/", { isError: true, hasMore: true });
     expect(
@@ -113,6 +137,51 @@ describe("BigbirdInquiryWorkspace 목록 카드", () => {
     createdAt: new Date("2026-10-29T09:00:00"),
     messages: [],
   };
+
+  it("출금 문의 카드는 태그는 기타문의 그대로 두고 제목만 출금 문의로 보인다", () => {
+    render(
+      <MemoryRouter>
+        <BigbirdInquiryWorkspace
+          threadUserIdx={undefined}
+          inquiries={[{ ...base, isWithdrawalInquiry: true }]}
+          isLoading={false}
+          isError={false}
+          onClickRefresh={() => {}}
+          isPanelOpen={false}
+          panelLabel="대화"
+        >
+          <p>패널 내용</p>
+        </BigbirdInquiryWorkspace>
+      </MemoryRouter>,
+    );
+    expect(screen.getByText("빅버드 머니 출금 문의")).toBeInTheDocument();
+    expect(screen.getByText("기타문의")).toBeInTheDocument();
+    expect(screen.queryByText("기타 문의")).not.toBeInTheDocument();
+  });
+
+  it.each([
+    [{ status: "requested" }, "상담 요청 중"],
+    [{ status: "consulting" }, "실시간 상담중"],
+    [{ status: "unknown", statusCode: "SOMETHING_NEW" }, "SOMETHING_NEW"],
+  ] as const)("%j 상태 카드는 배지 %s를 보인다", (override, label) => {
+    render(
+      <MemoryRouter>
+        <BigbirdInquiryWorkspace
+          threadUserIdx={undefined}
+          inquiries={[{ ...base, ...override }]}
+          isLoading={false}
+          isError={false}
+          onClickRefresh={() => {}}
+          isPanelOpen={false}
+          panelLabel="대화"
+        >
+          <p>패널 내용</p>
+        </BigbirdInquiryWorkspace>
+      </MemoryRouter>,
+    );
+    const card = screen.getByText("기타 문의").closest("li");
+    expect(within(card!).getByText(label)).toBeInTheDocument();
+  });
 
   it("기타 문의 카드는 기타문의 태그와 2행 제목 기타 문의를, 캠페인 문의 카드는 캠페인 문의 태그를 보인다", () => {
     render(

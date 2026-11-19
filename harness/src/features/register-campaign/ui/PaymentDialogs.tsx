@@ -37,6 +37,7 @@ const DIALOG_KEYS = {
   invalidStartDate: "payment.dialog.invalidStartDate",
   subscriptionRequired: "payment.dialog.subscriptionRequired",
   demoConfirm: "payment.dialog.demoConfirm",
+  reapprovalCompleted: "detail.dialog.reapproval",
 } as const satisfies Record<PaymentDialog["type"], string>;
 
 function focusChargeArea() {
@@ -74,6 +75,7 @@ export function PaymentDialogs({
         requestAnimationFrame(focusChargeArea);
         return;
       case "completed":
+      case "reapprovalCompleted":
         onLeaveToDetail();
         return;
       case "invalidStartDate":
@@ -91,8 +93,14 @@ export function PaymentDialogs({
     <AlertDialog
       open={dialog !== null}
       onOpenChange={(isOpen) => {
-        // 결제 완료는 확인으로만 닫힘(등록 내역으로 가야 함).
-        if (!isOpen && dialog?.type !== "completed") onClose();
+        // 결제·재승인 완료는 확인으로만 닫힘(등록 내역으로 가야 함).
+        if (
+          !isOpen &&
+          dialog?.type !== "completed" &&
+          dialog?.type !== "reapprovalCompleted"
+        ) {
+          onClose();
+        }
       }}
     >
       {keyPrefix && (

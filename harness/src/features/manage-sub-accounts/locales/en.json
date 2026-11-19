@@ -114,8 +114,8 @@
       "title": "Sub ID permissions",
       "name": {
         "campaign": "Campaigns",
-        "influencerMatching": "Influencer matching",
-        "influencerMarket": "Influencer market",
+        "creatorMatching": "Creator matching",
+        "creatorMarket": "Creator market",
         "commerce": "Commerce management",
         "buyerInquiry": "Buyer Q&A",
         "bigbirdMoney": "Bigbird Money"

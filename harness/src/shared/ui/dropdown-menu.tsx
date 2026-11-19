@@ -183,24 +183,35 @@ function DropdownMenuRadioGroup({
 function DropdownMenuRadioItem({
   className,
   children,
+  indicatorPosition = "start",
   ...props
-}: React.ComponentProps<typeof DropdownMenuPrimitive.RadioItem>) {
+}: React.ComponentProps<typeof DropdownMenuPrimitive.RadioItem> & {
+  // start = 왼쪽 점(기본), end = Figma Context Item의 오른쪽 체크(선택된 항목)
+  indicatorPosition?: "start" | "end"
+}) {
   return (
     <DropdownMenuPrimitive.RadioItem
       data-slot="dropdown-menu-radio-item"
       className={cn(
         menuItemClassName,
-        "pl-8.5",
+        indicatorPosition === "start" && "pl-8.5",
         className
       )}
       {...props}
     >
-      <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
-        <DropdownMenuPrimitive.ItemIndicator>
-          <CircleIcon className="size-2 fill-current" />
-        </DropdownMenuPrimitive.ItemIndicator>
-      </span>
+      {indicatorPosition === "start" ? (
+        <span className="pointer-events-none absolute left-2 flex size-3.5 items-center justify-center">
+          <DropdownMenuPrimitive.ItemIndicator>
+            <CircleIcon className="size-2 fill-current" />
+          </DropdownMenuPrimitive.ItemIndicator>
+        </span>
+      ) : null}
       {children}
+      {indicatorPosition === "end" ? (
+        <DropdownMenuPrimitive.ItemIndicator className="ml-auto flex">
+          <CheckIcon className="size-4 text-primary" />
+        </DropdownMenuPrimitive.ItemIndicator>
+      ) : null}
     </DropdownMenuPrimitive.RadioItem>
   )
 }

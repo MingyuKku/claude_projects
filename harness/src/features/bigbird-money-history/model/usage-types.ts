@@ -25,7 +25,7 @@ export type CampaignType = (typeof CAMPAIGN_TYPES)[number];
 export const USAGE_DETAILS = [
   "contractPick",
   "contractRecruit",
-  "aiManuscriptConfirm",
+  "manuscriptConfirm",
   "postingGuide",
 ] as const;
 
@@ -34,7 +34,7 @@ export type UsageDetail = (typeof USAGE_DETAILS)[number];
 export const SERVER_USAGE_DETAIL = {
   contractPick: "INFLUENCER_CONTRACT_PICK",
   contractRecruit: "INFLUENCER_CONTRACT_RECRUIT",
-  aiManuscriptConfirm: "AI_MANUSCRIPT_CONFIRM",
+  manuscriptConfirm: "MANUSCRIPT_CONFIRM",
   postingGuide: "POSTING_GUIDE",
 } as const satisfies Record<UsageDetail, string>;
 
@@ -63,8 +63,8 @@ export interface UsageRecord {
   amount: number | null;
   /** 사용 후 잔액. 값이 없으면 null. */
   remainingAmount: number | null;
-  /** 계약 대상(인플루언서). 모집형·부가 서비스·충전·출금처럼 대상이 없으면 null. */
-  contractTarget: { name: string; influencerId: string } | null;
+  /** 계약 대상(크리에이터). 모집형·부가 서비스·충전·출금처럼 대상이 없으면 null. */
+  contractTarget: { name: string; creatorId: string } | null;
 }
 
 export interface UsageListViewModel {

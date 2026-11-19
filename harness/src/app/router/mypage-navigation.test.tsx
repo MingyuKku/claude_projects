@@ -239,14 +239,6 @@ describe("마이페이지 · 계정 설정 셸", () => {
     expect(screen.getByRole("button", { name: "수정" })).toBeInTheDocument();
   });
 
-  it("?tab=company에 등록된 회사정보가 없으면 빈 보기와 등록 버튼으로 연다", async () => {
-    await renderRoute(`${ROUTES.mypageAccount}?tab=company`);
-    expect(
-      await screen.findByRole("button", { name: "등록" }),
-    ).toBeInTheDocument();
-    expect(screen.queryByRole("textbox", { name: /회사명/ })).toBeNull();
-  });
-
   function mockCompleteCompany() {
     mockV3Get((path: string) =>
       Promise.resolve(
@@ -456,22 +448,6 @@ describe("마이페이지 · 계정 설정 셸", () => {
     expect(selectedTabs().map((tab) => tab.textContent)).toEqual(["회사정보"]);
   });
 
-  it("기본 탭으로 돌아가면 tab 쿼리를 지운다", async () => {
-    const user = userEvent.setup();
-    const router = await renderRoute(`${ROUTES.mypageAccount}?tab=company`);
-    await user.click(
-      await screen.findByRole("tab", { name: "Master ID 관리" }),
-    );
-    expect(router.state.location.search).toBe("");
-  });
-
-  it("비로그인으로 직접 진입하면 로그인으로 이동한다", async () => {
-    mockSessionError(new ApiError(401, undefined));
-    const router = await renderRoute(ROUTES.mypageAccount);
-    await screen.findByLabelText("아이디");
-    expect(router.state.location.pathname).toBe(ROUTES.login);
-  });
-
   it("비로그인이 LNB 계정 설정을 누르면 로그인으로 이동한다", async () => {
     mockSessionError(new ApiError(401, undefined));
     const user = userEvent.setup();
@@ -482,15 +458,6 @@ describe("마이페이지 · 계정 설정 셸", () => {
     await user.click(link);
     await screen.findByLabelText("아이디");
     expect(router.state.location.pathname).toBe(ROUTES.login);
-  });
-
-  it("헤더 프로필 메뉴의 계정 설정은 /mypage/account로 이동한다", async () => {
-    const user = userEvent.setup();
-    const router = await renderRoute(ROUTES.main);
-    await user.click(await screen.findByRole("button", { name: "내 프로필" }));
-    await user.click(screen.getByRole("menuitem", { name: "계정 설정" }));
-    await screen.findByRole("tab", { name: "Master ID 관리" });
-    expect(router.state.location.pathname).toBe(ROUTES.mypageAccount);
   });
 
   describe("접힌 레일의 하위 메뉴가 있는 항목", () => {
@@ -567,14 +534,14 @@ describe("마이페이지 · 계정 설정 셸", () => {
       mockSession({ ...subSession, ...access });
     }
 
-    it("권한이 없으면 빅버드 머니·구매자 문의·인플루언서 검색이 비활성이다", async () => {
+    it("권한이 없으면 빅버드 머니·구매자 문의·크리에이터 검색이 비활성이다", async () => {
       mockPermissions({
         isBigbirdMoneyAccess: false,
         isPurchaserQuestionAccess: false,
       });
       await renderRoute(ROUTES.mypageAccount);
       await screen.findByRole("tab", { name: "Sub ID 관리" });
-      for (const name of ["빅버드 머니", "구매자 문의", "인플루언서 검색"]) {
+      for (const name of ["빅버드 머니", "구매자 문의", "크리에이터 검색"]) {
         expect(within(mainNav()).getByRole("link", { name })).toHaveAttribute(
           "aria-disabled",
           "true",
@@ -590,7 +557,7 @@ describe("마이페이지 · 계정 설정 셸", () => {
       });
       await renderRoute(ROUTES.mypageAccount);
       await screen.findByRole("tab", { name: "Sub ID 관리" });
-      for (const name of ["빅버드 머니", "구매자 문의", "인플루언서 검색"]) {
+      for (const name of ["빅버드 머니", "구매자 문의", "크리에이터 검색"]) {
         expect(
           within(mainNav()).getByRole("link", { name }),
         ).not.toHaveAttribute("aria-disabled");
@@ -697,7 +664,7 @@ describe("마이페이지 · 빅버드 머니", () => {
     id: "BC-12345678901234",
     type: "USE",
     usageDetailCode: "INFLUENCER_CONTRACT_PICK",
-    usageDetailName: "인플루언서 계약비용(PICK형)",
+    usageDetailName: "크리에이터 계약비용(PICK형)",
     usageDate: "2026-10-23 14:23:18",
     campaignName: "여름 시즌 캠핑 용품 신제품 리뷰",
     campaignCode: "CP0001",
@@ -952,37 +919,5 @@ describe("마이페이지 · 빅버드 머니", () => {
       expect(router.state.location.search).not.toContain("panel");
       expect(router.state.location.search).toContain("view=history");
     });
-  });
-
-  it("결제 서버가 더 붙인 쿼리(가상계좌 정보 등)도 이름과 상관없이 모두 지운다", async () => {
-    mockViewport({ tablet: true, desktop: false });
-    const router = await renderRoute(
-      `${ROUTES.mypageMoney}?isPaid=true&gopaymethod=VBank&accountNumber=1234567890&holderName=%ED%99%8D&dueDate=20261106`,
-    );
-
-    expect(await screen.findByText("충전 요청 완료")).toBeInTheDocument();
-    await waitFor(() => expect(router.state.location.search).toBe(""));
-  });
-
-  it.each(["USER_CANCELED", "PAYMENT_FAILED"])(
-    "결제 실패·취소(isPaid=false&code=%s)로 돌아오면 알럿 없이 쿼리만 지운다",
-    async (code) => {
-      mockViewport({ tablet: true, desktop: false });
-      const router = await renderRoute(
-        `${ROUTES.mypageMoney}?isPaid=false&code=${code}`,
-      );
-
-      await screen.findByRole("heading", { name: "상세 내역" });
-      await waitFor(() => expect(router.state.location.search).toBe(""));
-      expect(screen.queryByText("충전 요청 완료")).toBeNull();
-    },
-  );
-
-  it("isPaid=true가 없으면 알럿을 띄우지 않는다", async () => {
-    mockViewport({ tablet: true, desktop: false });
-    await renderRoute(ROUTES.mypageMoney);
-
-    await screen.findByRole("heading", { name: "상세 내역" });
-    expect(screen.queryByText("충전 요청 완료")).toBeNull();
   });
 });

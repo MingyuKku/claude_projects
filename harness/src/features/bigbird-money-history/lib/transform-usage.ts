@@ -73,7 +73,7 @@ export function transformUsageList(list: UsageList): UsageListViewModel {
           !isCampaignFree && target
             ? {
                 name: target.name?.trim() ?? "",
-                influencerId: target.influencerId?.trim() ?? "",
+                creatorId: target.influencerId?.trim() ?? "",
               }
             : null,
       };

@@ -4,13 +4,12 @@ import type { CampaignDraft, CampaignServiceType } from "@/entities/campaign";
 
 export function calculateDraftPayment(
   serviceType: CampaignServiceType,
-  { info, addOns, conditions }: CampaignDraft,
+  { addOns, conditions }: CampaignDraft,
 ) {
   return calculateCampaignPayment({
     serviceType,
-    campaignType: info.campaignType,
     addOns,
     headcount: conditions.headcount,
-    rewardPerInfluencer: conditions.rewardPerInfluencer,
+    rewardPerCreator: conditions.rewardPerCreator,
   });
 }

@@ -4,13 +4,14 @@ import { toIsoDate } from "@/shared/lib";
 import { CAMPAIGN_SERVICE_TYPES } from "../../model/codes";
 import {
   CAMPAIGN_ADD_ONS,
-  CAMPAIGN_TYPES,
   filterKnownCodes,
   toKnownCode,
 } from "../../model/input-codes";
 import { calculateCampaignPayment } from "../../model/payment-amount";
 import { findCampaignRecord, updateCampaignRecord } from "./campaign-db";
 import { toDateTime } from "./campaign-record";
+
+import type { CampaignPolicyAgreements } from "../../model/draft";
 
 // 서버가 하는 상태·금액 검사를 흉내 냄.
 
@@ -23,14 +24,16 @@ const PAYABLE_STATUS = "DRAFT";
  */
 export async function payCampaign(
   campaignIdx: number,
-  body: { expectedTotalAmount: number },
+  body: {
+    expectedTotalAmount: number;
+    agreements: CampaignPolicyAgreements;
+  },
 ) {
   const record = findCampaignRecord(campaignIdx);
   if (record.status !== PAYABLE_STATUS || record.demo) {
     throw new ApiError(409, { reason: "ALREADY_PAID" });
   }
-  const agreements = record.policy?.agreements;
-  if (!agreements || !Object.values(agreements).every(Boolean)) {
+  if (!Object.values(body.agreements).every(Boolean)) {
     throw new ApiError(400, { reason: "POLICY_NOT_AGREED" });
   }
   const { startDate } = record.info;
@@ -40,10 +43,9 @@ export async function payCampaign(
   const { totalAmount } = calculateCampaignPayment({
     serviceType:
       toKnownCode(CAMPAIGN_SERVICE_TYPES, record.serviceType) ?? "PICK",
-    campaignType: toKnownCode(CAMPAIGN_TYPES, record.info.campaignType),
     addOns: filterKnownCodes(CAMPAIGN_ADD_ONS, record.addOns),
     headcount: record.conditions.headcount,
-    rewardPerInfluencer: record.conditions.rewardPerInfluencer,
+    rewardPerCreator: record.conditions.rewardPerInfluencer,
   });
   if (totalAmount !== body.expectedTotalAmount) {
     throw new ApiError(409, { reason: "AMOUNT_CHANGED" });
@@ -51,6 +53,7 @@ export async function payCampaign(
   const paidAt = toDateTime(new Date());
   updateCampaignRecord(campaignIdx, (target) => {
     target.status = "REVIEWING";
+    target.policy = { agreements: { ...body.agreements } };
     target.payment = { paidAmount: totalAmount, paidAt };
   });
   return { status: "REVIEWING", paidAmount: totalAmount, paidAt, balance: 0 };
@@ -70,12 +73,16 @@ export async function cancelCampaignApproval(campaignIdx: number) {
     target.status = "DRAFT";
     target.payment = null;
     target.rejectReason = null;
+    target.policy = null;
   });
   return { status: "DRAFT", refundedAmount, balance: 0 };
 }
 
-/** 반려만 요청할 수 있고, 반려 사유를 지우고 승인 검토중으로 바꿈. */
-export async function requestCampaignReapproval(campaignIdx: number) {
+/** 반려만 요청할 수 있고, 동의 4개를 다시 받아 기록하며 반려 사유를 지우고 승인 검토중으로 바꿈. */
+export async function requestCampaignReapproval(
+  campaignIdx: number,
+  agreements: CampaignPolicyAgreements,
+) {
   const record = findCampaignRecord(campaignIdx);
   if (record.status !== "REJECTED") {
     throw new ApiError(409, {
@@ -83,9 +90,13 @@ export async function requestCampaignReapproval(campaignIdx: number) {
       status: record.status,
     });
   }
+  if (!Object.values(agreements).every(Boolean)) {
+    throw new ApiError(400, { reason: "POLICY_NOT_AGREED" });
+  }
   updateCampaignRecord(campaignIdx, (target) => {
     target.status = "REVIEWING";
     target.rejectReason = null;
+    target.policy = { agreements: { ...agreements } };
   });
   return { status: "REVIEWING" };
 }
@@ -102,6 +113,8 @@ export async function reviewCampaignForDev(
   updateCampaignRecord(campaignIdx, (target) => {
     target.status = decision.type === "reject" ? "REJECTED" : "IN_PROGRESS";
     target.rejectReason = decision.type === "reject" ? decision.reason : null;
+    // 서버처럼 반려하면 7단계 정책 동의 기록을 지움(승인은 그대로).
+    if (decision.type === "reject") target.policy = null;
   });
 }
 

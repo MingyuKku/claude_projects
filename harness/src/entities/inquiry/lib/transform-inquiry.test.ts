@@ -8,6 +8,7 @@ import {
   buildSubmittedInquiryViewModel,
   toCampaignCardBody,
   transformBigbirdInquiryDetailMessages,
+  transformBigbirdInquiryListItemToViewModel,
   transformBuyerInquiryDetailToViewModel,
   transformBuyerInquiryToViewModel,
   transformInquiryCampaignDetailToViewModel,
@@ -189,7 +190,7 @@ describe("transformInquiryThreadToViewModel", () => {
             fileType: "image",
             fileName: "보고서.xlsx",
           }),
-          // 인플루언서 문의는 fileType이 비어 와서 파일 이름 확장자로 사진·동영상을 가림
+          // 크리에이터 문의는 fileType이 비어 와서 파일 이름 확장자로 사진·동영상을 가림
           message({
             messageIdx: 9,
             attachmentIdx: 9,
@@ -494,7 +495,7 @@ describe("transformBuyerInquiryToViewModel", () => {
   });
 });
 
-describe("transformBuyerInquiryDetailToViewModel: 대표 이미지·상품명·인플루언서 닉네임", () => {
+describe("transformBuyerInquiryDetailToViewModel: 대표 이미지·상품명·크리에이터 닉네임", () => {
   const detail = (link: string | null): BuyerInquiryDetail => ({
     result: true,
     writerName: null,
@@ -536,15 +537,15 @@ describe("transformBuyerInquiryDetailToViewModel: 대표 이미지·상품명·�
     ).toBeNull();
   });
 
-  it("인플루언서 닉네임을 그대로 쓰고 비면 null", () => {
+  it("크리에이터 닉네임을 그대로 쓰고 비면 null", () => {
     expect(
       transformBuyerInquiryDetailToViewModel({
         ...detail(null),
         influencerNickname: "gang33431",
-      }).influencerNickname,
+      }).creatorNickname,
     ).toBe("gang33431");
     expect(
-      transformBuyerInquiryDetailToViewModel(detail(null)).influencerNickname,
+      transformBuyerInquiryDetailToViewModel(detail(null)).creatorNickname,
     ).toBeNull();
   });
 });
@@ -875,5 +876,119 @@ describe("transformInquiryMessageToViewModel: 빅버드 머니 출금 요청 카
     );
     expect(result.withdrawal).toBeNull();
     expect(result.kind).toBe("text");
+  });
+});
+
+describe("실제 출금 요청 대화(stage 2026-11-18, requesterName null)", () => {
+  const messages = [
+    {
+      messageIdx: 13771,
+      threadIdx: 2314,
+      body: '{"accountHolder":"유도이","amount":959107500,"requestedAt":"2026-11-18 11:36:44","requesterName":null,"bankName":"카카오뱅크","withdrawalIdx":33,"type":"BIGBIRD_MONEY_WITHDRAWAL","accountNumber":"0333301686433","status":"PENDING","requesterHandle":"diyou0408"}',
+      userIdx: 1,
+      attachmentIdx: null,
+      writeTime: "2026-11-18T11:36:45",
+      readTime: "2026-11-18T11:48:04",
+      modifyTime: null,
+      deleteTime: null,
+      identifier: "admin-concepters",
+      isUserMessage: false,
+      fileName: null,
+      fileSize: null,
+      fileType: null,
+      messageId: null,
+      auto: true,
+    },
+    {
+      messageIdx: 13772,
+      threadIdx: 2314,
+      body: "출금 요청이 접수되었습니다.",
+      userIdx: 6043,
+      attachmentIdx: 2870,
+      writeTime: "2026-11-18T11:36:45",
+      readTime: "2026-11-18T11:40:09",
+      modifyTime: null,
+      deleteTime: null,
+      identifier: "diyou0408",
+      isUserMessage: true,
+      fileName: "cute_dog_2 (1).jpeg",
+      fileSize: null,
+      fileType: "image/jpeg",
+      messageId: null,
+      auto: false,
+    },
+  ];
+
+  it("requesterName이 null이어도 출금 요청 카드로 읽고 신청자는 계정 id만 쓴다", () => {
+    const [card, notice] = transformBigbirdInquiryDetailMessages(messages);
+    expect(card).toMatchObject({
+      kind: "withdrawalCard",
+      isMine: true,
+      withdrawal: {
+        status: "requested",
+        amount: 959107500,
+        applicantId: "diyou0408",
+        bankName: "카카오뱅크",
+        accountNumber: "0333301686433",
+        accountHolder: "유도이",
+        requestedAt: new Date("2026-11-18T11:36:44"),
+      },
+    });
+    expect(card?.withdrawal?.applicantName).toBeUndefined();
+    // 글과 첨부를 한 메시지로 저장한 접수 메시지. body는 글이고 첨부는 그대로 남음.
+    expect(notice).toMatchObject({
+      kind: "image",
+      body: "출금 요청이 접수되었습니다.",
+      attachment: { attachmentIdx: 2870, fileName: "cute_dog_2 (1).jpeg" },
+    });
+  });
+});
+
+describe("transformBigbirdInquiryListItemToViewModel: 출금 문의", () => {
+  // 출금 신청으로 생긴 스레드의 목록 줄(stage 2026-11-18, threadIdx 2314)을 따른 값.
+  const base = {
+    threadIdx: 2314,
+    sequence: 1486,
+    campaignIdx: null,
+    brandName: null,
+    productName: null,
+    campaignCode: null,
+    status: "WAITING",
+    created: "2026-11-18 11:36",
+    finishTime: null,
+    boardType: true,
+  };
+  const isWithdrawal = (extra: Record<string, unknown>) =>
+    transformBigbirdInquiryListItemToViewModel({ ...base, ...extra })
+      .isWithdrawalInquiry;
+
+  it("서버가 준 withdrawalInquiry·isWithdrawalInquiry 값을 쓴다", () => {
+    // 2026-11-18 16:08 KST Swagger의 실제 이름
+    expect(isWithdrawal({ withdrawalInquiry: true })).toBe(true);
+    expect(isWithdrawal({ withdrawalInquiry: false })).toBe(false);
+    // 문서 설명의 이름
+    expect(isWithdrawal({ isWithdrawalInquiry: true })).toBe(true);
+    expect(isWithdrawal({ isWithdrawalInquiry: false })).toBe(false);
+    // 둘 다 오면 isWithdrawalInquiry가 먼저
+    expect(
+      isWithdrawal({ isWithdrawalInquiry: false, withdrawalInquiry: true }),
+    ).toBe(false);
+  });
+
+  it("서버 값이 있으면 title보다 먼저 쓴다", () => {
+    expect(
+      isWithdrawal({ withdrawalInquiry: false, title: "빅버드머니 출금 문의" }),
+    ).toBe(false);
+    expect(isWithdrawal({ withdrawalInquiry: true, title: null })).toBe(true);
+  });
+
+  it("서버 필드가 둘 다 없으면 title이 비어 있지 않은 줄을 출금 문의로 본다", () => {
+    expect(isWithdrawal({ title: "빅버드머니 출금 문의" })).toBe(true);
+    expect(isWithdrawal({ title: null })).toBe(false);
+    expect(isWithdrawal({ title: " " })).toBe(false);
+    // 필드가 아예 없는 예전 응답은 일반 문의
+    expect(isWithdrawal({})).toBe(false);
+    // 캠페인 문의의 title은 출금 문의로 보지 않음(출금 스레드는 캠페인이 없음)
+    expect(isWithdrawal({ campaignIdx: 700, title: "아무 제목" })).toBe(false);
   });
 });

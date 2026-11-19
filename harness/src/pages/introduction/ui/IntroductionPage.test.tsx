@@ -7,7 +7,7 @@ describe("IntroductionPage", () => {
     render(<IntroductionPage />);
 
     expect(
-      screen.getByRole("heading", { level: 1, name: /인플루언서 마케팅,/ }),
+      screen.getByRole("heading", { level: 1, name: /크리에이터 마케팅,/ }),
     ).toHaveTextContent("더 정확하게 시작하세요");
   });
 

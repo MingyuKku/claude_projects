@@ -141,9 +141,9 @@ describe("SubscriptionPlanList", () => {
     const steps = screen.getByText("이용 방식").parentElement!;
     for (const label of [
       "캠페인 등록",
-      "인플루언서 모집",
+      "크리에이터 모집",
       "신청자 확인",
-      "인플루언서 선정",
+      "크리에이터 선정",
       "캠페인 진행",
     ]) {
       expect(within(steps).getByText(label)).toBeInTheDocument();

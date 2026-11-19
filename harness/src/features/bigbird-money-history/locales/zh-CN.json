@@ -77,9 +77,9 @@
       "pick": "PICK型"
     },
     "usageDetail": {
-      "contractPick": "网红合同费用(PICK型)",
-      "contractRecruit": "网红合同费用(招募型)",
-      "aiManuscriptConfirm": "附加服务(AI稿件审核)",
+      "contractPick": "创作者合同费用(PICK型)",
+      "contractRecruit": "创作者合同费用(招募型)",
+      "manuscriptConfirm": "附加服务(AI稿件审核)",
       "postingGuide": "附加服务(AI发帖指南)"
     }
   },

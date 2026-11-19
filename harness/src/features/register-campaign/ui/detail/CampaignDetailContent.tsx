@@ -155,7 +155,7 @@ export function CampaignDetailContent({
           <Button
             className="flex-1 tablet:flex-none"
             disabled={actions.isRequesting}
-            onClick={() => void actions.requestReapproval()}
+            onClick={() => void actions.requestReapproval(detail.draft.policy)}
           >
             {t("detail.requestReapproval")}
           </Button>

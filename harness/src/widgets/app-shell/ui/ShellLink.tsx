@@ -10,7 +10,7 @@ import { NavigationContext } from "../model/navigation-context";
 import type { MenuPermissions } from "@/entities/session";
 import type { ComponentProps } from "react";
 
-// 구독은 역할, 인플루언서 검색·빅버드 머니·구매자 문의·인플루언서 문의는 세션의 메뉴 권한(`GET /v3/sec`)에 따라 아래에서 따로 판단함.
+// 구독은 역할, 크리에이터 검색·빅버드 머니·구매자 문의·크리에이터 문의는 세션의 메뉴 권한(`GET /v3/sec`)에 따라 아래에서 따로 판단함.
 const ENABLED_HREFS = new Set<string>([
   ROUTES.main,
   ROUTES.switchAccount,
@@ -20,23 +20,23 @@ const ENABLED_HREFS = new Set<string>([
 // 이 메뉴는 Sub ID가 해당 권한을 받아야 활성. 비로그인은 로그인 안내가 따로 있어 활성으로 둠.
 const PERMISSION_BY_HREF: Record<string, keyof MenuPermissions> = {
   [ROUTES.campaign]: "campaign",
-  [ROUTES.influencerSearch]: "influencerMatching",
+  [ROUTES.creatorSearch]: "creatorMatching",
   [ROUTES.mypageMoney]: "bigbirdMoney",
   [ROUTES.customerCenterBuyer]: "purchaserQuestion",
-  [ROUTES.customerCenterInfluencer]: "influencerQuestion",
+  [ROUTES.customerCenterCreator]: "creatorQuestion",
 };
 // 비로그인이 누르면 로그인으로 보내는 메뉴. 구독은 비로그인도 상품을 볼 수 있어 빠짐(마이페이지 QA 2026-11-16).
 const LOGIN_REQUIRED_HREFS = new Set<string>([
   ROUTES.campaign,
   ROUTES.customerCenterBigbird,
   ROUTES.customerCenterBuyer,
-  ROUTES.customerCenterInfluencer,
+  ROUTES.customerCenterCreator,
   ROUTES.mypageAccount,
   ROUTES.mypageMoney,
 ]);
 
 // 화면이 아직 없는 메뉴. 비로그인이 누르면 로그인 안내 알럿을 띄우고, 로그인한 사용자에게는 "준비 중"으로 비활성임.
-const LOGIN_ALERT_NAV_IDS = new Set<string>(["influencerManage", "chat"]);
+const LOGIN_ALERT_NAV_IDS = new Set<string>(["creatorManage", "chat"]);
 
 interface ShellLinkProps extends ComponentProps<"a"> {
   href: string;

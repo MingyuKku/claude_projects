@@ -23,17 +23,19 @@ export type SaveResult =
 /** 유형을 바꾸면 서버가 비우는 단계(A-5.1). */
 const STEPS_CLEARED_BY_TYPE_CHANGE: readonly CampaignDraftStep[] = [
   "product",
-  "influencer",
+  "creator",
   "addOns",
   "intro",
   "conditions",
 ];
 
-/** 보낼 단계: 마지막으로 저장한 값과 달라진 단계. */
+/** 보낼 단계: 마지막으로 저장한 값과 달라진 단계. 정책 동의는 결제 요청에 실어 보내므로 뺌. */
 export function getChangedSteps(
   state: Pick<RegisterWizardState, "draft" | "savedDraft">,
 ): CampaignDraftStep[] {
-  return CAMPAIGN_DRAFT_STEPS.filter((step) => isStepChanged(state, step));
+  return CAMPAIGN_DRAFT_STEPS.filter(
+    (step) => step !== "policy" && isStepChanged(state, step),
+  );
 }
 
 export interface DraftSaver {

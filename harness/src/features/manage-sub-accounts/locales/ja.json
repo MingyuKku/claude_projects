@@ -114,8 +114,8 @@
       "title": "サブID権限",
       "name": {
         "campaign": "キャンペーン",
-        "influencerMatching": "マッチング",
-        "influencerMarket": "マーケット",
+        "creatorMatching": "マッチング",
+        "creatorMarket": "マーケット",
         "commerce": "コマース管理",
         "buyerInquiry": "購入者問合せ",
         "bigbirdMoney": "ビッグバードマネー"

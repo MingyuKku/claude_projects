@@ -5,6 +5,7 @@
   "waiting": "Waiting",
   "consulting": "Consulting",
   "consultingBadge": "Live chat",
+  "requestedBadge": "Chat requested",
   "done": "Answered",
   "empty": {
     "title": "No inquiries yet.",
@@ -14,7 +15,8 @@
   "inquiryTitle": {
     "campaign": "{{name}} inquiry",
     "campaignUnknown": "Campaign inquiry",
-    "other": "Other inquiry"
+    "other": "Other inquiry",
+    "withdrawal": "Bigbird Money withdrawal inquiry"
   },
   "bigbirdManager": "Bigbird team",
   "completed": {

@@ -23,7 +23,9 @@ export function collectDefaultResources(): Messages {
   return messages;
 }
 
-async function loadLanguageResources(language: Language): Promise<Messages> {
+export async function loadLanguageResources(
+  language: Language,
+): Promise<Messages> {
   const entries = await Promise.all(
     Object.entries(lazyModules).flatMap(([path, load]) => {
       const location = parseLocalePath(path);

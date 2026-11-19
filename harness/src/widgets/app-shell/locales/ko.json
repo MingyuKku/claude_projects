@@ -2,19 +2,19 @@
   "nav": {
     "home": "홈",
     "campaign": "캠페인",
-    "influencerMatching": "인플루언서 매칭",
-    "influencerMarket": "인플루언서 마켓",
+    "creatorMatching": "크리에이터 매칭",
+    "creatorMarket": "크리에이터 마켓",
     "commerce": "커머스 관리",
     "mypage": "마이페이지",
     "support": "고객센터",
-    "search": "인플루언서 검색",
-    "influencerManage": "인플루언서 관리",
+    "search": "크리에이터 검색",
+    "creatorManage": "크리에이터 관리",
     "chat": "채팅",
     "commerceSales": "판매현황 관리",
     "commerceSettlement": "캠페인 정산",
     "bigbird": "빅버드 문의",
     "buyer": "구매자 문의",
-    "influencer": "인플루언서 문의",
+    "creator": "크리에이터 문의",
     "subscribe": "구독",
     "money": "빅버드 머니",
     "account": "계정 설정"
@@ -27,6 +27,15 @@
   },
   "registerCampaign": "캠페인 등록하기",
   "guide": "이용 가이드",
+  "language": {
+    "label": "언어 선택",
+    "name": {
+      "ko": "한국어",
+      "en": "영어",
+      "ja": "일본어",
+      "zhCN": "중국어-간체"
+    }
+  },
   "menu": {
     "main": "주 메뉴",
     "collapsed": "축소 메뉴",
@@ -59,8 +68,8 @@
     "checkFailed": "로그인 상태를 확인하지 못했습니다. 다시 시도해 주세요."
   },
   "role": {
-    "label": "광고주·인플루언서 전환",
+    "label": "광고주·크리에이터 전환",
     "advertiser": "광고주",
-    "influencer": "인플루언서"
+    "creator": "크리에이터"
   }
 }

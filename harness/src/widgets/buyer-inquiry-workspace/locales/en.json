@@ -6,13 +6,14 @@
   "done": "Answered",
   "status": {
     "consulting": "Live chat",
+    "requested": "Chat requested",
     "waiting": "Waiting",
     "done": "Answered"
   },
   "source": {
     "purchaser": "Buyer Q&A",
     "qna": "Product Q&A",
-    "influencer": "Influencer Q&A",
+    "creator": "Creator Q&A",
     "campaignQna": "Campaign Q&A"
   },
   "empty": "No inquiries yet.",
@@ -34,11 +35,11 @@
     "source": "Inquiry Type",
     "campaign": "Campaign",
     "campaignPlaceholder": "Select a campaign",
-    "influencer": "Influencer",
-    "influencerPlaceholder": "Select an influencer",
-    "influencerSearchPlaceholder": "Search influencers",
+    "creator": "Creator",
+    "creatorPlaceholder": "Select a creator",
+    "creatorSearchPlaceholder": "Search creators",
     "campaignFallback": "Campaign {{idx}}",
-    "influencerFallback": "Influencer {{idx}}",
+    "creatorFallback": "Creator {{idx}}",
     "removeChip": "Remove {{name}}",
     "registrationDate": "Date",
     "datePlaceholder": "Select a date",
@@ -49,7 +50,7 @@
       "ALL": "All",
       "PURCHASER_QUESTION": "Buyer Q&A",
       "PRODUCT_QNA": "Product Q&A",
-      "INFLUENCER_QUESTION": "Influencer Q&A",
+      "INFLUENCER_QUESTION": "Creator Q&A",
       "CAMPAIGN_QNA": "Campaign Q&A"
     }
   },
@@ -62,7 +63,7 @@
   "period": "Period",
   "campaignCode": "Campaign code",
   "shopCode": "Shop code",
-  "influencer": "Influencer",
+  "creator": "Creator",
   "campaignShortcut": "Go to campaign",
   "detailError": "Couldn't load details.",
   "copied": "Copied to clipboard.",

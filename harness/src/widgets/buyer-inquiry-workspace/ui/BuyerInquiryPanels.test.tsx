@@ -50,7 +50,7 @@ const inquiry: BuyerInquiryViewModel = {
   brandName: null,
   campaignName: null,
   shopName: null,
-  influencerNickname: null,
+  creatorNickname: null,
 };
 
 const message = (
@@ -172,12 +172,12 @@ function renderPanels(
   return router;
 }
 
-describe("인플루언서 문의 상담 종료", () => {
-  const influencer: BuyerInquiryViewModel = {
+describe("크리에이터 문의 상담 종료", () => {
+  const creator: BuyerInquiryViewModel = {
     ...inquiry,
-    key: "influencer-2092",
+    key: "creator-2092",
     inquiryIdx: 2092,
-    source: "influencer",
+    source: "creator",
     status: "consulting",
   };
 
@@ -193,7 +193,7 @@ describe("인플루언서 문의 상담 종료", () => {
     mockThread({ boardType: false });
     vi.mocked(serverApiV3.put).mockResolvedValue({ result: true });
     const onChangeStatus = vi.fn();
-    renderPanels(77, influencer, onChangeStatus);
+    renderPanels(77, creator, onChangeStatus);
     await userEvent.click(
       await screen.findByRole("button", { name: "상담 종료" }),
     );
@@ -207,12 +207,22 @@ describe("인플루언서 문의 상담 종료", () => {
     await waitFor(() => expect(onChangeStatus).toHaveBeenCalled());
   });
 
+  it("상대가 상담을 요청 중(수락 전)이면 상담 종료 버튼이 비활성이라 끝낼 수 없다", async () => {
+    mockThread({ boardType: false });
+    vi.mocked(serverApiV3.put).mockReset();
+    renderPanels(77, { ...creator, status: "requested" });
+    const button = await screen.findByRole("button", { name: "상담 종료" });
+    expect(button).toBeDisabled();
+    await userEvent.click(button);
+    expect(serverApiV3.put).not.toHaveBeenCalled();
+  });
+
   it("실시간 문의는 직접 열어도 수락(realtime/accept)을 보내지 않는다", async () => {
     mockThread({ boardType: false });
     vi.mocked(serverApiV3.put).mockReset();
     vi.mocked(serverApiV3.put).mockResolvedValue({ result: true });
     // 예전에 "열면 수락"을 켜던 이동 표시가 붙어 있어도 열기만으로는 아무것도 보내지 않음.
-    renderPanels(77, influencer, undefined, { openedByUser: true });
+    renderPanels(77, creator, undefined, { openedByUser: true });
     // 실시간 상담 중으로 열렸는지(상담 종료 버튼)를 확인한 뒤 수락이 없었는지 봄.
     await screen.findByRole("button", { name: "상담 종료" });
     expect(serverApiV3.put).not.toHaveBeenCalled();
@@ -220,7 +230,7 @@ describe("인플루언서 문의 상담 종료", () => {
 
   it("목록 상태가 상담 중이어도 스레드가 일반(boardType true)이면 버튼이 없다", async () => {
     mockThread({ boardType: true });
-    renderPanels(77, influencer);
+    renderPanels(77, creator);
     await screen.findByText("김하루");
     await waitFor(() =>
       expect(serverApiV3.get).toHaveBeenCalledWith(
@@ -233,7 +243,7 @@ describe("인플루언서 문의 상담 종료", () => {
 
   it("끝난 스레드(finishTime 있음)면 실시간이어도 버튼이 없다", async () => {
     mockThread({ boardType: false, finishTime: "2026-10-01T12:00:00" });
-    renderPanels(77, influencer);
+    renderPanels(77, creator);
     await screen.findByText("김하루");
     await waitFor(() =>
       expect(serverApiV3.get).toHaveBeenCalledWith(
@@ -245,7 +255,7 @@ describe("인플루언서 문의 상담 종료", () => {
   });
 
   it("실시간 상담 중이 아니면 버튼이 없다", async () => {
-    renderPanels(77, { ...influencer, status: "done" });
+    renderPanels(77, { ...creator, status: "done" });
     await screen.findByText("김하루");
     expect(screen.queryByRole("button", { name: "상담 종료" })).toBeNull();
   });

@@ -35,10 +35,21 @@ export function formatMessageTime(value: Date) {
 
 export const STATUS_BADGE_VARIANT = {
   waiting: "blue",
+  requested: "yellow",
   consulting: "green",
   done: "gray",
   failed: "red",
+  unknown: "gray",
 } satisfies Record<BigbirdInquiryViewModel["status"], ChatListBadge["variant"]>;
+
+/** 상태 배지 번역 키. 모르는 서버 값(`unknown`)은 번역하지 않고 서버 값을 그대로 보임. */
+export const STATUS_LABEL_KEY = {
+  waiting: "waiting",
+  requested: "requestedBadge",
+  consulting: "consultingBadge",
+  done: "done",
+  failed: "failed",
+} as const;
 
 /**
  * 목록·대화 제목. 캠페인 이름은 목록 응답의 상품명(종료 캠페인도 있음)을 먼저 쓰고, 없으면 광고주의 캠페인 목록
@@ -48,6 +59,8 @@ export function getInquiryTitleKey(
   inquiry: BigbirdInquiryViewModel,
   productName?: string,
 ) {
+  if (inquiry.isWithdrawalInquiry)
+    return { key: "inquiryTitle.withdrawal" } as const;
   const name =
     inquiry.productName?.trim() ||
     productName?.trim() ||

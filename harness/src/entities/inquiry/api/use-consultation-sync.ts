@@ -1,5 +1,6 @@
 import { useEffect, useRef } from "react";
 
+import { isRealtimeInquiryStatus } from "../lib/inquiry-status";
 import { isConsultationConnected } from "../lib/realtime-phase";
 import { usePurchaserConversation } from "./inquiry-api";
 import { useConsultationDocument } from "./realtime-consultation-api";
@@ -11,7 +12,7 @@ export type ConsultationConnection =
   "unknown" | "waiting" | "connected" | "missing";
 
 /**
- * 구매자·인플루언서 문의에서 상담 중(실시간)인 행의 상담 문서(`threadUserIdx/{상대}/sequence/{sequence}`)를 구독함.
+ * 구매자·크리에이터 문의에서 상담 중(실시간)인 행의 상담 문서(`threadUserIdx/{상대}/sequence/{sequence}`)를 구독함.
  * 문서가 바뀌면 대화(타임라인 REST)를 다시 받고, 연결·종료가 바뀌면 `onChanged`로 목록도 다시 받게 함. 연결 여부는 문서의
  * `acceptedAt`으로 판단함(가이드 2026-11-03). 상담 중이 아니거나 목록 행에 `sequence`가 없으면(서버 반영 전) 구독하지 않고
  * `missing`임. 화면 하나에서 한 번만 부르면 됨.
@@ -22,10 +23,10 @@ export function useConsultationSync(
 ) {
   const { threadUserIdx, sequence, source, status, inquiryIdx } = inquiry;
   const { mutate } = usePurchaserConversation(inquiry);
-  const isThreadSource = source === "purchaser" || source === "influencer";
+  const isThreadSource = source === "purchaser" || source === "creator";
   const isEnabled =
     isThreadSource &&
-    status === "consulting" &&
+    isRealtimeInquiryStatus(status) &&
     threadUserIdx !== null &&
     sequence !== null;
   const { consultation, isLoading, isError, isOtherDevice } =

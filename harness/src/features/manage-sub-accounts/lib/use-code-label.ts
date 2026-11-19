@@ -5,8 +5,8 @@ import type { PermissionKey } from "../model/constants";
 // 권한 이름. 권한은 서버가 필드로 주고 프론트가 키를 정하므로(model/constants의 PERMISSION_FIELDS) 모든 키에 번역이 있음.
 const PERMISSION_LABEL_KEYS = {
   campaign: "access.permission.name.campaign",
-  influencerMatching: "access.permission.name.influencerMatching",
-  influencerMarket: "access.permission.name.influencerMarket",
+  creatorMatching: "access.permission.name.creatorMatching",
+  creatorMarket: "access.permission.name.creatorMarket",
   commerce: "access.permission.name.commerce",
   buyerInquiry: "access.permission.name.buyerInquiry",
   bigbirdMoney: "access.permission.name.bigbirdMoney",

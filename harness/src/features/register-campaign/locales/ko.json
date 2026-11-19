@@ -2,7 +2,7 @@
   "step": {
     "campaignInfo": "캠페인 정보 입력",
     "product": "제품 정보 입력",
-    "influencer": "인플루언서 조건",
+    "creator": "크리에이터 조건",
     "addOns": "부가서비스",
     "intro": "캠페인 소개서",
     "conditions": "진행 조건 설정",
@@ -196,7 +196,7 @@
       "emptyDescription": "기사의 방향성과 상세 가이드는<br/>다음 단계인 '캠페인 소개서'에서 입력해 주세요."
     }
   },
-  "influencer": {
+  "creator": {
     "platform": "플랫폼 선택",
     "gender": {
       "label": "선호 성별",
@@ -247,8 +247,8 @@
     },
     "MANUSCRIPT_CONFIRM": {
       "name": "원고컨펌",
-      "price": "모집 인플루언서 당 5,000원",
-      "description": "인플루언서가 작성한 원고를 게시 전에 확인하고 수정 요청할 수 있습니다. AI 원고 컨펌 기능도 함께 이용할 수 있습니다."
+      "price": "모집 크리에이터 당 5,000원",
+      "description": "크리에이터가 작성한 원고를 게시 전에 확인하고 수정 요청할 수 있습니다. AI 원고 컨펌 기능도 함께 이용할 수 있습니다."
     }
   },
   "intro": {
@@ -299,7 +299,7 @@
     },
     "description": {
       "label": "캠페인 설명",
-      "placeholder": "인플루언서에게 보여질 캠페인 소개와 기대 내용을 작성해 주세요."
+      "placeholder": "크리에이터에게 보여질 캠페인 소개와 기대 내용을 작성해 주세요."
     },
     "notice": {
       "label": "유의사항",
@@ -423,7 +423,7 @@
     "section": {
       "info": "캠페인 정보",
       "product": "제품 정보",
-      "influencer": "인플루언서 조건",
+      "creator": "크리에이터 조건",
       "addOns": "부가서비스",
       "intro": "캠페인 소개서",
       "conditions": "진행 조건",
@@ -458,7 +458,7 @@
       "storeAddress": "매장 주소",
       "benefit": "제공 혜택 또는 체험 내용"
     },
-    "influencer": {
+    "creator": {
       "platform": "플랫폼",
       "ageGroups": "연령대",
       "gender": "성별",
@@ -509,7 +509,7 @@
   },
   "revision": {
     "lockedAmount": "결제 금액에 영향을 주는 값이라 수정할 수 없습니다.",
-    "lockedCompleted": "이미 동의·결제를 마친 내용이라 수정할 수 없습니다."
+    "lockedCompleted": "이미 결제를 마친 내용이라 수정할 수 없습니다."
   },
   "demo": {
     "notice": "현재 데모 모드로 캠페인을 작성하고 있습니다. 실제 결제 및 승인 요청은 진행되지 않습니다.",

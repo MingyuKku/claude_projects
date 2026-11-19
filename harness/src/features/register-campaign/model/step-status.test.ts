@@ -41,7 +41,7 @@ describe("단계 필수값", () => {
   it("제품발송형은 반품 회수 있음이면 회수 칸, 대여 상품이면 100만원 이상 금액과 대여 회수 칸이 필요하다", () => {
     const draft = draftWithInfo((value) => {
       value.product.productName = "앰플";
-      value.product.quantityPerInfluencer = 1;
+      value.product.quantityPerCreator = 1;
       value.product.productPrice = 45000;
     });
     expect(isStepComplete("product", draft)).toBe(true);
@@ -101,10 +101,10 @@ describe("단계 필수값", () => {
         titleHashtags: [],
         contentHashtags: ["협찬"],
       };
-      value.influencer.platform = "INSTAGRAM";
+      value.creator.platform = "INSTAGRAM";
     });
     expect(isStepComplete("intro", draft)).toBe(true);
-    draft.influencer.platform = "NAVER_BLOG";
+    draft.creator.platform = "NAVER_BLOG";
     expect(isStepComplete("intro", draft)).toBe(false);
   });
 
@@ -118,7 +118,7 @@ describe("단계 필수값", () => {
         titleHashtags: [],
         contentHashtags: ["협찬"],
       };
-      value.influencer.platform = "INSTAGRAM";
+      value.creator.platform = "INSTAGRAM";
     });
     expect(isStepComplete("intro", draft)).toBe(false);
     draft.intro.detailMedia = [
@@ -155,10 +155,10 @@ describe("사이드바 단계 상태", () => {
 
   it("현재 단계가 아닌 일부만 입력한 단계에 입력 중 표시를 한다", () => {
     const draft = draftWithInfo((value) => {
-      value.influencer.platform = "INSTAGRAM";
+      value.creator.platform = "INSTAGRAM";
     });
 
-    const byStep = (currentStep: "product" | "influencer") =>
+    const byStep = (currentStep: "product" | "creator") =>
       Object.fromEntries(
         getStepStatuses({
           steps,
@@ -168,8 +168,8 @@ describe("사이드바 단계 상태", () => {
         }).map((status) => [status.step, status.indicator]),
       );
 
-    expect(byStep("product").influencer).toBe("editing");
-    expect(byStep("influencer").influencer).toBeNull();
+    expect(byStep("product").creator).toBe("editing");
+    expect(byStep("creator").creator).toBeNull();
     expect(byStep("product").product).toBeNull();
   });
 

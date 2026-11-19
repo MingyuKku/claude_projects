@@ -84,8 +84,8 @@ describe("권한 변환", () => {
   it("v3 권한 6개를 표 순서대로 그린다", () => {
     expect(transformPermissions(authorization)).toEqual([
       { key: "campaign", isGranted: false },
-      { key: "influencerMatching", isGranted: true },
-      { key: "influencerMarket", isGranted: false },
+      { key: "creatorMatching", isGranted: true },
+      { key: "creatorMarket", isGranted: false },
       { key: "commerce", isGranted: false },
       { key: "bigbirdMoney", isGranted: true },
       { key: "buyerInquiry", isGranted: true },

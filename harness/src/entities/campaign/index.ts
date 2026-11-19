@@ -65,7 +65,7 @@ export type {
   CampaignConditionsDraft,
   CampaignDraft,
   CampaignDraftStep,
-  CampaignInfluencerDraft,
+  CampaignCreatorDraft,
   CampaignInfoDraft,
   CampaignIntroDraft,
   CampaignMedia,
@@ -76,8 +76,8 @@ export {
   CAMPAIGN_ADD_ONS,
   CAMPAIGN_PLATFORMS,
   CAMPAIGN_TYPES,
-  INFLUENCER_AGE_GROUPS,
-  INFLUENCER_GENDERS,
+  CREATOR_AGE_GROUPS,
+  CREATOR_GENDERS,
   POSTING_TOPICS,
 } from "./model/input-codes";
 export type {
@@ -85,8 +85,8 @@ export type {
   CampaignMediaType,
   CampaignPlatform,
   CampaignType,
-  InfluencerAgeGroup,
-  InfluencerGender,
+  CreatorAgeGroup,
+  CreatorGender,
   PostingTopic,
 } from "./model/input-codes";
 export { CAMPAIGN_PERIOD_DAYS, getCampaignEndDate } from "./model/period";
@@ -103,6 +103,7 @@ export {
   toCampaignRegisterStep,
 } from "./model/register-steps";
 export type { CampaignRegisterStep } from "./model/register-steps";
+export { toDraftStep } from "./model/server-steps";
 export type {
   CampaignListQuery,
   CampaignPage,

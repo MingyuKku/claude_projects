@@ -42,14 +42,25 @@ describe("getChangedSteps", () => {
   it("바뀐 단계만 단계 순서대로 고른다", () => {
     const store = createStore();
     store.getState().patchStepDraft("conditions", { postingPeriodMonths: 3 });
-    store.getState().patchStepDraft("influencer", { platform: "YOUTUBE" });
+    store.getState().patchStepDraft("creator", { platform: "YOUTUBE" });
     store.getState().patchStepDraft("info", { name: "캠페인" });
 
     expect(getChangedSteps(store.getState())).toEqual([
       "info",
-      "influencer",
+      "creator",
       "conditions",
     ]);
+  });
+
+  it("정책 동의만 바뀌면 저장할 단계가 없고 저장 요청도 보내지 않는다", async () => {
+    const store = createStore();
+    store.getState().patchStepDraft("policy", { service: true });
+    const saver = createDraftSaver(store, () => Promise.resolve());
+
+    expect(getChangedSteps(store.getState())).toEqual([]);
+    expect(saver.hasChanges()).toBe(false);
+    expect(await saver.save()).toEqual({ ok: true });
+    expect(saveCampaignStep).not.toHaveBeenCalled();
   });
 
   it("서버에 값이 없어 기본 선택으로 채운 단계도 저장할 단계로 고른다", () => {
@@ -57,7 +68,7 @@ describe("getChangedSteps", () => {
 
     expect(getChangedSteps(store.getState())).toEqual([
       "info",
-      "influencer",
+      "creator",
       "conditions",
     ]);
   });
@@ -146,7 +157,7 @@ describe("createDraftSaver", () => {
     // 서버가 비운 3·6단계는 화면의 기본 선택과 달라져서 이어서 다시 저장함.
     expect(
       vi.mocked(saveCampaignStep).mock.calls.map(([, step]) => step),
-    ).toEqual(["info", "influencer", "conditions"]);
+    ).toEqual(["info", "creator", "conditions"]);
     expect(store.getState().savedDraft.product.productName).toBe("");
   });
 

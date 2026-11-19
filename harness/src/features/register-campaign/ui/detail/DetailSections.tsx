@@ -17,7 +17,7 @@ import type { CampaignRegisterStep } from "@/entities/campaign";
 const EDITABLE_STEP_BY_SECTION = {
   1: "campaign-info",
   2: "product",
-  3: "influencer",
+  3: "creator",
   5: "intro",
   6: "conditions",
 } as const satisfies Partial<Record<number, CampaignRegisterStep>>;
@@ -36,7 +36,7 @@ function formatDateText(value: string | null) {
 export function DetailSections({ detail, onEditStep }: DetailSectionsProps) {
   const { t } = useTranslation("features/register-campaign");
   const { draft } = detail;
-  const { info, influencer, intro, conditions, policy } = draft;
+  const { info, creator, intro, conditions, policy } = draft;
 
   const won = (amount: number | null) =>
     amount === null ? "-" : t("payment.won", { amount: formatNumber(amount) });
@@ -45,7 +45,7 @@ export function DetailSections({ detail, onEditStep }: DetailSectionsProps) {
   const typeLabel = info.campaignType
     ? t(CAMPAIGN_TYPE_LABEL_KEYS[info.campaignType])
     : (detail.rawCampaignType ?? "-");
-  const hashtagRows = needsTitleHashtags(influencer.platform)
+  const hashtagRows = needsTitleHashtags(creator.platform)
     ? [
         { key: "title" as const, values: intro.titleHashtags },
         { key: "content" as const, values: intro.contentHashtags },
@@ -97,35 +97,33 @@ export function DetailSections({ detail, onEditStep }: DetailSectionsProps) {
 
       <DetailSection
         number={3}
-        title={t("detail.section.influencer")}
+        title={t("detail.section.creator")}
         onClickEdit={editHandler(3)}
       >
-        <DetailRow label={t("detail.influencer.platform")}>
-          {influencer.platform ? (
+        <DetailRow label={t("detail.creator.platform")}>
+          {creator.platform ? (
             <span className="flex items-center gap-2">
               <PlatformIcon
-                platform={PLATFORM_ICON_NAMES[influencer.platform]}
+                platform={PLATFORM_ICON_NAMES[creator.platform]}
                 className="size-6"
               />
-              {t(PLATFORM_LABEL_KEYS[influencer.platform])}
+              {t(PLATFORM_LABEL_KEYS[creator.platform])}
             </span>
           ) : (
             "-"
           )}
         </DetailRow>
-        <DetailRow label={t("detail.influencer.ageGroups")}>
-          {influencer.ageGroups
-            .map((age) => t(`influencer.ageGroup.${age}`))
+        <DetailRow label={t("detail.creator.ageGroups")}>
+          {creator.ageGroups
+            .map((age) => t(`creator.ageGroup.${age}`))
             .join(", ") || "-"}
         </DetailRow>
-        <DetailRow label={t("detail.influencer.gender")}>
-          {influencer.gender
-            ? t(`influencer.gender.${influencer.gender}`)
-            : "-"}
+        <DetailRow label={t("detail.creator.gender")}>
+          {creator.gender ? t(`creator.gender.${creator.gender}`) : "-"}
         </DetailRow>
-        <DetailRow label={t("detail.influencer.topics")}>
-          {influencer.topics
-            .map((topic) => t(`influencer.topic.${topic}`))
+        <DetailRow label={t("detail.creator.topics")}>
+          {creator.topics
+            .map((topic) => t(`creator.topic.${topic}`))
             .join(", ") || "-"}
         </DetailRow>
       </DetailSection>

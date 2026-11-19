@@ -64,14 +64,11 @@ describe("BuyerInquiryFilterDialog", () => {
     );
 
     await user.click(screen.getByRole("button", { name: "필터" }));
-    const [campaignBox, influencerBox] = screen.getAllByRole("combobox");
+    const [campaignBox, creatorBox] = screen.getAllByRole("combobox");
     await user.click(campaignBox!);
 
     // 검색 입력(cmdk 입력도 combobox 역할)이 없어 트리거 둘만 남고, 전체 + 캠페인 2개가 모두 보임.
-    expect(screen.getAllByRole("combobox")).toEqual([
-      campaignBox,
-      influencerBox,
-    ]);
+    expect(screen.getAllByRole("combobox")).toEqual([campaignBox, creatorBox]);
     expect(await screen.findAllByRole("option")).toHaveLength(3);
 
     await user.click(screen.getByRole("option", { name: /헤어/ }));
@@ -80,9 +77,9 @@ describe("BuyerInquiryFilterDialog", () => {
 
   it.each([
     ["buyer", "PURCHASER_QUESTION"],
-    ["influencer", "INFLUENCER_QUESTION"],
+    ["creator", "INFLUENCER_QUESTION"],
   ] as const)(
-    "%s 메뉴는 캠페인·인플루언서 목록을 %s로 받는다",
+    "%s 메뉴는 캠페인·크리에이터 목록을 %s로 받는다",
     async (menu, sourceType) => {
       render(
         <SWRConfig value={{ provider: () => new Map() }}>

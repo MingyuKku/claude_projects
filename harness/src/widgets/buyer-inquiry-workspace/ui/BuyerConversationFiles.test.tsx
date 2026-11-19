@@ -39,7 +39,7 @@ const inquiry: BuyerInquiryViewModel = {
   brandName: null,
   campaignName: null,
   shopName: null,
-  influencerNickname: null,
+  creatorNickname: null,
 };
 
 // userIdx가 상대(77)가 아니면 내 메시지.

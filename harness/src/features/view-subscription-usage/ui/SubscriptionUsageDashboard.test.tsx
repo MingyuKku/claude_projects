@@ -20,7 +20,7 @@ describe("SubscriptionUsageDashboard", () => {
       <SubscriptionUsageDashboard type="recruit" onChangeType={vi.fn()} />,
     );
 
-    expect(screen.getByText("인플루언서 검색 횟수")).toBeInTheDocument();
+    expect(screen.getByText("크리에이터 검색 횟수")).toBeInTheDocument();
     expect(screen.getAllByText("320 건").length).toBeGreaterThan(0);
     expect(screen.getByText("180 건")).toBeInTheDocument();
     expect(screen.getByText("모집형 브랜드형")).toBeInTheDocument();

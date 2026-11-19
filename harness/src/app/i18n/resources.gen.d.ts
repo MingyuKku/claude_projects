@@ -26,7 +26,7 @@ import type featuresNotificationConsent from "../../features/notification-consen
 import type featuresPaymentHistory from "../../features/payment-history/locales/ko.json";
 import type featuresRealtimeConsultation from "../../features/realtime-consultation/locales/ko.json";
 import type featuresRegisterCampaign from "../../features/register-campaign/locales/ko.json";
-import type featuresSearchInfluencer from "../../features/search-influencer/locales/ko.json";
+import type featuresSearchCreator from "../../features/search-creator/locales/ko.json";
 import type featuresSocialLogin from "../../features/social-login/locales/ko.json";
 import type featuresSwitchAccount from "../../features/switch-account/locales/ko.json";
 import type featuresViewSubscriptionUsage from "../../features/view-subscription-usage/locales/ko.json";
@@ -92,7 +92,7 @@ declare module "i18next" {
       "features/payment-history": typeof featuresPaymentHistory;
       "features/realtime-consultation": typeof featuresRealtimeConsultation;
       "features/register-campaign": typeof featuresRegisterCampaign;
-      "features/search-influencer": typeof featuresSearchInfluencer;
+      "features/search-creator": typeof featuresSearchCreator;
       "features/social-login": typeof featuresSocialLogin;
       "features/switch-account": typeof featuresSwitchAccount;
       "features/view-subscription-usage": typeof featuresViewSubscriptionUsage;

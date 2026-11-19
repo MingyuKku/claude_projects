@@ -2,7 +2,7 @@
   "step": {
     "campaignInfo": "填写活动信息",
     "product": "填写产品信息",
-    "influencer": "网红条件",
+    "creator": "创作者条件",
     "addOns": "附加服务",
     "intro": "캠페인 소개서",
     "conditions": "设置执行条件",
@@ -160,7 +160,7 @@
       "label": "是否回收退货",
       "no": "不回收",
       "yes": "回收",
-      "notice": "为防止最终入选的达人取消活动，请输入赞助产品退货回收地址。",
+      "notice": "为防止最终入选的创作者取消活动，请输入赞助产品退货回收地址。",
       "addressLabel": "赞助产品退货回收地址",
       "addressPlaceholder": "请输入回收地址。",
       "feeLabel": "退货回收运费",
@@ -196,7 +196,7 @@
       "emptyDescription": "报道方向和详细指南<br/>请在下一步“캠페인 소개서”中填写。"
     }
   },
-  "influencer": {
+  "creator": {
     "platform": "选择平台",
     "gender": {
       "label": "偏好性别",
@@ -247,8 +247,8 @@
     },
     "MANUSCRIPT_CONFIRM": {
       "name": "원고컨펌",
-      "price": "每位招募网红5,000韩元",
-      "description": "可在发布前查看网红撰写的稿件并要求修改，还可同时使用AI稿件审核功能。"
+      "price": "每位招募创作者5,000韩元",
+      "description": "可在发布前查看创作者撰写的稿件并要求修改，还可同时使用AI稿件审核功能。"
     }
   },
   "intro": {
@@ -299,7 +299,7 @@
     },
     "description": {
       "label": "活动说明",
-      "placeholder": "请填写向网红展示的活动介绍和期望内容。"
+      "placeholder": "请填写向创作者展示的活动介绍和期望内容。"
     },
     "notice": {
       "label": "注意事项",
@@ -423,7 +423,7 @@
     "section": {
       "info": "活动信息",
       "product": "产品信息",
-      "influencer": "网红条件",
+      "creator": "创作者条件",
       "addOns": "增值服务",
       "intro": "캠페인 소개서",
       "conditions": "进行条件",
@@ -458,7 +458,7 @@
       "storeAddress": "门店地址",
       "benefit": "提供福利或体验内容"
     },
-    "influencer": {
+    "creator": {
       "platform": "平台",
       "ageGroups": "年龄段",
       "gender": "性别",
@@ -509,7 +509,7 @@
   },
   "revision": {
     "lockedAmount": "该值会影响支付金额，无法修改。",
-    "lockedCompleted": "已完成同意和支付，无法修改。"
+    "lockedCompleted": "已完成支付，无法修改。"
   },
   "demo": {
     "notice": "当前正在以演示模式撰写活动。不会进行实际支付和审批申请。",

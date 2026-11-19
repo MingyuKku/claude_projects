@@ -1,7 +1,13 @@
-import { initI18n, resolveLanguage } from "@/shared/i18n";
+import {
+  initI18n,
+  isLanguage,
+  onLanguageChanged,
+  registerLanguageLoader,
+  resolveLanguage,
+} from "@/shared/i18n";
 
 import { loadLanguageFont } from "./fonts";
-import { loadResources } from "./resources";
+import { loadLanguageResources, loadResources } from "./resources";
 
 const STORAGE_KEY = "bigbird.lng";
 
@@ -22,7 +28,15 @@ function storeLanguage(language: string) {
   }
 }
 
-// 언어는 시작할 때 한 번만 정함. 렌더 전에 끝내야 한국어 → 다른 언어 깜빡임이 없음.
+// 주소에 ?lng= 가 있으면 새로 고쳤을 때 그 값이 저장값보다 앞서므로, 바뀐 언어로 맞춤.
+function syncQueryLanguage(language: string) {
+  const url = new URL(window.location.href);
+  if (!url.searchParams.has("lng")) return;
+  url.searchParams.set("lng", language);
+  window.history.replaceState(window.history.state, "", url);
+}
+
+// 시작할 때 언어를 정해 렌더 전에 끝내야 한국어 → 다른 언어 깜빡임이 없음. 이후 바뀌는 언어는 changeLanguage 가 맡음.
 export async function setupI18n(): Promise<void> {
   const query = new URLSearchParams(window.location.search).get("lng");
   const requested = resolveLanguage({
@@ -37,4 +51,13 @@ export async function setupI18n(): Promise<void> {
   await initI18n({ language, resources });
   document.documentElement.lang = language;
   loadLanguageFont(language);
+
+  registerLanguageLoader(loadLanguageResources);
+  onLanguageChanged((changed) => {
+    if (!isLanguage(changed)) return;
+    storeLanguage(changed);
+    syncQueryLanguage(changed);
+    document.documentElement.lang = changed;
+    loadLanguageFont(changed);
+  });
 }

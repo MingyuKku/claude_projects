@@ -11,6 +11,7 @@ import { formatNumber, useTranslation } from "@/shared/i18n";
 
 import { useLogoutAction } from "../model/useLogoutAction";
 import { AlertPopover } from "./AlertPopover";
+import { GuideLanguageButtons } from "./GuideLanguageButtons";
 
 import type { SessionViewModel } from "@/entities/session";
 
@@ -19,7 +20,7 @@ interface ShellHeaderActionsProps {
   onClickGuide: () => void;
 }
 
-// 헤더 오른쪽 묶음(포인트·알림·프로필, 비로그인은 이용 가이드·로그인). AppShell과 FocusShell이 함께 씀.
+// 헤더 오른쪽 묶음(비로그인은 이용 가이드·언어·로그인, 로그인은 포인트·알림·프로필). AppShell과 FocusShell이 함께 씀.
 export function ShellHeaderActions({
   session,
   onClickGuide,
@@ -33,13 +34,13 @@ export function ShellHeaderActions({
   if (!session) {
     return (
       <HeaderGuestActions
-        guideLabel={t("guide")}
         loginLabel={t("header.login")}
-        onClickGuide={onClickGuide}
         onClickLogin={() => {
           void navigate(ROUTES.login);
         }}
-      />
+      >
+        <GuideLanguageButtons placement="header" onClickGuide={onClickGuide} />
+      </HeaderGuestActions>
     );
   }
 
