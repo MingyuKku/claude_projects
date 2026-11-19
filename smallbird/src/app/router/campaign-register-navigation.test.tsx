@@ -33,6 +33,33 @@ function readMockCampaignCount() {
   return db.campaigns?.length ?? 0;
 }
 
+// 1단계(기본 정보)를 마친 PICK 캠페인을 목 저장소에 만듦. 결제 단계 등 1단계 뒤 단계는 이 상태여야 열림.
+async function createInfoCompleteCampaign(name: string, status?: string) {
+  const { campaignIdx } = await createCampaign({
+    serviceType: "PICK",
+    productType: "BRAND",
+    demo: false,
+  });
+  const key = "bigbird:mock:campaign-db";
+  const db = JSON.parse(window.sessionStorage.getItem(key) ?? "{}") as {
+    campaigns: { campaignIdx: number; status: string; info: object }[];
+  };
+  const record = db.campaigns.find(
+    (campaign) => campaign.campaignIdx === campaignIdx,
+  );
+  if (!record) throw new Error("mock campaign not found");
+  if (status) record.status = status;
+  record.info = {
+    ...record.info,
+    name,
+    brandIdx: 1,
+    campaignType: "PRODUCT_DELIVERY",
+    startDate: "2099-01-01",
+  };
+  window.sessionStorage.setItem(key, JSON.stringify(db));
+  return campaignIdx;
+}
+
 beforeEach(() => {
   window.sessionStorage.clear();
   resetSession(session);
@@ -141,21 +168,17 @@ describe("등록 마법사 골격", () => {
 });
 
 describe("8단계 충전 복귀", () => {
-  it("결제창에서 isPaid=true로 돌아오면 접수 알럿을 띄우고 결제 서버가 붙인 쿼리를 지운다", async () => {
-    const { campaignIdx } = await createCampaign({
-      serviceType: "PICK",
-      productType: "BRAND",
-      demo: false,
-    });
+  it("결제창에서 isPaid=true로 돌아오면 접수 알럿을 띄우고 결제 서버가 붙인 쿼리를 지운 뒤 결제 단계에 남는다", async () => {
+    // 결제창으로 떠나기 전처럼 결제 단계를 열 수 있는 캠페인에서 시작함.
+    const campaignIdx = await createInfoCompleteCampaign("결제 복귀 캠페인");
     const router = await renderRoute(
       `${ROUTES.campaignRegister}/${campaignIdx}?isPaid=true&gopaymethod=VBank&accountNumber=1234567890`,
     );
 
     expect(await screen.findByText("충전 요청 완료")).toBeInTheDocument();
     await waitFor(() =>
-      expect(router.state.location.search).not.toContain("isPaid"),
+      expect(router.state.location.search).toBe("?step=payment"),
     );
-    expect(router.state.location.search).not.toContain("accountNumber");
   });
 });
 
@@ -191,30 +214,8 @@ describe("등록 내역 진입", () => {
 });
 
 describe("반려 뒤 수정 모드", () => {
-  async function createRejectedCampaign() {
-    const { campaignIdx } = await createCampaign({
-      serviceType: "PICK",
-      productType: "BRAND",
-      demo: false,
-    });
-    const key = "bigbird:mock:campaign-db";
-    const db = JSON.parse(window.sessionStorage.getItem(key) ?? "{}") as {
-      campaigns: { campaignIdx: number; status: string; info: object }[];
-    };
-    const record = db.campaigns.find(
-      (campaign) => campaign.campaignIdx === campaignIdx,
-    );
-    if (!record) throw new Error("mock campaign not found");
-    record.status = "REJECTED";
-    record.info = {
-      ...record.info,
-      name: "반려된 캠페인",
-      brandIdx: 1,
-      campaignType: "PRODUCT_DELIVERY",
-      startDate: "2099-01-01",
-    };
-    window.sessionStorage.setItem(key, JSON.stringify(db));
-    return campaignIdx;
+  function createRejectedCampaign() {
+    return createInfoCompleteCampaign("반려된 캠페인", "REJECTED");
   }
 
   /** 모두 입력된 시드 캠페인(PICK형 승인 검토중)을 서버처럼 반려해 동의 기록을 지움. */

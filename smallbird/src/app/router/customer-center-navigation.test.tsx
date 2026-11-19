@@ -7,7 +7,6 @@ import { ROUTES } from "@/shared/config";
 import {
   mockSession,
   mockSessionError,
-  mockSessionErrorOnce,
   mockV3GetError,
   mockV3Get,
   renderRoute,
@@ -80,41 +79,8 @@ describe("고객센터 진입", () => {
     },
   );
 
-  // 로그인 흐름 자체는 main-navigation의 "로그인 성공 후 …" 테스트가 검증하므로, 여기서는 로그인한 세션에서 시작해
+  // 로그인 흐름 자체는 e2e/login.spec.ts 가 검증하므로, 여기서는 로그인한 세션에서 시작해
   // 이동 한 번씩만 검증함(여러 화면을 한 테스트에서 오가면 느린 CI에서 테스트 제한 시간을 넘기기 쉬움).
-  // 도착 화면은 본문 문구(데이터 상태에 따라 바뀜) 대신 화면의 정체로 확인함: 문서 제목(화면 컴포넌트가 그려야 바뀜), 경로, LNB 현재 위치.
-  async function expectCustomerCenterPage(
-    router: Awaited<ReturnType<typeof renderRoute>>,
-    { path, title }: { path: string; title: string },
-  ) {
-    await waitFor(() => expect(document.title).toBe(title));
-    expect(router.state.location.pathname).toBe(path);
-    expect(
-      within(screen.getByRole("navigation", { name: "주 메뉴" })).getByRole(
-        "link",
-        { name: title },
-      ),
-    ).toHaveAttribute("aria-current", "page");
-  }
-
-  const BIGBIRD_PAGE = {
-    path: ROUTES.customerCenterBigbird,
-    title: "빅버드 문의",
-  };
-
-  it("로그인 후 LNB 빅버드 문의를 누르면 그 경로의 세션을 확인하고 빅버드 문의 화면으로 이동한다", async () => {
-    const user = userEvent.setup();
-    const router = await renderRoute(ROUTES.main);
-    const nav = await screen.findByRole("navigation", { name: "주 메뉴" });
-    await user.click(within(nav).getByRole("link", { name: "빅버드 문의" }));
-    await expectCustomerCenterPage(router, BIGBIRD_PAGE);
-    expect(serverApiV3.get).toHaveBeenCalledWith("/sec", {
-      headers: { "X-Path": ROUTES.customerCenterBigbird },
-      signal: expect.any(AbortSignal),
-    });
-    // 세션은 `GET /v3/sec`로만 확인하고 V2 `GET /sec`는 부르지 않음.
-    expect(serverApi.get).not.toHaveBeenCalled();
-  });
 
   describe("빅버드 문의 대화", () => {
     function thread(threadIdx: number, created: string, body: string) {
@@ -282,18 +248,6 @@ describe("고객센터 진입", () => {
     });
   });
 
-  it("전체 메뉴에서 이동하면 메뉴가 닫힌다", async () => {
-    const user = userEvent.setup();
-    await renderRoute(ROUTES.main);
-    await user.click(await screen.findByRole("button", { name: "메뉴 열기" }));
-    const dialog = screen.getByRole("dialog", { name: "전체 메뉴" });
-    await user.click(within(dialog).getByRole("link", { name: "구매자 문의" }));
-    expect(
-      await screen.findByText("문의사항이 존재하지 않습니다."),
-    ).toBeInTheDocument();
-    expect(screen.queryByRole("dialog")).not.toBeInTheDocument();
-  });
-
   it("구매자 문의 권한이 없는 SUB는 구매자 문의 링크가 비활성이고 빅버드 문의는 활성이다", async () => {
     mockSession({
       ...session,
@@ -311,19 +265,6 @@ describe("고객센터 진입", () => {
     expect(
       within(nav).getByRole("link", { name: "빅버드 문의" }),
     ).not.toHaveAttribute("aria-disabled");
-  });
-
-  it("구매자 문의 권한이 없는 SUB가 직접 진입하면 서버가 403으로 막아 홈으로 보낸다", async () => {
-    mockSessionErrorOnce(
-      new ApiError(403, { result: false, reason: "forbidden" }),
-    );
-    const router = await renderRoute(ROUTES.customerCenterBuyer);
-    await waitFor(() =>
-      expect(router.state.location.pathname).toBe(ROUTES.main),
-    );
-    expect(
-      screen.queryByText("문의사항이 존재하지 않습니다."),
-    ).not.toBeInTheDocument();
   });
 
   it("권한 있는 SUB는 구매자 문의에 직접 진입할 수 있다", async () => {

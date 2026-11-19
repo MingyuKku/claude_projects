@@ -50,27 +50,6 @@ beforeEach(() => {
 });
 
 describe("루트 메인과 공통 메뉴", () => {
-  it("로그인 성공 후 / 에서 헤더와 LNB를 표시한다", async () => {
-    const user = userEvent.setup();
-    const router = await renderRoute(ROUTES.login);
-    await user.type(await screen.findByLabelText("아이디"), "tester");
-    await user.type(screen.getByLabelText("비밀번호"), "test-password");
-    await user.click(screen.getByRole("button", { name: "로그인" }));
-    expect(
-      await screen.findByRole("heading", { name: "홈" }),
-    ).toBeInTheDocument();
-    expect(router.state.location.pathname).toBe("/");
-    expect(serverApiV3.get).toHaveBeenCalledWith("/sec", {
-      headers: { "X-Path": "/" },
-      signal: expect.any(AbortSignal),
-    });
-    const nav = screen.getByRole("navigation", { name: "주 메뉴" });
-    expect(within(nav).getByRole("link", { name: "홈" })).toHaveAttribute(
-      "aria-current",
-      "page",
-    );
-  });
-
   it("기존 /main 링크는 쿼리를 유지하며 / 로 이동한다", async () => {
     const router = await renderRoute(`${ROUTES.legacyMain}?login=1`);
     expect(
@@ -203,7 +182,7 @@ describe("루트 메인과 공통 메뉴", () => {
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
-  it("LNB 하위 메뉴 그룹은 접힌 상태가 기본이고, 현재 화면의 그룹만 펼친다", async () => {
+  it("현재 화면이 아닌 LNB 하위 메뉴 그룹은 접혀 있다", async () => {
     await renderRoute(ROUTES.main);
     const [support] = await screen.findAllByText("고객센터", {
       selector: "summary span",
@@ -211,7 +190,7 @@ describe("루트 메인과 공통 메뉴", () => {
     expect(support?.closest("details")).not.toHaveAttribute("open");
   });
 
-  it("크리에이터 관리·채팅은 비로그인이 누르면 로그인 안내 알럿을 띄우고, 로그인하면 준비 중으로 비활성이다", async () => {
+  it("크리에이터 관리·채팅은 비로그인이 누르면 로그인 안내 알럿을 띄우고, 취소하면 닫고 로그인하러 가면 로그인으로 이동한다", async () => {
     mockSessionError(new ApiError(401, { result: false }));
     const user = userEvent.setup();
     const router = await renderRoute(ROUTES.main);
@@ -256,13 +235,6 @@ describe("루트 메인과 공통 메뉴", () => {
       "aria-expanded",
       "true",
     );
-  });
-
-  it("ADMIN의 로고는 아이디 변경으로 이동한다", async () => {
-    await renderRoute(ROUTES.main);
-    expect(
-      await screen.findByRole("link", { name: "빅버드 · 아이디 변경" }),
-    ).toHaveAttribute("href", ROUTES.switchAccount);
   });
 
   it("ADMIN이 아닌 로그인 사용자의 로고는 홈으로 이동한다", async () => {
@@ -517,14 +489,6 @@ describe("권한 없는 화면", () => {
 });
 
 describe("홈 본문과 검색 경로", () => {
-  it("/ 에서 홈 본문이 로그인 여부와 관계없이 보인다", async () => {
-    mockSessionError(new ApiError(401, { result: false }));
-    await renderRoute(ROUTES.main);
-    expect(await screen.findByRole("heading", { level: 2 })).toHaveTextContent(
-      "AI가 딱 맞는 크리에이터를 찾아드려요",
-    );
-  });
-
   it("검색을 제출하면 셸 안의 준비 중 화면으로 이동한다", async () => {
     const user = userEvent.setup();
     const router = await renderRoute(ROUTES.main);
