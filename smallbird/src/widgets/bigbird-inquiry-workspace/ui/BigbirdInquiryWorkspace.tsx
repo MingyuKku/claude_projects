@@ -2,7 +2,10 @@ import { LoaderCircle, Plus } from "lucide-react";
 import { useEffect, useRef } from "react";
 import { generatePath, Link, useNavigate, useSearchParams } from "react-router";
 
-import { useInquiryCampaigns } from "@/entities/inquiry";
+import {
+  matchesInquiryStatusFilter,
+  useInquiryCampaigns,
+} from "@/entities/inquiry";
 import { ChatListItem, ChatListPanel } from "@/shared/components/chat-list";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ROUTES } from "@/shared/config";
@@ -16,6 +19,7 @@ import {
   getInquiryTitleKey,
   getLastActivity,
   STATUS_BADGE_VARIANT,
+  STATUS_LABEL_KEY,
 } from "../lib/format";
 
 import type { BigbirdInquiryViewModel } from "@/entities/inquiry";
@@ -77,8 +81,8 @@ export function BigbirdInquiryWorkspace({
   const statusFilter = toStatusFilter(searchParams.get("status"));
   // 목록 응답에 브랜드명이 없어(백엔드 확인 중) 캠페인 목록에서 캠페인 번호로 찾음. 못 찾으면 배지를 그리지 않음.
   const { campaigns } = useInquiryCampaigns(threadUserIdx);
-  const visible = (inquiries ?? []).filter(
-    (inquiry) => statusFilter === "all" || inquiry.status === statusFilter,
+  const visible = (inquiries ?? []).filter((inquiry) =>
+    matchesInquiryStatusFilter(inquiry.status, statusFilter),
   );
 
   // 목록이 비었으면 PC 오른쪽 패널을 그리지 않습니다(Figma 빈 목록 6790:100192). 특정 문의 URL로 들어온 경우
@@ -172,6 +176,7 @@ export function BigbirdInquiryWorkspace({
           );
           const brandName = inquiry.brandName || campaign?.brandName;
           const title = getInquiryTitleKey(inquiry, campaign?.productName);
+          const isWithdrawal = title.key === "inquiryTitle.withdrawal";
           const isOther = title.key === "inquiryTitle.other";
           // Figma 26/10/29 카드(11315:49602·49659): 1행은 상태 배지 + 유형 태그, 2행은 캠페인 문의면 회색 브랜드명 + 제목.
           // 태그는 기타 문의면 "기타문의", 캠페인 문의면 "캠페인 문의"(사용자 확인 2026-11-12, 시안은 모든 카드에 "기타문의").
@@ -179,19 +184,21 @@ export function BigbirdInquiryWorkspace({
           return (
             <ChatListItem
               key={inquiry.threadIdx}
-              titlePrefix={isOther ? undefined : brandName}
+              titlePrefix={isOther || isWithdrawal ? undefined : brandName}
               title={t(title.key, { name: "name" in title ? title.name : "" })}
               badges={[
                 {
-                  label: t(
-                    inquiry.status === "consulting"
-                      ? "consultingBadge"
-                      : inquiry.status,
-                  ),
+                  label:
+                    inquiry.status === "unknown"
+                      ? (inquiry.statusCode ?? "")
+                      : t(STATUS_LABEL_KEY[inquiry.status]),
                   variant: STATUS_BADGE_VARIANT[inquiry.status],
                 },
                 {
-                  label: t(isOther ? "otherTag" : "campaignTag"),
+                  // 출금 문의도 캠페인이 없는 기타 문의라 태그는 기타문의 그대로(사용자 지시 2026-11-18).
+                  label: t(
+                    isOther || isWithdrawal ? "otherTag" : "campaignTag",
+                  ),
                   variant: "outline" as const,
                 },
               ]}

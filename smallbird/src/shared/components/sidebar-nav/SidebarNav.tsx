@@ -1,5 +1,5 @@
 import { cva } from "class-variance-authority";
-import { FileQuestionMark, PanelLeft, Plus } from "lucide-react";
+import { PanelLeft, Plus } from "lucide-react";
 
 import logo from "@/shared/assets/img/brand/logo.svg";
 import { cn } from "@/shared/lib/utils";
@@ -29,13 +29,9 @@ interface SidebarNavProps {
   primaryActionLabel?: string;
   onClickPrimaryAction?: () => void;
   isPrimaryActionDisabled?: boolean;
-  // 하단 이용 가이드 버튼 (Figma Guide Button). 레일에서는 숨김
-  guideLabel?: string;
-  onClickGuide?: () => void;
-  isGuideDisabled?: boolean;
-  // 이용 가이드 옆에 붙는 추가 요소 (예: 개발용 언어 전환)
-  guideExtra?: ReactNode;
-  // 이용 가이드 아래 전체 폭 요소 (Figma Footer의 Toggle / Tab, 예: 광고주·인플루언서 전환). 레일에서는 숨김
+  // 하단 전환 탭 위의 버튼 줄 (예: 이용 가이드·언어 메뉴). 레일에서는 숨김
+  footerActions?: ReactNode;
+  // 하단 전체 폭 요소 (Figma Footer의 Toggle / Tab, 예: 광고주·크리에이터 전환). 레일에서는 숨김
   footerSwitch?: ReactNode;
   navLabel: string;
   // SPA 라우터 링크를 쓰려면 href를 받는 컴포넌트를 넘김 (기본 <a>)
@@ -75,10 +71,7 @@ export function SidebarNav({
   primaryActionLabel,
   onClickPrimaryAction,
   isPrimaryActionDisabled = false,
-  guideLabel,
-  onClickGuide,
-  isGuideDisabled = false,
-  guideExtra,
+  footerActions,
   footerSwitch,
   navLabel,
   linkAs,
@@ -113,7 +106,7 @@ export function SidebarNav({
   const header = isCollapsed ? (
     <div className="px-2 pt-3.5 pb-1.5">{toggleButton}</div>
   ) : (
-    <div className="flex items-center justify-between py-4 pr-3.5 pl-4 tablet:py-5 tablet:pl-5">
+    <div className="flex items-center justify-between py-5 pr-3.5 pl-5">
       {logoContent}
       {toggleButton}
     </div>
@@ -164,23 +157,10 @@ export function SidebarNav({
           </ul>
         </nav>
       </div>
-      {/* Figma Footer(5058:74731): 이용 가이드 아래 전환 탭, 간격 10, 위 10·아래 16·좌우 10 */}
-      {(guideLabel || footerSwitch) && !isCollapsed && (
-        <div className="flex flex-col items-start gap-2.5 px-2.5 pt-2.5 pb-4">
-          {guideLabel && (
-            <div className="flex items-center gap-1">
-              <Button
-                variant="ghost-muted"
-                size="sm"
-                className="cursor-pointer"
-                onClick={onClickGuide}
-                disabled={isGuideDisabled}
-              >
-                <FileQuestionMark />
-                {guideLabel}
-              </Button>
-              {guideExtra}
-            </div>
+      {(footerActions || footerSwitch) && !isCollapsed && (
+        <div className="flex flex-col gap-3 px-2.5 pt-2.5 pb-4">
+          {footerActions && (
+            <div className="flex items-center gap-2">{footerActions}</div>
           )}
           {footerSwitch}
         </div>

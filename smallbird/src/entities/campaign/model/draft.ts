@@ -3,24 +3,26 @@ import type {
   CampaignMediaType,
   CampaignPlatform,
   CampaignType,
-  InfluencerAgeGroup,
-  InfluencerGender,
+  CreatorAgeGroup,
+  CreatorGender,
   PostingTopic,
 } from "./input-codes";
 
-// 등록 마법사가 입력받는 값. 단계 키는 단계별 수정 API(A-5.x)와 상세 조회(A-3)의 객체 이름과 같음.
+// 등록 마법사가 입력받는 값. 단계 키는 단계별 수정 API(A-5.x)와 상세 조회(A-3)의 객체 이름과 같되, 서버가 `influencer`라 부르는 단계만 `creator`임(`server-steps.ts`).
 // 글자 칸은 빈 문자열, 숫자·선택 칸은 null이 "입력 전"이고, 저장 요청을 만들 때 빈 값은 null로 바꿈.
 
 export const CAMPAIGN_DRAFT_STEPS = [
   "info",
   "product",
-  "influencer",
+  "creator",
   "addOns",
   "intro",
   "conditions",
   "policy",
 ] as const;
 export type CampaignDraftStep = (typeof CAMPAIGN_DRAFT_STEPS)[number];
+/** 단계별 저장 API가 있는 단계. 정책 동의(7단계)는 저장하지 않고 결제 요청에 실어 보냄. */
+export type CampaignSavedStep = Exclude<CampaignDraftStep, "policy">;
 
 export interface CampaignAddress {
   /** 우편번호 5자리. */
@@ -49,7 +51,7 @@ export interface CampaignInfoDraft {
 
 export interface CampaignProductDraft {
   productName: string;
-  quantityPerInfluencer: number | null;
+  quantityPerCreator: number | null;
   productPrice: number | null;
   /** 반품 회수 여부. 기본 "회수 안함". */
   returnRequired: boolean;
@@ -67,10 +69,10 @@ export interface CampaignProductDraft {
   visitBenefit: string;
 }
 
-export interface CampaignInfluencerDraft {
+export interface CampaignCreatorDraft {
   platform: CampaignPlatform | null;
-  gender: InfluencerGender | null;
-  ageGroups: InfluencerAgeGroup[];
+  gender: CreatorGender | null;
+  ageGroups: CreatorAgeGroup[];
   topics: PostingTopic[];
 }
 
@@ -87,7 +89,7 @@ export interface CampaignConditionsDraft {
   /** 모집형 진행 인원. PICK형은 null. */
   headcount: number | null;
   /** 모집형 제품발송형 1인당 리워드. 그 밖은 null. */
-  rewardPerInfluencer: number | null;
+  rewardPerCreator: number | null;
   postingPeriodMonths: number | null;
   secondaryCopyright: boolean | null;
 }
@@ -102,7 +104,7 @@ export interface CampaignPolicyAgreements {
 export interface CampaignDraft {
   info: CampaignInfoDraft;
   product: CampaignProductDraft;
-  influencer: CampaignInfluencerDraft;
+  creator: CampaignCreatorDraft;
   addOns: CampaignAddOn[];
   intro: CampaignIntroDraft;
   conditions: CampaignConditionsDraft;
@@ -112,7 +114,7 @@ export interface CampaignDraft {
 export function createEmptyProductDraft(): CampaignProductDraft {
   return {
     productName: "",
-    quantityPerInfluencer: null,
+    quantityPerCreator: null,
     productPrice: null,
     returnRequired: false,
     returnAddress: null,
@@ -133,7 +135,7 @@ export function createEmptyDraft(): CampaignDraft {
   return {
     info: { name: "", brandIdx: null, campaignType: null, startDate: null },
     product: createEmptyProductDraft(),
-    influencer: { platform: null, gender: null, ageGroups: [], topics: [] },
+    creator: { platform: null, gender: null, ageGroups: [], topics: [] },
     addOns: [],
     intro: {
       mainImage: null,
@@ -145,7 +147,7 @@ export function createEmptyDraft(): CampaignDraft {
     },
     conditions: {
       headcount: null,
-      rewardPerInfluencer: null,
+      rewardPerCreator: null,
       postingPeriodMonths: null,
       secondaryCopyright: null,
     },

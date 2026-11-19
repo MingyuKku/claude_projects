@@ -3,12 +3,15 @@ import { ApiError, serverApiV3 } from "@/shared/api";
 import { createEmptyDraft } from "../model/draft";
 import { deleteCampaign } from "./campaign-api";
 import {
+  cancelCampaignApproval,
   completeCampaignDemo,
   convertCampaignDemo,
   copyCampaign,
   createCampaign,
   fetchCampaignDetail,
   payCampaign,
+  requestCampaignReapproval,
+  reviewCampaignForDev,
   saveCampaignStep,
 } from "./campaign-detail-api";
 
@@ -16,7 +19,7 @@ import type { CampaignDraft } from "../model/draft";
 import type * as SharedApi from "@/shared/api";
 import type * as SharedConfig from "@/shared/config";
 
-// 서버 연동 모드(전체 목 모드가 아님)에서 서버가 있는 API는 서버로 보내고, 없는 기능은 그림자 목이 처리하는지 검증함.
+// 서버 연동 모드(전체 목 모드가 아님)에서 서버가 있는 API는 서버로 보내는지 검증함(데모 상태는 그림자 목이 덧씌울 수 있음).
 vi.mock("@/shared/config", async (importOriginal) => ({
   ...(await importOriginal<typeof SharedConfig>()),
   isCampaignApiMock: () => false,
@@ -25,6 +28,8 @@ vi.mock("@/shared/api", async (importOriginal) => ({
   ...(await importOriginal<typeof SharedApi>()),
   serverApiV3: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
 }));
+
+const AGREED = { service: true, privacy: true, operation: true, reward: true };
 
 const mockGet = vi.mocked(serverApiV3.get);
 const mockPost = vi.mocked(serverApiV3.post);
@@ -109,7 +114,7 @@ describe("서버 연동 모드", () => {
     const detail = await fetchCampaignDetail(7);
 
     expect(mockGet).toHaveBeenCalledWith("/campaign/7");
-    expect(detail.draft.influencer.ageGroups).toEqual(["AGE_20S"]);
+    expect(detail.draft.creator.ageGroups).toEqual(["AGE_20S"]);
     expect(detail.draft.intro).toMatchObject({
       mainImage: null,
       detailMedia: [],
@@ -151,57 +156,121 @@ describe("서버 연동 모드", () => {
     });
   });
 
-  it("정책 동의는 서버로 보내지 않고 목이 상세에 덮어쓴다", async () => {
-    mockGet.mockResolvedValue(liveDetail());
-
+  it("정책 동의는 저장하지 않고 서버로도 보내지 않는다", async () => {
     await saveCampaignStep(
       7,
       "policy",
       draftWith((draft) => {
-        draft.policy = {
-          service: true,
-          privacy: true,
-          operation: true,
-          reward: true,
-        };
+        draft.policy = { ...AGREED };
       }),
     );
-    const detail = await fetchCampaignDetail(7);
 
     expect(mockPut).not.toHaveBeenCalled();
-    expect(detail.draft.policy.reward).toBe(true);
+    expect(mockPost).not.toHaveBeenCalled();
+    expect(mockGet).not.toHaveBeenCalled();
   });
 
-  it("목으로 결제한 캠페인은 승인 검토중으로 보이고 서버로 수정을 보내지 않는다", async () => {
-    mockGet.mockResolvedValue(liveDetail());
-    await saveCampaignStep(
-      7,
-      "policy",
-      draftWith((draft) => {
-        draft.policy = {
-          service: true,
-          privacy: true,
-          operation: true,
-          reward: true,
-        };
-      }),
+  it("결제는 서버로 보내고 총액과 정책 동의를 함께 실어 보낸다", async () => {
+    const paidAt = "2099-01-01 10:00:00";
+    mockPost.mockResolvedValue({
+      status: "REVIEWING",
+      paidAmount: 11_000,
+      paidAt,
+      balance: 5_000,
+    });
+
+    const paid = await payCampaign(7, {
+      expectedTotalAmount: 11_000,
+      agreements: AGREED,
+    });
+
+    expect(mockPost).toHaveBeenCalledExactlyOnceWith("/campaign/7/payment", {
+      expectedTotalAmount: 11_000,
+      agreements: AGREED,
+    });
+    expect(paid).toEqual({
+      status: "REVIEWING",
+      paidAmount: 11_000,
+      paidAt,
+      balance: 5_000,
+    });
+  });
+
+  it("결제가 거절되면 reason과 서버 계산 금액을 그대로 전한다", async () => {
+    mockPost.mockRejectedValue(
+      new ApiError(409, { reason: "AMOUNT_CHANGED", totalAmount: 11_000 }),
     );
 
-    const paid = await payCampaign(7, 0);
-    const detail = await fetchCampaignDetail(7);
-    const reason = await readReason(
-      saveCampaignStep(
-        7,
-        "product",
-        draftWith(() => {}),
+    expect(
+      await readReason(
+        payCampaign(7, { expectedTotalAmount: 10_000, agreements: AGREED }),
       ),
+    ).toEqual({ reason: "AMOUNT_CHANGED", totalAmount: 11_000 });
+  });
+
+  it("재승인 요청은 서버로 보내고 정책 동의 4개를 함께 싣는다", async () => {
+    mockPost.mockResolvedValue({ status: "REVIEWING" });
+
+    const result = await requestCampaignReapproval(7, AGREED);
+
+    expect(mockPost).toHaveBeenCalledExactlyOnceWith("/campaign/7/approval", {
+      agreements: AGREED,
+    });
+    expect(result).toEqual({ status: "REVIEWING" });
+  });
+
+  it("재승인 요청이 거절되면 reason을 그대로 전한다", async () => {
+    mockPost.mockRejectedValue(
+      new ApiError(400, { reason: "POLICY_NOT_AGREED" }),
     );
 
-    expect(paid.status).toBe("REVIEWING");
-    expect(detail.stage).toBe("REVIEWING");
-    expect(detail.payment?.paidAmount).toBe(0);
-    expect(reason).toEqual({ reason: "NOT_EDITABLE" });
-    expect(mockPut).not.toHaveBeenCalled();
+    expect(
+      await readReason(
+        requestCampaignReapproval(7, { ...AGREED, reward: false }),
+      ),
+    ).toEqual({ reason: "POLICY_NOT_AGREED" });
+  });
+
+  it("승인 요청 취소는 서버로 보내고 환불 금액을 읽는다", async () => {
+    mockPost.mockResolvedValue({
+      status: "DRAFT",
+      refundedAmount: 11_000,
+      balance: 16_000,
+    });
+
+    const result = await cancelCampaignApproval(7);
+
+    expect(mockPost).toHaveBeenCalledExactlyOnceWith(
+      "/campaign/7/payment/cancel",
+    );
+    expect(result).toEqual({
+      status: "DRAFT",
+      refundedAmount: 11_000,
+      balance: 16_000,
+    });
+  });
+
+  it("승인 요청 취소가 거절되면 reason과 현재 상태를 그대로 전한다", async () => {
+    mockPost.mockRejectedValue(
+      new ApiError(409, { reason: "NOT_CANCELABLE", status: "IN_PROGRESS" }),
+    );
+
+    expect(await readReason(cancelCampaignApproval(7))).toEqual({
+      reason: "NOT_CANCELABLE",
+      status: "IN_PROGRESS",
+    });
+  });
+
+  it("개발용 승인·반려는 stage 전용 API로 보낸다", async () => {
+    mockPost.mockResolvedValue(undefined);
+
+    await reviewCampaignForDev(7, { type: "approve" });
+    await reviewCampaignForDev(7, { type: "reject", reason: "금액 확인" });
+
+    expect(mockPost).toHaveBeenNthCalledWith(1, "/campaign/7/test/approve");
+    expect(mockPost).toHaveBeenNthCalledWith(2, "/campaign/7/test/reject", {
+      rejectReason: "금액 확인",
+    });
   });
 });
 
@@ -223,28 +292,6 @@ describe("서버 연동 모드의 삭제", () => {
       reason: "NOT_DELETABLE",
       status: "REVIEWING",
     });
-  });
-
-  it("목으로 결제한 캠페인은 서버로 삭제를 보내지 않고 거절한다", async () => {
-    mockGet.mockResolvedValue(liveDetail());
-    await saveCampaignStep(
-      7,
-      "policy",
-      draftWith((draft) => {
-        draft.policy = {
-          service: true,
-          privacy: true,
-          operation: true,
-          reward: true,
-        };
-      }),
-    );
-    await payCampaign(7, 0);
-
-    expect(await readReason(deleteCampaign(7))).toEqual({
-      reason: "NOT_DELETABLE",
-    });
-    expect(mockDelete).not.toHaveBeenCalled();
   });
 });
 

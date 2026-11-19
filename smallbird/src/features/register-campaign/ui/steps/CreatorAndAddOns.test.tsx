@@ -6,7 +6,7 @@ import { createEmptyDraft } from "@/entities/campaign";
 import { useRegisterWizardStore } from "../../model/wizard-context";
 import { RegisterWizardProvider } from "../RegisterWizardProvider";
 import { AddOnsStep } from "./add-ons/AddOnsStep";
-import { InfluencerStep } from "./influencer/InfluencerStep";
+import { CreatorStep } from "./creator/CreatorStep";
 
 import type { CampaignDetail, CampaignDraft } from "@/entities/campaign";
 
@@ -40,12 +40,12 @@ function TitleHashtagProbe() {
   );
 }
 
-describe("InfluencerStep", () => {
+describe("CreatorStep", () => {
   it("플랫폼 6개를 시안 순서로 보이고 하나만 고른다", async () => {
     const user = userEvent.setup();
     render(
       <RegisterWizardProvider detail={createDetail()}>
-        <InfluencerStep />
+        <CreatorStep />
       </RegisterWizardProvider>,
     );
     const group = screen.getByRole("radiogroup", { name: "플랫폼 선택" });
@@ -70,7 +70,7 @@ describe("InfluencerStep", () => {
     const user = userEvent.setup();
     render(
       <RegisterWizardProvider detail={createDetail()}>
-        <InfluencerStep />
+        <CreatorStep />
       </RegisterWizardProvider>,
     );
 
@@ -95,7 +95,7 @@ describe("InfluencerStep", () => {
   it("서버에 값이 없으면 시안의 기본 선택(인스타그램·여성·10대·뷰티)으로 보인다", () => {
     render(
       <RegisterWizardProvider detail={createDetail()}>
-        <InfluencerStep />
+        <CreatorStep />
       </RegisterWizardProvider>,
     );
 
@@ -121,7 +121,7 @@ describe("InfluencerStep", () => {
     render(
       <RegisterWizardProvider
         detail={createDetail((draft) => {
-          draft.influencer = {
+          draft.creator = {
             platform: "TIKTOK",
             gender: "MALE",
             ageGroups: ["AGE_40S"],
@@ -129,7 +129,7 @@ describe("InfluencerStep", () => {
           };
         })}
       >
-        <InfluencerStep />
+        <CreatorStep />
       </RegisterWizardProvider>,
     );
 
@@ -155,7 +155,7 @@ describe("InfluencerStep", () => {
     const user = userEvent.setup();
     render(
       <RegisterWizardProvider detail={createDetail()}>
-        <InfluencerStep />
+        <CreatorStep />
       </RegisterWizardProvider>,
     );
 
@@ -184,11 +184,11 @@ describe("InfluencerStep", () => {
     render(
       <RegisterWizardProvider
         detail={createDetail((draft) => {
-          draft.influencer.platform = "NAVER_BLOG";
+          draft.creator.platform = "NAVER_BLOG";
           draft.intro.titleHashtags = ["봄신상"];
         })}
       >
-        <InfluencerStep />
+        <CreatorStep />
         <TitleHashtagProbe />
       </RegisterWizardProvider>,
     );

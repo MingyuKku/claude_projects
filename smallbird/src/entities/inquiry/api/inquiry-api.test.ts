@@ -65,6 +65,24 @@ describe("fetchBigbirdInquiryPage", () => {
     });
   });
 
+  it("REQUESTED는 상담 요청 중으로, 모르는 상태는 서버 값을 남겨 목록을 유지한다", async () => {
+    vi.mocked(serverApiV3.get).mockResolvedValue({
+      result: true,
+      list: [
+        { ...listItem, status: "REQUESTED", boardType: false },
+        { ...listItem, threadIdx: 102, status: "SOMETHING_NEW" },
+      ],
+      hasMore: false,
+    });
+    const page = await fetchBigbirdInquiryPage(5971, "ALL", 0);
+    expect(
+      page.inquiries.map((inquiry) => [inquiry.status, inquiry.statusCode]),
+    ).toEqual([
+      ["requested", "REQUESTED"],
+      ["unknown", "SOMETHING_NEW"],
+    ]);
+  });
+
   it("서버 상태 필터로 상담 중 문의만 조회한다", async () => {
     vi.mocked(serverApiV3.get).mockResolvedValue({
       result: true,
@@ -239,6 +257,35 @@ describe("fetchBuyerInquiryPage", () => {
     ]);
   });
 
+  it("실시간 상담 요청 중(REQUESTED) 항목이 있어도 목록 전체를 읽고, 모르는 상태는 서버 값을 남긴다", async () => {
+    vi.mocked(serverApiV3.get).mockResolvedValue({
+      result: true,
+      list: [
+        {
+          ...item,
+          inquiryIdx: 2141,
+          sourceType: "INFLUENCER_QUESTION",
+          status: "REQUESTED",
+        },
+        { ...item, inquiryIdx: 2142, status: "SOMETHING_NEW" },
+        item,
+      ],
+      pagingInfo: { page: 1, size: 20, totalCount: 3, totalPage: 1 },
+    });
+    const page = await fetchBuyerInquiryPage("all", 1);
+    expect(
+      page.inquiries.map((inquiry) => [
+        inquiry.inquiryIdx,
+        inquiry.status,
+        inquiry.statusCode,
+      ]),
+    ).toEqual([
+      [2141, "requested", "REQUESTED"],
+      [2142, "unknown", "SOMETHING_NEW"],
+      [501, "waiting", "WAITING"],
+    ]);
+  });
+
   it("탭을 서버 상태값으로 바꿔 쪽 단위로 조회한다", async () => {
     vi.mocked(serverApiV3.get).mockResolvedValue({
       result: true,
@@ -276,7 +323,7 @@ describe("fetchBuyerInquiryPage", () => {
     },
   );
 
-  it("인플루언서 문의 목록은 searchType 없이 keyword만 보낸다(숫자 검색어도 같다)", async () => {
+  it("크리에이터 문의 목록은 searchType 없이 keyword만 보낸다(숫자 검색어도 같다)", async () => {
     vi.mocked(serverApiV3.get).mockResolvedValue({
       result: true,
       list: [],
@@ -284,7 +331,7 @@ describe("fetchBuyerInquiryPage", () => {
     });
     for (const keyword of ["강민규", "20261001"]) {
       await fetchBuyerInquiryPage("all", 1, { sourceType: "ALL", keyword }, [
-        "influencer",
+        "creator",
         "campaignQna",
       ]);
       expect(serverApiV3.get).toHaveBeenLastCalledWith(
@@ -328,7 +375,7 @@ describe("fetchBuyerInquiryPage", () => {
     ).not.toHaveProperty("startDate");
   });
 
-  it("선택한 문의 유형·캠페인·인플루언서를 서버 필터로 전달한다", async () => {
+  it("선택한 문의 유형·캠페인·크리에이터를 서버 필터로 전달한다", async () => {
     vi.mocked(serverApiV3.get).mockResolvedValue({
       result: true,
       list: [],
@@ -337,7 +384,7 @@ describe("fetchBuyerInquiryPage", () => {
     await fetchBuyerInquiryPage("all", 1, {
       sourceType: "PRODUCT_QNA",
       campaignIdx: 10,
-      influencerThreadUserIdx: 50,
+      creatorThreadUserIdx: 50,
     });
     expect(serverApiV3.get).toHaveBeenCalledWith("/help/inquiry", {
       params: {
@@ -750,6 +797,29 @@ describe("fetchThreadConversation", () => {
     ).resolves.toMatchObject({ isRealtime: false });
   });
 
+  it("끝난 실시간 스레드의 종료 시각을 돌려주고, 일반 문의나 진행 중이면 null이다", async () => {
+    const respond = (overrides: Record<string, unknown>) =>
+      vi.mocked(serverApiV3.get).mockResolvedValue({
+        result: true,
+        data: [{ ...thread(2116, []), ...overrides }],
+      });
+    respond({ boardType: false, finishTime: "2026-10-01T10:03:16" });
+    await expect(
+      fetchThreadConversation(5546, 7531, 2116),
+    ).resolves.toMatchObject({
+      isRealtime: false,
+      realtimeFinishedAt: new Date("2026-10-01T10:03:16").getTime(),
+    });
+    respond({ boardType: false, finishTime: null });
+    await expect(
+      fetchThreadConversation(5546, 7531, 2116),
+    ).resolves.toMatchObject({ realtimeFinishedAt: null });
+    respond({ boardType: true, finishTime: "2026-10-01T10:03:16" });
+    await expect(
+      fetchThreadConversation(5546, 7531, 2116),
+    ).resolves.toMatchObject({ realtimeFinishedAt: null });
+  });
+
   it("목록에 없는 스레드와 404는 빈 대화로 보고 다른 오류는 그대로 던진다", async () => {
     vi.mocked(serverApiV3.get).mockResolvedValue({
       result: true,
@@ -758,11 +828,13 @@ describe("fetchThreadConversation", () => {
     await expect(fetchThreadConversation(5546, 7531, 2116)).resolves.toEqual({
       messages: [],
       isRealtime: false,
+      realtimeFinishedAt: null,
     });
     vi.mocked(serverApiV3.get).mockRejectedValue(new ApiError(404, null));
     await expect(fetchThreadConversation(5546, 7531, 2116)).resolves.toEqual({
       messages: [],
       isRealtime: false,
+      realtimeFinishedAt: null,
     });
     vi.mocked(serverApiV3.get).mockRejectedValue(new ApiError(500, null));
     await expect(

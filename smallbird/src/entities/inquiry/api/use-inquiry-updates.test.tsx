@@ -15,7 +15,7 @@ vi.mock("@/shared/api", async (importOriginal) => ({
 }));
 
 const query: InquiryUpdateQuery = {
-  isInfluencerMenu: true,
+  isCreatorMenu: true,
   status: "ALL",
   sourceType: "ALL",
 };
@@ -125,7 +125,7 @@ describe("useInquiryUpdatePolling", () => {
     expect(sinceOf(1)).toBe("2026-11-09 13:59:40");
   });
 
-  it("바뀐 게 있을 때만 목록 다시 받기를 부르고 인플루언서 전용 주소와 필터를 보낸다", async () => {
+  it("바뀐 게 있을 때만 목록 다시 받기를 부르고 크리에이터 전용 주소와 필터를 보낸다", async () => {
     vi.mocked(serverApiV3.get)
       .mockResolvedValueOnce(answer(false, "2026-11-09 14:00:10"))
       .mockResolvedValueOnce(answer(true, "2026-11-09 14:00:20"));
@@ -135,7 +135,7 @@ describe("useInquiryUpdatePolling", () => {
         status: "WAITING",
         sourceType: "CAMPAIGN_QNA",
         campaignIdx: 7,
-        influencerThreadUserIdx: 9,
+        creatorThreadUserIdx: 9,
       },
     });
     await advance(10_000);
@@ -160,7 +160,7 @@ describe("useInquiryUpdatePolling", () => {
     vi.mocked(serverApiV3.get).mockResolvedValue(
       answer(false, "2026-11-09 14:00:10"),
     );
-    renderPolling({ query: { ...query, isInfluencerMenu: false } });
+    renderPolling({ query: { ...query, isCreatorMenu: false } });
     await advance(10_000);
     expect(serverApiV3.get).toHaveBeenCalledWith(
       "/help/inquiry/has-updates",

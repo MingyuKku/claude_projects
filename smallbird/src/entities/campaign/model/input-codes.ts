@@ -8,7 +8,7 @@ export const CAMPAIGN_TYPES = [
 ] as const;
 export type CampaignType = (typeof CAMPAIGN_TYPES)[number];
 
-/** 3단계 플랫폼(시안 순서). 인플루언서 검색용 `entities/platform`(4개)과 따로 둠. */
+/** 3단계 플랫폼(시안 순서). 크리에이터 검색용 `entities/platform`(4개)과 따로 둠. */
 export const CAMPAIGN_PLATFORMS = [
   "INSTAGRAM",
   "NAVER_BLOG",
@@ -19,19 +19,19 @@ export const CAMPAIGN_PLATFORMS = [
 ] as const;
 export type CampaignPlatform = (typeof CAMPAIGN_PLATFORMS)[number];
 
-export const INFLUENCER_GENDERS = ["FEMALE", "MALE", "ALL"] as const;
-export type InfluencerGender = (typeof INFLUENCER_GENDERS)[number];
+export const CREATOR_GENDERS = ["FEMALE", "MALE", "ALL"] as const;
+export type CreatorGender = (typeof CREATOR_GENDERS)[number];
 
-export const INFLUENCER_AGE_GROUPS = [
+export const CREATOR_AGE_GROUPS = [
   "AGE_10S",
   "AGE_20S",
   "AGE_30S",
   "AGE_40S",
   "AGE_50S_PLUS",
 ] as const;
-export type InfluencerAgeGroup = (typeof INFLUENCER_AGE_GROUPS)[number];
+export type CreatorAgeGroup = (typeof CREATOR_AGE_GROUPS)[number];
 
-/** 포스팅 주제. 인플루언서 카테고리 대분류 20개 + 전체(`All`), 서버 `trans_key` 표기 그대로(목록 조회 API 없음). */
+/** 포스팅 주제. 크리에이터 카테고리 대분류 20개 + 전체(`All`), 서버 `trans_key` 표기 그대로(목록 조회 API 없음). */
 export const POSTING_TOPICS = [
   "DigitalAppliances",
   "Education",

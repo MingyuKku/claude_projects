@@ -42,6 +42,7 @@ import {
   formatMessageTime,
   getInquiryTitleKey,
   STATUS_BADGE_VARIANT,
+  STATUS_LABEL_KEY,
 } from "../lib/format";
 import { mergeConversationMessages } from "../lib/merge-messages";
 import { BigbirdMessageComposer } from "./BigbirdMessageComposer";
@@ -281,7 +282,7 @@ export function BigbirdInquiryConversation({
   ) {
     const side = message.isMine ? "me" : "other";
     const name = message.isMine ? myName : t("bigbirdManager");
-    // 서버의 상담 종료 안내는 말풍선이 아니라 가운데 구분선(마켓·인플루언서 시안과 같음).
+    // 서버의 상담 종료 안내는 말풍선이 아니라 가운데 구분선(마켓·크리에이터 시안과 같음).
     if (message.kind === "notice") {
       // 연결 안내는 한 줄이 길어 좁은 폭에서는 칩 안에서 줄을 바꿈.
       return (
@@ -382,11 +383,9 @@ export function BigbirdInquiryConversation({
               >
                 {/* 헤더 배지는 목록 카드와 같은 "실시간 상담중"(REQ-23-0018). 목록 탭의 "상담 중"과는 다른 문구 */}
                 <Badge variant={STATUS_BADGE_VARIANT[inquiry.status]}>
-                  {t(
-                    inquiry.status === "consulting"
-                      ? "consultingBadge"
-                      : inquiry.status,
-                  )}
+                  {inquiry.status === "unknown"
+                    ? inquiry.statusCode
+                    : t(STATUS_LABEL_KEY[inquiry.status])}
                 </Badge>
                 <span className="-my-0.5 truncate py-0.5">
                   {t(title.key, { name: "name" in title ? title.name : "" })}

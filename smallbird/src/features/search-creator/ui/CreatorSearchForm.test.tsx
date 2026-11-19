@@ -4,7 +4,7 @@ import { createMemoryRouter, RouterProvider, useLocation } from "react-router";
 
 import { MEDIA_QUERY } from "@/shared/config";
 
-import { InfluencerSearchForm } from "./InfluencerSearchForm";
+import { CreatorSearchForm } from "./CreatorSearchForm";
 
 function LocationProbe() {
   const { pathname, search } = useLocation();
@@ -18,7 +18,7 @@ function renderForm() {
         path: "*",
         element: (
           <>
-            <InfluencerSearchForm />
+            <CreatorSearchForm />
             <LocationProbe />
           </>
         ),
@@ -43,7 +43,7 @@ afterEach(() => vi.unstubAllGlobals());
 const QUERY_NAME = "ex) 스킨케어 신제품 홍보, 20대 여성 타깃, 인스타 중심";
 
 function getSubmit() {
-  return screen.getByRole("button", { name: "인플루언서 탐색" });
+  return screen.getByRole("button", { name: "크리에이터 탐색" });
 }
 
 // jsdom에는 Radix Select가 쓰는 포인터 캡처·스크롤 API가 없음.
@@ -54,7 +54,7 @@ beforeAll(() => {
   Element.prototype.scrollIntoView = () => {};
 });
 
-describe("InfluencerSearchForm", () => {
+describe("CreatorSearchForm", () => {
   it("공백만 있으면 제출 버튼이 비활성화된다", async () => {
     const user = userEvent.setup();
     renderForm();
@@ -71,7 +71,7 @@ describe("InfluencerSearchForm", () => {
     await user.type(screen.getByRole("textbox"), " 스킨케어 ");
     await user.click(getSubmit());
     expect(await screen.findByTestId("location")).toHaveTextContent(
-      "/influencers/search?q=%EC%8A%A4%ED%82%A8%EC%BC%80%EC%96%B4&platform=instagram",
+      "/creators/search?q=%EC%8A%A4%ED%82%A8%EC%BC%80%EC%96%B4&platform=instagram",
     );
   });
 
@@ -84,7 +84,7 @@ describe("InfluencerSearchForm", () => {
       expect(textbox).toHaveValue("a\nb");
       expect(router.state.location.pathname).toBe("/");
       await user.keyboard("{Enter}");
-      expect(router.state.location.pathname).toBe("/influencers/search");
+      expect(router.state.location.pathname).toBe("/creators/search");
       expect(router.state.location.search).toBe("?q=a%0Ab&platform=instagram");
     });
 
@@ -118,10 +118,10 @@ describe("InfluencerSearchForm", () => {
     it("항상 버튼에 이름이 보이고 플랫폼을 바꾸면 쿼리의 platform도 바뀐다", async () => {
       const user = userEvent.setup();
       const router = renderForm();
-      expect(getSubmit()).toHaveTextContent("인플루언서 탐색");
+      expect(getSubmit()).toHaveTextContent("크리에이터 탐색");
       await user.click(getPlatform());
       await user.click(await screen.findByRole("option", { name: "네이버" }));
-      expect(getSubmit()).toHaveTextContent("인플루언서 탐색");
+      expect(getSubmit()).toHaveTextContent("크리에이터 탐색");
       expect(getPlatform()).toHaveTextContent("네이버");
       await user.type(screen.getByRole("textbox"), "hi");
       await user.click(getSubmit());
@@ -298,7 +298,7 @@ describe("InfluencerSearchForm", () => {
       await user.click(getSubmit());
       await waitFor(() =>
         expect(screen.getByTestId("location")).toHaveTextContent(
-          "/influencers/search?q=",
+          "/creators/search?q=",
         ),
       );
     });

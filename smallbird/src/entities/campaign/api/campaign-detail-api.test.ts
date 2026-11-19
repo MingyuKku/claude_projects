@@ -6,6 +6,9 @@ import {
   copyCampaign,
   createCampaign,
   fetchCampaignDetail,
+  payCampaign,
+  requestCampaignReapproval,
+  reviewCampaignForDev,
   saveCampaignStep,
 } from "./campaign-detail-api";
 
@@ -176,9 +179,9 @@ describe("단계별 수정", () => {
     const reason = await readReason(
       saveCampaignStep(
         campaignIdx,
-        "influencer",
+        "creator",
         draftWith((draft) => {
-          draft.influencer.platform = "INSTAGRAM";
+          draft.creator.platform = "INSTAGRAM";
         }),
       ),
     );
@@ -234,7 +237,7 @@ describe("단계별 수정", () => {
     ).toBe("NOT_EDITABLE");
   });
 
-  it("반려 중에는 유형·부가서비스·인원·리워드·정책 동의를 바꿀 수 없고, 같은 값은 저장된다", async () => {
+  it("반려 중에는 유형·부가서비스·인원·리워드를 바꿀 수 없고, 같은 값은 저장된다", async () => {
     const { draft } = await fetchCampaignDetail(REJECTED_IDX);
 
     await saveCampaignStep(REJECTED_IDX, "addOns", draft);
@@ -253,7 +256,6 @@ describe("단계별 수정", () => {
         ...draft,
         conditions: { ...draft.conditions, headcount: 99 },
       }),
-      saveCampaignStep(REJECTED_IDX, "policy", draft),
     ];
     for (const request of locked) {
       expect(await readReason(request)).toBe("LOCKED_FIELD");
@@ -274,7 +276,7 @@ describe("이전 캠페인 불러오기", () => {
     expect(copied.stage).toBe("DRAFT");
     expect(copied.payment).toBeNull();
     expect(copied.draft.product).toEqual(source.draft.product);
-    expect(copied.draft.influencer).toEqual(source.draft.influencer);
+    expect(copied.draft.creator).toEqual(source.draft.creator);
     expect(copied.draft.policy).toEqual(createEmptyDraft().policy);
   });
 
@@ -316,5 +318,138 @@ describe("브랜드 삭제와 캠페인", () => {
     expect(draftCampaign.draft.info.brandIdx).toBeNull();
     expect(draftCampaign.brand).toBeNull();
     expect(paidCampaign.brand?.name).toBe("초록숲");
+  });
+});
+
+describe("결제", () => {
+  const AGREED = {
+    service: true,
+    privacy: true,
+    operation: true,
+    reward: true,
+  };
+
+  it("동의가 하나라도 빠지면 400 POLICY_NOT_AGREED이고 상태가 바뀌지 않는다", async () => {
+    const campaignIdx = await createPickCampaign();
+
+    const reason = await readReason(
+      payCampaign(campaignIdx, {
+        expectedTotalAmount: 0,
+        agreements: { ...AGREED, reward: false },
+      }),
+    );
+
+    expect(reason).toBe("POLICY_NOT_AGREED");
+    expect((await fetchCampaignDetail(campaignIdx)).stage).toBe("DRAFT");
+  });
+
+  it("보낸 총액이 계산과 다르면 409 AMOUNT_CHANGED이다", async () => {
+    const campaignIdx = await createPickCampaign();
+
+    const reason = await readReason(
+      payCampaign(campaignIdx, {
+        expectedTotalAmount: 10_000,
+        agreements: AGREED,
+      }),
+    );
+
+    expect(reason).toBe("AMOUNT_CHANGED");
+  });
+
+  it("포스팅가이드를 고르면 부가세를 포함한 11,000원을 결제하고 동의를 기록한다", async () => {
+    const campaignIdx = await createPickCampaign();
+    await saveCampaignStep(
+      campaignIdx,
+      "addOns",
+      draftWith((draft) => {
+        draft.addOns = ["POSTING_GUIDE"];
+      }),
+    );
+
+    const paid = await payCampaign(campaignIdx, {
+      expectedTotalAmount: 11_000,
+      agreements: AGREED,
+    });
+    const detail = await fetchCampaignDetail(campaignIdx);
+
+    expect(paid.paidAmount).toBe(11_000);
+    expect(detail.stage).toBe("REVIEWING");
+    expect(detail.payment?.paidAmount).toBe(11_000);
+    expect(detail.draft.policy).toEqual(AGREED);
+  });
+
+  it("포스팅가이드를 고르지 않으면 0원이어도 승인 요청으로 결제된다", async () => {
+    const campaignIdx = await createPickCampaign();
+
+    const paid = await payCampaign(campaignIdx, {
+      expectedTotalAmount: 0,
+      agreements: AGREED,
+    });
+
+    expect(paid.status).toBe("REVIEWING");
+    expect(paid.paidAmount).toBe(0);
+  });
+});
+
+describe("반려 뒤 재승인 요청", () => {
+  const AGREED = {
+    service: true,
+    privacy: true,
+    operation: true,
+    reward: true,
+  };
+
+  async function rejectPickReviewing() {
+    await reviewCampaignForDev(PICK_REVIEWING_IDX, {
+      type: "reject",
+      reason: "금액 확인",
+    });
+  }
+
+  it("반려하면 서버처럼 정책 동의 기록이 지워진다", async () => {
+    await rejectPickReviewing();
+
+    const detail = await fetchCampaignDetail(PICK_REVIEWING_IDX);
+
+    expect(detail.stage).toBe("REJECTED");
+    expect(detail.draft.policy).toEqual({
+      service: false,
+      privacy: false,
+      operation: false,
+      reward: false,
+    });
+  });
+
+  it("동의가 하나라도 빠지면 400 POLICY_NOT_AGREED이고 반려 상태가 그대로다", async () => {
+    await rejectPickReviewing();
+
+    const reason = await readReason(
+      requestCampaignReapproval(PICK_REVIEWING_IDX, {
+        ...AGREED,
+        reward: false,
+      }),
+    );
+
+    expect(reason).toBe("POLICY_NOT_AGREED");
+    expect((await fetchCampaignDetail(PICK_REVIEWING_IDX)).stage).toBe(
+      "REJECTED",
+    );
+  });
+
+  it("동의를 다시 보내면 승인 검토중이 되고 동의를 기록하며 반려 사유를 지운다", async () => {
+    await rejectPickReviewing();
+
+    await requestCampaignReapproval(PICK_REVIEWING_IDX, AGREED);
+    const detail = await fetchCampaignDetail(PICK_REVIEWING_IDX);
+
+    expect(detail.stage).toBe("REVIEWING");
+    expect(detail.draft.policy).toEqual(AGREED);
+    expect(detail.rejectReason).toBeNull();
+  });
+
+  it("반려가 아닌 캠페인은 409 NOT_REQUESTABLE이다", async () => {
+    expect(
+      await readReason(requestCampaignReapproval(PICK_REVIEWING_IDX, AGREED)),
+    ).toBe("NOT_REQUESTABLE");
   });
 });

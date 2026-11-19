@@ -39,7 +39,7 @@ interface BuyerConversationProps {
   myAvatarSrc?: string;
 }
 
-/** 대화 영역의 메시지 부분. 구매자·인플루언서 문의는 상대↔광고주 스레드, 상품·캠페인 Q&A는 질문과 답변. */
+/** 대화 영역의 메시지 부분. 구매자·크리에이터 문의는 상대↔광고주 스레드, 상품·캠페인 Q&A는 질문과 답변. */
 export function BuyerConversation({
   inquiry,
   isOtherDevice = false,
@@ -78,10 +78,11 @@ function PurchaserConversation({
     isError,
     mutate,
     markDeleted,
+    realtimeFinishedAt,
   } = usePurchaserConversation(inquiry);
-  // 임시: 인플루언서 앱이 읽음을 서버에 알리지 않아 상대가 뒤에 답한 내 메시지를 읽은 것으로 봄(백엔드 확인 대기, 지울 때는 이 줄과 함수).
+  // 임시: 크리에이터 앱이 읽음을 서버에 알리지 않아 상대가 뒤에 답한 내 메시지를 읽은 것으로 봄(백엔드 확인 대기, 지울 때는 이 줄과 함수).
   const messages =
-    inquiry.source === "influencer" && fetchedMessages
+    inquiry.source === "creator" && fetchedMessages
       ? markReadByLaterReply(fetchedMessages)
       : fetchedMessages;
   const writerName = inquiry.writerName ?? t("unknownWriter");
@@ -92,11 +93,7 @@ function PurchaserConversation({
     messages !== undefined,
     onRead,
   );
-  // 인플루언서 문의에만 실시간 상담의 시작·종료 줄을 끼움(사용자 요청 2026-11-09). 구매자 문의에도 쓸지는 미정.
-  const realtimeLines = useRealtimeSessionLines(
-    inquiry,
-    inquiry.source === "influencer",
-  );
+  const realtimeLines = useRealtimeSessionLines(inquiry, realtimeFinishedAt);
   const shownMessages = messages
     ? insertRealtimeLines(messages, realtimeLines, {
         start: t("realtime.started"),

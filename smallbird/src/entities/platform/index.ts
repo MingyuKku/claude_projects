@@ -1,2 +1,2 @@
-export { INFLUENCER_PLATFORMS, isInfluencerPlatform } from "./model/platforms";
-export type { InfluencerPlatform } from "./model/platforms";
+export { CREATOR_PLATFORMS, isCreatorPlatform } from "./model/platforms";
+export type { CreatorPlatform } from "./model/platforms";

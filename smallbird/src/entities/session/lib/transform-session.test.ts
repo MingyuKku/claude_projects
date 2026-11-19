@@ -18,12 +18,12 @@ const base: Session = {
 
 const ALL_TRUE = {
   campaign: true,
-  influencerMatching: true,
-  influencerMarket: true,
+  creatorMatching: true,
+  creatorMarket: true,
   commerce: true,
   bigbirdMoney: true,
   purchaserQuestion: true,
-  influencerQuestion: true,
+  creatorQuestion: true,
 };
 
 describe("transformSessionToViewModel", () => {
@@ -82,12 +82,12 @@ describe("transformSessionToViewModel", () => {
     });
     expect(vm.permissions).toEqual({
       campaign: false,
-      influencerMatching: true,
-      influencerMarket: false,
+      creatorMatching: true,
+      creatorMarket: false,
       commerce: false,
       bigbirdMoney: true,
       purchaserQuestion: false,
-      influencerQuestion: false,
+      creatorQuestion: false,
     });
   });
 

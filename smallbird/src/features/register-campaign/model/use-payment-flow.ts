@@ -13,6 +13,8 @@ import {
   getCampaignDetailPath,
   payCampaign,
   readCampaignPaymentError,
+  requestCampaignReapproval,
+  toDraftStep,
 } from "@/entities/campaign";
 import { useTranslation } from "@/shared/i18n";
 
@@ -33,7 +35,9 @@ export type PaymentDialog =
   | { type: "invalidStartDate" }
   | { type: "subscriptionRequired" }
   /** 데모 "완료" 확인. 확인하면 저장 후 작성 완료 요청. */
-  | { type: "demoConfirm" };
+  | { type: "demoConfirm" }
+  /** 반려 뒤 재승인 요청을 보냄. 확인하면 등록 내역으로 감. */
+  | { type: "reapprovalCompleted" };
 
 /** 충전 영역(잔액 부족 알럿의 "확인"이 스크롤·포커스할 곳). */
 export const CHARGE_AREA_ID = "register-charge-area";
@@ -43,7 +47,8 @@ function toRegisterStep(
   serverStep: string,
   steps: readonly RegisterStepDefinition[],
 ): CampaignRegisterStep | null {
-  const draftStep = serverStep === "add-ons" ? "addOns" : serverStep;
+  const draftStep = toDraftStep(serverStep);
+  if (draftStep === null) return null;
   return (
     steps.find(({ step }) => DRAFT_STEP_BY_REGISTER_STEP[step] === draftStep)
       ?.step ?? null
@@ -53,6 +58,7 @@ function toRegisterStep(
 /**
  * 8단계 "결제하기". 모든 단계 검사 → 잔액 확인 → 저장 → 결제 순서이고,
  * 결과는 알럿으로 알림. 결제 완료가 곧 승인 요청이라 "확인"을 누르면 등록 내역으로 감(기록을 남기지 않음).
+ * 반려 뒤 수정 모드의 마지막 단계는 결제 없이 같은 위치에서 재승인을 요청함(`requestReapproval`).
  */
 export function usePaymentFlow(steps: readonly RegisterStepDefinition[]) {
   const { t } = useTranslation("features/register-campaign");
@@ -112,7 +118,7 @@ export function usePaymentFlow(steps: readonly RegisterStepDefinition[]) {
         return;
       }
       default:
-        // AMOUNT_CHANGED는 프론트 금액을 저장된 초안으로 계산해서 단가가 바뀐 경우뿐이라 실패로 알림.
+        // 금액은 저장된 초안으로 계산하므로 AMOUNT_CHANGED는 단가가 바뀐 경우뿐이라 실패로 알림.
         setDialog({ type: "failed" });
     }
   }
@@ -142,7 +148,10 @@ export function usePaymentFlow(steps: readonly RegisterStepDefinition[]) {
       handleFailedSave(saved);
       return;
     }
-    const [error] = await tryit(payCampaign)(campaignIdx, totalAmount);
+    const [error] = await tryit(payCampaign)(campaignIdx, {
+      expectedTotalAmount: totalAmount,
+      agreements: draft.policy,
+    });
     setIsPaying(false);
     if (error) {
       await handleFailedPayment(error);
@@ -180,10 +189,53 @@ export function usePaymentFlow(steps: readonly RegisterStepDefinition[]) {
     leaveToDetail();
   }
 
+  /**
+   * 반려 뒤 수정 모드의 마지막 단계 "재승인 요청". 결제·환불 없이 저장한 뒤 7단계에서 다시 받은 동의와 함께 요청함.
+   * 동의가 화면 상태에만 있어 등록 내역으로 나가기 전에 여기서 보냄.
+   */
+  async function requestReapproval() {
+    if (isPaying) return;
+    const { draft, campaignIdx } = store.getState();
+    const firstIncomplete = getFirstIncompleteStep(steps, draft);
+    if (firstIncomplete !== "payment") {
+      setDialog({ type: "required", targetStep: firstIncomplete });
+      return;
+    }
+    setIsPaying(true);
+    const saved = await saver.save();
+    if (!saved.ok) {
+      setIsPaying(false);
+      handleFailedSave(saved);
+      return;
+    }
+    const [error] = await tryit(requestCampaignReapproval)(
+      campaignIdx,
+      draft.policy,
+    );
+    setIsPaying(false);
+    if (!error) {
+      setDialog({ type: "reapprovalCompleted" });
+      return;
+    }
+    const reason = readCampaignPaymentError(error)?.reason;
+    if (
+      reason === "INCOMPLETE_DRAFT" ||
+      reason === "POLICY_NOT_AGREED" ||
+      reason === "INVALID_START_DATE"
+    ) {
+      await handleFailedPayment(error);
+      return;
+    }
+    toast.error(t("toast.requestFailed"));
+    // 그사이 상태가 바뀌었으면(NOT_REQUESTABLE) 등록 내역이 새 상태를 보여 줌.
+    if (reason === "NOT_REQUESTABLE") leaveToDetail();
+  }
+
   return {
     dialog,
     isPaying,
     pay,
+    requestReapproval,
     completeDemo,
     closeDialog: () => setDialog(null),
     leaveToDetail,

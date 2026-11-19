@@ -36,7 +36,58 @@ const file = (overrides: Partial<InquiryMessageViewModel> = {}) =>
     ...overrides,
   });
 
+describe("groupAttachments: 첨부 body 판정", () => {
+  it.each([
+    "https://cdn/a.png",
+    "//cdn/a.png",
+    "/upload/a.png",
+    "upload/a.png",
+    "blob:https://biz.bigbird.co.kr/1234",
+    "data:image/png;base64,AAAA",
+  ])("파일 주소 %s는 글로 보지 않는다", (body) => {
+    const rows = groupAttachments([file({ body })]);
+    expect(rows[0]).toMatchObject({ type: "files", text: null });
+  });
+
+  it.each(["출금 요청이 접수되었습니다.", "Note: thanks", "감사합니다"])(
+    "글 %s는 말풍선으로 쓴다",
+    (body) => {
+      const rows = groupAttachments([file({ body })]);
+      const [row] = rows;
+      // 한 단어짜리 글은 주소와 구분되지 않지만 `/`가 없어 글로 봄.
+      expect(row?.type === "files" && row.text?.body).toBe(body);
+    },
+  );
+});
+
 describe("groupAttachments", () => {
+  it("글과 첨부를 한 메시지로 저장한 첨부(body가 글)는 그 글을 말풍선으로 쓰고 첨부를 아래에 붙인다", () => {
+    const rows = groupAttachments([
+      file({
+        body: "출금 요청이 접수되었습니다.",
+        attachment: {
+          attachmentIdx: 2870,
+          fileName: "통장.jpeg",
+          fileSize: null,
+          fileType: "image/jpeg",
+        },
+      }),
+    ]);
+    expect(rows).toHaveLength(1);
+    const row = rows[0];
+    // 첨부가 달린 메시지의 글은 수정·삭제 대상이 아니라서 임시 id(≤ 0)를 씀.
+    expect(row?.type === "files" && row.text && row.text.id <= 0).toBe(true);
+    expect(row).toMatchObject({
+      type: "files",
+      text: {
+        kind: "text",
+        body: "출금 요청이 접수되었습니다.",
+        attachment: null,
+      },
+      messages: [{ attachment: { attachmentIdx: 2870 } }],
+    });
+  });
+
   it("같은 쪽이 연달아 보낸 첨부는 한 줄로 묶는다", () => {
     const rows = groupAttachments([file(), file(), file()]);
     expect(rows.map((row) => row.type)).toEqual(["files"]);

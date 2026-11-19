@@ -50,22 +50,6 @@ function requireSessionRoute(
   };
 }
 
-// 캠페인 화면은 API가 나오기 전이라 stage·prod 빌드에서는 준비 중 화면임. 개발 서버에서는 목으로 동작하는 화면을 아래에서 엶.
-const CAMPAIGN_COMING_SOON_PATHS = [
-  ROUTES.campaign,
-  ROUTES.campaignCreate,
-  ROUTES.campaignRegister,
-  ROUTES.campaignRegisterEdit,
-  ROUTES.campaignDetail,
-];
-
-function comingSoonPage(path: string) {
-  return page(
-    path,
-    async () => (await import("@/pages/coming-soon")).ComingSoonPage,
-  );
-}
-
 export const routes: RouteObject[] = [
   {
     path: ROUTES.home,
@@ -87,12 +71,9 @@ export const routes: RouteObject[] = [
             }),
           },
           page(
-            ROUTES.influencerSearch,
+            ROUTES.creatorSearch,
             async () => (await import("@/pages/coming-soon")).ComingSoonPage,
           ),
-          ...(import.meta.env.DEV
-            ? []
-            : CAMPAIGN_COMING_SOON_PATHS.map(comingSoonPage)),
         ],
       },
       page(ROUTES.introduction, async () => {
@@ -121,43 +102,37 @@ export const routes: RouteObject[] = [
       ]),
 
       // 캠페인 현황·개설·등록. Sub ID 차단은 세션 middleware가 맡음.
-      ...(import.meta.env.DEV
-        ? [
-            requireSessionRoute(CampaignLayout, [
-              page(
-                ROUTES.campaign,
-                async () =>
-                  (await import("@/pages/campaign-status")).CampaignStatusPage,
-              ),
-              page(
-                ROUTES.campaignCreate,
-                async () =>
-                  (await import("@/pages/campaign-create")).CampaignCreatePage,
-              ),
-            ]),
-            // 등록 마법사는 LNB 없이 FocusShell을 화면이 직접 그림.
-            requireSessionRoute(SessionLayout, [
-              page(
-                ROUTES.campaignRegister,
-                async () =>
-                  (await import("@/pages/campaign-register"))
-                    .CampaignRegisterEntryPage,
-              ),
-              page(
-                ROUTES.campaignRegisterEdit,
-                async () =>
-                  (await import("@/pages/campaign-register"))
-                    .CampaignRegisterPage,
-              ),
-              page(
-                ROUTES.campaignDetail,
-                async () =>
-                  (await import("@/pages/campaign-register"))
-                    .CampaignDetailPage,
-              ),
-            ]),
-          ]
-        : []),
+      requireSessionRoute(CampaignLayout, [
+        page(
+          ROUTES.campaign,
+          async () =>
+            (await import("@/pages/campaign-status")).CampaignStatusPage,
+        ),
+        page(
+          ROUTES.campaignCreate,
+          async () =>
+            (await import("@/pages/campaign-create")).CampaignCreatePage,
+        ),
+      ]),
+      // 등록 마법사는 LNB 없이 FocusShell을 화면이 직접 그림.
+      requireSessionRoute(SessionLayout, [
+        page(
+          ROUTES.campaignRegister,
+          async () =>
+            (await import("@/pages/campaign-register"))
+              .CampaignRegisterEntryPage,
+        ),
+        page(
+          ROUTES.campaignRegisterEdit,
+          async () =>
+            (await import("@/pages/campaign-register")).CampaignRegisterPage,
+        ),
+        page(
+          ROUTES.campaignDetail,
+          async () =>
+            (await import("@/pages/campaign-register")).CampaignDetailPage,
+        ),
+      ]),
 
       requireSessionRoute(AuthenticatedLayout, [
         page(
@@ -179,10 +154,10 @@ export const routes: RouteObject[] = [
               .CustomerCenterBuyerPage,
         ),
         page(
-          ROUTES.customerCenterInfluencerThread,
+          ROUTES.customerCenterCreatorThread,
           async () =>
             (await import("@/pages/customer-center-buyer"))
-              .CustomerCenterInfluencerPage,
+              .CustomerCenterCreatorPage,
         ),
       ]),
 

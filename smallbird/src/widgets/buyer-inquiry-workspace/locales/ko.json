@@ -6,13 +6,14 @@
   "done": "답변 완료",
   "status": {
     "consulting": "실시간 상담 중",
+    "requested": "상담 요청 중",
     "waiting": "답변 대기",
     "done": "답변 완료"
   },
   "source": {
     "purchaser": "구매자 문의",
     "qna": "상품 Q&A",
-    "influencer": "인플루언서 문의",
+    "creator": "크리에이터 문의",
     "campaignQna": "캠페인 Q&A"
   },
   "empty": "문의사항이 존재하지 않습니다.",
@@ -34,11 +35,11 @@
     "source": "문의 유형",
     "campaign": "캠페인",
     "campaignPlaceholder": "캠페인을 선택하세요.",
-    "influencer": "인플루언서",
-    "influencerPlaceholder": "인플루언서를 선택하세요.",
-    "influencerSearchPlaceholder": "인플루언서를 검색하세요.",
+    "creator": "크리에이터",
+    "creatorPlaceholder": "크리에이터를 선택하세요.",
+    "creatorSearchPlaceholder": "크리에이터를 검색하세요.",
     "campaignFallback": "캠페인 {{idx}}",
-    "influencerFallback": "인플루언서 {{idx}}",
+    "creatorFallback": "크리에이터 {{idx}}",
     "removeChip": "{{name}} 조건 해제",
     "registrationDate": "등록일",
     "datePlaceholder": "날짜를 선택하세요.",
@@ -49,7 +50,7 @@
       "ALL": "전체",
       "PURCHASER_QUESTION": "구매자 문의",
       "PRODUCT_QNA": "상품 Q&A",
-      "INFLUENCER_QUESTION": "인플루언서 문의",
+      "INFLUENCER_QUESTION": "크리에이터 문의",
       "CAMPAIGN_QNA": "캠페인 Q&A"
     }
   },
@@ -62,7 +63,7 @@
   "period": "진행 기간",
   "campaignCode": "캠페인 코드",
   "shopCode": "공구샵 코드",
-  "influencer": "공구 진행 인플루언서",
+  "creator": "공구 진행 크리에이터",
   "campaignShortcut": "캠페인 바로가기",
   "detailError": "상세 정보를 불러오지 못했습니다.",
   "copied": "클립보드에 복사가 완료되었습니다.",

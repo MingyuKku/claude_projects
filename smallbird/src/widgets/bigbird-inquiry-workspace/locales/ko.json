@@ -5,6 +5,7 @@
   "waiting": "답변 대기",
   "consulting": "상담 중",
   "consultingBadge": "실시간 상담중",
+  "requestedBadge": "상담 요청 중",
   "done": "답변 완료",
   "empty": {
     "title": "문의사항이 존재하지 않습니다.",
@@ -14,7 +15,8 @@
   "inquiryTitle": {
     "campaign": "{{name}} 문의",
     "campaignUnknown": "캠페인 문의",
-    "other": "기타 문의"
+    "other": "기타 문의",
+    "withdrawal": "빅버드 머니 출금 문의"
   },
   "bigbirdManager": "빅버드 담당자",
   "completed": {

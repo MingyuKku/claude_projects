@@ -1,7 +1,7 @@
 import { AddOnsStep } from "./steps/add-ons/AddOnsStep";
 import { CampaignInfoStep } from "./steps/campaign-info/CampaignInfoStep";
 import { ConditionsStep } from "./steps/conditions/ConditionsStep";
-import { InfluencerStep } from "./steps/influencer/InfluencerStep";
+import { CreatorStep } from "./steps/creator/CreatorStep";
 import { IntroStep } from "./steps/intro/IntroStep";
 import { PaymentStep } from "./steps/payment/PaymentStep";
 import { PolicyStep } from "./steps/policy/PolicyStep";
@@ -22,8 +22,8 @@ export function RegisterStepBody({ step, chargeSlot }: RegisterStepBodyProps) {
       return <CampaignInfoStep />;
     case "product":
       return <ProductStep />;
-    case "influencer":
-      return <InfluencerStep />;
+    case "creator":
+      return <CreatorStep />;
     case "add-ons":
       return <AddOnsStep />;
     case "intro":

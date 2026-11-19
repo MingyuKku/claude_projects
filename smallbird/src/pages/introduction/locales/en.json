@@ -1,9 +1,9 @@
 {
   "seo": {
-    "title": "Bigbird — Influencer marketing, now more accurate with data",
-    "description": "Bigbird matches influencers to your product and campaign goals, covering everything from content execution to monitoring and performance analysis.",
+    "title": "Bigbird — Creator marketing, now more accurate with data",
+    "description": "Bigbird matches creators to your product and campaign goals, covering everything from content execution to monitoring and performance analysis.",
     "siteName": "Bigbird",
-    "ogImageAlt": "From matching to collaboration, work with influencers easily"
+    "ogImageAlt": "From matching to collaboration, work with creators easily"
   },
   "header": {
     "guide": "Guide",
@@ -11,7 +11,7 @@
   },
   "hero": {
     "title": {
-      "line1": "Influencer marketing,",
+      "line1": "Creator marketing,",
       "line2": "start smarter",
       "line3": "with data"
     },
@@ -20,16 +20,16 @@
     "downloadName": "빅버드 서비스 소개서.pdf"
   },
   "section1": {
-    "title": "The advertiser-only marketing platform\nconnecting brands and influencers",
-    "description": "Bigbird matches influencers to your product and campaign goals, covering everything from content execution to monitoring and performance analysis.",
+    "title": "The advertiser-only marketing platform\nconnecting brands and creators",
+    "description": "Bigbird matches creators to your product and campaign goals, covering everything from content execution to monitoring and performance analysis.",
     "cards": {
       "advertiser": {
         "title": "Advertiser platform",
-        "description": "Manage campaign requests, influencer selection,\ncampaign status and performance analysis."
+        "description": "Manage campaign requests, creator selection,\ncampaign status and performance analysis."
       },
-      "influencer": {
-        "title": "Influencer platform",
-        "description": "Influencers join campaigns\nand create and register content."
+      "creator": {
+        "title": "Creator platform",
+        "description": "Creators join campaigns\nand create and register content."
       },
       "buyer": {
         "title": "Buyer platform",
@@ -40,36 +40,36 @@
   "section2": {
     "awardsAlt": "2015 SMBA Commissioner's Award, KIPO patent registration",
     "title": "Leading brands and institutions chose Bigbird",
-    "description": "Backed by major brand collaborations and results, we deliver trusted influencer marketing.",
+    "description": "Backed by major brand collaborations and results, we deliver trusted creator marketing.",
     "partners": {
-      "samsung": "Samsung Electronics Mobile Division influencer marketing\n'삼성피켓' co-business selected",
+      "samsung": "Samsung Electronics Mobile Division creator marketing\n'삼성피켓' co-business selected",
       "aws": "2020 Startup Leap Package\nAmazon final selection",
       "google": "2020 Startup Leap Package\nGoogle final selection"
     }
   },
   "section3": {
     "title": "Many brands have worked with Bigbird",
-    "description": "Bigbird has run influencer marketing for brand campaigns, group buying, live commerce and consumer data analysis, tailored to each advertising goal.",
+    "description": "Bigbird has run creator marketing for brand campaigns, group buying, live commerce and consumer data analysis, tailored to each advertising goal.",
     "brandsLabel": "Brands that worked with Bigbird"
   },
   "section4": {
-    "title": "Manage everything influencer marketing needs\n<accent>in one place</accent>",
-    "description": "Find influencers that fit your campaign, and easily manage every step\nfrom SNS channel execution to performance review.",
+    "title": "Manage everything creator marketing needs\n<accent>in one place</accent>",
+    "description": "Find creators that fit your campaign, and easily manage every step\nfrom SNS channel execution to performance review.",
     "cards": {
       "authentic": {
-        "label": "Authentic influencer matching",
-        "title": "Find authentic influencers,\nnot just follower counts",
-        "description": "Beyond follower counts, we analyze content engagement and influence to find influencers that fit your product"
+        "label": "Authentic creator matching",
+        "title": "Find authentic creators,\nnot just follower counts",
+        "description": "Beyond follower counts, we analyze content engagement and influence to find creators that fit your product"
       },
       "target": {
-        "label": "Target influencer analysis",
+        "label": "Target creator analysis",
         "title": "Find more finely segmented\ntargets for your product",
-        "description": "Analyze influencers by primary and secondary categories to find target influencer groups that suit your product"
+        "description": "Analyze creators by primary and secondary categories to find target creator groups that suit your product"
       },
       "evaluation": {
-        "label": "Influencer evaluation by campaign type",
-        "title": "Evaluate influencers\nfor your campaign goal",
-        "description": "Evaluate and select suitable influencers by campaign goal, such as brand awareness, group buying and live commerce"
+        "label": "Creator evaluation by campaign type",
+        "title": "Evaluate creators\nfor your campaign goal",
+        "description": "Evaluate and select suitable creators by campaign goal, such as brand awareness, group buying and live commerce"
       },
       "channel": {
         "label": "Campaign execution by SNS channel",
@@ -77,9 +77,9 @@
         "description": "Run marketing on channels that fit your campaign goal, including Instagram, Naver Blog, Facebook, YouTube and TikTok"
       },
       "global": {
-        "label": "Global influencer platform",
-        "title": "Beyond Korea,\nconnect with global influencers",
-        "description": "Based on language analysis by country and influencer data, expand into overseas influencer marketing"
+        "label": "Global creator platform",
+        "title": "Beyond Korea,\nconnect with global creators",
+        "description": "Based on language analysis by country and creator data, expand into overseas creator marketing"
       }
     }
   },
@@ -90,34 +90,34 @@
       "brand": {
         "badge": "브랜드형",
         "title": "Raise brand awareness and\ncreate natural buzz",
-        "description": "We match influencers to your product\nto run brand content and viral issue campaigns",
+        "description": "We match creators to your product\nto run brand content and viral issue campaigns",
         "items": {
           "basic": {
             "title": "베이직형",
-            "description": "Run diffusion-type viral campaigns with many influencers at a reasonable cost"
+            "description": "Run diffusion-type viral campaigns with many creators at a reasonable cost"
           },
           "premium": {
             "title": "프리미엄형",
-            "description": "Run premium branding campaigns with authentic influencers who cause little ad fatigue"
+            "description": "Run premium branding campaigns with authentic creators who cause little ad fatigue"
           }
         }
       },
       "groupBuy": {
         "badge": "공구형",
-        "title": "Use influencer fandom to\nlead to purchases",
-        "description": "Run group buying, open market and live commerce with influencers whose followers are likely to buy",
+        "title": "Use creator fandom to\nlead to purchases",
+        "description": "Run group buying, open market and live commerce with creators whose followers are likely to buy",
         "items": {
           "openMarket": {
             "title": "오픈마켓형",
-            "description": "Run group buying with many influencers, and connect payment and sales management through the buyer platform"
+            "description": "Run group buying with many creators, and connect payment and sales management through the buyer platform"
           },
           "performance": {
             "title": "퍼포먼스형",
-            "description": "Run purchase-focused group-buying campaigns with influencers who have loyal followers likely to buy"
+            "description": "Run purchase-focused group-buying campaigns with creators who have loyal followers likely to buy"
           },
           "liveCommerce": {
             "title": "라이브커머스형",
-            "description": "Through influencer live broadcasts, connect product reviews, real-time engagement and purchase conversion"
+            "description": "Through creator live broadcasts, connect product reviews, real-time engagement and purchase conversion"
           }
         }
       }
@@ -143,8 +143,8 @@
             "description": "Analysis of the main Galaxy Tab user base and the consumer types most likely to buy"
           },
           "matching": {
-            "title": "Target influencer matching",
-            "description": "Matching target influencers whose followers include the main users most likely to buy"
+            "title": "Target creator matching",
+            "description": "Matching target creators whose followers include the main users most likely to buy"
           }
         }
       },
@@ -152,28 +152,28 @@
         "heading": "공구형 campaign cases",
         "cards": {
           "collect": {
-            "title": "Collecting target influencers",
+            "title": "Collecting target creators",
             "description": "Collecting big data on group-buying hashtags and keywords by SNS channel"
           },
           "select": {
-            "title": "Influencer selection by advertiser",
-            "description": "Matching the best AI-based influencers for the advertiser's product type"
+            "title": "Creator selection by advertiser",
+            "description": "Matching the best AI-based creators for the advertiser's product type"
           },
           "explore": {
             "title": "Finding loyal buyers",
-            "description": "Marketing through influencers with a devoted fan base drives high sales efficiency"
+            "description": "Marketing through creators with a devoted fan base drives high sales efficiency"
           },
           "purchase": {
             "title": "Running group buying",
-            "description": "Running influencer live commerce and influencer group buying"
+            "description": "Running creator live commerce and creator group buying"
           }
         }
       }
     }
   },
   "banner": {
-    "title": "Looking for influencers that fit your brand?",
-    "description": "We recommend influencers for your brand goals and product"
+    "title": "Looking for creators that fit your brand?",
+    "description": "We recommend creators for your brand goals and product"
   },
   "contact": {
     "title": "Adoption inquiry",

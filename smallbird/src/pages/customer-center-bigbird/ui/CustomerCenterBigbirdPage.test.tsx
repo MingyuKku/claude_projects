@@ -10,6 +10,8 @@ import {
 
 import { CustomerCenterBigbirdPage } from "./CustomerCenterBigbirdPage";
 
+import type * as InquiryEntity from "@/entities/inquiry";
+
 const mocks = vi.hoisted(() => ({
   isDesktop: true,
   useRealtimeConversation: vi.fn(),
@@ -20,7 +22,10 @@ const inquiries = [
   { threadIdx: 102, status: "done", isRealtime: true },
 ];
 
-vi.mock("@/entities/inquiry", () => ({
+vi.mock("@/entities/inquiry", async (importOriginal) => ({
+  // 상태 탭 판정은 실제 구현을 씀(탭 필터가 목록·자동 선택에 그대로 걸리게).
+  matchesInquiryStatusFilter: (await importOriginal<typeof InquiryEntity>())
+    .matchesInquiryStatusFilter,
   useBigbirdInquiries: () => ({
     inquiries,
     isLoading: false,

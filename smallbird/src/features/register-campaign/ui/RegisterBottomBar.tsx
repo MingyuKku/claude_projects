@@ -22,17 +22,23 @@ interface DefaultBarProps {
   onClickNext: () => void;
 }
 
-/** 반려 뒤 수정 모드: "다음" 하나(저장 후 등록 내역으로). */
+/** 반려 뒤 수정 모드: 임시저장 없이 "이전·다음"이고, 마지막(결제) 단계는 "다음" 자리에 "재승인 요청". */
 interface RevisionBarProps {
   variant: "revision";
   preview: RegisterPreviewButtonState | null;
+  hasPrevious: boolean;
+  isLastStep: boolean;
+  /** 재승인 요청 중이면 "재승인 요청"을 막음(다시 누를 수 없게). */
+  isRequesting: boolean;
+  onClickPrevious: () => void;
   onClickNext: () => void;
 }
 
 type RegisterBottomBarProps = DefaultBarProps | RevisionBarProps;
 
 function getNextLabelKey(props: RegisterBottomBarProps) {
-  if (props.variant === "revision" || !props.isLastStep) return "action.next";
+  if (!props.isLastStep) return "action.next";
+  if (props.variant === "revision") return "detail.requestReapproval";
   return props.isDemo ? "action.complete" : "action.pay";
 }
 
@@ -41,6 +47,7 @@ export function RegisterBottomBar(props: RegisterBottomBarProps) {
   const { t } = useTranslation("features/register-campaign");
   const { preview } = props;
   const isDefault = props.variant === "default";
+  const isBusy = isDefault ? props.isPaying : props.isRequesting;
   const nextLabelKey = getNextLabelKey(props);
 
   return (
@@ -63,7 +70,7 @@ export function RegisterBottomBar(props: RegisterBottomBarProps) {
           {t("action.saveDraft")}
         </Button>
       )}
-      {isDefault && props.hasPrevious && (
+      {props.hasPrevious && (
         <Button
           variant="outline"
           className="flex-1 tablet:flex-none"
@@ -75,12 +82,15 @@ export function RegisterBottomBar(props: RegisterBottomBarProps) {
       )}
       <Button
         className="flex-1 tablet:flex-none"
-        disabled={isDefault && props.isPaying}
-        aria-busy={(isDefault && props.isPaying) || undefined}
+        disabled={isBusy}
+        aria-busy={isBusy || undefined}
         onClick={props.onClickNext}
       >
         {t(nextLabelKey)}
-        {nextLabelKey !== "action.complete" && <ChevronRight aria-hidden />}
+        {nextLabelKey !== "action.complete" &&
+          nextLabelKey !== "detail.requestReapproval" && (
+            <ChevronRight aria-hidden />
+          )}
       </Button>
     </div>
   );

@@ -38,7 +38,7 @@ function wrapper({ children }: { children: ReactNode }) {
 }
 
 describe("useBuyerInquiries", () => {
-  it("구매자 메뉴는 받은 쪽이 인플루언서 행뿐이면 보일 행이 나올 때까지 다음 쪽을 이어 받는다", async () => {
+  it("구매자 메뉴는 받은 쪽이 크리에이터 행뿐이면 보일 행이 나올 때까지 다음 쪽을 이어 받는다", async () => {
     vi.mocked(serverApiV3.get).mockImplementation((_url, config) => {
       const page = (config as { params: { page: number } }).params.page;
       return Promise.resolve({
@@ -63,7 +63,7 @@ describe("useBuyerInquiries", () => {
     expect(result.current.hasMore).toBe(false);
   });
 
-  it("인플루언서 메뉴는 전용 목록을 받고 거르지 않는다", async () => {
+  it("크리에이터 메뉴는 전용 목록을 받고 거르지 않는다", async () => {
     vi.mocked(serverApiV3.get).mockResolvedValue({
       result: true,
       list: [row(4, "INFLUENCER_QUESTION"), row(5, "CAMPAIGN_QNA")],
@@ -72,14 +72,14 @@ describe("useBuyerInquiries", () => {
     const { result } = renderHook(
       () =>
         useBuyerInquiries("all", { sourceType: "ALL" }, [
-          "influencer",
+          "creator",
           "campaignQna",
         ]),
       { wrapper },
     );
     await waitFor(() =>
       expect(result.current.inquiries?.map((item) => item.key)).toEqual([
-        "influencer-4",
+        "creator-4",
         "campaignQna-5",
       ]),
     );
@@ -121,7 +121,7 @@ describe("useBuyerInquiries", () => {
             ([url]) => url === "/help/influencer-inquiry/has-updates",
           ).length;
       const { result } = renderHook(
-        () => useBuyerInquiries("all", { sourceType: "ALL" }, ["influencer"]),
+        () => useBuyerInquiries("all", { sourceType: "ALL" }, ["creator"]),
         { wrapper },
       );
       await waitFor(() => expect(result.current.inquiries).toHaveLength(1));

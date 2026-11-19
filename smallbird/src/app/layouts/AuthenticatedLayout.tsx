@@ -6,11 +6,11 @@ import { AppShell } from "@/widgets/app-shell";
 
 import type { sessionLoader } from "../router/session-middleware";
 
-// 입력창이 있는 문의 화면(빅버드·구매자·인플루언서). 가상 키보드가 입력창을 가리지 않게 키보드 대응을 켬(iOS Safari는 키보드가 레이아웃을 줄이지 않음).
+// 입력창이 있는 문의 화면(빅버드·구매자·크리에이터). 가상 키보드가 입력창을 가리지 않게 키보드 대응을 켬(iOS Safari는 키보드가 레이아웃을 줄이지 않음).
 const INQUIRY_PATH_PREFIXES: string[] = [
   ROUTES.customerCenterBigbird,
   ROUTES.customerCenterBuyer,
-  ROUTES.customerCenterInfluencer,
+  ROUTES.customerCenterCreator,
 ];
 
 // 키보드가 떠 있는 동안 본문 아래 끝이 비치는 배경. 모바일은 입력창 배경(대화 영역 bg-muted)이 본문 끝까지 차고, 태블릿 이상은 대화 영역 밖 여백(bg-background)이 끝에 닿음.

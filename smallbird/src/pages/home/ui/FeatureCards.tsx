@@ -18,11 +18,9 @@ import type { SessionViewModel } from "@/entities/session";
 // isLoginRequired 카드는 비로그인이 누르면 로그인 안내 알럿을 띄움(디자인팀 QA 2026-10-28).
 // 요금 안내는 비로그인도 볼 수 있는 구독 상품 화면으로 감(마이페이지 QA 2026-11-16).
 // isMasterOnly 카드는 Sub ID가 들어갈 수 없는 화면이라 LNB 구독 메뉴처럼 비활성(툴팁 없음).
-// 캠페인 현황은 개발 서버에서만 연결함(API가 나오면 함께 공개). 그 밖에는 목적지 없이 비활성.
-const CAMPAIGN_CARD_TARGET = import.meta.env.DEV ? ROUTES.campaign : undefined;
 const CARDS = [
-  { key: "recommend", to: ROUTES.influencerSearch, isLoginRequired: true },
-  { key: "campaign", to: CAMPAIGN_CARD_TARGET, isLoginRequired: true },
+  { key: "recommend", to: ROUTES.creatorSearch, isLoginRequired: true },
+  { key: "campaign", to: ROUTES.campaign, isLoginRequired: true },
   { key: "pricing", to: ROUTES.mypageSubscribe, isMasterOnly: true },
 ] as const;
 
@@ -51,8 +49,8 @@ interface FeatureCardsProps {
   className?: string;
 }
 
-// 카드 3개. 인플루언서 추천은 로그인하면 이동하고, 요금 안내는 비로그인·Master면 구독 화면으로 이동함(Sub ID는 비활성).
-// 캠페인 등록/운영은 대상 화면이 생길 때까지 비활성. 인플루언서 추천·캠페인 등록/운영은 비로그인이 누르면 로그인 안내 알럿을 띄움.
+// 카드 3개. 크리에이터 추천은 로그인하면 이동하고, 요금 안내는 비로그인·Master면 구독 화면으로 이동함(Sub ID는 비활성).
+// 캠페인 등록/운영은 대상 화면이 생길 때까지 비활성. 크리에이터 추천·캠페인 등록/운영은 비로그인이 누르면 로그인 안내 알럿을 띄움.
 export function FeatureCards({ session, className }: FeatureCardsProps) {
   const { t } = useTranslation("pages/home");
   const isMobile = useMediaQuery(MEDIA_QUERY.mobile);

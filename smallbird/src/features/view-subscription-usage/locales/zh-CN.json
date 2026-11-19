@@ -8,8 +8,8 @@
     "tooltip": "{{value}}次"
   },
   "quota": {
-    "search": "网红搜索次数",
-    "proposal": "网红提案次数",
+    "search": "创作者搜索次数",
+    "proposal": "创作者提案次数",
     "used": "已用",
     "remaining": "剩余"
   },
@@ -26,7 +26,7 @@
   },
   "metric": {
     "campaignCount": "广告活动创建数",
-    "searchCount": "网红搜索数",
+    "searchCount": "创作者搜索数",
     "proposalCount": "提案发送数",
     "matchCount": "匹配成功数"
   },

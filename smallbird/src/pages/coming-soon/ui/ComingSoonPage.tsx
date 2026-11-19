@@ -14,8 +14,8 @@ export function ComingSoonPage() {
   return (
     <>
       <title>{t("title")}</title>
-      {/* 인플루언서 검색 화면은 Figma 시안이 없어 헤더 제목과 LNB 활성 항목을 "인플루언서"로 임시 처리함. */}
-      <SessionAppShell session={session} activeNavId="influencerMatching">
+      {/* 크리에이터 검색 화면은 Figma 시안이 없어 헤더 제목과 LNB 활성 항목을 "크리에이터"로 임시 처리함. */}
+      <SessionAppShell session={session} activeNavId="creatorMatching">
         <div className="flex min-h-full items-center justify-center">
           <EmptyState type="construction" title={t("title")} />
         </div>

@@ -2,19 +2,19 @@
   "nav": {
     "home": "首页",
     "campaign": "广告活动",
-    "influencerMatching": "网红匹配",
-    "influencerMarket": "网红市场",
+    "creatorMatching": "创作者匹配",
+    "creatorMarket": "创作者市场",
     "commerce": "电商管理",
     "mypage": "个人中心",
     "support": "客服",
-    "search": "网红搜索",
-    "influencerManage": "网红管理",
+    "search": "创作者搜索",
+    "creatorManage": "创作者管理",
     "chat": "聊天",
     "commerceSales": "销售情况管理",
     "commerceSettlement": "广告活动结算",
     "bigbird": "Bigbird咨询",
     "buyer": "买家咨询",
-    "influencer": "网红咨询",
+    "creator": "创作者咨询",
     "subscribe": "订阅",
     "money": "Bigbird 余额",
     "account": "账号设置"
@@ -27,6 +27,15 @@
   },
   "registerCampaign": "注册广告活动",
   "guide": "使用指南",
+  "language": {
+    "label": "语言",
+    "name": {
+      "ko": "韩语",
+      "en": "英语",
+      "ja": "日语",
+      "zhCN": "中文-简体"
+    }
+  },
   "menu": {
     "main": "主菜单",
     "collapsed": "收起的菜单",
@@ -59,8 +68,8 @@
     "checkFailed": "无法确认登录状态，请重试。"
   },
   "role": {
-    "label": "切换广告主·网红",
+    "label": "切换广告主·创作者",
     "advertiser": "广告主",
-    "influencer": "网红"
+    "creator": "创作者"
   }
 }

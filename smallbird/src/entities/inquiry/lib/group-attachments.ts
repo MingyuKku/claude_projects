@@ -19,6 +19,14 @@ const isFile = (message: InquiryMessageViewModel) =>
   message.attachment !== null &&
   !message.isDeleted;
 
+// 첨부 메시지의 body는 보통 파일 주소임. 출금 요청 접수처럼 서버가 글과 첨부를 한 메시지로 저장하면 body가 글임.
+// 주소는 스킴(`https://`·`blob:`·`data:`)이나 `/`로 시작하거나, 공백 없는 상대 경로(`upload/a.png`)임.
+const FILE_URL = /^(?:[a-z][a-z0-9+.-]*:\/\/|blob:|data:|\/)|^\S+\/\S+$/i;
+
+/** 첨부 메시지의 body가 파일 주소가 아니라 같이 보낸 글인지. */
+export const hasOwnText = (message: InquiryMessageViewModel) =>
+  isFile(message) && message.body.trim() !== "" && !FILE_URL.test(message.body);
+
 const isPlainText = (message: InquiryMessageViewModel) =>
   message.kind === "text" && !message.campaign && !message.isDeleted;
 
@@ -34,6 +42,18 @@ export function groupAttachments(
   for (const message of messages) {
     if (!isFile(message)) {
       rows.push({ type: "message", id: message.id, message });
+      continue;
+    }
+    if (hasOwnText(message)) {
+      rows.push({
+        type: "files",
+        id: message.id,
+        isMine: message.isMine,
+        createdAt: message.createdAt,
+        // 첨부가 달린 메시지는 본문 수정·삭제 대상이 아니라서 임시 id(≤ 0)로 둠.
+        text: { ...message, id: -message.id, kind: "text", attachment: null },
+        messages: [message],
+      });
       continue;
     }
     const last = rows.at(-1);

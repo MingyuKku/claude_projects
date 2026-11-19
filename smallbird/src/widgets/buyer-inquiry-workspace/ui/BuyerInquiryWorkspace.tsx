@@ -96,7 +96,7 @@ export function BuyerInquiryWorkspace({
       ? {
           titlePrefix: text.brandName ?? undefined,
           title: t("card.campaignInquiry", {
-            label: [text.campaignName, text.influencerNickname]
+            label: [text.campaignName, text.creatorNickname]
               .filter(Boolean)
               .join(" "),
           }),
@@ -141,14 +141,14 @@ export function BuyerInquiryWorkspace({
   function handleRemoveCampaign() {
     setSearchParams((params) => {
       params.delete("campaignIdx");
-      params.delete("influencerThreadUserIdx");
+      params.delete("creatorThreadUserIdx");
       return params;
     });
   }
 
-  function handleRemoveInfluencer() {
+  function handleRemoveCreator() {
     setSearchParams((params) => {
-      params.delete("influencerThreadUserIdx");
+      params.delete("creatorThreadUserIdx");
       return params;
     });
   }
@@ -160,13 +160,10 @@ export function BuyerInquiryWorkspace({
       else params.delete("source");
       if (value.campaignIdx === undefined) params.delete("campaignIdx");
       else params.set("campaignIdx", String(value.campaignIdx));
-      if (value.influencerThreadUserIdx === undefined)
-        params.delete("influencerThreadUserIdx");
+      if (value.creatorThreadUserIdx === undefined)
+        params.delete("creatorThreadUserIdx");
       else
-        params.set(
-          "influencerThreadUserIdx",
-          String(value.influencerThreadUserIdx),
-        );
+        params.set("creatorThreadUserIdx", String(value.creatorThreadUserIdx));
       if (value.startDate && value.endDate) {
         params.set("startDate", value.startDate);
         params.set("endDate", value.endDate);
@@ -252,7 +249,7 @@ export function BuyerInquiryWorkspace({
               threadUserIdx={threadUserIdx}
               onRemoveSource={handleRemoveSource}
               onRemoveCampaign={handleRemoveCampaign}
-              onRemoveInfluencer={handleRemoveInfluencer}
+              onRemoveCreator={handleRemoveCreator}
             />
           )
         }
@@ -280,7 +277,10 @@ export function BuyerInquiryWorkspace({
             // 상태 배지는 항상 붙임(Figma 26/10/29 11315:50439, 사용자 결정 2026-10-30).
             badges={[
               {
-                label: t(`status.${inquiry.status}`),
+                label:
+                  inquiry.status === "unknown"
+                    ? (inquiry.statusCode ?? "")
+                    : t(`status.${inquiry.status}`),
                 variant: STATUS_BADGE_VARIANT[inquiry.status],
               },
               { label: t(`source.${inquiry.source}`), variant: "outline" },

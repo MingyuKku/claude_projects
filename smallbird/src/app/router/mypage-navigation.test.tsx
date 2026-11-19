@@ -567,14 +567,14 @@ describe("마이페이지 · 계정 설정 셸", () => {
       mockSession({ ...subSession, ...access });
     }
 
-    it("권한이 없으면 빅버드 머니·구매자 문의·인플루언서 검색이 비활성이다", async () => {
+    it("권한이 없으면 빅버드 머니·구매자 문의·크리에이터 검색이 비활성이다", async () => {
       mockPermissions({
         isBigbirdMoneyAccess: false,
         isPurchaserQuestionAccess: false,
       });
       await renderRoute(ROUTES.mypageAccount);
       await screen.findByRole("tab", { name: "Sub ID 관리" });
-      for (const name of ["빅버드 머니", "구매자 문의", "인플루언서 검색"]) {
+      for (const name of ["빅버드 머니", "구매자 문의", "크리에이터 검색"]) {
         expect(within(mainNav()).getByRole("link", { name })).toHaveAttribute(
           "aria-disabled",
           "true",
@@ -590,7 +590,7 @@ describe("마이페이지 · 계정 설정 셸", () => {
       });
       await renderRoute(ROUTES.mypageAccount);
       await screen.findByRole("tab", { name: "Sub ID 관리" });
-      for (const name of ["빅버드 머니", "구매자 문의", "인플루언서 검색"]) {
+      for (const name of ["빅버드 머니", "구매자 문의", "크리에이터 검색"]) {
         expect(
           within(mainNav()).getByRole("link", { name }),
         ).not.toHaveAttribute("aria-disabled");
@@ -697,7 +697,7 @@ describe("마이페이지 · 빅버드 머니", () => {
     id: "BC-12345678901234",
     type: "USE",
     usageDetailCode: "INFLUENCER_CONTRACT_PICK",
-    usageDetailName: "인플루언서 계약비용(PICK형)",
+    usageDetailName: "크리에이터 계약비용(PICK형)",
     usageDate: "2026-10-23 14:23:18",
     campaignName: "여름 시즌 캠핑 용품 신제품 리뷰",
     campaignCode: "CP0001",

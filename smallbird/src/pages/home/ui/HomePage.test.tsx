@@ -70,11 +70,11 @@ describe("HomePage", () => {
   it("로그인 사용자에게 히어로·검색·카드를 보여 준다", async () => {
     renderHome();
     expect(await screen.findByRole("heading", { level: 2 })).toHaveTextContent(
-      "제품 정보를 입력하면 AI가 딱 맞는 인플루언서를 찾아드려요",
+      "제품 정보를 입력하면 AI가 딱 맞는 크리에이터를 찾아드려요",
     );
     expect(
       screen.getByText(
-        "AI가 브랜드와 목표에 맞는 인플루언서를 빠르게 추천해 드립니다",
+        "AI가 브랜드와 목표에 맞는 크리에이터를 빠르게 추천해 드립니다",
       ),
     ).toBeInTheDocument();
     expect(screen.getByRole("textbox")).toBeInTheDocument();
@@ -141,15 +141,15 @@ describe("HomePage", () => {
     );
   });
 
-  it("인플루언서 추천 카드는 로그인하면 검색 화면으로 이동한다", async () => {
+  it("크리에이터 추천 카드는 로그인하면 검색 화면으로 이동한다", async () => {
     const user = userEvent.setup();
     renderHome();
     await screen.findByRole("heading", { level: 2 });
-    const card = screen.getByRole("button", { name: /인플루언서 추천/ });
+    const card = screen.getByRole("button", { name: /크리에이터 추천/ });
     expect(card).not.toHaveAttribute("aria-disabled");
     await user.click(card);
     expect(screen.getByTestId("location")).toHaveTextContent(
-      "/influencers/search",
+      "/creators/search",
     );
   });
 
@@ -160,7 +160,7 @@ describe("HomePage", () => {
       );
     });
 
-    it.each([/인플루언서 추천/, /캠페인 등록\/운영/])(
+    it.each([/크리에이터 추천/, /캠페인 등록\/운영/])(
       "%s 카드를 누르면 이동하지 않고 로그인 안내 알럿을 띄운다",
       async (name) => {
         const user = userEvent.setup();
@@ -193,7 +193,7 @@ describe("HomePage", () => {
       const user = userEvent.setup();
       renderHome();
       await screen.findByRole("heading", { level: 2 });
-      await user.click(screen.getByRole("button", { name: /인플루언서 추천/ }));
+      await user.click(screen.getByRole("button", { name: /크리에이터 추천/ }));
       await user.click(
         within(await screen.findByRole("alertdialog")).getByRole("button", {
           name: "취소",
@@ -215,11 +215,11 @@ describe("HomePage", () => {
     });
   });
 
-  describe("인플루언서 추천 카드 터치", () => {
+  describe("크리에이터 추천 카드 터치", () => {
     async function renderCard() {
       renderHome();
       await screen.findByRole("heading", { level: 2 });
-      return screen.getByRole("button", { name: /인플루언서 추천/ });
+      return screen.getByRole("button", { name: /크리에이터 추천/ });
     }
 
     it("손가락을 대기만 해서는 이동하지 않고, 떼면 이동한다", async () => {
@@ -236,7 +236,7 @@ describe("HomePage", () => {
         clientY: 101,
       });
       expect(screen.getByTestId("location")).toHaveTextContent(
-        "/influencers/search",
+        "/creators/search",
       );
     });
 
@@ -272,14 +272,14 @@ describe("HomePage", () => {
     });
   });
 
-  it("인플루언서 추천 카드는 키보드 Enter로도 이동한다", async () => {
+  it("크리에이터 추천 카드는 키보드 Enter로도 이동한다", async () => {
     const user = userEvent.setup();
     renderHome();
     await screen.findByRole("heading", { level: 2 });
-    screen.getByRole("button", { name: /인플루언서 추천/ }).focus();
+    screen.getByRole("button", { name: /크리에이터 추천/ }).focus();
     await user.keyboard("{Enter}");
     expect(screen.getByTestId("location")).toHaveTextContent(
-      "/influencers/search",
+      "/creators/search",
     );
   });
 

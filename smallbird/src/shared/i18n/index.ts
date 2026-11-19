@@ -2,6 +2,11 @@
 export { Trans, useTranslation } from "react-i18next";
 
 export {
+  changeLanguage,
+  onLanguageChanged,
+  registerLanguageLoader,
+} from "./changeLanguage";
+export {
   COMMON_NAMESPACE,
   DEFAULT_LANGUAGE,
   isLanguage,

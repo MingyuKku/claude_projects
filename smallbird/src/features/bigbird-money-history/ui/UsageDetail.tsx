@@ -19,11 +19,11 @@ function ContractTarget({ record }: { record: UsageRecord }) {
   const { contractTarget } = record;
   // 대상이 없으면(충전·출금, 모집형·부가 서비스) 빈칸.
   if (!contractTarget) return "";
-  const handle = contractTarget.influencerId.replace(/^@?/, "@");
+  const handle = contractTarget.creatorId.replace(/^@?/, "@");
   return (
     <span className="flex flex-col">
       <span>{contractTarget.name}</span>
-      {contractTarget.influencerId && (
+      {contractTarget.creatorId && (
         <span className="text-muted-foreground">{handle}</span>
       )}
     </span>

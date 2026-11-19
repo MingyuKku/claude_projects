@@ -77,9 +77,9 @@
       "pick": "PICK"
     },
     "usageDetail": {
-      "contractPick": "Influencer contract fee (PICK)",
-      "contractRecruit": "Influencer contract fee (Recruitment)",
-      "aiManuscriptConfirm": "Add-on (AI Draft Review)",
+      "contractPick": "Creator contract fee (PICK)",
+      "contractRecruit": "Creator contract fee (Recruitment)",
+      "manuscriptConfirm": "Add-on (AI Draft Review)",
       "postingGuide": "Add-on (AI Posting Guide)"
     }
   },

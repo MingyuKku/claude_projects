@@ -17,7 +17,7 @@ import { useKeyboardAwareShell } from "../model/useKeyboardAwareShell";
 import { useMobileMenu } from "../model/useMobileMenu";
 import { useScrollRestoration } from "../model/useScrollRestoration";
 import { useShellNavItems } from "../model/useShellNavItems";
-import { DevLanguageSwitcher } from "./DevLanguageSwitcher";
+import { GuideLanguageButtons } from "./GuideLanguageButtons";
 import { ShellHeaderActions } from "./ShellHeaderActions";
 import { ShellLink } from "./ShellLink";
 
@@ -28,7 +28,7 @@ import type { ReactNode } from "react";
 const CUSTOMER_CENTER_PATH_PREFIXES: string[] = [
   ROUTES.customerCenterBigbird,
   ROUTES.customerCenterBuyer,
-  ROUTES.customerCenterInfluencer,
+  ROUTES.customerCenterCreator,
 ];
 // 고객센터는 모바일에서 본문이 가장자리까지 차고, 태블릿 이상에서는 위쪽 여백 없이 좌우·아래만 둠.
 // 키보드가 열린 동안은 입력창 아래 여백이 --keyboard-anchor-gap 하나가 되도록 본문 아래 여백을 뺌.
@@ -163,6 +163,10 @@ export function AppShell({
     void navigate(ROUTES.campaignCreate);
   }
 
+  function handleClickGuide() {
+    window.open(CLIENT_GUIDE_URL, "_blank", "noopener,noreferrer");
+  }
+
   const sidebarProps = {
     items,
     logoAlt: t("logo.alt"),
@@ -173,11 +177,15 @@ export function AppShell({
     // 캠페인 기능은 개발 서버에서만 켬(API가 나오면 함께 공개).
     isPrimaryActionDisabled: !import.meta.env.DEV,
     onClickPrimaryAction: handleClickRegisterCampaign,
-    // 비로그인의 이용 가이드는 헤더에만 둠(Figma 주석 5180:89119).
-    guideLabel: session ? t("guide") : undefined,
-    guideExtra: import.meta.env.DEV ? <DevLanguageSwitcher /> : undefined,
-    // 광고주·인플루언서 전환(Figma Sidebar Footer Toggle / Tab). 인플루언서 화면이 아직 없어 광고주에 고정함.
-    footerSwitch: session ? (
+    // 로그인하면 이용 가이드·언어 메뉴가 LNB 하단에 있고, 비로그인은 헤더에 있음.
+    footerActions: session ? (
+      <GuideLanguageButtons
+        placement="sidebar"
+        onClickGuide={handleClickGuide}
+      />
+    ) : undefined,
+    // 광고주·크리에이터 전환(Figma Sidebar Footer Toggle / Tab). 크리에이터 화면이 아직 없어 광고주에 고정함.
+    footerSwitch: (
       <ToggleTab
         aria-label={t("role.label")}
         className="w-full *:flex-1"
@@ -185,13 +193,12 @@ export function AppShell({
         onValueChange={() => {}}
         options={[
           { value: "advertiser", label: t("role.advertiser") },
-          { value: "influencer", label: t("role.influencer"), disabled: true },
+          { value: "creator", label: t("role.creator"), disabled: true },
         ]}
       />
-    ) : undefined,
-    onClickGuide: () =>
-      window.open(CLIENT_GUIDE_URL, "_blank", "noopener,noreferrer"),
+    ),
   };
+
   const navigationContextValue = {
     showLoginRequired: () => setIsLoginAlertOpen(true),
     isAuthenticated: session !== null,
@@ -243,7 +250,7 @@ export function AppShell({
           >
             <ShellHeaderActions
               session={session}
-              onClickGuide={sidebarProps.onClickGuide}
+              onClickGuide={handleClickGuide}
             />
           </AppHeader>
           <main

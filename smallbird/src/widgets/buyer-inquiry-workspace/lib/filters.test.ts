@@ -22,7 +22,7 @@ describe("구매자 문의 URL 필터", () => {
 
   it("문의 유형은 그 메뉴의 출처만 읽고 다른 메뉴 값은 전체로 본다", () => {
     const params = new URLSearchParams("source=campaignQna");
-    expect(toBuyerInquiryFilters(params, "influencer").sourceType).toBe(
+    expect(toBuyerInquiryFilters(params, "creator").sourceType).toBe(
       "CAMPAIGN_QNA",
     );
     expect(toBuyerInquiryFilters(params, "buyer").sourceType).toBe("ALL");

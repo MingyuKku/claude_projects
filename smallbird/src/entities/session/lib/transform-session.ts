@@ -6,24 +6,24 @@ import type {
 
 const ALL_PERMISSIONS: MenuPermissions = {
   campaign: true,
-  influencerMatching: true,
-  influencerMarket: true,
+  creatorMatching: true,
+  creatorMarket: true,
   commerce: true,
   bigbirdMoney: true,
   purchaserQuestion: true,
-  influencerQuestion: true,
+  creatorQuestion: true,
 };
 
 function toMenuPermissions(session: Session): MenuPermissions {
   if (session.authority !== "SUB") return ALL_PERMISSIONS;
   return {
     campaign: session.isCampaignAccess ?? false,
-    influencerMatching: session.isInfluencerMatchingAccess ?? false,
-    influencerMarket: session.isInfluencerMarketAccess ?? false,
+    creatorMatching: session.isInfluencerMatchingAccess ?? false,
+    creatorMarket: session.isInfluencerMarketAccess ?? false,
     commerce: session.isCommerceAccess ?? false,
     bigbirdMoney: session.isBigbirdMoneyAccess ?? false,
     purchaserQuestion: session.isPurchaserQuestionAccess ?? false,
-    influencerQuestion: session.isInfluencerQuestionAccess ?? false,
+    creatorQuestion: session.isInfluencerQuestionAccess ?? false,
   };
 }
 

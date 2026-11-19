@@ -130,7 +130,7 @@ export const section1 = {
       hoverVideo: "/media/intro/s1-card1-hover.mp4",
     },
     {
-      key: "influencer" as const,
+      key: "creator" as const,
       // 1708x3778 원본은 4.8MB 라 보이는 위쪽(y 0-1560)만 남기고 폭 820px 로 줄임.
       // 자르는 높이를 바꾸면 section1-card-classes 의 카드 2 높이 값도 함께 바꿔야 함.
       image: S1_CARD2,

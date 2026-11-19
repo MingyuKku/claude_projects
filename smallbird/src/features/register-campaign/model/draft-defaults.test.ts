@@ -7,7 +7,7 @@ describe("applyDraftDefaults", () => {
     const draft = applyDraftDefaults(createEmptyDraft());
 
     expect(draft.info.campaignType).toBe("PRODUCT_DELIVERY");
-    expect(draft.influencer).toEqual({
+    expect(draft.creator).toEqual({
       platform: "INSTAGRAM",
       gender: "FEMALE",
       ageGroups: ["AGE_10S"],
@@ -22,7 +22,7 @@ describe("applyDraftDefaults", () => {
   it("서버에 저장된 값은 그대로 두고 비어 있는 칸만 채운다", () => {
     const saved = createEmptyDraft();
     saved.info.campaignType = "STORE_VISIT";
-    saved.influencer = {
+    saved.creator = {
       platform: "YOUTUBE",
       gender: null,
       ageGroups: ["AGE_40S"],
@@ -34,7 +34,7 @@ describe("applyDraftDefaults", () => {
     const draft = applyDraftDefaults(saved);
 
     expect(draft.info.campaignType).toBe("STORE_VISIT");
-    expect(draft.influencer).toEqual({
+    expect(draft.creator).toEqual({
       platform: "YOUTUBE",
       gender: "FEMALE",
       ageGroups: ["AGE_40S"],

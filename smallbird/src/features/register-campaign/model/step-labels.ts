@@ -4,7 +4,7 @@ import type { CampaignRegisterStep } from "@/entities/campaign";
 export const STEP_LABEL_KEYS = {
   "campaign-info": "step.campaignInfo",
   product: "step.product",
-  influencer: "step.influencer",
+  creator: "step.creator",
   "add-ons": "step.addOns",
   intro: "step.intro",
   conditions: "step.conditions",

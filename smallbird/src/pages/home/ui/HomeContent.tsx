@@ -1,6 +1,6 @@
 import { preload } from "react-dom";
 
-import { InfluencerSearchForm } from "@/features/search-influencer";
+import { CreatorSearchForm } from "@/features/search-creator";
 import heroBackground from "@/shared/assets/img/home/hero-bg.jpg";
 import { WavyBackground } from "@/shared/components/wavy-background";
 import { MEDIA_QUERY } from "@/shared/config";
@@ -44,7 +44,7 @@ export function HomeContent({ session }: HomeContentProps) {
 
   return (
     <div
-      // 펼친 검색창이 이 영역의 안쪽 위까지 덮으므로 위 패딩이 곧 펼친 입력창의 위쪽 여백임(시안: PC 48·태블릿 40·모바일 16). features/search-influencer.
+      // 펼친 검색창이 이 영역의 안쪽 위까지 덮으므로 위 패딩이 곧 펼친 입력창의 위쪽 여백임(시안: PC 48·태블릿 40·모바일 16). features/search-creator.
       data-search-expand-boundary
       data-keyboard-anchor
       className="relative flex min-h-full flex-col items-center justify-center px-4 py-4 in-data-[keyboard=open]:pb-(--keyboard-anchor-gap) tablet:px-10 tablet:py-10 tablet:in-data-[keyboard=open]:pb-(--keyboard-anchor-gap) desktop:py-12"
@@ -69,7 +69,7 @@ export function HomeContent({ session }: HomeContentProps) {
           {t("hero.subtitle")}
         </p>
       </section>
-      <InfluencerSearchForm className={SEARCH_FORM_CLASS_NAME} />
+      <CreatorSearchForm className={SEARCH_FORM_CLASS_NAME} />
       <FeatureCards session={session} className={FEATURE_CARDS_CLASS_NAME} />
     </div>
   );

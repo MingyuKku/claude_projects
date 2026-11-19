@@ -77,9 +77,9 @@
       "pick": "PICK형"
     },
     "usageDetail": {
-      "contractPick": "인플루언서 계약비용(PICK형)",
-      "contractRecruit": "인플루언서 계약비용(모집형)",
-      "aiManuscriptConfirm": "부가 서비스(AI 원고컨펌)",
+      "contractPick": "크리에이터 계약비용(PICK형)",
+      "contractRecruit": "크리에이터 계약비용(모집형)",
+      "manuscriptConfirm": "부가 서비스(AI 원고컨펌)",
       "postingGuide": "부가 서비스(AI 포스팅가이드)"
     }
   },

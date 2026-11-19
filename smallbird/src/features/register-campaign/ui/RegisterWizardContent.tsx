@@ -7,7 +7,6 @@ import { isLockedInRevision } from "../model/revision";
 import { isStepStarted } from "../model/step-completion";
 import { STEP_LABEL_KEYS } from "../model/step-labels";
 import { useIntroGenerationNotice } from "../model/use-intro-generation";
-import { useLeaveToOverview } from "../model/use-leave-to-overview";
 import { usePaymentFlow } from "../model/use-payment-flow";
 import { useRegisterPanel } from "../model/use-register-panel";
 import { useSaveBeforeLeave } from "../model/use-save-before-leave";
@@ -62,7 +61,6 @@ export function RegisterWizardContent({
     (state) => state.isRevisionMode,
   );
   const isDemo = useRegisterWizardStore((state) => state.isDemo);
-  const leaveToOverview = useLeaveToOverview();
   const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
   const isTabletUp = useMediaQuery(MEDIA_QUERY.tabletUp);
   const { panel } = useRegisterPanel();
@@ -125,7 +123,13 @@ export function RegisterWizardContent({
         <RegisterBottomBar
           variant="revision"
           preview={preview}
-          onClickNext={leaveToOverview}
+          hasPrevious={previousStep !== null}
+          isLastStep={nextStep === null}
+          isRequesting={payment.isPaying}
+          onClickPrevious={goPrevious}
+          onClickNext={
+            nextStep === null ? () => void payment.requestReapproval() : goNext
+          }
         />
       ) : (
         <RegisterBottomBar

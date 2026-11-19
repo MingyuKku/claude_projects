@@ -95,14 +95,14 @@ describe("applyRealtimeConsultation", () => {
   it("연결 상태에 따라 표시 상태와 단계를 정한다", () => {
     expect(
       applyRealtimeConsultation(inquiry(), consultation(), start),
-    ).toMatchObject({ realtimePhase: "requesting", status: "waiting" });
+    ).toMatchObject({ realtimePhase: "requesting", status: "requested" });
     expect(
       applyRealtimeConsultation(
         inquiry(),
         consultation({ isConnect: true }),
         start,
       ),
-    ).toMatchObject({ realtimePhase: "requesting", status: "waiting" });
+    ).toMatchObject({ realtimePhase: "requesting", status: "requested" });
     // 연결은 isConnect가 아니라 요청 뒤 계정 문서의 msgResponseDate로 판단함
     expect(
       applyRealtimeConsultation(inquiry(), consultation(), start, start + 10),

@@ -35,9 +35,9 @@ vi.mock("firebase/firestore", () => ({
 }));
 
 const inquiry: BuyerInquiryViewModel = {
-  key: "influencer-501",
+  key: "creator-501",
   inquiryIdx: 501,
-  source: "influencer",
+  source: "creator",
   status: "done",
   campaignIdx: 10,
   orderNumber: null,
@@ -53,7 +53,7 @@ const inquiry: BuyerInquiryViewModel = {
   brandName: null,
   campaignName: null,
   shopName: null,
-  influencerNickname: null,
+  creatorNickname: null,
 };
 
 const restMessage = (
@@ -93,7 +93,7 @@ const consultationMessage = (
   created: `2026-10-01 ${created}`,
 });
 
-function mockThread() {
+function mockThread(finishTime: string | null = "2026-10-01T10:03:16") {
   vi.mocked(serverApiV3.get).mockResolvedValue({
     result: true,
     data: [
@@ -104,7 +104,7 @@ function mockThread() {
         toUserIdx: 1,
         fmUserIdx: 77,
         campaignIdx: 10,
-        finishTime: "2026-10-01T10:03:16",
+        finishTime,
         created: "2026-10-01T10:00:00",
         boardType: false,
         status: "ANSWERED",
@@ -144,7 +144,7 @@ beforeEach(() => {
   };
 });
 
-describe("인플루언서 문의 대화의 실시간 시작·종료 줄", () => {
+describe("구매자·크리에이터 문의 대화의 실시간 시작·종료 줄", () => {
   it("연결 첫 응답 앞에 시작 줄, 종료 안내 자리에 종료 줄을 한 번씩 그린다", async () => {
     renderConversation(inquiry);
     expect(await screen.findByText(STARTED)).toBeInTheDocument();
@@ -163,6 +163,7 @@ describe("인플루언서 문의 대화의 실시간 시작·종료 줄", () => 
   });
 
   it("종료 안내가 없는 진행 중 상담은 시작 줄만 그린다", async () => {
+    mockThread(null);
     firestore.data = {
       sequence: 1318,
       threadIdx: 501,
@@ -178,6 +179,37 @@ describe("인플루언서 문의 대화의 실시간 시작·종료 줄", () => 
     expect(screen.queryByText(ENDED)).not.toBeInTheDocument();
   });
 
+  it("서버의 종료 안내가 없어도 스레드가 끝났으면 그 시각에 종료 줄을 한 번 그린다", async () => {
+    firestore.data = {
+      sequence: 1318,
+      threadIdx: 501,
+      messages: [
+        consultationMessage("10:00:00", "안녕 광고주야", "requester"),
+        consultationMessage("10:00:20", "실시간 상담을 요청했습니다.", "auto"),
+        consultationMessage("10:00:46", "안녕하세요 광고주입니다", "responder"),
+      ],
+    };
+    renderConversation(inquiry);
+    expect(await screen.findByText(STARTED)).toBeInTheDocument();
+    expect(screen.getAllByText(ENDED)).toHaveLength(1);
+  });
+
+  it("연결되지 않은 요청(시작 줄 없음)은 스레드가 끝나도 종료 줄을 그리지 않는다", async () => {
+    firestore.data = {
+      sequence: 1318,
+      threadIdx: 501,
+      messages: [
+        consultationMessage("10:00:00", "안녕 광고주야", "requester"),
+        consultationMessage("10:00:20", "실시간 상담을 요청했습니다.", "auto"),
+      ],
+    };
+    renderConversation(inquiry);
+    expect(
+      await screen.findByText("안녕하세요 광고주입니다"),
+    ).toBeInTheDocument();
+    expect(screen.queryByText(ENDED)).not.toBeInTheDocument();
+  });
+
   it("상담 문서가 없으면 줄 없이 REST 대화만 보인다", async () => {
     firestore.data = undefined;
     vi.spyOn(console, "error").mockImplementation(() => {});
@@ -189,17 +221,14 @@ describe("인플루언서 문의 대화의 실시간 시작·종료 줄", () => 
     expect(screen.queryByText(ENDED)).not.toBeInTheDocument();
   });
 
-  it("구매자 문의 대화에는 줄을 넣지 않는다", async () => {
+  it("구매자(마켓) 문의 대화에도 같은 시작·종료 줄을 그린다", async () => {
     renderConversation({
       ...inquiry,
       key: "purchaser-501",
       source: "purchaser",
     });
-    expect(
-      await screen.findByText("안녕하세요 광고주입니다"),
-    ).toBeInTheDocument();
-    expect(screen.queryByText(STARTED)).not.toBeInTheDocument();
-    expect(screen.queryByText(ENDED)).not.toBeInTheDocument();
+    expect(await screen.findByText(STARTED)).toBeInTheDocument();
+    expect(screen.getByText(ENDED)).toBeInTheDocument();
   });
 });
 

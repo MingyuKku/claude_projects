@@ -40,14 +40,14 @@
     },
     "recruit": {
       "features": {
-        "1": "Run influencer recruitment campaigns",
+        "1": "Run creator recruitment campaigns",
         "2": "Brand and Group Buy both included",
         "3": "Supports various campaign types"
       },
       "intro": {
         "title": "About Recruitment",
         "items": {
-          "1": "You register a campaign, influencers apply, and you pick from the applicants.",
+          "1": "You register a campaign, creators apply, and you pick from the applicants.",
           "2": "One Recruitment subscription covers both Brand and Group Buy.",
           "3": "Well suited to running diverse campaign types."
         }
@@ -62,14 +62,14 @@
     },
     "pick": {
       "features": {
-        "1": "Pick and propose to influencers directly",
+        "1": "Pick and propose to creators directly",
         "2": "Brand and Group Buy both included",
         "3": "Supports tailored collaborations"
       },
       "intro": {
         "title": "About PICK",
         "items": {
-          "1": "You search for the influencers you want, pick them, and send a proposal.",
+          "1": "You search for the creators you want, pick them, and send a proposal.",
           "2": "One PICK subscription covers both Brand and Group Buy.",
           "3": "Well suited to tailored collaborations."
         }
@@ -95,7 +95,7 @@
       "title": "About Group Buy",
       "items": {
         "1": "Campaigns that sell products through group buying.",
-        "2": "Connect product sales with influencers.",
+        "2": "Connect product sales with creators.",
         "3": "Good for operations focused on sales, orders, and results."
       }
     }

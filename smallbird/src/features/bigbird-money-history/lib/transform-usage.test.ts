@@ -9,7 +9,7 @@ const item = {
   mainImageUrl: "https://cdn.bigbird.local/campaign.png",
   campaignType: "pick",
   usageDetailCode: "INFLUENCER_CONTRACT_PICK",
-  usageDetailName: "인플루언서 계약비용(PICK형)",
+  usageDetailName: "크리에이터 계약비용(PICK형)",
   usageAmount: -50000,
   remainingAmount: 1250000,
   contractTarget: { name: "김하루", influencerId: "@haru_beauty" },
@@ -50,10 +50,10 @@ describe("transformUsageList", () => {
       campaignImageUrl: "https://cdn.bigbird.local/campaign.png",
       campaignType: "pick",
       usageDetail: "contractPick",
-      usageDetailText: "인플루언서 계약비용(PICK형)",
+      usageDetailText: "크리에이터 계약비용(PICK형)",
       amount: -50000,
       remainingAmount: 1250000,
-      contractTarget: { name: "김하루", influencerId: "@haru_beauty" },
+      contractTarget: { name: "김하루", creatorId: "@haru_beauty" },
     });
     expect(result.records[0]?.usedAt).toEqual(new Date("2026-10-23T14:23:18"));
   });
@@ -112,7 +112,7 @@ describe("transformUsageList", () => {
     const { records } = transformUsageList(
       listOf(
         { usageDetailCode: "INFLUENCER_CONTRACT_RECRUIT" },
-        { usageDetailCode: "AI_MANUSCRIPT_CONFIRM" },
+        { usageDetailCode: "MANUSCRIPT_CONFIRM" },
         { usageDetailCode: "POSTING_GUIDE" },
         { usageDetailCode: "NEW_SERVICE", usageDetailName: "신규 서비스" },
         { usageDetailCode: null, usageDetailName: "매칭거절" },
@@ -121,9 +121,9 @@ describe("transformUsageList", () => {
     expect(
       records.map((record) => [record.usageDetail, record.usageDetailText]),
     ).toEqual([
-      ["contractRecruit", "인플루언서 계약비용(PICK형)"],
-      ["aiManuscriptConfirm", "인플루언서 계약비용(PICK형)"],
-      ["postingGuide", "인플루언서 계약비용(PICK형)"],
+      ["contractRecruit", "크리에이터 계약비용(PICK형)"],
+      ["manuscriptConfirm", "크리에이터 계약비용(PICK형)"],
+      ["postingGuide", "크리에이터 계약비용(PICK형)"],
       [null, "신규 서비스"],
       [null, "매칭거절"],
     ]);

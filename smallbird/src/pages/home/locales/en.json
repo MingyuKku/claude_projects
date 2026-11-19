@@ -1,14 +1,14 @@
 {
   "title": "Home",
   "hero": {
-    "title": "Describe your product and\nAI finds the right influencers",
-    "subtitle": "AI quickly recommends influencers that fit your brand and goals"
+    "title": "Describe your product and\nAI finds the right creators",
+    "subtitle": "AI quickly recommends creators that fit your brand and goals"
   },
   "card": {
     "comingSoon": "Coming soon",
     "recommend": {
-      "title": "Influencer picks",
-      "description": "AI recommends the best influencers based on data."
+      "title": "Creator picks",
+      "description": "AI recommends the best creators based on data."
     },
     "campaign": {
       "title": "Run campaigns",

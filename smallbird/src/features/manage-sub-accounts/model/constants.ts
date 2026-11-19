@@ -19,8 +19,8 @@ export const PAGE_PARAM = "page";
 /** 화면에 그리는 권한 순서. */
 export const PERMISSION_KEYS = [
   "campaign",
-  "influencerMatching",
-  "influencerMarket",
+  "creatorMatching",
+  "creatorMarket",
   "commerce",
   "bigbirdMoney",
   "buyerInquiry",
@@ -30,8 +30,8 @@ export type PermissionKey = (typeof PERMISSION_KEYS)[number];
 /** 권한 → 권한 API 필드. `PUT`은 바꾼 필드만 보냄(부분 수정). */
 export const PERMISSION_FIELDS = {
   campaign: "isCampaignAccess",
-  influencerMatching: "isInfluencerMatchingAccess",
-  influencerMarket: "isInfluencerMarketAccess",
+  creatorMatching: "isInfluencerMatchingAccess",
+  creatorMarket: "isInfluencerMarketAccess",
   commerce: "isCommerceAccess",
   buyerInquiry: "isPurchaserQuestionAccess",
   bigbirdMoney: "isBigbirdMoneyAccess",

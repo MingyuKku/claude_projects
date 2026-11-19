@@ -41,7 +41,7 @@ export function DetailProductSection({
             {product.productName
               ? t("detail.product.nameAndQuantityValue", {
                   name: product.productName,
-                  count: product.quantityPerInfluencer ?? 0,
+                  count: product.quantityPerCreator ?? 0,
                 })
               : "-"}
           </DetailRow>

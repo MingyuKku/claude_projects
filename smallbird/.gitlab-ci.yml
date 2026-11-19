@@ -1,3 +1,12 @@
+# ============================================================
+# S6 Registry retention — Container Registry 보존 태그 자동 생성
+# ============================================================
+include:
+  # 템플릿이 인프라 수정 중이라 prod 브랜치(보호 브랜치)를 따라간다. 안정되면 커밋 SHA 로 고정한다.
+  - project: "ops/ci-common"
+    file: "/retain-post-deploy.gitlab-ci.yml"
+    ref: prod
+
 # 병합 게이트: 사람이든 AI 든 같은 검사를 통과해야 병합된다.
 # GitLab 프로젝트 설정 > Merge requests 에서 "Pipelines must succeed" 를 켜고,
 # 기본 브랜치를 protected 로 두어 직접 push 를 막는다. (CI 파일만으로는 강제되지 않는다)
@@ -263,3 +272,23 @@ ai-review:
       when: manual
     - when: on_success
   allow_failure: true
+
+# ============================================================
+# S6 Registry retention jobs
+# pid=60 는 현재 stage 환경만 운영 — retain:stage 만 활성화.
+# prod 환경이 생기면 retain:prod 를 추가하세요.
+# ============================================================
+retain:stage:
+  extends: .retain-tag
+  cache: []
+  # 평소 몇 초 안에 끝난다. 멈췄을 때 기본값(60분)까지 러너를 붙잡지 않게 한다.
+  timeout: 10m
+  # 태그만 붙이는 job 이라 배포로 기록하지 않는다(재배포·롤백 버튼, 오래된 배포 막기 설정 영향 방지).
+  environment:
+    name: stage
+    action: prepare
+  needs: ["deploy:stage"]
+  variables:
+    TAG_PREFIX: stage
+  rules:
+    - if: $CI_COMMIT_BRANCH == "stage"

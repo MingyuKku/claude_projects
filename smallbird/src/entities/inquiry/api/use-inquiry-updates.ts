@@ -22,13 +22,13 @@ export function formatKstDateTime(timestamp: number) {
 }
 
 export interface InquiryUpdateQuery {
-  /** 인플루언서 문의 메뉴면 전용 엔드포인트(`/influencer-inquiry/has-updates`)를 씀. */
-  isInfluencerMenu: boolean;
+  /** 크리에이터 문의 메뉴면 전용 엔드포인트(`/influencer-inquiry/has-updates`)를 씀. */
+  isCreatorMenu: boolean;
   /** 목록에 건 필터와 같은 서버 값. 검색어·등록일은 폴링 대상이 아님(바뀌면 목록을 다시 받을 때 반영됨). */
   status: string;
   sourceType: string;
   campaignIdx?: number;
-  influencerThreadUserIdx?: number;
+  creatorThreadUserIdx?: number;
 }
 
 /** `since` 이후 목록에 바뀐 게 있는지만 확인함. 실제 목록은 기존 목록 API가 받음. */
@@ -37,7 +37,7 @@ export async function fetchInquiryHasUpdates(
   since: string,
 ) {
   const response = await serverApiV3.get(
-    query.isInfluencerMenu
+    query.isCreatorMenu
       ? "/help/influencer-inquiry/has-updates"
       : "/help/inquiry/has-updates",
     {
@@ -48,9 +48,9 @@ export async function fetchInquiryHasUpdates(
         ...(query.campaignIdx === undefined
           ? {}
           : { campaignIdx: query.campaignIdx }),
-        ...(query.influencerThreadUserIdx === undefined
+        ...(query.creatorThreadUserIdx === undefined
           ? {}
-          : { influencerThreadUserIdx: query.influencerThreadUserIdx }),
+          : { influencerThreadUserIdx: query.creatorThreadUserIdx }),
       },
     },
   );

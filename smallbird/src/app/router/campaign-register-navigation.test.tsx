@@ -217,7 +217,38 @@ describe("반려 뒤 수정 모드", () => {
     return campaignIdx;
   }
 
-  it("잠긴 단계는 읽기 전용 안내와 함께 열리고, 하단은 다음 하나로 등록 내역에 돌아간다", async () => {
+  /** 모두 입력된 시드 캠페인(PICK형 승인 검토중)을 서버처럼 반려해 동의 기록을 지움. */
+  async function rejectFilledCampaign() {
+    // 시드는 처음 읽을 때 저장소에 들어가므로 먼저 읽음.
+    await fetchCampaignDetail(6);
+    const key = "bigbird:mock:campaign-db";
+    const db = JSON.parse(window.sessionStorage.getItem(key) ?? "{}") as {
+      campaigns: {
+        campaignIdx: number;
+        status: string;
+        policy: object | null;
+        rejectReason: string | null;
+        intro: { mainImage: object | null; detailMedia: object[] };
+      }[];
+    };
+    const record = db.campaigns.find((campaign) => campaign.campaignIdx === 6);
+    if (!record) throw new Error("mock campaign not found");
+    record.status = "REJECTED";
+    record.policy = null;
+    record.rejectReason = "금액 확인";
+    // 시드는 소개서 이미지가 없어 작성 완료로 보이지 않으므로 채움.
+    const image = {
+      attachmentIdx: 1,
+      url: "https://example.com/a.png",
+      mediaType: "IMAGE",
+    };
+    record.intro.mainImage = image;
+    record.intro.detailMedia = [image];
+    window.sessionStorage.setItem(key, JSON.stringify(db));
+    return 6;
+  }
+
+  it("잠긴 단계는 읽기 전용 안내와 함께 열리고, 하단은 임시저장 없이 이전·다음이다", async () => {
     const user = userEvent.setup();
     const campaignIdx = await createRejectedCampaign();
     const router = await renderRoute(
@@ -233,13 +264,66 @@ describe("반려 뒤 수정 모드", () => {
       screen.getByRole("checkbox", { name: /AI 포스팅 가이드/ }),
     ).toBeDisabled();
     expect(screen.queryByRole("button", { name: "임시저장" })).toBeNull();
-    expect(screen.queryByRole("button", { name: /이전/ })).toBeNull();
+    expect(screen.getByRole("button", { name: /이전/ })).toBeInTheDocument();
 
     await user.click(screen.getByRole("button", { name: /다음/ }));
 
     await waitFor(() =>
+      expect(router.state.location.search).toContain("step=intro"),
+    );
+  });
+
+  it("7단계는 열려 있어 동의를 다시 받고, 8단계에서 결제 없이 재승인을 요청한다", async () => {
+    const user = userEvent.setup();
+    const campaignIdx = await rejectFilledCampaign();
+    const router = await renderRoute(
+      `${ROUTES.campaignRegister}/${campaignIdx}?step=policy`,
+    );
+
+    const agreeAll = await screen.findByRole("checkbox", {
+      name: "약관 전체 동의",
+    });
+    expect(agreeAll).toBeEnabled();
+    expect(agreeAll).not.toBeChecked();
+    await user.click(agreeAll);
+    await user.click(screen.getByRole("button", { name: /다음/ }));
+    await user.click(
+      await screen.findByRole("button", { name: "재승인 요청" }),
+    );
+
+    expect(
+      await screen.findByText("재승인 요청이 완료되었습니다."),
+    ).toBeInTheDocument();
+    await user.click(screen.getByRole("button", { name: "확인" }));
+    await waitFor(() =>
       expect(router.state.location.pathname).toBe(`/campaign/${campaignIdx}`),
     );
+    const detail = await fetchCampaignDetail(campaignIdx);
+    expect(detail.stage).toBe("REVIEWING");
+    expect(detail.draft.policy).toEqual({
+      service: true,
+      privacy: true,
+      operation: true,
+      reward: true,
+    });
+  });
+
+  it("동의 없이 8단계에서 재승인을 요청하면 필수 항목 알럿 뒤 7단계로 보낸다", async () => {
+    const user = userEvent.setup();
+    const campaignIdx = await rejectFilledCampaign();
+    const router = await renderRoute(
+      `${ROUTES.campaignRegister}/${campaignIdx}?step=payment`,
+    );
+
+    await user.click(
+      await screen.findByRole("button", { name: "재승인 요청" }),
+    );
+    await user.click(await screen.findByRole("button", { name: "확인" }));
+
+    await waitFor(() =>
+      expect(router.state.location.search).toContain("step=policy"),
+    );
+    expect((await fetchCampaignDetail(campaignIdx)).stage).toBe("REJECTED");
   });
 });
 

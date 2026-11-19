@@ -12,7 +12,7 @@ export const CAMPAIGN_STEP_PARAM = "step";
 export const CAMPAIGN_REGISTER_STEPS = [
   "campaign-info",
   "product",
-  "influencer",
+  "creator",
   "add-ons",
   "intro",
   "conditions",
@@ -28,7 +28,7 @@ export const DRAFT_STEP_BY_REGISTER_STEP: Record<
 > = {
   "campaign-info": "info",
   product: "product",
-  influencer: "influencer",
+  creator: "creator",
   "add-ons": "addOns",
   intro: "intro",
   conditions: "conditions",

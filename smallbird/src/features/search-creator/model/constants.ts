@@ -1,7 +1,7 @@
-import type { InfluencerPlatform } from "@/entities/platform";
+import type { CreatorPlatform } from "@/entities/platform";
 
 // 처음 보이는 플랫폼. 선택 해제는 지원하지 않으므로 검색은 항상 플랫폼 하나를 가짐.
-export const DEFAULT_PLATFORM: InfluencerPlatform = "instagram";
+export const DEFAULT_PLATFORM: CreatorPlatform = "instagram";
 
 // `leading-5`(20px). getComputedStyle이 line-height를 숫자로 주지 못하는 환경의 대비값.
 export const FALLBACK_LINE_HEIGHT = 20;

@@ -6,13 +6,14 @@
   "done": "已回复",
   "status": {
     "consulting": "实时咨询中",
+    "requested": "咨询请求中",
     "waiting": "待回复",
     "done": "已回复"
   },
   "source": {
     "purchaser": "买家咨询",
     "qna": "商品问答",
-    "influencer": "网红咨询",
+    "creator": "创作者咨询",
     "campaignQna": "活动问答"
   },
   "empty": "暂无咨询。",
@@ -34,11 +35,11 @@
     "source": "咨询类型",
     "campaign": "活动",
     "campaignPlaceholder": "选择活动",
-    "influencer": "达人",
-    "influencerPlaceholder": "选择达人",
-    "influencerSearchPlaceholder": "搜索达人",
+    "creator": "创作者",
+    "creatorPlaceholder": "选择创作者",
+    "creatorSearchPlaceholder": "搜索创作者",
     "campaignFallback": "活动 {{idx}}",
-    "influencerFallback": "达人 {{idx}}",
+    "creatorFallback": "创作者 {{idx}}",
     "removeChip": "取消{{name}}",
     "registrationDate": "登记日期",
     "datePlaceholder": "选择日期",
@@ -49,7 +50,7 @@
       "ALL": "全部",
       "PURCHASER_QUESTION": "买家咨询",
       "PRODUCT_QNA": "商品问答",
-      "INFLUENCER_QUESTION": "网红咨询",
+      "INFLUENCER_QUESTION": "创作者咨询",
       "CAMPAIGN_QNA": "活动问答"
     }
   },
@@ -62,7 +63,7 @@
   "period": "进行期间",
   "campaignCode": "活动代码",
   "shopCode": "店铺代码",
-  "influencer": "网红",
+  "creator": "创作者",
   "campaignShortcut": "前往活动",
   "detailError": "无法加载详情。",
   "copied": "已复制到剪贴板。",

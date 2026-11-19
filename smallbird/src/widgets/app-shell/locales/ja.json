@@ -2,19 +2,19 @@
   "nav": {
     "home": "ホーム",
     "campaign": "キャンペーン",
-    "influencerMatching": "マッチング",
-    "influencerMarket": "マーケット",
+    "creatorMatching": "マッチング",
+    "creatorMarket": "マーケット",
     "commerce": "コマース管理",
     "mypage": "マイページ",
     "support": "サポート",
     "search": "クリエイター検索",
-    "influencerManage": "クリエイター管理",
+    "creatorManage": "クリエイター管理",
     "chat": "チャット",
     "commerceSales": "販売状況管理",
     "commerceSettlement": "キャンペーン精算",
     "bigbird": "Bigbird問合せ",
     "buyer": "購入者問合せ",
-    "influencer": "クリエイター問合せ",
+    "creator": "クリエイター問合せ",
     "subscribe": "サブスク",
     "money": "ビッグバードマネー",
     "account": "アカウント設定"
@@ -27,6 +27,15 @@
   },
   "registerCampaign": "キャンペーン登録",
   "guide": "利用ガイド",
+  "language": {
+    "label": "言語",
+    "name": {
+      "ko": "韓国語",
+      "en": "英語",
+      "ja": "日本語",
+      "zhCN": "中国語-簡体"
+    }
+  },
   "menu": {
     "main": "メインメニュー",
     "collapsed": "縮小メニュー",
@@ -61,6 +70,6 @@
   "role": {
     "label": "広告主・クリエイター切り替え",
     "advertiser": "広告主",
-    "influencer": "クリエイター"
+    "creator": "クリエイター"
   }
 }

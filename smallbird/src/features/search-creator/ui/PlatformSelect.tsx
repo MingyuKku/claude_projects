@@ -1,7 +1,4 @@
-import {
-  INFLUENCER_PLATFORMS,
-  isInfluencerPlatform,
-} from "@/entities/platform";
+import { CREATOR_PLATFORMS, isCreatorPlatform } from "@/entities/platform";
 import { PlatformIcon } from "@/shared/components/platform-icon";
 import { useTranslation } from "@/shared/i18n";
 import {
@@ -12,11 +9,11 @@ import {
   SelectValue,
 } from "@/shared/ui/select";
 
-import type { InfluencerPlatform } from "@/entities/platform";
+import type { CreatorPlatform } from "@/entities/platform";
 
 interface PlatformSelectProps {
-  value: InfluencerPlatform;
-  onChange: (platform: InfluencerPlatform) => void;
+  value: CreatorPlatform;
+  onChange: (platform: CreatorPlatform) => void;
 }
 
 // 입력창 안의 작은 칩 모양 트리거: 공용 SelectTrigger의 폭·글자색·간격만 시안(Text Field 플랫폼 셀렉트)에 맞춤.
@@ -27,10 +24,10 @@ const TRIGGER_CLASS_NAME =
 const ITEM_CLASS_NAME = "gap-1.5 [&_svg:not([class*='text-'])]:text-primary";
 
 export function PlatformSelect({ value, onChange }: PlatformSelectProps) {
-  const { t } = useTranslation("features/search-influencer");
+  const { t } = useTranslation("features/search-creator");
 
   function handleChangeValue(next: string) {
-    if (isInfluencerPlatform(next)) onChange(next);
+    if (isCreatorPlatform(next)) onChange(next);
   }
 
   return (
@@ -43,7 +40,7 @@ export function PlatformSelect({ value, onChange }: PlatformSelectProps) {
         <SelectValue />
       </SelectTrigger>
       <SelectContent align="start" className="max-h-56 w-50">
-        {INFLUENCER_PLATFORMS.map((platform) => (
+        {CREATOR_PLATFORMS.map((platform) => (
           <SelectItem
             key={platform}
             value={platform}

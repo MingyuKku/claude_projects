@@ -8,8 +8,8 @@
     "tooltip": "{{value}}"
   },
   "quota": {
-    "search": "Influencer searches",
-    "proposal": "Influencer proposals",
+    "search": "Creator searches",
+    "proposal": "Creator proposals",
     "used": "Used",
     "remaining": "Left"
   },
@@ -26,7 +26,7 @@
   },
   "metric": {
     "campaignCount": "Campaigns created",
-    "searchCount": "Influencer searches",
+    "searchCount": "Creator searches",
     "proposalCount": "Proposals sent",
     "matchCount": "Matches made"
   },

@@ -84,7 +84,7 @@ export const campaignDetailSchema = z.object({
     postingPeriodMonths: nullable(z.number().int()),
     secondaryCopyright: nullable(z.boolean()),
   }),
-  /** 7단계 정책 동의(A-5.7 구현 예정). */
+  /** 7단계 정책 동의. 결제할 때 기록한 값이고 결제 전·v2 캠페인은 네 항목이 모두 false. */
   policy: z
     .object({
       agreements: z.object({
@@ -95,7 +95,7 @@ export const campaignDetailSchema = z.object({
       }),
     })
     .nullish(),
-  /** 결제 정보(프론트 요청). 결제 전이면 null. */
+  /** 결제 정보. 결제 전이면 null. */
   payment: z
     .object({ paidAmount: z.number().int(), paidAt: z.string() })
     .nullish(),

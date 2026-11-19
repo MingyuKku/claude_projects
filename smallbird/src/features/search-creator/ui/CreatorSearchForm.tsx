@@ -10,7 +10,7 @@ import { useMediaQuery } from "@/shared/lib/useMediaQuery";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 
-import { buildInfluencerSearchUrl } from "../lib/build-search-url";
+import { buildCreatorSearchUrl } from "../lib/build-search-url";
 import {
   DEFAULT_PLATFORM,
   EXPAND_ACTION_MIN_LINES,
@@ -21,7 +21,7 @@ import { useInlineExpand } from "../model/useInlineExpand";
 import { useTextareaOverflow } from "../model/useTextareaOverflow";
 import { PlatformSelect } from "./PlatformSelect";
 
-import type { InfluencerPlatform } from "@/entities/platform";
+import type { CreatorPlatform } from "@/entities/platform";
 import type { CssVariableStyle } from "@/shared/lib";
 import type {
   ChangeEvent,
@@ -74,20 +74,19 @@ function preventFocusLoss(event: ReactMouseEvent<HTMLButtonElement>) {
   event.preventDefault();
 }
 
-interface InfluencerSearchFormProps {
+interface CreatorSearchFormProps {
   className?: string;
 }
 
-// 광고주가 제품 정보를 문장으로 입력하고 플랫폼을 골라 인플루언서 검색 경로로 이동함 (specs/home.md §3).
-export function InfluencerSearchForm({ className }: InfluencerSearchFormProps) {
-  const { t } = useTranslation("features/search-influencer");
+// 광고주가 제품 정보를 문장으로 입력하고 플랫폼을 골라 크리에이터 검색 경로로 이동함 (specs/home.md §3).
+export function CreatorSearchForm({ className }: CreatorSearchFormProps) {
+  const { t } = useTranslation("features/search-creator");
   const navigate = useNavigate();
   const textareaId = useId();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const formRef = useRef<HTMLFormElement>(null);
   const [query, setQuery] = useState("");
-  const [platform, setPlatform] =
-    useState<InfluencerPlatform>(DEFAULT_PLATFORM);
+  const [platform, setPlatform] = useState<CreatorPlatform>(DEFAULT_PLATFORM);
   const isTouch = useMediaQuery(MEDIA_QUERY.touch);
   const isMobile = useMediaQuery(MEDIA_QUERY.mobile);
   const expand = useInlineExpand({ formRef });
@@ -122,7 +121,7 @@ export function InfluencerSearchForm({ className }: InfluencerSearchFormProps) {
 
   function submitQuery() {
     if (!canSubmit) return;
-    void navigate(buildInfluencerSearchUrl({ query, platform }));
+    void navigate(buildCreatorSearchUrl({ query, platform }));
   }
 
   function handleChangeQuery(event: ChangeEvent<HTMLTextAreaElement>) {

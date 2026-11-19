@@ -8,11 +8,22 @@ import { cn } from "@/shared/lib/utils";
 
 import { getAttachmentDownloadUrl } from "../api/inquiry-api";
 import { formatFileSize } from "../lib/attachment-rules";
+import { hasOwnText } from "../lib/group-attachments";
 
 import type { ConversationRow } from "../lib/group-attachments";
+import type { InquiryMessageViewModel } from "../model/schema";
 import type { ReactNode } from "react";
 
 type FilesRow = Extract<ConversationRow, { type: "files" }>;
+
+/** 이미지·동영상의 표시 주소. 글과 첨부를 한 메시지로 저장해 body가 글이면 첨부 받기 주소를 씀. */
+function getMediaSrc(message: InquiryMessageViewModel) {
+  if (!hasOwnText(message) || !message.attachment) return message.body;
+  return getAttachmentDownloadUrl(
+    message.kind === "video" ? "video" : "image",
+    message.attachment.attachmentIdx,
+  );
+}
 
 interface ConversationFilesProps {
   row: FilesRow;
@@ -62,7 +73,7 @@ export function ConversationFiles({
               message.kind === "video"
                 ? ("video" as const)
                 : ("image" as const),
-            src: message.body,
+            src: getMediaSrc(message),
             name: message.attachment.fileName ?? "",
             downloadHref: getAttachmentDownloadUrl(
               message.kind === "video" ? "video" : "image",
@@ -100,9 +111,15 @@ export function ConversationFiles({
                 >
                   <FileThumbnail
                     type={message.kind === "video" ? "video" : "image"}
-                    src={message.kind === "video" ? undefined : message.body}
+                    src={
+                      message.kind === "video"
+                        ? undefined
+                        : getMediaSrc(message)
+                    }
                     videoSrc={
-                      message.kind === "video" ? message.body : undefined
+                      message.kind === "video"
+                        ? getMediaSrc(message)
+                        : undefined
                     }
                     alt={fileName}
                   />

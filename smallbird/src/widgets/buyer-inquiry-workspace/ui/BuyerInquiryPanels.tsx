@@ -45,7 +45,7 @@ interface BuyerInquiryPanelsProps {
   myAvatarSrc?: string;
 }
 
-/** 문의 대화(구매자·인플루언서 문의 스레드, 상품·캠페인 Q&A)와 상세 정보 패널. */
+/** 문의 대화(구매자·크리에이터 문의 스레드, 상품·캠페인 Q&A)와 상세 정보 패널. */
 export function BuyerInquiryPanels({
   inquiry,
   threadUserIdx,
@@ -107,7 +107,9 @@ export function BuyerInquiryPanels({
             <ChevronLeft className="size-4" />
           </Button>
           <Badge variant={STATUS_BADGE_VARIANT[inquiry.status]}>
-            {t(`status.${inquiry.status}`)}
+            {inquiry.status === "unknown"
+              ? inquiry.statusCode
+              : t(`status.${inquiry.status}`)}
           </Badge>
           <Avatar size="md">
             {avatarSrc && <AvatarImage src={avatarSrc} alt="" />}
@@ -204,7 +206,7 @@ export function BuyerInquiryPanels({
 }
 
 /**
- * 진행 중인 구매자·인플루언서 실시간 상담의 종료 버튼(`PUT /v3/help/thread/{threadIdx}`, 가이드 2026-11-03).
+ * 진행 중인 구매자·크리에이터 실시간 상담의 종료 버튼(`PUT /v3/help/thread/{threadIdx}`, 가이드 2026-11-03).
  * 문의 번호가 스레드 번호와 같음. 시간 초과 종료는 백엔드 스케줄러가 하므로 프론트 타이머는 없음.
  */
 function RealtimeFinishButton({
@@ -220,6 +222,8 @@ function RealtimeFinishButton({
   const { t } = useTranslation("widgets/buyer-inquiry-workspace");
   const { mutate } = usePurchaserConversation(inquiry);
   const [isFinishing, setIsFinishing] = useState(false);
+  // 상대가 요청한 상담을 광고주가 첫 메시지로 연결하기 전(상담 요청 중)에는 끝낼 수 없음.
+  const isRequested = inquiry.status === "requested";
 
   async function handleClickFinish() {
     setIsFinishing(true);
@@ -244,7 +248,7 @@ function RealtimeFinishButton({
     <Button
       variant="outline-foreground"
       size="sm"
-      disabled={isFinishing}
+      disabled={isFinishing || isRequested}
       onClick={() => void handleClickFinish()}
     >
       {t("realtime.end")}

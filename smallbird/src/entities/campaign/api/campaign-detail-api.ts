@@ -12,6 +12,7 @@ import {
   campaignPaymentErrorSchema,
   campaignReapprovalRequestedSchema,
 } from "../model/detail-schema";
+import { SERVER_STEP_PATHS } from "../model/server-steps";
 import { loadCampaignDetailMock, loadCampaignShadowMock } from "./mock-loader";
 import {
   applyShadowToLiveDetail,
@@ -21,22 +22,11 @@ import {
 
 import type { CampaignProductType, CampaignServiceType } from "../model/codes";
 import type { CampaignDetail } from "../model/detail-types";
-import type { CampaignDraft, CampaignDraftStep } from "../model/draft";
-
-/** 서버가 받는 단계 경로. 정책 동의(7단계)는 서버 API가 없어 목이 처리함. */
-const SERVER_STEP_PATHS = {
-  info: "info",
-  product: "product",
-  influencer: "influencer",
-  addOns: "add-ons",
-  intro: "intro",
-  conditions: "conditions",
-} as const satisfies Partial<Record<CampaignDraftStep, string>>;
-type ServerStep = keyof typeof SERVER_STEP_PATHS;
-
-function isServerStep(step: CampaignDraftStep): step is ServerStep {
-  return step in SERVER_STEP_PATHS;
-}
+import type {
+  CampaignDraft,
+  CampaignDraftStep,
+  CampaignPolicyAgreements,
+} from "../model/draft";
 
 /** A-1 `POST /v3/campaign`. 등록 화면에 들어올 때 한 번 부름(서버가 중복 생성을 막지 않음). */
 export async function createCampaign(input: {
@@ -76,7 +66,9 @@ export async function saveCampaignStep(
   step: CampaignDraftStep,
   draft: CampaignDraft,
 ): Promise<void> {
-  if (isCampaignApiMock() || !isServerStep(step)) {
+  // 정책 동의는 임시저장하지 않음(서버가 결제할 때 기록함).
+  if (step === "policy") return;
+  if (isCampaignApiMock()) {
     await runShadowOperation(campaignIdx, async (mock) => {
       const response = await mock.saveCampaignStep(
         campaignIdx,
@@ -119,17 +111,19 @@ export async function copyCampaign(
 }
 
 /**
- * `POST /v3/campaign/{campaignIdx}/payment`. 빅버드 머니로 결제하고 승인 요청을 겸함. 화면에 보인 총액을 함께 보내
- * 서버 계산과 다르면 거절됨(`AMOUNT_CHANGED`). 0원이어도 승인 요청으로 부름.
+ * `POST /v3/campaign/{campaignIdx}/payment`. 빅버드 머니로 결제하고 승인 요청을 겸함. 화면에 보인 총액(부가세 포함)과
+ * 정책 동의를 함께 보내고, 서버 계산과 다르면 거절됨(`AMOUNT_CHANGED`). 0원이어도 승인 요청으로 부름.
  */
 export async function payCampaign(
   campaignIdx: number,
-  expectedTotalAmount: number,
+  body: { expectedTotalAmount: number; agreements: CampaignPolicyAgreements },
 ) {
-  return runShadowOperation(campaignIdx, async (mock) =>
-    campaignPaidSchema.parse(
-      await mock.payCampaign(campaignIdx, { expectedTotalAmount }),
-    ),
+  if (isCampaignApiMock()) {
+    const mock = await loadCampaignDetailMock();
+    return campaignPaidSchema.parse(await mock.payCampaign(campaignIdx, body));
+  }
+  return campaignPaidSchema.parse(
+    await serverApiV3.post(`/campaign/${campaignIdx}/payment`, body),
   );
 }
 
@@ -146,32 +140,58 @@ export function readCampaignPaymentError(error: unknown) {
 
 /** `POST /v3/campaign/{campaignIdx}/payment/cancel`. 결제 금액 전액을 빅버드 머니로 환불하고 등록 중으로 돌림. */
 export async function cancelCampaignApproval(campaignIdx: number) {
-  return runShadowOperation(campaignIdx, async (mock) =>
-    campaignApprovalCanceledSchema.parse(
+  if (isCampaignApiMock()) {
+    const mock = await loadCampaignDetailMock();
+    return campaignApprovalCanceledSchema.parse(
       await mock.cancelCampaignApproval(campaignIdx),
-    ),
-  );
-}
-
-/** `POST /v3/campaign/{campaignIdx}/approval`. 반려 뒤 고친 내용으로 다시 승인을 요청함(추가 결제 없음). */
-export async function requestCampaignReapproval(campaignIdx: number) {
-  return runShadowOperation(campaignIdx, async (mock) =>
-    campaignReapprovalRequestedSchema.parse(
-      await mock.requestCampaignReapproval(campaignIdx),
-    ),
+    );
+  }
+  return campaignApprovalCanceledSchema.parse(
+    await serverApiV3.post(`/campaign/${campaignIdx}/payment/cancel`),
   );
 }
 
 /**
- * 개발 서버 확인 도구: 운영 화면이 없어 승인 검토중 캠페인을 운영팀처럼 반려·승인함. 배포 빌드에는 목이 없어 늘 실패함.
+ * `POST /v3/campaign/{campaignIdx}/approval`. 반려 뒤 고친 내용으로 다시 승인을 요청함(추가 결제 없음). 반려하면 서버가
+ * 정책 동의를 지우므로 결제처럼 동의 4개를 함께 보내고, 하나라도 true가 아니면 거절됨(`POLICY_NOT_AGREED`).
+ */
+export async function requestCampaignReapproval(
+  campaignIdx: number,
+  agreements: CampaignPolicyAgreements,
+) {
+  if (isCampaignApiMock()) {
+    const mock = await loadCampaignDetailMock();
+    return campaignReapprovalRequestedSchema.parse(
+      await mock.requestCampaignReapproval(campaignIdx, agreements),
+    );
+  }
+  return campaignReapprovalRequestedSchema.parse(
+    await serverApiV3.post(`/campaign/${campaignIdx}/approval`, {
+      agreements,
+    }),
+  );
+}
+
+/**
+ * 개발 서버 확인 도구: 운영 앱이 V3에 연결되기 전이라 승인 검토중 캠페인을 운영팀처럼 반려·승인함. 서버의 stage 전용
+ * API(`/test/approve`·`/test/reject`, prod에서는 404)를 부르며, 이 도구는 개발 서버(`DEV`)에서만 그림.
  */
 export async function reviewCampaignForDev(
   campaignIdx: number,
   decision: { type: "reject"; reason: string } | { type: "approve" },
 ) {
-  await runShadowOperation(campaignIdx, (mock) =>
-    mock.reviewCampaignForDev(campaignIdx, decision),
-  );
+  if (isCampaignApiMock()) {
+    const mock = await loadCampaignDetailMock();
+    await mock.reviewCampaignForDev(campaignIdx, decision);
+    return;
+  }
+  if (decision.type === "approve") {
+    await serverApiV3.post(`/campaign/${campaignIdx}/test/approve`);
+    return;
+  }
+  await serverApiV3.post(`/campaign/${campaignIdx}/test/reject`, {
+    rejectReason: decision.reason,
+  });
 }
 
 /** `POST /v3/campaign/{campaignIdx}/demo/complete`. 데모 작성을 마침(결제·승인 요청 없음). 이후 수정할 수 없음. */

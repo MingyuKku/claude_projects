@@ -2,7 +2,7 @@
   "step": {
     "campaignInfo": "キャンペーン情報入力",
     "product": "商品情報入力",
-    "influencer": "クリエイター条件",
+    "creator": "クリエイター条件",
     "addOns": "オプション",
     "intro": "캠페인 소개서",
     "conditions": "進行条件設定",
@@ -196,7 +196,7 @@
       "emptyDescription": "記事の方向性と詳しいガイドは、<br/>次の「캠페인 소개서」で入力してください。"
     }
   },
-  "influencer": {
+  "creator": {
     "platform": "プラットフォーム選択",
     "gender": {
       "label": "希望性別",
@@ -299,7 +299,7 @@
     },
     "description": {
       "label": "キャンペーン説明",
-      "placeholder": "インフルエンサーに表示するキャンペーン紹介と期待する内容を入力してください。"
+      "placeholder": "クリエイターに表示するキャンペーン紹介と期待する内容を入力してください。"
     },
     "notice": {
       "label": "注意事項",
@@ -423,7 +423,7 @@
     "section": {
       "info": "キャンペーン情報",
       "product": "製品情報",
-      "influencer": "インフルエンサー条件",
+      "creator": "クリエイター条件",
       "addOns": "付加サービス",
       "intro": "캠페인 소개서",
       "conditions": "進行条件",
@@ -458,7 +458,7 @@
       "storeAddress": "店舗住所",
       "benefit": "提供特典または体験内容"
     },
-    "influencer": {
+    "creator": {
       "platform": "プラットフォーム",
       "ageGroups": "年代",
       "gender": "性別",
@@ -509,7 +509,7 @@
   },
   "revision": {
     "lockedAmount": "決済金額に影響する値のため修正できません。",
-    "lockedCompleted": "同意・決済済みの内容のため修正できません。"
+    "lockedCompleted": "決済済みの内容のため修正できません。"
   },
   "demo": {
     "notice": "現在デモモードでキャンペーンを作成しています。実際の決済や承認リクエストは行われません。",

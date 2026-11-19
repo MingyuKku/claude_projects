@@ -2,19 +2,19 @@
   "nav": {
     "home": "Home",
     "campaign": "Campaigns",
-    "influencerMatching": "Matching",
-    "influencerMarket": "Influencer market",
+    "creatorMatching": "Matching",
+    "creatorMarket": "Creator market",
     "commerce": "Commerce",
     "mypage": "My page",
     "support": "Support",
-    "search": "Influencer search",
-    "influencerManage": "Influencer management",
+    "search": "Creator search",
+    "creatorManage": "Creator management",
     "chat": "Chat",
     "commerceSales": "Sales management",
     "commerceSettlement": "Campaign settlement",
     "bigbird": "Ask Bigbird",
     "buyer": "Buyer Q&A",
-    "influencer": "Influencer Q&A",
+    "creator": "Creator Q&A",
     "subscribe": "Subscription",
     "money": "Bigbird Money",
     "account": "Account Settings"
@@ -27,6 +27,15 @@
   },
   "registerCampaign": "New campaign",
   "guide": "Guide",
+  "language": {
+    "label": "Language",
+    "name": {
+      "ko": "Korean",
+      "en": "English",
+      "ja": "Japanese",
+      "zhCN": "Chinese-Simplified"
+    }
+  },
   "menu": {
     "main": "Main menu",
     "collapsed": "Collapsed menu",
@@ -59,8 +68,8 @@
     "checkFailed": "Couldn't check sign-in status. Try again."
   },
   "role": {
-    "label": "Switch between advertiser and influencer",
+    "label": "Switch between advertiser and creator",
     "advertiser": "Advertiser",
-    "influencer": "Influencer"
+    "creator": "Creator"
   }
 }

@@ -346,6 +346,25 @@ describe("첨부 메시지", () => {
   });
 });
 
+describe("출금 문의 대화 헤더", () => {
+  it("헤더 제목을 기타 문의 대신 출금 문의로 보인다", () => {
+    get.mockReturnValue(new Promise(() => {}));
+    renderConversation(
+      inquiry({
+        isRealtime: false,
+        realtimePhase: null,
+        isWithdrawalInquiry: true,
+      }),
+      undefined,
+      vi.fn(),
+    );
+    expect(
+      screen.getByRole("heading", { name: /빅버드 머니 출금 문의/ }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("기타 문의")).not.toBeInTheDocument();
+  });
+});
+
 describe("빅버드 머니 출금 요청 카드", () => {
   const withdrawalMessage = (
     id: number,
@@ -401,6 +420,49 @@ describe("빅버드 머니 출금 요청 카드", () => {
       screen.getByText("통장 사본과 신청자 명의가 일치하지 않습니다."),
     ).toBeInTheDocument();
     expect(screen.getAllByText("거절 사유")).toHaveLength(1);
+  });
+
+  it("신청자 이름이 없는 카드와 글+첨부 한 메시지(실제 stage 응답 모양)에서 카드·접수 글·첨부가 모두 보인다", () => {
+    get.mockReturnValue(new Promise(() => {}));
+    const card = withdrawalMessage(13771, "requested", 959107500);
+    renderConversation(
+      inquiry({
+        isRealtime: false,
+        realtimePhase: null,
+        messages: [
+          {
+            ...card,
+            withdrawal: {
+              ...card.withdrawal,
+              applicantName: undefined,
+              applicantId: "diyou0408",
+            },
+          },
+          {
+            ...card,
+            id: 13772,
+            kind: "image" as const,
+            body: "출금 요청이 접수되었습니다.",
+            withdrawal: null,
+            attachment: {
+              attachmentIdx: 2870,
+              fileName: "cute_dog_2 (1).jpeg",
+              fileSize: null,
+              fileType: "image/jpeg",
+            },
+          },
+        ],
+      }),
+      undefined,
+      vi.fn(),
+    );
+    expect(screen.getByText("959,107,500원")).toBeInTheDocument();
+    expect(screen.getByText("@diyou0408")).toBeInTheDocument();
+    expect(screen.getByText("출금 요청이 접수되었습니다.")).toBeInTheDocument();
+    // 글이 이미지 주소로 쓰이지 않고, 첨부는 첨부 받기 주소로 보임.
+    expect(
+      screen.getByAltText("cute_dog_2 (1).jpeg").getAttribute("src"),
+    ).toContain("/v3/help/file/download/image/2870");
   });
 
   it("출금 요청 메시지를 상태별 카드로 그리고 수정·삭제 툴바는 두지 않는다", () => {
@@ -549,6 +611,40 @@ describe("텍스트+첨부 묶음의 수정·삭제", () => {
     expect(screen.queryByText("지울 메시지")).not.toBeInTheDocument();
     expect(screen.getByText("남길 메시지")).toBeInTheDocument();
     expect(get.mock.calls.length).toBe(fetchedCount);
+  });
+
+  it("글+첨부를 한 메시지로 저장한 글(합성 글)에는 수정·삭제 툴바가 열리지 않는다", async () => {
+    const user = userEvent.setup();
+    renderConversation(
+      inquiry({
+        isRealtime: false,
+        realtimePhase: null,
+        messages: [
+          {
+            ...base,
+            id: 20,
+            kind: "image" as const,
+            body: "출금 요청이 접수되었습니다.",
+            createdAt: new Date("2026-10-19T10:00:00"),
+            attachment: {
+              attachmentIdx: 2870,
+              fileName: "a.jpeg",
+              fileSize: null,
+              fileType: "image/jpeg",
+            },
+          },
+        ],
+      }),
+      undefined,
+      vi.fn(),
+    );
+    await user.click(screen.getByText("출금 요청이 접수되었습니다."));
+    expect(
+      screen.queryByRole("button", { name: "수정" }),
+    ).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: "삭제" }),
+    ).not.toBeInTheDocument();
   });
 
   it("종료된 문의에서는 툴바가 없다", async () => {

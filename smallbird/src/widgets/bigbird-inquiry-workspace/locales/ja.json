@@ -5,6 +5,7 @@
   "waiting": "返信待ち",
   "consulting": "相談中",
   "consultingBadge": "リアルタイム相談中",
+  "requestedBadge": "相談リクエスト中",
   "done": "回答済み",
   "empty": {
     "title": "お問い合わせはありません。",
@@ -14,7 +15,8 @@
   "inquiryTitle": {
     "campaign": "{{name}}の問合せ",
     "campaignUnknown": "キャンペーン問合せ",
-    "other": "その他問合せ"
+    "other": "その他問合せ",
+    "withdrawal": "ビッグバードマネー出金問合せ"
   },
   "bigbirdManager": "Bigbird担当者",
   "completed": {

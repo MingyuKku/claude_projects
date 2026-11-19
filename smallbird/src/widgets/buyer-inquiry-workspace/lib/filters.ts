@@ -10,7 +10,7 @@ import type {
   BuyerInquiryFilters,
 } from "@/entities/inquiry";
 
-// Figma 26/10/29(11315:50439) 탭 순서: 전체 · 답변 대기 · 상담 중 · 답변 완료(구매자·인플루언서 문의 공통, 사용자 결정 2026-11-05)
+// Figma 26/10/29(11315:50439) 탭 순서: 전체 · 답변 대기 · 상담 중 · 답변 완료(구매자·크리에이터 문의 공통, 사용자 결정 2026-11-05)
 export const STATUS_FILTERS = ["all", "waiting", "consulting", "done"] as const;
 
 function toPositiveNumber(value: string | null) {
@@ -37,10 +37,10 @@ export function toBuyerInquiryFilters(
   return {
     sourceType: source ? INQUIRY_SOURCE_TYPE[source] : "ALL",
     campaignIdx,
-    influencerThreadUserIdx:
+    creatorThreadUserIdx:
       campaignIdx === undefined
         ? undefined
-        : toPositiveNumber(params.get("influencerThreadUserIdx")),
+        : toPositiveNumber(params.get("creatorThreadUserIdx")),
     keyword: params.get("q")?.trim() || undefined,
     startDate: hasDateRange ? (startDate ?? undefined) : undefined,
     endDate: hasDateRange ? (endDate ?? undefined) : undefined,

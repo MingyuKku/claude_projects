@@ -23,11 +23,14 @@ import {
   UserMenu,
 } from "@/shared/components/app-header";
 import { Dimmed } from "@/shared/components/dimmed";
+import { GuideButton } from "@/shared/components/guide-button";
+import { LanguageMenu } from "@/shared/components/language-menu";
 import {
   SidebarNav,
   SidebarNavItem,
   SidebarRailItem,
 } from "@/shared/components/sidebar-nav";
+import { ToggleTab } from "@/shared/components/toggle-tab";
 import { Avatar, AvatarPlaceholder } from "@/shared/ui/avatar";
 import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
@@ -53,8 +56,8 @@ const NAV_ITEMS: SidebarNavItemData[] = [
   { id: "home", label: "홈", icon: House, href: "#", isActive: true },
   { id: "campaign", label: "캠페인", icon: Handshake, href: "#" },
   {
-    id: "influencer",
-    label: "인플루언서",
+    id: "creator",
+    label: "크리에이터",
     icon: Users,
     subItems: SUB_ITEMS,
   },
@@ -122,6 +125,11 @@ const HEADER_ROWS: HeaderRow[] = [
   "Log-Out",
 ];
 
+const LANGUAGE_OPTIONS = [
+  { value: "ko", code: "KO", label: "한국어" },
+  { value: "en", code: "EN", label: "English" },
+];
+
 function Caption({ children }: { children: string }) {
   return (
     <span className="text-xs font-medium text-muted-foreground">
@@ -134,7 +142,15 @@ function MainHeader({ row, title }: { row: HeaderRow; title?: string }) {
   return (
     <AppHeader title={title} icon={<House />} menuLabel="메뉴 열기">
       {row === "Log-Out" ? (
-        <HeaderGuestActions guideLabel="이용 가이드" loginLabel="로그인" />
+        <HeaderGuestActions loginLabel="로그인">
+          <GuideButton label="이용 가이드" />
+          <LanguageMenu
+            value="ko"
+            options={LANGUAGE_OPTIONS}
+            menuLabel="언어 선택"
+            onChangeLanguage={() => {}}
+          />
+        </HeaderGuestActions>
       ) : (
         <>
           <HeaderPointButton amount="999,999" label="포인트" />
@@ -354,9 +370,9 @@ function SidebarPreview() {
     <>
       <Section title="Sidebar (5058:76567)">
         {[
-          { caption: "Open / Close=False, Guide Button=True", guide: true },
-          { caption: "Open / Close=False, Guide Button=False", guide: false },
-        ].map(({ caption, guide }) => (
+          { caption: "Open / Close=False, Footer=True", hasFooter: true },
+          { caption: "Open / Close=False, Footer=False", hasFooter: false },
+        ].map(({ caption, hasFooter }) => (
           <div key={caption} className="flex flex-col gap-1">
             <Caption>{caption}</Caption>
             <div className="h-200">
@@ -366,7 +382,33 @@ function SidebarPreview() {
                 navLabel="주 메뉴"
                 toggleLabel="사이드바 접기"
                 primaryActionLabel="캠페인 등록하기"
-                guideLabel={guide ? "이용 가이드" : undefined}
+                footerActions={
+                  hasFooter ? (
+                    <>
+                      <GuideButton label="이용 가이드" />
+                      <LanguageMenu
+                        value="ko"
+                        options={LANGUAGE_OPTIONS}
+                        menuLabel="언어 선택"
+                        onChangeLanguage={() => {}}
+                      />
+                    </>
+                  ) : undefined
+                }
+                footerSwitch={
+                  hasFooter ? (
+                    <ToggleTab
+                      aria-label="광고주·크리에이터 전환"
+                      className="w-full *:flex-1"
+                      value="advertiser"
+                      onValueChange={() => {}}
+                      options={[
+                        { value: "advertiser", label: "광고주" },
+                        { value: "creator", label: "크리에이터" },
+                      ]}
+                    />
+                  ) : undefined
+                }
               />
             </div>
           </div>

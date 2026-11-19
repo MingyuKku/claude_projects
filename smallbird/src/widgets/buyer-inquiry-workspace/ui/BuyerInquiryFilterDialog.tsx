@@ -3,7 +3,7 @@ import { useId, useState } from "react";
 
 import {
   INQUIRY_SOURCE_TYPE,
-  useBuyerInfluencerOptions,
+  useBuyerCreatorOptions,
   useInquiryCampaigns,
 } from "@/entities/inquiry";
 import { Combobox } from "@/shared/components/combobox";
@@ -52,7 +52,7 @@ export function BuyerInquiryFilterDialog({
   const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
   const [open, setOpen] = useState(false);
   const titleId = useId();
-  // Figma 인플루언서 필터(10819:41465): 전체 · 인플루언서 문의 · 캠페인 Q&A.
+  // Figma 크리에이터 필터(10819:41465): 전체 · 크리에이터 문의 · 캠페인 Q&A.
   const sourceTypes = [
     "ALL",
     ...INQUIRY_MENU[menu].sources.map((source) => INQUIRY_SOURCE_TYPE[source]),
@@ -61,14 +61,14 @@ export function BuyerInquiryFilterDialog({
   const [draft, setDraft] = useState<BuyerInquiryFilters>(value);
   const { filterSourceType } = INQUIRY_MENU[menu];
   const { campaigns } = useInquiryCampaigns(threadUserIdx, filterSourceType);
-  const { options } = useBuyerInfluencerOptions(
+  const { options } = useBuyerCreatorOptions(
     draft.campaignIdx,
     filterSourceType,
   );
   const hasChanges =
     draft.sourceType !== value.sourceType ||
     draft.campaignIdx !== value.campaignIdx ||
-    draft.influencerThreadUserIdx !== value.influencerThreadUserIdx ||
+    draft.creatorThreadUserIdx !== value.creatorThreadUserIdx ||
     toRangeKey(draft) !== toRangeKey(value);
 
   function handleOpenChange(next: boolean) {
@@ -101,7 +101,7 @@ export function BuyerInquiryFilterDialog({
           <legend className="mb-2 text-sm font-medium">
             {t("filter.source")}
           </legend>
-          {/* 토글 간격 8, 3개(인플루언서 메뉴)도 한 줄에 들어가도록 최소 폭 없이 균등 분배, 선택은 흰 2px을 띄운 primary 링(Figma Toggle focus ring) */}
+          {/* 토글 간격 8, 3개(크리에이터 메뉴)도 한 줄에 들어가도록 최소 폭 없이 균등 분배, 선택은 흰 2px을 띄운 primary 링(Figma Toggle focus ring) */}
           <div className="flex gap-2">
             {sourceTypes.map((sourceType) => (
               <Button
@@ -137,7 +137,7 @@ export function BuyerInquiryFilterDialog({
             setDraft((current) => ({
               ...current,
               campaignIdx: selected === "all" ? undefined : Number(selected),
-              influencerThreadUserIdx: undefined,
+              creatorThreadUserIdx: undefined,
             }))
           }
           options={[
@@ -153,15 +153,15 @@ export function BuyerInquiryFilterDialog({
           searchPlaceholder=""
           emptyText=""
         />
-        {/* 인플루언서는 검색되는 콤보박스(Figma Combobox 6777:61876) */}
+        {/* 크리에이터는 검색되는 콤보박스(Figma Combobox 6777:61876) */}
         <Combobox
-          label={t("filter.influencer")}
+          label={t("filter.creator")}
           disabled={draft.campaignIdx === undefined}
-          value={draft.influencerThreadUserIdx?.toString() ?? ""}
+          value={draft.creatorThreadUserIdx?.toString() ?? ""}
           onValueChange={(selected) =>
             setDraft((current) => ({
               ...current,
-              influencerThreadUserIdx:
+              creatorThreadUserIdx:
                 selected === "all" ? undefined : Number(selected),
             }))
           }
@@ -171,11 +171,11 @@ export function BuyerInquiryFilterDialog({
               value: option.threadUserIdx.toString(),
               label:
                 option.displayName ??
-                t("filter.influencerFallback", { idx: option.threadUserIdx }),
+                t("filter.creatorFallback", { idx: option.threadUserIdx }),
             })),
           ]}
-          placeholder={t("filter.influencerPlaceholder")}
-          searchPlaceholder={t("filter.influencerSearchPlaceholder")}
+          placeholder={t("filter.creatorPlaceholder")}
+          searchPlaceholder={t("filter.creatorSearchPlaceholder")}
           // 검색 결과 없음 문구는 시안에 없어 비워 둠(문구 확정 대기)
           emptyText=""
         />

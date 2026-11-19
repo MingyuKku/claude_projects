@@ -8,8 +8,8 @@
     "tooltip": "{{value}}건"
   },
   "quota": {
-    "search": "인플루언서 검색 횟수",
-    "proposal": "인플루언서 제안 횟수",
+    "search": "크리에이터 검색 횟수",
+    "proposal": "크리에이터 제안 횟수",
     "used": "사용",
     "remaining": "잔여"
   },
@@ -26,7 +26,7 @@
   },
   "metric": {
     "campaignCount": "캠페인 생성 수",
-    "searchCount": "인플루언서 검색 수",
+    "searchCount": "크리에이터 검색 수",
     "proposalCount": "제안 발송 수",
     "matchCount": "매칭 성사 수"
   },

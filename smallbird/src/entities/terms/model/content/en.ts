@@ -324,7 +324,7 @@ The definitions of the terms used in these Terms are as follows.
 
 2. "Member" means a person who has completed the Member registration procedure through the Webpage and is able to use the Service provided by the Company.
 
-3. "Influencer" means a Member who promotes an Advertiser's products by posting product usage reviews, evaluations, etc. (hereinafter collectively "Content") through Social Media.
+3. "Creator" means a Member who promotes an Advertiser's products by posting product usage reviews, evaluations, etc. (hereinafter collectively "Content") through Social Media.
 
 4. "Advertiser" means a Member who wishes to sell products using the Service.
 
@@ -332,7 +332,7 @@ The definitions of the terms used in these Terms are as follows.
 
 6. "Social Media" means a channel (Social Network Service) in which conversation and interaction take place using Content.
 
-7. "Campaign" means an event in which an Advertiser and an Influencer enter into a marketing service agreement and the Influencer promotes the Advertiser's products through Social Media.
+7. "Campaign" means an event in which an Advertiser and a Creator enter into a marketing service agreement and the Creator promotes the Advertiser's products through Social Media.
 
 Article 3 (Effect of the Terms)
 
@@ -405,47 +405,47 @@ Chapter 3 Provision and Use of the Service
 
 Article 9 (Content of the Service)
 
-1. Advertisers and Influencers may conduct or participate in the following Campaigns through the Service.
+1. Advertisers and Creators may conduct or participate in the following Campaigns through the Service.
 
-① Brand-type Campaign : A form of promotion in which content promoting an Advertiser's brand or product is produced and promoted by, for example, being exposed on the Influencer's Social Media, with specific details governed by the "Service" policy.
+① Brand-type Campaign : A form of promotion in which content promoting an Advertiser's brand or product is produced and promoted by, for example, being exposed on the Creator's Social Media, with specific details governed by the "Service" policy.
 
-② Group-purchase Type I Campaign : A Campaign in which an Advertiser enters into a marketing service agreement with an Influencer through the "Service" to promote a product, and the Influencer promotes the product through Social Media activities or the like and receives a portion of the amount sold through such promotion as a commission, with specific details governed by the "Service" policy.
+② Group-purchase Type I Campaign : A Campaign in which an Advertiser enters into a marketing service agreement with a Creator through the "Service" to promote a product, and the Creator promotes the product through Social Media activities or the like and receives a portion of the amount sold through such promotion as a commission, with specific details governed by the "Service" policy.
 
-③ Group-purchase Type II Campaign : A form of promotion in which the list of products of Advertisers registered with the "Service" is exposed only to Influencers registered with the Service, and the Influencer directly selects the products they wish to promote and receives a commission after promoting them, with specific details governed by the "Service" policy.
+③ Group-purchase Type II Campaign : A form of promotion in which the list of products of Advertisers registered with the "Service" is exposed only to Creators registered with the Service, and the Creator directly selects the products they wish to promote and receives a commission after promoting them, with specific details governed by the "Service" policy.
 
 ④ Easy Shop-type Campaign : A Campaign in which an Advertiser provides market (store) opening and payment functions in order to sell products directly, and receives an agreed commission per market, with specific details governed by the "Service" policy.
 
-⑤ App-install-type Campaign : A Campaign in which, in order to promote an Advertiser's app (application), an Advertiser enters into a marketing service agreement with an Influencer through the "Service", and the Influencer promotes the product through Social Media activities or the like and receives an agreed commission according to the number of subscribers who install the app through such promotion, with specific details governed by the "Service" policy.
+⑤ App-install-type Campaign : A Campaign in which, in order to promote an Advertiser's app (application), an Advertiser enters into a marketing service agreement with a Creator through the "Service", and the Creator promotes the product through Social Media activities or the like and receives an agreed commission according to the number of subscribers who install the app through such promotion, with specific details governed by the "Service" policy.
 
-2. The Company may recommend Influencers suitable for an Advertiser's Campaign according to conditions such as the Advertiser's advertising purpose, category, and budget, and the Advertiser may select some or all of them to conduct the Campaign.
+2. The Company may recommend Creators suitable for an Advertiser's Campaign according to conditions such as the Advertiser's advertising purpose, category, and budget, and the Advertiser may select some or all of them to conduct the Campaign.
 
-3. After Influencer matching is completed, an Advertiser cannot request cancellation of the Campaign or a refund. However, an Advertiser may apply to the Company to change the content or schedule of the Campaign one (1) time only, and the Company may approve or reject the application depending on whether the Influencer consents, the progress of the Campaign, and so on.
+3. After Creator matching is completed, an Advertiser cannot request cancellation of the Campaign or a refund. However, an Advertiser may apply to the Company to change the content or schedule of the Campaign one (1) time only, and the Company may approve or reject the application depending on whether the Creator consents, the progress of the Campaign, and so on.
 
 4. The Company may request an Advertiser to register and sell Campaign products through a shopping hosting solution operated by the Company or by a 3rd party designated by the Company. If an Advertiser wishes to sell Campaign products through the Advertiser's own separate sales site rather than the shopping hosting solution provided by the Company, the Advertiser must apply the tracking code issued by the Service.
 
-5. When a Campaign ends, the Company provides the Advertiser and the Influencer with information on the Campaign's performance.
+5. When a Campaign ends, the Company provides the Advertiser and the Creator with information on the Campaign's performance.
 
 6. The Company may add or change the details of the Service where necessary, and in the event of a material change, it will announce the change by posting on the Webpage or the like or by providing a linked screen.
 
 Article 10 (Payment Settlement)
 
-1. Figures such as the sales price and sales volume generated through the Service can be checked on the Advertiser-only platform and the Influencer-only platform.
+1. Figures such as the sales price and sales volume generated through the Service can be checked on the Advertiser-only platform and the Creator-only platform.
 
-2. In using the Service, Advertisers and Influencers must not engage in unlawful acts such as falsely generating or understating performance by abnormal means, and if they do, they may bear civil and criminal liability.
+2. In using the Service, Advertisers and Creators must not engage in unlawful acts such as falsely generating or understating performance by abnormal means, and if they do, they may bear civil and criminal liability.
 
 3. Payment settlement is carried out for each individual Campaign, and the profit-sharing method that the Member agreed to before the start of the Campaign applies.
 
 4. The Advertiser pays the Company the advertising fee calculated according to the Service's per-Campaign profit-sharing criteria.
 
-5. The Company pays commissions to Influencer Members according to the Service's per-Campaign profit-sharing criteria.
+5. The Company pays commissions to Creator Members according to the Service's per-Campaign profit-sharing criteria.
 
-6. The settlement period under Paragraphs 3 through 5 of this Article is, in principle, in units of 1 month, and, after the Campaign ends and the review of refunds and cancellations, including sales performance, is completed, settlement is carried out by the 10th of the following month for purchases that have been confirmed, and is managed through the Advertiser-only platform and the Influencer-only platform.
+6. The settlement period under Paragraphs 3 through 5 of this Article is, in principle, in units of 1 month, and, after the Campaign ends and the review of refunds and cancellations, including sales performance, is completed, settlement is carried out by the 10th of the following month for purchases that have been confirmed, and is managed through the Advertiser-only platform and the Creator-only platform.
 
 Article 11 (Disclaimer of Agency and Warranty)
 
-1. The Company is a mail-order brokerage business operator that mediates the conclusion of product purchase contracts among Advertisers, Influencers, and Buyers, and merely operates, manages, and provides the system for purchasing products; it does not act as an agent of Advertisers or Buyers, and the responsibility for transactions concluded between Members and for the information provided by a Member must be borne directly by that Member.
+1. The Company is a mail-order brokerage business operator that mediates the conclusion of product purchase contracts among Advertisers, Creators, and Buyers, and merely operates, manages, and provides the system for purchasing products; it does not act as an agent of Advertisers or Buyers, and the responsibility for transactions concluded between Members and for the information provided by a Member must be borne directly by that Member.
 
-2. In connection with transactions among Advertisers, Influencers, and Buyers, the Company does not warrant anything, including the existence and genuineness of the intent to sell or buy, the quality, completeness, safety, and legality of registered products and their non-infringement of the rights of others, and the truthfulness or legality of information entered by Buyers or Advertisers and of materials posted on URLs linked through such information.
+2. In connection with transactions among Advertisers, Creators, and Buyers, the Company does not warrant anything, including the existence and genuineness of the intent to sell or buy, the quality, completeness, safety, and legality of registered products and their non-infringement of the rights of others, and the truthfulness or legality of information entered by Buyers or Advertisers and of materials posted on URLs linked through such information.
 
 3. The Company makes no warranty or representation whatsoever regarding the content of products registered by Advertisers or the terms of transactions.
 
@@ -473,7 +473,7 @@ Article 13 (Attribution of Copyright and Restrictions on Use)
 
 1. Copyright and other intellectual property rights in works created by the Company belong to the Company.
 
-2. Copyright in compensated Content created by an Influencer through the Service belongs to the Advertiser and the Company.
+2. Copyright in compensated Content created by a Creator through the Service belongs to the Advertiser and the Company.
 
 3. A Member must not, without the Company's prior consent, use intellectual property rights belonging to the Company for profit-making purposes by reproduction, transmission, publication, distribution, broadcasting, or other means, or allow a 3rd party to do so.
 
@@ -503,19 +503,19 @@ Article 15 (Obligations of Members)
 ⑫ Distributing to others, or exploiting, system errors or bugs that a Member discovers on the Company's website
 ⑬ Other acts equivalent to those in Items 1 through 12 that harm the Company
 
-Article 16 (Rights and Obligations of Influencers)
+Article 16 (Rights and Obligations of Creators)
 
-1. When posting information about products on Social Media, an Influencer must comply with the following obligations.
+1. When posting information about products on Social Media, a Creator must comply with the following obligations.
 
-① The Influencer must create Content in compliance with the guidelines provided by the Company or the Advertiser.
-② The Influencer posts Content on the designated date after receiving the Advertiser's sponsored goods or samples.
-③ When creating Content, the Influencer must attach photos or videos of the product together with a review, etc., and must fill in other items essential for promotion.
-④ As agreed with the Advertiser, the Influencer uploads Content to Social Media after inspection by the Advertiser, and may not arbitrarily modify or delete Content that has been created without the Advertiser's consent.
-⑤ The Influencer must keep the post publicly visible for the contracted period starting from the day after the end date of the writing period. (However, in the case of a group-purchase Campaign, information such as the sales price will be deleted at the Advertiser's request after the group-purchase period ends.)
-⑥ If the Advertiser requests a revision because the Content created by the Influencer does not match the product or contains exaggerated or false information, the Influencer must revise the Content.
-⑦ The Influencer must comply with the Influencer obligations designated on the "Service" Webpage, etc.
+① The Creator must create Content in compliance with the guidelines provided by the Company or the Advertiser.
+② The Creator posts Content on the designated date after receiving the Advertiser's sponsored goods or samples.
+③ When creating Content, the Creator must attach photos or videos of the product together with a review, etc., and must fill in other items essential for promotion.
+④ As agreed with the Advertiser, the Creator uploads Content to Social Media after inspection by the Advertiser, and may not arbitrarily modify or delete Content that has been created without the Advertiser's consent.
+⑤ The Creator must keep the post publicly visible for the contracted period starting from the day after the end date of the writing period. (However, in the case of a group-purchase Campaign, information such as the sales price will be deleted at the Advertiser's request after the group-purchase period ends.)
+⑥ If the Advertiser requests a revision because the Content created by the Creator does not match the product or contains exaggerated or false information, the Creator must revise the Content.
+⑦ The Creator must comply with the Creator obligations designated on the "Service" Webpage, etc.
 
-2. An Influencer must not engage in any of the following acts.
+2. A Creator must not engage in any of the following acts.
 
 ① Violating or neglecting the obligations in Paragraph 1 of this Article
 ② Entering false delivery information or intentionally entering incorrect delivery information
@@ -523,37 +523,37 @@ Article 16 (Rights and Obligations of Influencers)
 ④ Reselling, transferring, or leasing sponsored goods to a 3rd party within 3 months of receiving them
 ⑤ Engaging in other acts contrary to the Advertiser's request
 
-3. If an Influencer violates or neglects the obligations in this Article, the Advertiser may demand that the Influencer perform them (hereinafter a "Warning Message").
+3. If a Creator violates or neglects the obligations in this Article, the Advertiser may demand that the Creator perform them (hereinafter a "Warning Message").
 
-4. If an Influencer violates the obligations in this Article or receives a Warning Message from an Advertiser, the various benefits or use of services provided in the Influencer's capacity may be suspended, and Campaign settlement may be withheld.
+4. If a Creator violates the obligations in this Article or receives a Warning Message from an Advertiser, the various benefits or use of services provided in the Creator's capacity may be suspended, and Campaign settlement may be withheld.
 
-5. If an Influencer fails to perform the obligations for a considerable period after receiving a Warning Message, the Advertiser may terminate the contract with the Influencer and claim damages for the non-performance.
+5. If a Creator fails to perform the obligations for a considerable period after receiving a Warning Message, the Advertiser may terminate the contract with the Creator and claim damages for the non-performance.
 
 Article 17 (Rights and Obligations of Advertisers)
 
 1. An Advertiser must, at the Advertiser's own responsibility, handle matters related to the sale of products sold through a Campaign, such as delivery, returns, exchanges, refunds, and responding to Buyers.
 
-2. An Advertiser must deliver sponsored goods or samples to the Influencer conducting the Campaign, and the delivery costs and responsibility arising in connection therewith shall be borne by the Advertiser.
+2. An Advertiser must deliver sponsored goods or samples to the Creator conducting the Campaign, and the delivery costs and responsibility arising in connection therewith shall be borne by the Advertiser.
 
-3. If a problem such as damage, loss, delay, misdelivery, or omission of delivery occurs during the delivery of sponsored goods (hereinafter a "Delivery Incident"), the Advertiser must redeliver the same sponsored goods to the Influencer within 3 business days from the date the Advertiser became aware of the Delivery Incident.
+3. If a problem such as damage, loss, delay, misdelivery, or omission of delivery occurs during the delivery of sponsored goods (hereinafter a "Delivery Incident"), the Advertiser must redeliver the same sponsored goods to the Creator within 3 business days from the date the Advertiser became aware of the Delivery Incident.
 
-4. Copyright in Content uploaded by an Influencer belongs to the Influencer, and the Advertiser and the Company have the exclusive right to use the Content. Even after the posting period ends, the Advertiser may, through consultation with the Company, use all or part of the Content uploaded by the Influencer for product promotion purposes, but in this case must indicate the source of the Content and use it in compliance with relevant laws.
+4. Copyright in Content uploaded by a Creator belongs to the Creator, and the Advertiser and the Company have the exclusive right to use the Content. Even after the posting period ends, the Advertiser may, through consultation with the Company, use all or part of the Content uploaded by the Creator for product promotion purposes, but in this case must indicate the source of the Content and use it in compliance with relevant laws.
 
-5. If an Advertiser modifies or adapts all or part of the Content for product promotion purposes to create derivative works (2차적저작물), the Advertiser must obtain the Influencer's prior consent.
+5. If an Advertiser modifies or adapts all or part of the Content for product promotion purposes to create derivative works (2차적저작물), the Advertiser must obtain the Creator's prior consent.
 
-6. An Advertiser can check the progress of a Campaign through the Service website it has joined, and can check the Content created by the Influencer in real time through the website, etc.
+6. An Advertiser can check the progress of a Campaign through the Service website it has joined, and can check the Content created by the Creator in real time through the website, etc.
 
 7. For delivery, settlement, and provision of statistics in connection with the sale of the Advertiser's products, the Advertiser must entrust Buyer information to the Company.
 
-8. An Advertiser must not use information about Influencers or Buyers learned in the course of conducting a Campaign for any purpose other than conducting the Campaign.
+8. An Advertiser must not use information about Creators or Buyers learned in the course of conducting a Campaign for any purpose other than conducting the Campaign.
 
-9. If any of the following grounds arises with respect to an Advertiser, the Influencer may request the Company to rescind or terminate the marketing service agreement.
+9. If any of the following grounds arises with respect to an Advertiser, the Creator may request the Company to rescind or terminate the marketing service agreement.
 
 ① Where the information about sponsored goods posted through the Company's website, etc. is false or differs substantially from the actual goods
 ② Where the sponsored goods violate, or are likely to violate, relevant laws
 ③ Where the sponsored goods harm good morals, such as adult products
 ④ Where the sponsored goods are defective or negative public opinion has formed regarding the Advertiser's brand
-⑤ Where the Advertiser does not deliver the sponsored goods to the Influencer, or does not redeliver the sponsored goods after a Delivery Incident occurs
+⑤ Where the Advertiser does not deliver the sponsored goods to the Creator, or does not redeliver the sponsored goods after a Delivery Incident occurs
 
 Chapter 5 Dispute Resolution, Etc.
 

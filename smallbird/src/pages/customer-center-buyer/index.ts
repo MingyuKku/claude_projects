@@ -1,4 +1,4 @@
 export {
   CustomerCenterBuyerPage,
-  CustomerCenterInfluencerPage,
+  CustomerCenterCreatorPage,
 } from "./ui/CustomerCenterBuyerPage";

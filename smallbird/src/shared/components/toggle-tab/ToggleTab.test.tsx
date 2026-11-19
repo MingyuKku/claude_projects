@@ -44,16 +44,16 @@ describe("ToggleTab", () => {
         aria-label="회원 유형"
         options={[
           { value: "advertiser", label: "광고주" },
-          { value: "influencer", label: "인플루언서", disabled: true },
+          { value: "creator", label: "크리에이터", disabled: true },
         ]}
         value="advertiser"
         onValueChange={onValueChange}
       />,
     );
 
-    const influencer = screen.getByRole("radio", { name: "인플루언서" });
-    expect(influencer).toBeDisabled();
-    await user.click(influencer);
+    const creator = screen.getByRole("radio", { name: "크리에이터" });
+    expect(creator).toBeDisabled();
+    await user.click(creator);
 
     expect(onValueChange).not.toHaveBeenCalled();
     expect(screen.getByRole("radio", { name: "광고주" })).toBeChecked();

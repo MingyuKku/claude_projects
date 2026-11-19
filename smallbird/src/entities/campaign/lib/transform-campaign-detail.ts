@@ -10,8 +10,8 @@ import {
   CAMPAIGN_PLATFORMS,
   CAMPAIGN_TYPES,
   filterKnownCodes,
-  INFLUENCER_AGE_GROUPS,
-  INFLUENCER_GENDERS,
+  CREATOR_AGE_GROUPS,
+  CREATOR_GENDERS,
   POSTING_TOPICS,
   toKnownCode,
 } from "../model/input-codes";
@@ -76,7 +76,7 @@ export function transformCampaignDetail(
       },
       product: {
         productName: product.productName ?? "",
-        quantityPerInfluencer: product.quantityPerInfluencer,
+        quantityPerCreator: product.quantityPerInfluencer,
         productPrice: product.productPrice,
         returnRequired: product.returnRequired,
         returnAddress: toAddress(product.returnAddress),
@@ -91,13 +91,10 @@ export function transformCampaignDetail(
         visitCouponCode: product.visitCouponCode ?? "",
         visitBenefit: product.visitBenefit ?? "",
       },
-      influencer: {
+      creator: {
         platform: toKnownCode(CAMPAIGN_PLATFORMS, influencer.platform),
-        gender: toKnownCode(INFLUENCER_GENDERS, influencer.gender),
-        ageGroups: filterKnownCodes(
-          INFLUENCER_AGE_GROUPS,
-          influencer.ageGroups,
-        ),
+        gender: toKnownCode(CREATOR_GENDERS, influencer.gender),
+        ageGroups: filterKnownCodes(CREATOR_AGE_GROUPS, influencer.ageGroups),
         topics: filterKnownCodes(POSTING_TOPICS, influencer.topics),
       },
       addOns: filterKnownCodes(CAMPAIGN_ADD_ONS, response.addOns),
@@ -109,7 +106,12 @@ export function transformCampaignDetail(
         titleHashtags: intro.titleHashtags,
         contentHashtags: intro.contentHashtags,
       },
-      conditions: { ...conditions },
+      conditions: {
+        headcount: conditions.headcount,
+        rewardPerCreator: conditions.rewardPerInfluencer,
+        postingPeriodMonths: conditions.postingPeriodMonths,
+        secondaryCopyright: conditions.secondaryCopyright,
+      },
       policy: response.policy?.agreements ?? emptyDraft.policy,
     },
     payment: response.payment ?? null,
