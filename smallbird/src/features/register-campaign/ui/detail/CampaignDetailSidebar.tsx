@@ -31,8 +31,11 @@ export function CampaignDetailSidebar({
 
   function handleSelect(id: string) {
     const target = steps.find(({ step }) => step === id)?.step;
+    // 기록을 쌓지 않아(replace) 헤더 "<"가 들어온 화면(현황)으로 한 번에 돌아감.
     if (target)
-      void navigate(getCampaignRegisterPath(detail.campaignIdx, target));
+      void navigate(getCampaignRegisterPath(detail.campaignIdx, target), {
+        replace: true,
+      });
   }
 
   return (

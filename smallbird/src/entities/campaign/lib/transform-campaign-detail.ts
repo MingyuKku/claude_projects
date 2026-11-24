@@ -12,7 +12,7 @@ import {
   filterKnownCodes,
   CREATOR_AGE_GROUPS,
   CREATOR_GENDERS,
-  getPostingTopics,
+  POSTING_TOPICS,
   toKnownCode,
 } from "../model/input-codes";
 
@@ -96,12 +96,7 @@ export function transformCampaignDetail(
         platform: toKnownCode(CAMPAIGN_PLATFORMS, influencer.platform),
         gender: toKnownCode(CREATOR_GENDERS, influencer.gender),
         ageGroups: filterKnownCodes(CREATOR_AGE_GROUPS, influencer.ageGroups),
-        topics: filterKnownCodes(
-          getPostingTopics(
-            toKnownCode(CAMPAIGN_PRODUCT_TYPES, response.productType),
-          ),
-          influencer.topics,
-        ),
+        topics: filterKnownCodes(POSTING_TOPICS, influencer.topics),
       },
       groupBuy: {
         productName: groupBuying?.groupBuyingProductName ?? "",

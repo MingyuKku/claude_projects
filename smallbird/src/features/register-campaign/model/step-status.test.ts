@@ -1,6 +1,7 @@
 import { createEmptyDraft } from "@/entities/campaign";
 
-import { isStepComplete } from "./step-completion";
+import { applyDraftDefaults } from "./draft-defaults";
+import { isStepComplete, isStepStarted } from "./step-completion";
 import {
   getFirstIncompleteStep,
   getStepStatuses,
@@ -142,6 +143,7 @@ describe("사이드바 단계 상태", () => {
   it("1단계를 통과하기 전에는 2~8단계가 비활성이다", () => {
     const statuses = getStepStatuses({
       steps,
+      productType: "BRAND",
       draft: createEmptyDraft(),
       currentStep: "campaign-info",
       hasVisitedPayment: false,
@@ -162,6 +164,7 @@ describe("사이드바 단계 상태", () => {
       Object.fromEntries(
         getStepStatuses({
           steps,
+          productType: "BRAND",
           draft,
           currentStep,
           hasVisitedPayment: false,
@@ -177,6 +180,7 @@ describe("사이드바 단계 상태", () => {
     const draft = draftWithInfo();
     const statuses = getStepStatuses({
       steps,
+      productType: "BRAND",
       draft,
       currentStep: "payment",
       hasVisitedPayment: true,
@@ -192,6 +196,24 @@ describe("사이드바 단계 상태", () => {
       policy: "warning",
       payment: null,
     });
+  });
+});
+
+describe("입력 시작 판정", () => {
+  it("기본 선택만 있는 단계는 유형마다 입력을 시작하지 않은 것으로 본다", () => {
+    for (const productType of ["BRAND", "GROUP_BUY"] as const) {
+      const draft = applyDraftDefaults(createEmptyDraft(), { productType });
+
+      expect(isStepStarted("creator", draft, productType)).toBe(false);
+    }
+  });
+
+  it("공구형 기본 선택(무관)은 브랜드형 기준으로는 입력한 값이다", () => {
+    const draft = applyDraftDefaults(createEmptyDraft(), {
+      productType: "GROUP_BUY",
+    });
+
+    expect(isStepStarted("creator", draft, "BRAND")).toBe(true);
   });
 });
 

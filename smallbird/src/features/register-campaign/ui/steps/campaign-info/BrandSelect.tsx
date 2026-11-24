@@ -5,7 +5,11 @@ import { useBrands } from "@/entities/brand";
 import { FormField } from "@/shared/components/form-field";
 import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
-import { useMediaQuery } from "@/shared/lib";
+import {
+  fieldFocusRingClassName,
+  fieldOpenRingClassName,
+  useMediaQuery,
+} from "@/shared/lib";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 import {
@@ -57,7 +61,11 @@ export function BrandSelect({ onClickManage }: BrandSelectProps) {
         type="button"
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        className="flex h-10 w-full items-center gap-4 rounded-md border border-input bg-background px-3 text-left text-sm leading-5 text-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 data-[state=open]:ring-2 data-[state=open]:ring-primary data-[state=open]:ring-offset-2"
+        className={cn(
+          "flex h-10 w-full items-center gap-4 rounded-md border border-input bg-background px-3 text-left text-sm leading-5 text-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:bg-accent",
+          fieldFocusRingClassName,
+          fieldOpenRingClassName,
+        )}
       >
         <span className="min-w-0 flex-1 truncate">
           {selected?.name ?? t("info.brand.placeholder")}

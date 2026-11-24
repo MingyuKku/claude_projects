@@ -142,7 +142,9 @@
     "FACEBOOK": "페이스북",
     "YOUTUBE": "유튜브",
     "TIKTOK": "틱톡",
-    "X": "엑스"
+    "X": "엑스",
+    "SHORTS": "숏츠",
+    "REELS": "릴스"
   },
   "platformGroupBuy": {
     "NAVER_BLOG": "네이버 블로그"
@@ -241,6 +243,7 @@
     },
     "ageGroup": {
       "label": "선호 연령대(복수선택 가능)",
+      "ALL": "무관",
       "AGE_10S": "10대",
       "AGE_20S": "20대",
       "AGE_30S": "30대",
@@ -250,26 +253,14 @@
     "topic": {
       "label": "포스팅 주제(복수선택 가능)",
       "DigitalAppliances": "디지털&가전",
-      "Education": "교육",
-      "SportsLeisure": "스포츠&레져",
-      "MarketTools": "마켓&공구",
       "Beauty": "뷰티",
       "LivingHealth": "생활&건강",
       "TravelCulture": "여행&문화",
-      "AgeProfession": "연령&직업",
-      "FoodCooking": "음식&요리",
-      "DailyLife": "일상&데일리",
-      "Region": "지역",
-      "BookPublication": "책&출판",
       "PregnancyParenting": "출산&육아",
-      "Hobby": "취미",
       "Fashion": "패션",
       "Food": "식품",
       "FurnitureInterior": "가구&인테리어",
-      "Pet": "반려동물",
-      "ASMR": "ASMR",
-      "Review": "리뷰",
-      "All": "전체"
+      "All": "무관"
     },
     "groupBuyTopic": {
       "All": "무관",

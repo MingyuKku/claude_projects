@@ -3,7 +3,11 @@ import { useState } from "react";
 
 import { FormField } from "@/shared/components/form-field";
 import { MEDIA_QUERY } from "@/shared/config";
-import { useMediaQuery } from "@/shared/lib";
+import {
+  fieldFocusRingClassName,
+  fieldOpenRingClassName,
+  useMediaQuery,
+} from "@/shared/lib";
 import { cn } from "@/shared/lib/utils";
 import {
   Drawer,
@@ -56,7 +60,12 @@ export function OptionSelect({
         disabled={disabled}
         aria-haspopup="listbox"
         aria-expanded={isOpen}
-        className="flex h-10 w-full items-center gap-4 rounded-md border border-input bg-background px-3 text-left text-sm leading-5 text-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-background data-[state=open]:ring-2 data-[state=open]:ring-primary data-[state=open]:ring-offset-2"
+        className={cn(
+          "flex h-10 w-full items-center gap-4 rounded-md border border-input bg-background px-3 text-left text-sm leading-5 text-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:bg-accent",
+          fieldFocusRingClassName,
+          "disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-background",
+          fieldOpenRingClassName,
+        )}
       >
         <span
           className={cn(

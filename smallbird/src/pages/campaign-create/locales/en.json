@@ -37,11 +37,11 @@
     "inUse": "In use"
   },
   "action": {
-    "demo": "데모 체험하기",
+    "demo": "Try the demo",
     "subscribe": "Subscribe",
     "inUse": "In use",
     "comingSoonButton": "Coming soon",
-    "demoRegister": "데모 캠페인 등록"
+    "demoRegister": "Register demo campaign"
   },
   "comingSoon": "Coming soon.\nStay tuned!",
   "product": {
@@ -49,12 +49,12 @@
       "brand": {
         "1": "Brand campaigns via creator recruitment",
         "2": "Matching after proposal is accepted",
-        "3": "제품발송형, 매장방문형, 기자단형",
-        "4": "원고 컨펌 add-on available (5,000 KRW each)"
+        "3": "Product delivery, store visit, press",
+        "4": "Draft confirmation add-on available (5,000 KRW each)"
       },
       "groupBuy": {
         "1": "Group buy campaigns via creator recruitment",
-        "2": "제품발송형 only",
+        "2": "Product delivery only",
         "3": "Set group buy fee per creator",
         "4": "Sales status and settlement"
       }
@@ -63,12 +63,12 @@
       "brand": {
         "1": "Find creators and propose per creator",
         "2": "Matching after proposal is accepted",
-        "3": "제품발송형, 매장방문형, 기자단형",
-        "4": "원고 컨펌 add-on available (5,000 KRW each)"
+        "3": "Product delivery, store visit, press",
+        "4": "Draft confirmation add-on available (5,000 KRW each)"
       },
       "groupBuy": {
         "1": "Find creators and propose group buys",
-        "2": "제품발송형 only",
+        "2": "Product delivery only",
         "3": "Set group buy fee per creator",
         "4": "Sales status and settlement"
       }

@@ -6,7 +6,7 @@
     "creator": "创作者条件",
     "groupBuy": "设置团购条件",
     "addOns": "附加服务",
-    "intro": "캠페인 소개서",
+    "intro": "活动介绍书",
     "conditions": "设置执行条件",
     "policy": "同意活动政策",
     "payment": "支付"
@@ -49,7 +49,7 @@
     "notEditable": {
       "title": "无法修改",
       "description": "该活动正在审核或已通过审核，无法修改。即将前往注册详情。",
-      "demoDescription": "已完成的데모 캠페인无法修改。即将前往基本信息。"
+      "demoDescription": "已完成的演示活动无法修改。即将前往基本信息。"
     }
   },
   "info": {
@@ -62,9 +62,9 @@
     },
     "type": {
       "label": "活动类型",
-      "PRODUCT_DELIVERY": "제품발송형",
-      "PRESS": "기자단형",
-      "STORE_VISIT": "매장방문형"
+      "PRODUCT_DELIVERY": "产品提供型",
+      "PRESS": "记者团型",
+      "STORE_VISIT": "到店访问型"
     },
     "typeChange": {
       "title": "更改活动类型",
@@ -142,7 +142,9 @@
     "FACEBOOK": "Facebook",
     "YOUTUBE": "YouTube",
     "TIKTOK": "TikTok",
-    "X": "X"
+    "X": "X",
+    "SHORTS": "Shorts",
+    "REELS": "Reels"
   },
   "platformGroupBuy": {
     "NAVER_BLOG": "Naver 博客"
@@ -199,10 +201,10 @@
     },
     "press": {
       "noticeTitle": "请在下一步填写。",
-      "noticeAbout": "기자단형活动不是产品提供、到店或购买，而是针对品牌和服务进行采访、撰写报道的活动。",
-      "noticeGuide": "内容主题、关键词、参考资料等报道撰写指南可在“캠페인 소개서”步骤中详细说明。",
-      "emptyTitle": "기자단형无需填写赞助信息。",
-      "emptyDescription": "报道方向和详细指南<br/>请在下一步“캠페인 소개서”中填写。"
+      "noticeAbout": "记者团型活动不是产品提供、到店或购买，而是针对品牌和服务进行采访、撰写报道的活动。",
+      "noticeGuide": "内容主题、关键词、参考资料等报道撰写指南可在“活动介绍书”步骤中详细说明。",
+      "emptyTitle": "记者团型无需填写赞助信息。",
+      "emptyDescription": "报道方向和详细指南<br/>请在下一步“活动介绍书”中填写。"
     }
   },
   "groupBuy": {
@@ -241,6 +243,7 @@
     },
     "ageGroup": {
       "label": "偏好年龄段（可多选）",
+      "ALL": "不限",
       "AGE_10S": "10多岁",
       "AGE_20S": "20多岁",
       "AGE_30S": "30多岁",
@@ -250,26 +253,14 @@
     "topic": {
       "label": "发帖主题（可多选）",
       "DigitalAppliances": "数码&家电",
-      "Education": "教育",
-      "SportsLeisure": "运动&休闲",
-      "MarketTools": "市集&团购",
       "Beauty": "美妆",
       "LivingHealth": "生活&健康",
       "TravelCulture": "旅行&文化",
-      "AgeProfession": "年龄&职业",
-      "FoodCooking": "美食&烹饪",
-      "DailyLife": "日常",
-      "Region": "地区",
-      "BookPublication": "图书&出版",
       "PregnancyParenting": "孕产&育儿",
-      "Hobby": "兴趣爱好",
       "Fashion": "时尚",
       "Food": "食品",
       "FurnitureInterior": "家具&家居",
-      "Pet": "宠物",
-      "ASMR": "ASMR",
-      "Review": "测评",
-      "All": "全部"
+      "All": "不限"
     },
     "groupBuyTopic": {
       "All": "不限",
@@ -292,7 +283,7 @@
       "description": "根据活动目的和产品自动生成最合适的发帖指南。"
     },
     "MANUSCRIPT_CONFIRM": {
-      "name": "원고컨펌",
+      "name": "稿件确认",
       "price": "每位招募创作者5,000韩元",
       "description": "可在发布前查看创作者撰写的稿件并要求修改，还可同时使用AI稿件审核功能。"
     }
@@ -300,7 +291,7 @@
   "intro": {
     "mode": {
       "ai": {
-        "title": "AI 캠페인 소개서 撰写",
+        "title": "AI撰写活动介绍书",
         "description": "AI根据商品信息生成指南。"
       },
       "manual": {
@@ -316,8 +307,8 @@
       "resultTitle": "AI生成",
       "regenerate": "重新生成",
       "loading": {
-        "title": "AI 캠페인 소개서 生成中",
-        "description": "生成完成后即可查看캠페인 소개서。",
+        "title": "正在生成AI活动介绍书",
+        "description": "生成完成后即可查看活动介绍书。",
         "caption": "视情况最多可能需要5分钟。"
       }
     },
@@ -369,7 +360,7 @@
       "rangeError": "请输入1~999个月。"
     },
     "copyright": {
-      "label": "2차 저작권使用",
+      "label": "二次著作权使用",
       "use": "使用",
       "notUse": "不使用"
     }
@@ -380,7 +371,7 @@
       "service": "同意服务条款",
       "privacy": "同意隐私政策",
       "operation": "同意活动运营政策",
-      "reward": "同意리워드及支付相关政策"
+      "reward": "同意奖励及支付相关政策"
     },
     "terms": {
       "service": "服务条款",
@@ -394,7 +385,7 @@
       "title": "活动概要",
       "serviceType": "服务类型",
       "campaignType": "活动类型",
-      "reward": "리워드",
+      "reward": "奖励",
       "rewardValue": "提供产品（价值{{amount}}韩元）",
       "period": "活动期间",
       "periodValue": "{{start}} - {{end}}（{{days}}天）"
@@ -472,7 +463,7 @@
       "creator": "创作者条件",
       "groupBuy": "设置团购条件",
       "addOns": "增值服务",
-      "intro": "캠페인 소개서",
+      "intro": "活动介绍书",
       "conditions": "进行条件",
       "policy": "同意政策",
       "payment": "支付信息"
@@ -496,10 +487,10 @@
       "returnFee": "退货回收运费",
       "returnContact": "退货回收联系方式",
       "returnAddress": "退货回收地址",
-      "rentalReturn": "대여 상품回收",
-      "rentalFee": "대여 상품回收运费",
-      "rentalContact": "대여 상품回收联系方式",
-      "rentalAddress": "대여 상품回收地址",
+      "rentalReturn": "租赁产品回收",
+      "rentalFee": "租赁产品回收运费",
+      "rentalContact": "租赁产品回收联系方式",
+      "rentalAddress": "租赁产品回收地址",
       "coupon": "到店优惠券验证码",
       "storeName": "到店门店名称",
       "storeAddress": "门店地址",
@@ -527,7 +518,7 @@
     "conditions": {
       "period": "帖子保留期限",
       "periodValue_other": "{{count}}个月以上",
-      "copyright": "2차 저작권使用",
+      "copyright": "二次著作权使用",
       "copyrightUsed": "使用（含商业用途）"
     },
     "policy": {

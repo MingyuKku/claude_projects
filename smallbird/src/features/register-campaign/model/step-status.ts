@@ -1,7 +1,11 @@
 import { isStepComplete, isStepStarted } from "./step-completion";
 
 import type { RegisterStepDefinition } from "./steps";
-import type { CampaignDraft, CampaignRegisterStep } from "@/entities/campaign";
+import type {
+  CampaignDraft,
+  CampaignProductType,
+  CampaignRegisterStep,
+} from "@/entities/campaign";
 
 // 사이드바 단계 상태(스펙 §3 단계 사이드바). 1단계를 통과하기 전에는 2~8단계를 막고, 오른쪽 표시는
 // 결제 단계에 들어온 뒤의 필수 미입력 경고 → 그 밖에 일부만 입력한(현재 단계가 아닌) 단계의 입력 중 순으로 정함.
@@ -22,6 +26,7 @@ export function isInfoComplete(draft: CampaignDraft) {
 function getIndicator(
   definition: RegisterStepDefinition,
   draft: CampaignDraft,
+  productType: CampaignProductType,
   isCurrent: boolean,
   hasVisitedPayment: boolean,
 ): StepIndicator {
@@ -29,18 +34,21 @@ function getIndicator(
   if (draftStep === null || isOptional) return null;
   if (isStepComplete(draftStep, draft)) return null;
   if (hasVisitedPayment) return "warning";
-  if (!isCurrent && isStepStarted(draftStep, draft)) return "editing";
+  if (!isCurrent && isStepStarted(draftStep, draft, productType))
+    return "editing";
   return null;
 }
 
 export function getStepStatuses({
   steps,
   draft,
+  productType,
   currentStep,
   hasVisitedPayment,
 }: {
   steps: readonly RegisterStepDefinition[];
   draft: CampaignDraft;
+  productType: CampaignProductType;
   currentStep: CampaignRegisterStep;
   hasVisitedPayment: boolean;
 }): StepStatus[] {
@@ -54,7 +62,13 @@ export function getStepStatuses({
     return {
       step: definition.step,
       state,
-      indicator: getIndicator(definition, draft, isCurrent, hasVisitedPayment),
+      indicator: getIndicator(
+        definition,
+        draft,
+        productType,
+        isCurrent,
+        hasVisitedPayment,
+      ),
     };
   });
 }

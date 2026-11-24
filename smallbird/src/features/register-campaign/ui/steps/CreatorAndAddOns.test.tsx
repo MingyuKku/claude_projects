@@ -1,4 +1,4 @@
-import { render, screen } from "@testing-library/react";
+import { render, screen, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { createEmptyDraft } from "@/entities/campaign";
@@ -13,6 +13,37 @@ import type {
   CampaignDraft,
   CampaignProductType,
 } from "@/entities/campaign";
+
+vi.mock("sonner", () => ({
+  toast: Object.assign(vi.fn(), { success: vi.fn(), error: vi.fn() }),
+}));
+
+// 포스팅 주제 목록은 서버 API(A-5.3-1)에서 받으므로 시안 순서의 9개를 돌려줌.
+const ALL_TOPICS = [
+  "All",
+  "Beauty",
+  "LivingHealth",
+  "PregnancyParenting",
+  "Food",
+  "DigitalAppliances",
+  "FurnitureInterior",
+  "Fashion",
+  "TravelCulture",
+];
+const serverTopics = vi.hoisted(() => ({ list: [] as string[] }));
+
+vi.mock("@/entities/campaign", async (importOriginal) => ({
+  ...(await importOriginal<Record<string, unknown>>()),
+  usePostingTopics: () => ({
+    topics: serverTopics.list,
+    error: undefined,
+    isLoading: false,
+  }),
+}));
+
+beforeEach(() => {
+  serverTopics.list = ALL_TOPICS;
+});
 
 function createDetail(
   patch?: (draft: CampaignDraft) => void,
@@ -47,6 +78,23 @@ function TitleHashtagProbe() {
   );
 }
 
+/** "무관"은 연령대·주제에 모두 있어 토글 묶음을 먼저 고름. */
+function getGroup(name: string) {
+  return within(screen.getByRole("toolbar", { name }));
+}
+
+function TopicsProbe() {
+  const topics = useRegisterWizardStore((state) => state.draft.creator.topics);
+  return <output aria-label="주제 값">{topics.join(",")}</output>;
+}
+
+function AgeGroupsProbe() {
+  const ageGroups = useRegisterWizardStore(
+    (state) => state.draft.creator.ageGroups,
+  );
+  return <output aria-label="연령대 값">{ageGroups.join(",")}</output>;
+}
+
 describe("CreatorStep", () => {
   it("플랫폼 6개를 시안 순서로 보이고 하나만 고른다", async () => {
     const user = userEvent.setup();
@@ -73,7 +121,7 @@ describe("CreatorStep", () => {
     );
   });
 
-  it("공구형은 플랫폼을 시안 순서와 '네이버 블로그'로, 포스팅 주제는 9개만 보인다", () => {
+  it("공구형은 플랫폼(숏츠·릴스 포함)을 시안 순서와 '네이버 블로그'로, 연령대는 '무관' 포함, 포스팅 주제는 9개가 보인다", () => {
     render(
       <RegisterWizardProvider detail={createDetail(undefined, "GROUP_BUY")}>
         <CreatorStep />
@@ -94,7 +142,17 @@ describe("CreatorStep", () => {
       "틱톡",
       "페이스북",
       "엑스",
+      "숏츠",
+      "릴스",
     ]);
+    expect(
+      Array.from(
+        screen
+          .getByRole("toolbar", { name: "선호 연령대(복수선택 가능)" })
+          .querySelectorAll("button"),
+        (item) => item.textContent,
+      ),
+    ).toEqual(["무관", "10대", "20대", "30대", "40대", "50대 이상"]);
     expect(
       Array.from(
         screen
@@ -123,24 +181,56 @@ describe("CreatorStep", () => {
       </RegisterWizardProvider>,
     );
 
-    await user.click(screen.getByRole("button", { name: "무관" }));
-    expect(screen.getByRole("button", { name: "무관" })).toHaveAttribute(
-      "aria-pressed",
-      "true",
+    await user.click(
+      getGroup("포스팅 주제(복수선택 가능)").getByRole("button", {
+        name: "무관",
+      }),
     );
-    expect(screen.getByRole("button", { name: "뷰티" })).toHaveAttribute(
-      "aria-pressed",
-      "false",
-    );
+    expect(
+      getGroup("포스팅 주제(복수선택 가능)").getByRole("button", {
+        name: "무관",
+      }),
+    ).toHaveAttribute("aria-pressed", "true");
+    expect(
+      getGroup("포스팅 주제(복수선택 가능)").getByRole("button", {
+        name: "뷰티",
+      }),
+    ).toHaveAttribute("aria-pressed", "false");
 
-    await user.click(screen.getByRole("button", { name: "패션" }));
-    expect(screen.getByRole("button", { name: "무관" })).toHaveAttribute(
-      "aria-pressed",
-      "false",
+    await user.click(
+      getGroup("포스팅 주제(복수선택 가능)").getByRole("button", {
+        name: "패션",
+      }),
     );
+    expect(
+      getGroup("포스팅 주제(복수선택 가능)").getByRole("button", {
+        name: "무관",
+      }),
+    ).toHaveAttribute("aria-pressed", "false");
   });
 
-  it("연령대는 여러 개 고르고, 포스팅 주제는 서버 코드 21개다", async () => {
+  it("공구형은 연령대 '무관'을 고르면 다른 연령대를 풀고, 다른 연령대를 고르면 '무관'을 푼다", async () => {
+    const user = userEvent.setup();
+    render(
+      <RegisterWizardProvider detail={createDetail(undefined, "GROUP_BUY")}>
+        <CreatorStep />
+        <AgeGroupsProbe />
+      </RegisterWizardProvider>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "20대" }));
+    await user.click(
+      getGroup("선호 연령대(복수선택 가능)").getByRole("button", {
+        name: "무관",
+      }),
+    );
+    expect(screen.getByLabelText("연령대 값")).toHaveTextContent("ALL");
+
+    await user.click(screen.getByRole("button", { name: "30대" }));
+    expect(screen.getByLabelText("연령대 값")).toHaveTextContent("AGE_30S");
+  });
+
+  it("브랜드형에는 숏츠·릴스가 없고 연령대·포스팅 주제에 '무관'이 있으며 주제는 서버 코드 9개다", async () => {
     const user = userEvent.setup();
     render(
       <RegisterWizardProvider detail={createDetail()}>
@@ -163,7 +253,13 @@ describe("CreatorStep", () => {
       screen
         .getByRole("toolbar", { name: "포스팅 주제(복수선택 가능)" })
         .querySelectorAll("button"),
-    ).toHaveLength(21);
+    ).toHaveLength(9);
+    expect(screen.queryByRole("radio", { name: "숏츠" })).toBeNull();
+    expect(
+      getGroup("선호 연령대(복수선택 가능)").getByRole("button", {
+        name: "무관",
+      }),
+    ).toBeInTheDocument();
   });
 
   it("서버에 값이 없으면 시안의 기본 선택(인스타그램·여성·10대·뷰티)으로 보인다", () => {
@@ -191,6 +287,28 @@ describe("CreatorStep", () => {
     );
   });
 
+  it("공구형은 서버에 값이 없으면 연령대·주제 기본 선택이 '무관'이다", () => {
+    render(
+      <RegisterWizardProvider detail={createDetail(undefined, "GROUP_BUY")}>
+        <CreatorStep />
+      </RegisterWizardProvider>,
+    );
+
+    for (const name of [
+      "선호 연령대(복수선택 가능)",
+      "포스팅 주제(복수선택 가능)",
+    ]) {
+      expect(
+        getGroup(name).getByRole("button", { name: "무관" }),
+      ).toHaveAttribute("aria-pressed", "true");
+    }
+    expect(
+      getGroup("선호 연령대(복수선택 가능)").getByRole("button", {
+        name: "10대",
+      }),
+    ).toHaveAttribute("aria-pressed", "false");
+  });
+
   it("서버에 저장된 값이 있으면 기본 선택 대신 그 값으로 보인다", () => {
     render(
       <RegisterWizardProvider
@@ -199,7 +317,7 @@ describe("CreatorStep", () => {
             platform: "TIKTOK",
             gender: "MALE",
             ageGroups: ["AGE_40S"],
-            topics: ["Pet"],
+            topics: ["Fashion"],
           };
         })}
       >
@@ -223,6 +341,27 @@ describe("CreatorStep", () => {
       "aria-pressed",
       "true",
     );
+  });
+
+  it("서버 주제 목록에 없는 저장된 주제는 선택에서 뺀다", () => {
+    serverTopics.list = ["All", "Beauty"];
+    render(
+      <RegisterWizardProvider
+        detail={createDetail((draft) => {
+          draft.creator.topics = ["Fashion", "Beauty"];
+        })}
+      >
+        <CreatorStep />
+        <TopicsProbe />
+      </RegisterWizardProvider>,
+    );
+
+    expect(screen.getByLabelText("주제 값")).toHaveTextContent(/^Beauty$/);
+    expect(
+      getGroup("포스팅 주제(복수선택 가능)").queryByRole("button", {
+        name: "패션",
+      }),
+    ).toBeNull();
   });
 
   it("연령대·포스팅 주제는 마지막 하나를 해제할 수 없다", async () => {

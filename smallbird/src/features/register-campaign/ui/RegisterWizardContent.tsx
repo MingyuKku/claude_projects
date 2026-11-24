@@ -58,7 +58,7 @@ export function RegisterWizardContent({
   useUploadGuard();
   useIntroGenerationNotice(currentStep);
   const hasIntroInput = useRegisterWizardStore((state) =>
-    isStepStarted("intro", state.draft),
+    isStepStarted("intro", state.draft, state.productType),
   );
   const isRevisionMode = useRegisterWizardStore(
     (state) => state.isRevisionMode,

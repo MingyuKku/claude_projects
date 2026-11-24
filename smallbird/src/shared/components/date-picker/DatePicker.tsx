@@ -4,6 +4,10 @@ import { useState } from "react";
 
 import { FormField } from "@/shared/components/form-field";
 import { formatDate } from "@/shared/i18n";
+import {
+  fieldFocusRingClassName,
+  fieldOpenRingClassName,
+} from "@/shared/lib/field-ring";
 import { useMediaQuery } from "@/shared/lib/useMediaQuery";
 import { cn } from "@/shared/lib/utils";
 import { Calendar } from "@/shared/ui/calendar";
@@ -19,7 +23,12 @@ import type { ComponentProps, ReactNode } from "react";
 
 // Figma 디자인 시스템 Date Picker(6901:49560). 높이 40, 오류 문구가 있으면 Destructive 링.
 const triggerVariants = cva(
-  "flex h-10 w-full items-center rounded-md border border-input bg-background px-3 py-2 text-left text-sm leading-5 text-foreground outline-none transition-[color,background-color,border-color,box-shadow] hover:bg-accent focus-visible:bg-background focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none data-[state=open]:bg-background data-[state=open]:ring-2 data-[state=open]:ring-primary data-[state=open]:ring-offset-2",
+  [
+    "flex h-10 w-full items-center rounded-md border border-input bg-background px-3 py-2 text-left text-sm leading-5 text-foreground outline-none transition-[color,background-color,border-color,box-shadow] hover:bg-accent focus-visible:bg-background",
+    fieldFocusRingClassName,
+    "disabled:pointer-events-none data-[state=open]:bg-background",
+    fieldOpenRingClassName,
+  ],
   {
     variants: {
       isInvalid: {

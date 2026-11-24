@@ -135,6 +135,7 @@ export function createRegisterWizardStore(detail: CampaignDetail) {
         isRevisionMode: detail.stage === "REJECTED",
         draft: applyDraftDefaults(detail.draft, {
           hasServerCampaignType: detail.rawCampaignType !== null,
+          productType: detail.productType ?? "BRAND",
         }),
         savedDraft: detail.draft,
         hasVisitedPayment: false,
@@ -160,7 +161,9 @@ export function createRegisterWizardStore(detail: CampaignDetail) {
           set((state) => {
             revokePendingIntroMedia(state.draft.intro);
             return {
-              draft: applyDraftDefaults(draft),
+              draft: applyDraftDefaults(draft, {
+                productType: state.productType,
+              }),
               savedDraft: draft,
               introMode: getInitialIntroMode(draft),
               introAi: IDLE_INTRO_AI,
@@ -171,10 +174,13 @@ export function createRegisterWizardStore(detail: CampaignDetail) {
             revokePendingIntroMedia(state.draft.intro);
             const empty = createEmptyDraft();
             return {
-              draft: applyDraftDefaults({
-                ...empty,
-                info: { ...state.draft.info, campaignType },
-              }),
+              draft: applyDraftDefaults(
+                {
+                  ...empty,
+                  info: { ...state.draft.info, campaignType },
+                },
+                { productType: state.productType },
+              ),
               introMode: "AI",
               // 진행 중인 AI 생성 작업도 버림.
               introAi: IDLE_INTRO_AI,

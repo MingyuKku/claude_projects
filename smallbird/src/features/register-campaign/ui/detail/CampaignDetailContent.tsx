@@ -141,6 +141,7 @@ export function CampaignDetailContent({
                 ? (step) =>
                     void navigate(
                       getCampaignRegisterPath(detail.campaignIdx, step),
+                      { replace: true },
                     )
                 : undefined
             }

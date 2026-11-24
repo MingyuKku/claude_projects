@@ -1,5 +1,6 @@
 import { useId } from "react";
 
+import { fieldWithinRingClassName } from "@/shared/lib/field-ring";
 import { cn } from "@/shared/lib/utils";
 import { Label } from "@/shared/ui/label";
 
@@ -47,7 +48,12 @@ export function PriceField({
         </Label>
       )}
       <div className="flex items-center gap-2">
-        <div className="flex h-10 min-w-0 flex-1 items-center rounded-md border border-input bg-background px-3 py-2 has-focus-visible:ring-2 has-focus-visible:ring-primary has-focus-visible:ring-offset-2">
+        <div
+          className={cn(
+            "flex h-10 min-w-0 flex-1 items-center rounded-md border border-input bg-background px-3 py-2",
+            fieldWithinRingClassName,
+          )}
+        >
           <input
             inputMode="numeric"
             {...props}

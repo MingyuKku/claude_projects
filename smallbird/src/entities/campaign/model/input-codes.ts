@@ -1,5 +1,3 @@
-import type { CampaignProductType } from "./codes";
-
 // 등록 단계 입력값의 서버 코드(API 요구 명세 "코드" 표). 화면 문구는 코드마다 번역 키를 둠.
 
 /** 캠페인 유형. 구매리뷰형은 스펙아웃(2026-11-13). */
@@ -18,13 +16,17 @@ export const CAMPAIGN_PLATFORMS = [
   "YOUTUBE",
   "TIKTOK",
   "X",
+  "SHORTS",
+  "REELS",
 ] as const;
 export type CampaignPlatform = (typeof CAMPAIGN_PLATFORMS)[number];
 
 export const CREATOR_GENDERS = ["FEMALE", "MALE", "ALL"] as const;
 export type CreatorGender = (typeof CREATOR_GENDERS)[number];
 
+/** "무관"(`ALL`)은 서버가 5개 연령대를 모두 고른 것으로 저장하고 조회에서 `["ALL"]` 하나로 줌. 공구형 시안에만 있음. */
 export const CREATOR_AGE_GROUPS = [
+  "ALL",
   "AGE_10S",
   "AGE_20S",
   "AGE_30S",
@@ -33,53 +35,19 @@ export const CREATOR_AGE_GROUPS = [
 ] as const;
 export type CreatorAgeGroup = (typeof CREATOR_AGE_GROUPS)[number];
 
-/** 포스팅 주제. 크리에이터 카테고리 대분류 20개 + 전체(`All`), 서버 `trans_key` 표기 그대로(목록 조회 API 없음). */
+/** 번역을 가진 포스팅 주제 코드. 무관은 `All`. 어떤 주제를 어떤 순서로 고르게 할지는 서버 목록(`usePostingTopics`)이 정함. 서버가 받는 코드 밖은 400 `INVALID_FIELD`. */
 export const POSTING_TOPICS = [
-  "DigitalAppliances",
-  "Education",
-  "SportsLeisure",
-  "MarketTools",
+  "All",
   "Beauty",
   "LivingHealth",
-  "TravelCulture",
-  "AgeProfession",
-  "FoodCooking",
-  "DailyLife",
-  "Region",
-  "BookPublication",
   "PregnancyParenting",
-  "Hobby",
-  "Fashion",
   "Food",
+  "DigitalAppliances",
   "FurnitureInterior",
-  "Pet",
-  "ASMR",
-  "Review",
-  "All",
+  "Fashion",
+  "TravelCulture",
 ] as const;
 export type PostingTopic = (typeof POSTING_TOPICS)[number];
-
-/** 공구형 포스팅 주제(시안 순서). 서버 코드 중 이 9개만 고르게 하고 "무관"은 `All`. */
-export const GROUP_BUY_POSTING_TOPICS = [
-  "All",
-  "Beauty",
-  "LivingHealth",
-  "PregnancyParenting",
-  "Food",
-  "DigitalAppliances",
-  "FurnitureInterior",
-  "Fashion",
-  "TravelCulture",
-] as const satisfies readonly PostingTopic[];
-
-/** 상품 유형에서 고를 수 있는 포스팅 주제. */
-export function getPostingTopics(
-  productType: CampaignProductType | null,
-): readonly PostingTopic[] {
-  return productType === "GROUP_BUY"
-    ? GROUP_BUY_POSTING_TOPICS
-    : POSTING_TOPICS;
-}
 
 /** 부가서비스. PICK형은 둘 다 고를 수 있고 등록 결제는 AI 포스팅 가이드만(원고컨펌은 매칭 때 결제). */
 export const CAMPAIGN_ADD_ONS = [

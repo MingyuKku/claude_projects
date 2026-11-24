@@ -84,12 +84,12 @@ export function BigbirdInquiryDetailPanel({
                 src={imageUrl}
                 alt={campaign.name}
                 loading="lazy"
-                className="h-18.25 w-full rounded-md border border-border object-cover"
+                className="aspect-[235/81] w-full rounded-md border border-border object-contain"
               />
             ) : (
               <div
                 aria-hidden
-                className="h-18.25 w-full rounded-md border border-border bg-muted"
+                className="aspect-[235/81] w-full rounded-md border border-border bg-muted"
               />
             )}
             <div className="flex flex-col gap-1.5">

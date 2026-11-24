@@ -19,6 +19,19 @@ describe("applyDraftDefaults", () => {
     });
   });
 
+  it("공구형은 연령대·주제 기본 선택이 시안대로 '무관'이다", () => {
+    const draft = applyDraftDefaults(createEmptyDraft(), {
+      productType: "GROUP_BUY",
+    });
+
+    expect(draft.creator).toEqual({
+      platform: "INSTAGRAM",
+      gender: "FEMALE",
+      ageGroups: ["ALL"],
+      topics: ["All"],
+    });
+  });
+
   it("서버에 저장된 값은 그대로 두고 비어 있는 칸만 채운다", () => {
     const saved = createEmptyDraft();
     saved.info.campaignType = "STORE_VISIT";

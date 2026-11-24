@@ -6,7 +6,7 @@
     "creator": "クリエイター条件",
     "groupBuy": "共同購入条件設定",
     "addOns": "オプション",
-    "intro": "캠페인 소개서",
+    "intro": "キャンペーン紹介書",
     "conditions": "進行条件設定",
     "policy": "ポリシー同意",
     "payment": "決済"
@@ -49,7 +49,7 @@
     "notEditable": {
       "title": "編集できません",
       "description": "このキャンペーンは承認審査中または承認済みのため編集できません。登録内容に移動します。",
-      "demoDescription": "作成済みの데모 캠페인は編集できません。基本情報に移動します。"
+      "demoDescription": "作成済みのデモキャンペーンは編集できません。基本情報に移動します。"
     }
   },
   "info": {
@@ -62,9 +62,9 @@
     },
     "type": {
       "label": "キャンペーン種類",
-      "PRODUCT_DELIVERY": "제품발송형",
-      "PRESS": "기자단형",
-      "STORE_VISIT": "매장방문형"
+      "PRODUCT_DELIVERY": "商品提供型",
+      "PRESS": "プレス型",
+      "STORE_VISIT": "店舗訪問型"
     },
     "typeChange": {
       "title": "キャンペーン種類の変更",
@@ -142,7 +142,9 @@
     "FACEBOOK": "Facebook",
     "YOUTUBE": "YouTube",
     "TIKTOK": "TikTok",
-    "X": "X"
+    "X": "X",
+    "SHORTS": "ショート",
+    "REELS": "リール"
   },
   "platformGroupBuy": {
     "NAVER_BLOG": "ネイバーブログ"
@@ -199,10 +201,10 @@
     },
     "press": {
       "noticeTitle": "次のステップで入力してください。",
-      "noticeAbout": "기자단형キャンペーンは、商品提供・店舗訪問・購入ではなく、ブランドやサービスの取材・記事作成を行うキャンペーンです。",
-      "noticeGuide": "テーマ・キーワード・参考資料など記事作成ガイドは「캠페인 소개서」ステップで詳しく案内できます。",
-      "emptyTitle": "기자단형は協賛情報の入力がありません。",
-      "emptyDescription": "記事の方向性と詳しいガイドは、<br/>次の「캠페인 소개서」で入力してください。"
+      "noticeAbout": "プレス型キャンペーンは、商品提供・店舗訪問・購入ではなく、ブランドやサービスの取材・記事作成を行うキャンペーンです。",
+      "noticeGuide": "テーマ・キーワード・参考資料など記事作成ガイドは「キャンペーン紹介書」ステップで詳しく案内できます。",
+      "emptyTitle": "プレス型は協賛情報の入力がありません。",
+      "emptyDescription": "記事の方向性と詳しいガイドは、<br/>次の「キャンペーン紹介書」で入力してください。"
     }
   },
   "groupBuy": {
@@ -241,6 +243,7 @@
     },
     "ageGroup": {
       "label": "希望年代（複数選択可）",
+      "ALL": "指定なし",
       "AGE_10S": "10代",
       "AGE_20S": "20代",
       "AGE_30S": "30代",
@@ -250,26 +253,14 @@
     "topic": {
       "label": "投稿テーマ（複数選択可）",
       "DigitalAppliances": "デジタル&家電",
-      "Education": "教育",
-      "SportsLeisure": "スポーツ&レジャー",
-      "MarketTools": "マーケット&共同購入",
       "Beauty": "ビューティー",
       "LivingHealth": "生活&健康",
       "TravelCulture": "旅行&文化",
-      "AgeProfession": "年代&職業",
-      "FoodCooking": "料理&グルメ",
-      "DailyLife": "日常&デイリー",
-      "Region": "地域",
-      "BookPublication": "本&出版",
       "PregnancyParenting": "出産&育児",
-      "Hobby": "趣味",
       "Fashion": "ファッション",
       "Food": "食品",
       "FurnitureInterior": "家具&インテリア",
-      "Pet": "ペット",
-      "ASMR": "ASMR",
-      "Review": "レビュー",
-      "All": "すべて"
+      "All": "指定なし"
     },
     "groupBuyTopic": {
       "All": "指定なし",
@@ -292,7 +283,7 @@
       "description": "キャンペーンの目的と商品に合った最適な投稿ガイドを自動で作成します。"
     },
     "MANUSCRIPT_CONFIRM": {
-      "name": "원고컨펌",
+      "name": "原稿確認",
       "price": "募集クリエイター1人あたり5,000ウォン",
       "description": "クリエイターが作成した原稿を投稿前に確認し、修正を依頼できます。AI原稿チェック機能も一緒に利用できます。"
     }
@@ -300,7 +291,7 @@
   "intro": {
     "mode": {
       "ai": {
-        "title": "AI 캠페인 소개서 作成",
+        "title": "AIキャンペーン紹介書の作成",
         "description": "商品情報をもとにAIがガイドを作成します。"
       },
       "manual": {
@@ -316,8 +307,8 @@
       "resultTitle": "AI生成",
       "regenerate": "再生成する",
       "loading": {
-        "title": "AI 캠페인 소개서 生成中",
-        "description": "生成が完了すると캠페인 소개서を確認できます。",
+        "title": "AIキャンペーン紹介書を生成中",
+        "description": "生成が完了するとキャンペーン紹介書を確認できます。",
         "caption": "状況により最大5分かかる場合があります。"
       }
     },
@@ -369,7 +360,7 @@
       "rangeError": "1〜999か月の範囲で入力してください。"
     },
     "copyright": {
-      "label": "2차 저작권の使用",
+      "label": "二次著作権の使用",
       "use": "使用",
       "notUse": "使用しない"
     }
@@ -380,7 +371,7 @@
       "service": "利用規約に同意",
       "privacy": "プライバシーポリシーに同意",
       "operation": "キャンペーン運営ポリシーに同意",
-      "reward": "리워드・決済ポリシーに同意"
+      "reward": "リワード・決済ポリシーに同意"
     },
     "terms": {
       "service": "利用規約",
@@ -394,7 +385,7 @@
       "title": "キャンペーン概要",
       "serviceType": "サービス種別",
       "campaignType": "キャンペーン種別",
-      "reward": "리워드",
+      "reward": "リワード",
       "rewardValue": "製品提供（{{amount}}ウォン相当）",
       "period": "キャンペーン期間",
       "periodValue": "{{start}} - {{end}}（{{days}}日）"
@@ -472,7 +463,7 @@
       "creator": "クリエイター条件",
       "groupBuy": "共同購入条件設定",
       "addOns": "付加サービス",
-      "intro": "캠페인 소개서",
+      "intro": "キャンペーン紹介書",
       "conditions": "進行条件",
       "policy": "ポリシーへの同意",
       "payment": "決済情報"
@@ -496,10 +487,10 @@
       "returnFee": "返品回収の送料",
       "returnContact": "返品回収の連絡先",
       "returnAddress": "返品回収の住所",
-      "rentalReturn": "대여 상품の回収",
-      "rentalFee": "대여 상품回収の送料",
-      "rentalContact": "대여 상품回収の連絡先",
-      "rentalAddress": "대여 상품回収の住所",
+      "rentalReturn": "レンタル商品の回収",
+      "rentalFee": "レンタル商品回収の送料",
+      "rentalContact": "レンタル商品回収の連絡先",
+      "rentalAddress": "レンタル商品回収の住所",
       "coupon": "来店クーポン認証番号",
       "storeName": "来店店舗名",
       "storeAddress": "店舗住所",
@@ -527,7 +518,7 @@
     "conditions": {
       "period": "投稿維持期間",
       "periodValue_other": "{{count}}か月以上",
-      "copyright": "2차 저작권の使用",
+      "copyright": "二次著作権の使用",
       "copyrightUsed": "使用（商用利用を含む）"
     },
     "policy": {

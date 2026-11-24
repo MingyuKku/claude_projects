@@ -1,4 +1,9 @@
 export { cn } from "./utils";
+export {
+  fieldFocusRingClassName,
+  fieldOpenRingClassName,
+  fieldWithinRingClassName,
+} from "./field-ring";
 export { EMPTY_VALUE, orEmptyValue } from "./empty-value";
 export type { CssVariableStyle } from "./css-variable-style";
 export {

@@ -158,21 +158,24 @@ describe("transformCampaignDetail 공동구매 조건", () => {
     });
   });
 
-  it("공구형은 고를 수 있는 주제 9개에 없는 서버 값을 선택하지 않은 것으로 읽는다", () => {
+  it("고를 수 있는 주제 9개에 없는 서버 값은 선택하지 않은 것으로 읽는다", () => {
     const response = createResponse();
-    response.productType = "GROUP_BUY";
     response.influencer.topics = ["Education", "Beauty", "All"];
 
     expect(transformCampaignDetail(response).draft.creator.topics).toEqual([
       "Beauty",
       "All",
     ]);
+  });
 
-    response.productType = "BRAND";
-    expect(transformCampaignDetail(response).draft.creator.topics).toEqual([
-      "Education",
-      "Beauty",
-      "All",
-    ]);
+  it("숏츠·릴스 플랫폼과 연령대 무관 코드를 그대로 읽는다", () => {
+    const response = createResponse();
+    response.influencer.platform = "SHORTS";
+    response.influencer.ageGroups = ["ALL"];
+
+    expect(transformCampaignDetail(response).draft.creator).toMatchObject({
+      platform: "SHORTS",
+      ageGroups: ["ALL"],
+    });
   });
 });

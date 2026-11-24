@@ -2,6 +2,10 @@ import { CheckIcon, ChevronDownIcon, ChevronUpIcon } from "lucide-react"
 import { Select as SelectPrimitive } from "radix-ui"
 import * as React from "react"
 
+import {
+  fieldFocusRingClassName,
+  fieldOpenRingClassName,
+} from "@/shared/lib/field-ring"
 import { cn } from "@/shared/lib/utils"
 
 function Select({
@@ -36,7 +40,7 @@ function SelectTrigger({
       data-slot="select-trigger"
       data-size={size}
       className={cn(
-        "flex w-full items-center justify-between ds-gap-4 rounded-md border border-input bg-background px-3 text-sm leading-(--ds-leading-5) whitespace-nowrap text-foreground transition-[color,box-shadow] outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 data-[state=open]:ring-2 data-[state=open]:ring-primary data-[state=open]:ring-offset-2 aria-invalid:focus-visible:ring-destructive aria-invalid:data-[state=open]:ring-destructive disabled:cursor-not-allowed data-[size=default]:h-10 data-[size=sm]:h-9 *:data-[slot=select-value]:block *:data-[slot=select-value]:truncate *:data-[slot=select-value]:[&_img]:mr-1.5 *:data-[slot=select-value]:[&_img]:inline-block *:data-[slot=select-value]:[&_img]:align-middle *:data-[slot=select-value]:[&_svg]:mr-1.5 *:data-[slot=select-value]:[&_svg]:inline-block *:data-[slot=select-value]:[&_svg]:align-middle [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+        "flex w-full items-center justify-between ds-gap-4 rounded-md border border-input bg-background px-3 text-sm leading-(--ds-leading-5) whitespace-nowrap text-foreground transition-[color,box-shadow] outline-none", fieldFocusRingClassName, fieldOpenRingClassName, "aria-invalid:focus-visible:ring-destructive aria-invalid:data-[state=open]:ring-destructive disabled:cursor-not-allowed data-[size=default]:h-10 data-[size=sm]:h-9 *:data-[slot=select-value]:block *:data-[slot=select-value]:truncate *:data-[slot=select-value]:[&_img]:mr-1.5 *:data-[slot=select-value]:[&_img]:inline-block *:data-[slot=select-value]:[&_img]:align-middle *:data-[slot=select-value]:[&_svg]:mr-1.5 *:data-[slot=select-value]:[&_svg]:inline-block *:data-[slot=select-value]:[&_svg]:align-middle [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
         className
       )}
       {...props}

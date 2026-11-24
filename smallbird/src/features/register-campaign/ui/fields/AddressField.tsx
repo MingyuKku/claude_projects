@@ -54,7 +54,6 @@ export function AddressField({
               value={value?.address ?? ""}
               placeholder={placeholder}
               className="min-w-0 flex-1"
-              onClick={() => void handleClickSearch()}
             />
             <Button variant="outline" onClick={() => void handleClickSearch()}>
               {t("address.search")}

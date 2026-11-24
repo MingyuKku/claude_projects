@@ -57,8 +57,8 @@ export function CampaignStatusPage() {
   const subscribedTypes = subscriptions.data
     ? getSubscribedTypes(subscriptions.data)
     : null;
-  // PC·TAB은 전체 탭에만, MO는 모든 탭 위에 둠(시안, 스펙 D-3).
-  const canRegister = !isSubAccount && (!isTabletUp || params.tab === "all");
+  // 모든 탭에서 유지함
+  const canRegister = !isSubAccount;
 
   function handleClickRegister() {
     void navigate(ROUTES.campaignCreate);

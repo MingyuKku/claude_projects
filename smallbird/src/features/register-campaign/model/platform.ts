@@ -12,6 +12,9 @@ export const PLATFORM_ICON_NAMES = {
   YOUTUBE: "youtube",
   TIKTOK: "tiktok",
   X: "x",
+  // 시안이 숏츠는 유튜브, 릴스는 인스타그램 로고를 씀.
+  SHORTS: "youtube",
+  REELS: "instagram",
 } as const satisfies Record<CampaignPlatform, PlatformIconName>;
 
 export const PLATFORM_LABEL_KEYS = {
@@ -21,9 +24,21 @@ export const PLATFORM_LABEL_KEYS = {
   YOUTUBE: "platform.YOUTUBE",
   TIKTOK: "platform.TIKTOK",
   X: "platform.X",
+  SHORTS: "platform.SHORTS",
+  REELS: "platform.REELS",
 } as const satisfies Record<CampaignPlatform, string>;
 
-/** 공구형 3단계 플랫폼 순서(시안 3.0.1). 그 밖은 `CAMPAIGN_PLATFORMS` 순서. */
+/** 브랜드형 3단계 플랫폼. 숏츠·릴스는 공구형 시안(3.0.1)에만 있음. */
+export const BRAND_PLATFORMS = [
+  "INSTAGRAM",
+  "NAVER_BLOG",
+  "FACEBOOK",
+  "YOUTUBE",
+  "TIKTOK",
+  "X",
+] as const satisfies readonly CampaignPlatform[];
+
+/** 공구형 3단계 플랫폼 순서(시안 3.0.1). */
 export const GROUP_BUY_PLATFORMS = [
   "INSTAGRAM",
   "NAVER_BLOG",
@@ -31,6 +46,8 @@ export const GROUP_BUY_PLATFORMS = [
   "TIKTOK",
   "FACEBOOK",
   "X",
+  "SHORTS",
+  "REELS",
 ] as const satisfies readonly CampaignPlatform[];
 
 /** 공구형은 "네이버 블로그", 그 밖은 "블로그"로 보임. */

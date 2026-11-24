@@ -150,8 +150,8 @@ export function BuyerInquiryDetailPanel({
       {(detail.campaignCode || detail.campaignType || period) && (
         <Section
           title={t("campaignInfo")}
-          // 배너 높이는 Figma Container(11315:50441)의 Thumbnail 73(구매자·크리에이터 문의 모두). 컨테이너는 289로 고정하지 않고 내용에
-          // 맡김: 캠페인명이 두 줄이거나 공구 진행 크리에이터 줄이 있어도 넘치지 않고, 기본 내용이면 289가 됨.
+          // 시안은 잘라 채우지만 세로 이미지가 거의 안 보여 전체를 표시함. 컨테이너 높이는 고정하지 않고 내용에
+          // 맡김: 캠페인명이 두 줄이거나 공구 진행 크리에이터 줄이 있어도 넘치지 않음.
           contentClassName="gap-2 tablet:gap-3"
         >
           {/* 캠페인을 목록에서 못 찾거나 이미지가 없어도 배너 자리는 남깁니다. */}
@@ -160,12 +160,12 @@ export function BuyerInquiryDetailPanel({
               src={campaignImageUrl}
               alt={campaignName ?? ""}
               loading="lazy"
-              className="h-18.25 w-full rounded-md border border-border object-cover"
+              className="aspect-[235/81] w-full rounded-md border border-border object-contain"
             />
           ) : (
             <div
               aria-hidden
-              className="h-18.25 w-full rounded-md border border-border bg-muted"
+              className="aspect-[235/81] w-full rounded-md border border-border bg-muted"
             />
           )}
           {/* Figma Wrap(6756:41105): 캠페인명과 정보 줄·복사 버튼은 6px 간격입니다. */}

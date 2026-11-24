@@ -1,6 +1,7 @@
 import { cva, type VariantProps } from "class-variance-authority"
 import * as React from "react"
 
+import { fieldFocusRingClassName } from "@/shared/lib/field-ring"
 import { cn } from "@/shared/lib/utils"
 
 // Figma 디자인 시스템 Input(6918:60663) 필드. inputSize md 40 / sm 36.
@@ -9,7 +10,7 @@ import { cn } from "@/shared/lib/utils"
 // HTML input의 size 속성과 겹치지 않게 inputSize로 둠.
 // 행간만 ds 변수로 둠. ds-text 묶음은 iOS의 text-base가 행간까지 바꿔서 쓰지 않음.
 const inputVariants = cva(
-  "w-full min-w-0 rounded-md text-ellipsis border border-input bg-background px-3 text-sm leading-(--ds-leading-5) text-foreground supports-[-webkit-touch-callout:none]:text-base transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 aria-invalid:focus-visible:ring-destructive disabled:pointer-events-none disabled:cursor-not-allowed file:mr-2 file:border-0 file:bg-transparent file:p-0 file:text-sm file:leading-(--ds-leading-5) file:font-medium file:text-foreground",
+  ["w-full min-w-0 rounded-md text-ellipsis border border-input bg-background px-3 text-sm leading-(--ds-leading-5) text-foreground supports-[-webkit-touch-callout:none]:text-base transition-[color,box-shadow] outline-none selection:bg-primary selection:text-primary-foreground placeholder:text-muted-foreground", fieldFocusRingClassName, "aria-invalid:focus-visible:ring-destructive disabled:pointer-events-none disabled:cursor-not-allowed file:mr-2 file:border-0 file:bg-transparent file:p-0 file:text-sm file:leading-(--ds-leading-5) file:font-medium file:text-foreground"],
   {
     variants: {
       inputSize: {

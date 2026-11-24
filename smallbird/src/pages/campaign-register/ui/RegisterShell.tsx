@@ -15,7 +15,7 @@ interface RegisterShellProps {
   children?: ReactNode;
 }
 
-// 등록 화면 셸: 헤더 "<" + "캠페인 등록". "<"는 브라우저 뒤로가기이고 앱 안 기록이 없으면 홈으로 감(스펙 §3 셸).
+// 등록 화면 셸: 헤더 "<" + "캠페인 등록". "<"는 브라우저 뒤로가기이고 앱 안 기록이 없으면 캠페인 현황으로 감(스펙 §3 셸).
 export function RegisterShell({
   isDemo = false,
   sidebar,
@@ -23,7 +23,7 @@ export function RegisterShell({
 }: RegisterShellProps) {
   const { t } = useTranslation("pages/campaign-register");
   const session = useOutletContext<SessionViewModel>();
-  const goBack = useGoBack(ROUTES.home);
+  const goBack = useGoBack(ROUTES.campaign);
 
   return (
     <>

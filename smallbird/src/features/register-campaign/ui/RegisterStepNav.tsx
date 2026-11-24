@@ -36,6 +36,7 @@ export function RegisterStepNav({
   const statuses = getStepStatuses({
     steps,
     draft,
+    productType,
     currentStep,
     hasVisitedPayment,
   });

@@ -64,7 +64,7 @@ export function LoadPreviousPanel() {
 
   function handleClickLoad() {
     if (selectedIdx === null) return;
-    if (hasAnyInput(draft)) {
+    if (hasAnyInput(draft, productType)) {
       setIsOverwriteAlertOpen(true);
       return;
     }

@@ -2,6 +2,10 @@ import { CalendarIcon } from "lucide-react";
 import { useState } from "react";
 
 import { formatDate } from "@/shared/i18n";
+import {
+  fieldFocusRingClassName,
+  fieldOpenRingClassName,
+} from "@/shared/lib/field-ring";
 import { useMediaQuery } from "@/shared/lib/useMediaQuery";
 import { cn } from "@/shared/lib/utils";
 import { Calendar } from "@/shared/ui/calendar";
@@ -52,7 +56,10 @@ export function DateRangePicker({
       disabled={disabled}
       aria-labelledby={labelledBy}
       className={cn(
-        "flex h-10 w-full items-center rounded-md border border-input bg-background px-3 py-2 text-left text-sm leading-5 font-normal text-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-background data-[state=open]:ring-2 data-[state=open]:ring-primary data-[state=open]:ring-offset-2",
+        "flex h-10 w-full items-center rounded-md border border-input bg-background px-3 py-2 text-left text-sm leading-5 font-normal text-foreground transition-[color,background-color,border-color,box-shadow] outline-none hover:bg-accent",
+        fieldFocusRingClassName,
+        "disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-background",
+        fieldOpenRingClassName,
         className,
       )}
     >

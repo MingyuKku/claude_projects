@@ -30,6 +30,7 @@ export {
   useCampaignDetail,
 } from "./api/use-campaign-detail";
 export { useCopySources } from "./api/use-copy-sources";
+export { usePostingTopics } from "./api/use-posting-topics";
 export { useProductCategories } from "./api/use-product-categories";
 export {
   useCampaignPage,
@@ -81,8 +82,6 @@ export {
   CAMPAIGN_TYPES,
   CREATOR_AGE_GROUPS,
   CREATOR_GENDERS,
-  getPostingTopics,
-  GROUP_BUY_POSTING_TOPICS,
   POSTING_TOPICS,
 } from "./model/input-codes";
 export type {
