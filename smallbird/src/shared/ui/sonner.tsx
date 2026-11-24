@@ -1,4 +1,5 @@
 import { Loader2Icon, XIcon } from "lucide-react"
+import { useEffect } from "react"
 import { Toaster as Sonner, type ToasterProps } from "sonner"
 
 // Figma 디자인 시스템 Toast(6706:10632) 기준.
@@ -30,8 +31,36 @@ const toasterClassNames = {
 const TOAST_WIDTH = "388px"
 const TOAST_OFFSET = 16
 
+const TOASTER_SELECTOR = "[data-sonner-toaster]"
+const EXPANDED_TOAST_SELECTOR = `${TOASTER_SELECTOR} [data-sonner-toast][data-expanded="true"]`
+
+// iOS Safari는 탭한 요소를 hover 상태로 두고 다른 클릭 가능한 요소를 탭하기 전에는 mouseout·mouseleave를 보내지 않음
+// (Apple "Safari Web Content Guide: Handling Events", WebKit 158517). sonner는 mouseenter로 토스트를 펼치며 타이머를 멈추고
+// mouseleave로만 접어서, 터치로 펼치면 계속 펼쳐진 채 자동으로 사라지지 않음. 그래서 토스트 바깥을 터치하면
+// mouseout을 대신 보내 접음(React가 mouseout에서 onMouseLeave를 만듦). 마우스·펜 입력과 토스트 안쪽 터치는 건드리지 않음.
+// sonner나 React를 올리면 sonner.test.tsx와 iOS 실기기에서 다시 확인할 것.
+function useCollapseOnOutsideTouch() {
+  useEffect(() => {
+    function handlePointerDown(event: PointerEvent) {
+      if (event.pointerType !== "touch") return
+      const toaster = document
+        .querySelector(EXPANDED_TOAST_SELECTOR)
+        ?.closest(TOASTER_SELECTOR)
+      if (!toaster) return
+      if (event.target instanceof Node && toaster.contains(event.target)) return
+      toaster.dispatchEvent(new MouseEvent("mouseout", { bubbles: true }))
+    }
+
+    document.addEventListener("pointerdown", handlePointerDown, true)
+    return () =>
+      document.removeEventListener("pointerdown", handlePointerDown, true)
+  }, [])
+}
+
 // 앱이 라이트 테마만 지원하므로 next-themes 없이 고정함.
 const Toaster = ({ ...props }: ToasterProps) => {
+  useCollapseOnOutsideTouch()
+
   return (
     <Sonner
       theme="light"
@@ -41,6 +70,9 @@ const Toaster = ({ ...props }: ToasterProps) => {
       offset={TOAST_OFFSET}
       mobileOffset={TOAST_OFFSET}
       closeButton
+      // sonner 기본값은 position(top-center)에서 정해져 위로만 밀어서 닫을 수 있음. 위를 유지하고 좌우를 더함.
+      // 터치에서 위로 끄는 움직임은 index.css가 제한함.
+      swipeDirections={["top", "left", "right"]}
       icons={{
         loading: <Loader2Icon className="size-4 animate-spin" />,
         close: <XIcon className="size-4" />,

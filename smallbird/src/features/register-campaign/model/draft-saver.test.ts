@@ -38,6 +38,36 @@ beforeEach(() => {
   vi.mocked(saveCampaignStep).mockReset().mockResolvedValue(undefined);
 });
 
+describe("getChangedSteps 상품 유형", () => {
+  function createGroupBuyStore() {
+    const draft = applyDraftDefaults(createEmptyDraft());
+    return createRegisterWizardStore({
+      campaignIdx: 8,
+      campaignCode: "PO-00000000000008",
+      serviceType: "PICK",
+      productType: "GROUP_BUY",
+      isDemo: false,
+      rawCampaignType: draft.info.campaignType,
+      draft,
+    } as CampaignDetail);
+  }
+
+  it("브랜드형은 공동구매 조건이 바뀌어도 보내지 않는다(서버가 거절함)", () => {
+    const store = createStore();
+    store.getState().patchStepDraft("groupBuy", { price: 1000 });
+
+    expect(getChangedSteps(store.getState())).toEqual([]);
+  });
+
+  it("공구형은 공동구매 조건을 보내고 진행 조건은 보내지 않는다", () => {
+    const store = createGroupBuyStore();
+    store.getState().patchStepDraft("groupBuy", { price: 1000 });
+    store.getState().patchStepDraft("conditions", { postingPeriodMonths: 3 });
+
+    expect(getChangedSteps(store.getState())).toEqual(["groupBuy"]);
+  });
+});
+
 describe("getChangedSteps", () => {
   it("바뀐 단계만 단계 순서대로 고른다", () => {
     const store = createStore();

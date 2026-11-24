@@ -1,17 +1,9 @@
 {
-  "brand": {
-    "bigbird": {
-      "loginTitle": "Bigbird Partner Center login"
-    },
-    "petplay": {
-      "loginTitle": "Petplay Partner Center login"
-    }
-  },
   "submitting": "Logging in",
   "error": {
     "idRequired": "Enter your ID.",
     "passwordRequired": "Enter your password.",
-    "mismatch": "ID or password doesn't match.",
+    "mismatch": "Member information not found.",
     "unknown": "An error occurred. Try again later.",
     "exited": "Withdrawn member.",
     "noAccount": "No such account, or member withdrawn.",

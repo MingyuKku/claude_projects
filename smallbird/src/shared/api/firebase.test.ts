@@ -1,9 +1,12 @@
-import { beforeEach, describe, expect, it, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-const initializeApp = vi.fn(() => ({ name: "app" }));
+const initializeApp = vi.fn((_options: unknown, name?: string) => ({
+  name: name ?? "[DEFAULT]",
+}));
+const getApps = vi.fn((): { name: string }[] => []);
 const getFirestore = vi.fn(() => ({ type: "firestore" }));
 
-vi.mock("firebase/app", () => ({ getApps: () => [], initializeApp }));
+vi.mock("firebase/app", () => ({ getApps, initializeApp }));
 vi.mock("firebase/firestore", () => ({ getFirestore }));
 
 const signInWithCustomToken = vi.fn(async () => undefined);
@@ -17,6 +20,18 @@ vi.mock("firebase/auth", () => ({
 
 const post = vi.fn(async () => ({ result: true, token: "custom-token" }));
 vi.mock("./clients", () => ({ serverApiV3: { post } }));
+
+// 설정값은 환경(.env.local, CI)마다 달라서 테스트가 직접 정한다. 모듈을 새로 불러올 때 이 값을 읽는다.
+beforeEach(() => {
+  vi.stubEnv("VITE_FIREBASE_API_KEY", "test-key");
+  vi.stubEnv("VITE_FIREBASE_AUTH_DOMAIN", "test.firebaseapp.com");
+  vi.stubEnv("VITE_FIREBASE_PROJECT_ID", "test-project");
+  vi.stubEnv("VITE_FIREBASE_APP_ID", "test-app-id");
+});
+
+afterEach(() => {
+  vi.unstubAllEnvs();
+});
 
 // 모듈 안의 캐시를 테스트마다 비우기 위해 매번 새로 불러온다.
 async function loadFirebase() {
@@ -39,6 +54,22 @@ describe("getFirestoreDb", () => {
 
     expect(a).toBe(b);
     expect(initializeApp).toHaveBeenCalledTimes(1);
+  });
+
+  it("다른 이름의 앱이 먼저 있어도 Firestore는 기본 앱으로 초기화한다", async () => {
+    getApps.mockReturnValue([{ name: "push" }]);
+    const getFirestoreDb = await loadGetFirestoreDb();
+
+    await getFirestoreDb();
+
+    // 이름을 넘기지 않아야(인자 하나) 기본 앱이다.
+    expect(initializeApp).toHaveBeenCalledExactlyOnceWith({
+      apiKey: "test-key",
+      authDomain: "test.firebaseapp.com",
+      projectId: "test-project",
+      appId: "test-app-id",
+    });
+    getApps.mockReturnValue([]);
   });
 
   it("초기화가 실패하면 다음 호출에서 다시 시도한다", async () => {
@@ -126,5 +157,48 @@ describe("getFirestoreDb", () => {
     await pending;
 
     expect(signOut).toHaveBeenCalledTimes(2);
+  });
+});
+
+describe("getFirebaseApp", () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    getApps.mockReturnValue([]);
+  });
+
+  it("이름별로 앱을 한 번만 만든다", async () => {
+    const { getFirebaseApp } = await loadFirebase();
+    const [a, b] = await Promise.all([
+      getFirebaseApp("push", { appId: "push-app" }),
+      getFirebaseApp("push", { appId: "push-app" }),
+    ]);
+
+    expect(a).toBe(b);
+    expect(initializeApp).toHaveBeenCalledExactlyOnceWith(
+      { appId: "push-app" },
+      "push",
+    );
+  });
+
+  it("이미 같은 이름의 앱이 있으면 새로 만들지 않는다", async () => {
+    getApps.mockReturnValue([{ name: "push" }]);
+    const { getFirebaseApp } = await loadFirebase();
+
+    await expect(getFirebaseApp("push", {})).resolves.toEqual({
+      name: "push",
+    });
+    expect(initializeApp).not.toHaveBeenCalled();
+  });
+
+  it("생성이 실패하면 다음 호출에서 다시 시도한다", async () => {
+    const { getFirebaseApp } = await loadFirebase();
+    initializeApp.mockImplementationOnce(() => {
+      throw new Error("init");
+    });
+
+    await expect(getFirebaseApp("push", {})).rejects.toThrow("init");
+    await expect(getFirebaseApp("push", {})).resolves.toEqual({
+      name: "push",
+    });
   });
 });

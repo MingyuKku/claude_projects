@@ -1,4 +1,4 @@
-import { RotateCcw, X } from "lucide-react";
+import { RefreshCcw, X } from "lucide-react";
 import { useId, useState } from "react";
 
 import { SubHeader } from "@/shared/components/app-header";
@@ -67,7 +67,11 @@ export function FilterDialog({
         aria-describedby={undefined}
       >
         <SubHeader
-          title={<DialogTitle>{t("list.filter.title")}</DialogTitle>}
+          title={
+            <DialogTitle className="text-base leading-none">
+              {t("list.filter.title")}
+            </DialogTitle>
+          }
           actions={
             <DialogClose asChild>
               <Button
@@ -134,11 +138,10 @@ export function FilterDialogBody({
         {fields.map((field) => {
           const labelId = `${idPrefix}-${field.id}`;
           return (
-            <div
-              key={field.id}
-              className="flex flex-col gap-2 text-sm font-medium"
-            >
-              <span id={labelId}>{field.label}</span>
+            <div key={field.id} className="flex flex-col gap-2 text-sm">
+              <span id={labelId} className="font-medium">
+                {field.label}
+              </span>
               {field.type === "date" ? (
                 <DateField
                   field={field}
@@ -171,7 +174,7 @@ export function FilterDialogBody({
           className={cn(isScreen && "h-9.5")}
           onClick={() => setDraft({})}
         >
-          <RotateCcw />
+          <RefreshCcw />
           {t("list.filter.reset")}
         </Button>
         <Button

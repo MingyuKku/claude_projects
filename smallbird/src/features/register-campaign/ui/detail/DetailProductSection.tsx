@@ -5,6 +5,7 @@ import { DetailRow, DetailSection, StatusBadge } from "./DetailSection";
 import type { CampaignAddress, CampaignDetail } from "@/entities/campaign";
 
 interface DetailProductSectionProps {
+  number: number;
   detail: CampaignDetail;
   /** 캠페인 유형 표시 문구(협찬 유형). */
   typeLabel: string;
@@ -18,6 +19,7 @@ function formatAddress(address: CampaignAddress | null) {
 
 // 매장방문형 시안의 "방문 안내 및 유의사항"은 입력 칸이 없어 그리지 않음.
 export function DetailProductSection({
+  number,
   detail,
   typeLabel,
   onClickEdit,
@@ -30,7 +32,7 @@ export function DetailProductSection({
 
   return (
     <DetailSection
-      number={2}
+      number={number}
       title={t("detail.section.product")}
       onClickEdit={onClickEdit}
     >

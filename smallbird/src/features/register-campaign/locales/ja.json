@@ -2,7 +2,9 @@
   "step": {
     "campaignInfo": "キャンペーン情報入力",
     "product": "商品情報入力",
+    "productGroupBuy": "協賛商品情報入力",
     "creator": "クリエイター条件",
+    "groupBuy": "共同購入条件設定",
     "addOns": "オプション",
     "intro": "캠페인 소개서",
     "conditions": "進行条件設定",
@@ -31,6 +33,7 @@
     "fileType": "JPG・PNGファイルのみアップロードできます。",
     "fileSize": "10MB以下のファイルのみアップロードできます。",
     "videoSize": "500MB以下の動画のみアップロードできます。",
+    "videoConvertFailed": "動画を変換できません。別のファイルをアップロードしてください。",
     "requestFailed": "リクエストに失敗しました。しばらくしてからもう一度お試しください。",
     "addressSearchFailed": "住所検索を読み込めませんでした。しばらくしてからもう一度お試しください。",
     "aiCompleted": "AI生成が完了しました。",
@@ -74,9 +77,12 @@
       "manage": "ブランド管理"
     },
     "period": {
-      "label": "希望開始日",
+      "label": {
+        "brand": "希望開始日",
+        "groupBuy": "共同購入希望開始日"
+      },
       "placeholder": "日付を選択してください。",
-      "help": "終了日は自動で30日後に設定されます。"
+      "help": "終了日は自動で{{days}}日後に設定されます。"
     }
   },
   "brands": {
@@ -138,6 +144,9 @@
     "TIKTOK": "TikTok",
     "X": "X"
   },
+  "platformGroupBuy": {
+    "NAVER_BLOG": "ネイバーブログ"
+  },
   "unit": {
     "won": "ウォン",
     "count": "個"
@@ -196,6 +205,32 @@
       "emptyDescription": "記事の方向性と詳しいガイドは、<br/>次の「캠페인 소개서」で入力してください。"
     }
   },
+  "groupBuy": {
+    "productName": {
+      "label": "共同購入商品名",
+      "placeholder": "共同購入商品名を入力してください。"
+    },
+    "category": {
+      "label": "共同購入商品 大分類",
+      "placeholder": "電子商取引等の商品情報提供告示に該当する大分類を選択してください。"
+    },
+    "middleCategory": {
+      "label": "共同購入商品 中分類",
+      "placeholder": "電子商取引等の商品情報提供告示に該当する中分類を選択してください。"
+    },
+    "recommendedPrice": {
+      "label": "希望小売価格",
+      "placeholder": "希望小売価格を入力してください。"
+    },
+    "price": {
+      "label": "共同購入価格",
+      "placeholder": "共同購入価格を入力してください。"
+    },
+    "notice": {
+      "lowestPrice": "ネイバーショッピング検索の最安値より10%以上安く設定することをおすすめします。",
+      "mayChange": "共同購入価格は、共同購入開始時点のネイバーショッピング検索の最安値に応じて変更される場合があります。"
+    }
+  },
   "creator": {
     "platform": "プラットフォーム選択",
     "gender": {
@@ -235,6 +270,17 @@
       "ASMR": "ASMR",
       "Review": "レビュー",
       "All": "すべて"
+    },
+    "groupBuyTopic": {
+      "All": "指定なし",
+      "Beauty": "ビューティー",
+      "LivingHealth": "生活&健康",
+      "PregnancyParenting": "出産&育児",
+      "Food": "食品",
+      "DigitalAppliances": "デジタル&家電",
+      "FurnitureInterior": "家具&インテリア",
+      "Fashion": "ファッション",
+      "TravelCulture": "旅行&文化"
     }
   },
   "addOns": {
@@ -424,6 +470,7 @@
       "info": "キャンペーン情報",
       "product": "製品情報",
       "creator": "クリエイター条件",
+      "groupBuy": "共同購入条件設定",
       "addOns": "付加サービス",
       "intro": "캠페인 소개서",
       "conditions": "進行条件",
@@ -466,6 +513,7 @@
     },
     "addOns": {
       "applied": "申請済み",
+      "appliedWithPrice": "申請済み（1件{{amount}}ウォン）",
       "notApplied": "未申請"
     },
     "intro": {

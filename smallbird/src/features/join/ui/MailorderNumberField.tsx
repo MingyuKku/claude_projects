@@ -1,4 +1,4 @@
-import { AuthInput, AuthText } from "@/shared/components/auth";
+import { AuthInput, AuthSupportText, AuthText } from "@/shared/components/auth";
 import { useTranslation } from "@/shared/i18n";
 
 import {
@@ -53,41 +53,41 @@ export function MailorderNumberField({
 
   return (
     <div className="flex flex-col gap-2">
-      <AuthText size="md">{t("company.mailorderNumber")}</AuthText>
-      <div className="flex w-full gap-2.5">
-        <div className="h-11 min-w-0 flex-1">
-          <AuthInput
-            inputMode="numeric"
-            aria-label={t("company.mailorderYear")}
-            value={parts[MAILORDER_YEAR_INDEX]}
-            onChange={(event) =>
-              handleChangePart(MAILORDER_YEAR_INDEX, event.target.value)
-            }
-          />
-        </div>
-        <div className="h-11 min-w-0 flex-1">
-          <AuthInput
-            aria-label={t("company.mailorderRegion")}
-            placeholder={t("company.regionPlaceholder")}
-            value={parts[MAILORDER_REGION_INDEX]}
-            onChange={handleChangeRegion}
-            onCompositionEnd={handleCompositionEndRegion}
-          />
-        </div>
-        <div className="h-11 min-w-0 flex-1">
-          <AuthInput
-            inputMode="numeric"
-            aria-label={t("company.mailorderSerial")}
-            value={parts[MAILORDER_SERIAL_INDEX]}
-            onChange={(event) =>
-              handleChangePart(MAILORDER_SERIAL_INDEX, event.target.value)
-            }
-          />
+      <div className="flex flex-col gap-2.5">
+        <AuthText size="md">{t("company.mailorderNumber")}</AuthText>
+        <div className="flex w-full gap-2.5">
+          <div className="h-11 min-w-0 flex-1">
+            <AuthInput
+              inputMode="numeric"
+              aria-label={t("company.mailorderYear")}
+              value={parts[MAILORDER_YEAR_INDEX]}
+              onChange={(event) =>
+                handleChangePart(MAILORDER_YEAR_INDEX, event.target.value)
+              }
+            />
+          </div>
+          <div className="h-11 min-w-0 flex-1">
+            <AuthInput
+              aria-label={t("company.mailorderRegion")}
+              placeholder={t("company.regionPlaceholder")}
+              value={parts[MAILORDER_REGION_INDEX]}
+              onChange={handleChangeRegion}
+              onCompositionEnd={handleCompositionEndRegion}
+            />
+          </div>
+          <div className="h-11 min-w-0 flex-1">
+            <AuthInput
+              inputMode="numeric"
+              aria-label={t("company.mailorderSerial")}
+              value={parts[MAILORDER_SERIAL_INDEX]}
+              onChange={(event) =>
+                handleChangePart(MAILORDER_SERIAL_INDEX, event.target.value)
+              }
+            />
+          </div>
         </div>
       </div>
-      <AuthText size="sm" tone="faint">
-        {t("company.regionHint")}
-      </AuthText>
+      <AuthSupportText>{t("company.regionHint")}</AuthSupportText>
     </div>
   );
 }

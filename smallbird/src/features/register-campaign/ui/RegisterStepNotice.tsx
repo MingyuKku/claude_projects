@@ -13,7 +13,7 @@ interface RegisterStepNoticeProps {
   step: CampaignRegisterStep;
 }
 
-// 단계 제목 위 안내. 기자단형 2단계(시안 13320:116000)와 4단계 부가서비스(13385:248323). 문구의 "'모집가이드 작성' 단계"는 기획 변경으로
+// 단계 제목 위 안내. 기자단형 2단계(시안 13320:116000)와 부가서비스(13385:248323). 문구의 "'모집가이드 작성' 단계"는 기획 변경으로
 // "캠페인 소개서"로 씀(스펙 §3 2단계).
 export function RegisterStepNotice({ step }: RegisterStepNoticeProps) {
   const { t } = useTranslation("features/register-campaign");

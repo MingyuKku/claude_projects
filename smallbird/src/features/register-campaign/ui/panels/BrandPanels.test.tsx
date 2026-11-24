@@ -6,6 +6,7 @@ import { SWRConfig } from "swr";
 
 import { addBrand } from "@/entities/brand";
 import { createEmptyDraft } from "@/entities/campaign";
+import { serverApiV3 } from "@/shared/api";
 
 import { uploadCampaignFile } from "../../api/upload-campaign-file";
 import { useRegisterWizardStore } from "../../model/wizard-context";
@@ -16,9 +17,15 @@ import { BrandManagePanel } from "./BrandManagePanel";
 import type * as UploadApi from "../../api/upload-campaign-file";
 import type * as BrandEntity from "@/entities/brand";
 import type { CampaignDetail } from "@/entities/campaign";
+import type * as SharedApi from "@/shared/api";
 
 vi.mock("sonner", () => ({
   toast: Object.assign(vi.fn(), { success: vi.fn(), error: vi.fn() }),
+}));
+
+vi.mock("@/shared/api", async (importOriginal) => ({
+  ...(await importOriginal<typeof SharedApi>()),
+  serverApiV3: { get: vi.fn(), post: vi.fn(), delete: vi.fn() },
 }));
 
 vi.mock("@/entities/brand", async (importOriginal) => {
@@ -34,11 +41,48 @@ vi.mock("../../api/upload-campaign-file", async (importOriginal) => {
   };
 });
 
+// 서버의 브랜드 목록(최근 추가순)을 흉내 냄: 조회·추가·삭제와 이미지 업로드.
+let brands: { brandIdx: number; name: string; imageUrl: string | null }[];
+
 beforeEach(() => {
   vi.mocked(uploadCampaignFile).mockClear();
   vi.mocked(addBrand).mockClear();
-  window.sessionStorage.clear();
   vi.mocked(toast.error).mockClear();
+  brands = [
+    { brandIdx: 4, name: "비글로우", imageUrl: null },
+    { brandIdx: 3, name: "빅링크 코스메틱", imageUrl: null },
+    { brandIdx: 2, name: "초록숲", imageUrl: null },
+    { brandIdx: 1, name: "데일리 스튜디오", imageUrl: null },
+  ];
+  vi.mocked(serverApiV3.get)
+    .mockReset()
+    .mockImplementation((async (path: string) => {
+      if (path === "/brand") return { brands: [...brands] };
+      throw new Error(`unmocked GET ${path}`);
+    }) as never);
+  vi.mocked(serverApiV3.post)
+    .mockReset()
+    .mockImplementation((async (path: string, body: { name: string }) => {
+      if (path === "/campaign/files") {
+        return {
+          attachmentIdx: 501,
+          url: "https://example.com/logo.png",
+          mediaType: "IMAGE",
+        };
+      }
+      if (path === "/brand") {
+        const brand = { brandIdx: 5, name: body.name, imageUrl: null };
+        brands.unshift(brand);
+        return brand;
+      }
+      throw new Error(`unmocked POST ${path}`);
+    }) as never);
+  vi.mocked(serverApiV3.delete)
+    .mockReset()
+    .mockImplementation((async (path: string) => {
+      const brandIdx = Number(path.replace("/brand/", ""));
+      brands = brands.filter((brand) => brand.brandIdx !== brandIdx);
+    }) as never);
 });
 
 function createDetail(brandIdx: number | null): CampaignDetail {
@@ -99,7 +143,6 @@ function renderPanel(panel: "brands" | "add-brand", brandIdx: number | null) {
 describe("BrandManagePanel", () => {
   it("등록 브랜드와 개수를 보이고, 지금 고른 브랜드를 지우면 목록에서 빠지고 선택이 빈다", async () => {
     const user = userEvent.setup();
-    // 목 저장소 시드: 4 비글로우 · 3 빅링크 코스메틱 · 2 초록숲 · 1 데일리 스튜디오
     renderPanel("brands", 2);
 
     expect(await screen.findByText("초록숲")).toBeInTheDocument();

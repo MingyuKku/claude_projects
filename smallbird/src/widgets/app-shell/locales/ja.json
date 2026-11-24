@@ -60,7 +60,17 @@
     "title": "通知",
     "close": "通知を閉じる",
     "emptyTitle": "新しい通知はありません",
-    "emptyDescription": "サービス利用中の主な通知がここに表示されます。"
+    "emptyDescription": "サービス利用中の主な通知がここに表示されます。",
+    "item": {
+      "approved": {
+        "title": "キャンペーン承認",
+        "description": "{{name}}が承認されました。"
+      },
+      "rejected": {
+        "title": "キャンペーン差し戻し",
+        "description": "{{name}}が差し戻されました。"
+      }
+    }
   },
   "logoutFailed": "ログアウトできませんでした。もう一度お試しください。",
   "session": {

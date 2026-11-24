@@ -58,3 +58,15 @@ export interface CopySourceCampaign {
   /** 등록일 `yyyy-MM-dd`. */
   createdDate: string | null;
 }
+
+export interface ProductMiddleCategory {
+  idx: number;
+  name: string;
+}
+
+/** 공구형 상품 카테고리 대분류. 중분류는 대분류에 딸려 있음. */
+export interface ProductCategory {
+  idx: number;
+  name: string;
+  children: ProductMiddleCategory[];
+}

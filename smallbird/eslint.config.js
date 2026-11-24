@@ -49,11 +49,13 @@ const SLICE_IMPORT_PATTERNS = [
   },
 ];
 
-// Firebase SDK는 src/shared/api/firebase.ts 가 감싼다. 초기화·익명 로그인·번들 분리를 한 곳에서 관리하기 위해서다.
+// Firebase SDK는 src/shared/api 의 firebase.ts(앱 생성·Firestore)와 firebase-messaging.ts(웹푸시)가 감싼다.
+// 앱 생성은 firebase.ts 의 getFirebaseApp 한 곳에서만 하고, 번들 분리(동적 import)를 지키기 위해서다.
 const FIREBASE_IMPORT_PATTERNS = [
   {
     regex: "^firebase(/|$)",
-    message: "Firebase SDK는 '@/shared/api'의 getFirestoreDb로만 쓴다.",
+    message:
+      "Firebase SDK는 '@/shared/api'의 래퍼(firebase.ts·firebase-messaging.ts)로만 쓴다.",
   },
 ];
 
@@ -86,6 +88,12 @@ export default defineConfig([
     languageOptions: { globals: globals.node },
   },
 
+  // public/ 의 정적 스크립트는 Service Worker(푸시 수신)다.
+  {
+    files: ["public/**/*.js"],
+    languageOptions: { globals: globals.serviceworker },
+  },
+
   {
     files: ["**/*.{ts,tsx}"],
     rules: {
@@ -111,9 +119,15 @@ export default defineConfig([
     },
   },
 
-  // Firebase SDK를 직접 다루는 유일한 파일. 옵션 전체를 다시 선언하므로 나머지 제한은 함께 넘긴다.
+  // Firebase SDK를 직접 다루는 파일. 새 Firebase 제품을 쓰려면 여기에 파일을 추가한다.
+  // 옵션 전체를 다시 선언하므로 나머지 제한은 함께 넘긴다.
   {
-    files: ["src/shared/api/firebase.ts", "src/shared/api/firebase.test.ts"],
+    files: [
+      "src/shared/api/firebase.ts",
+      "src/shared/api/firebase.test.ts",
+      "src/shared/api/firebase-messaging.ts",
+      "src/shared/api/firebase-messaging.test.ts",
+    ],
     rules: {
       "no-restricted-imports": [
         "error",

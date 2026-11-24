@@ -1,4 +1,4 @@
-import { ChevronRight, FileText } from "lucide-react";
+import { ChevronRight, SquareMenu } from "lucide-react";
 
 import { DeleteCampaignButton } from "@/features/delete-campaign";
 import { useTranslation } from "@/shared/i18n";
@@ -67,7 +67,7 @@ export function IconAction({
       className="rounded-md"
       onClick={onClickDetail}
     >
-      <FileText />
+      <SquareMenu />
     </Button>
   );
 }

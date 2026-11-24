@@ -16,9 +16,15 @@ interface SnsLoginRowProps {
   onErrorStart: () => void;
   /** 애플 팝업 뒤 로그인이 거절되거나 실패함. 다른 공급자는 복귀 화면이 로그인 화면에 실패 state를 넘김. */
   onFailLogin: () => void;
+  /** 주면 로그인을 시작하지 않고 이것만 호출함(크리에이터 탭). */
+  onInterceptAction?: () => void;
 }
 
-export function SnsLoginRow({ onErrorStart, onFailLogin }: SnsLoginRowProps) {
+export function SnsLoginRow({
+  onErrorStart,
+  onFailLogin,
+  onInterceptAction,
+}: SnsLoginRowProps) {
   const navigate = useNavigate();
 
   // 애플은 팝업이라 클릭 직후에 열려야 브라우저가 막지 않음. 미리 불러 두고 실패는 클릭할 때 다시 시도해 알림.
@@ -40,6 +46,10 @@ export function SnsLoginRow({ onErrorStart, onFailLogin }: SnsLoginRowProps) {
 
   function createClickHandler(start: () => Promise<void>) {
     return () => {
+      if (onInterceptAction) {
+        onInterceptAction();
+        return;
+      }
       start().catch((error: unknown) => {
         // 원인은 콘솔에 남기고, 화면에는 번역된 안내만 보여 준다.
         console.error(error);
@@ -49,7 +59,7 @@ export function SnsLoginRow({ onErrorStart, onFailLogin }: SnsLoginRowProps) {
   }
 
   return (
-    <div className="flex items-center justify-center gap-5">
+    <div className="flex items-center justify-center ds-gap-4">
       <SnsButton
         platform={socialPlatformSchema.enum.kakao}
         size="small"

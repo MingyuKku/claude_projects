@@ -23,6 +23,7 @@ import { useMediaQuery } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
 
 import { isSubscriptionExpiredForWrite } from "../lib/subscription-guard";
+import { TAB_STAGES } from "../model/constants";
 import { useStatusParams } from "../model/use-status-params";
 import { CampaignListSection } from "./CampaignListSection";
 import { StatusTabs } from "./StatusTabs";
@@ -31,6 +32,7 @@ import { SubscriptionRequiredDialog } from "./SubscriptionRequiredDialog";
 import type { ShortcutKind } from "../lib/campaign-actions";
 import type { CampaignSummary } from "@/entities/campaign";
 import type { SessionViewModel } from "@/entities/session";
+import type { ReactNode } from "react";
 
 // 캠페인 현황: 진행 단계 탭·검색·유형 필터·표(PC)/카드(TAB·MO). 탭·검색·유형·쪽은 주소 쿼리가 소유함.
 // 셸(헤더·LNB)은 app 레이어의 CampaignLayout이 감쌈.
@@ -100,28 +102,52 @@ export function CampaignStatusPage() {
   );
   // 계정에 캠페인이 하나도 없음: 조건 없는 전체 탭이 0건.
   const isAccountEmpty = emptyKind === "none" && params.tab === "all";
-  const emptyContent = isAccountEmpty ? (
-    <EmptyState
-      type="no-list"
-      title={t("empty.account.title")}
-      description={t("empty.account.description")}
-      className="flex-1 py-10"
-      action={
-        isSubAccount ? undefined : (
-          <Button variant="outline" onClick={handleClickRegister}>
-            {t("action.register")}
-          </Button>
-        )
-      }
-    />
-  ) : (
-    <ListEmptyState
-      kind={emptyKind}
-      keyword={params.keyword}
-      noneTitle={t(`empty.tab.${params.tab}`)}
-      height="fill"
-    />
+  // 검색·필터 결과가 0건이면 계정에 캠페인이 있는지 조건 없는 전체 목록으로 확인함(시안이 두 경우의 문구를 나눔).
+  const listTotalCount = isTabletUp
+    ? paged.list?.totalCount
+    : scroll.isLoading
+      ? undefined
+      : scroll.totalCount;
+  const needsAccountCheck =
+    params.tab === "all" && emptyKind !== "none" && listTotalCount === 0;
+  const accountList = useCampaignPage(
+    needsAccountCheck
+      ? { statuses: TAB_STAGES.all, type: null, keyword: "", page: 1 }
+      : null,
   );
+  const isNoCampaignAccount =
+    needsAccountCheck && accountList.list?.totalCount === 0;
+  const emptyFillClassName = "flex-1 py-10";
+
+  let emptyContent: ReactNode;
+  if (isAccountEmpty) {
+    emptyContent = (
+      <EmptyState
+        type="start"
+        title={t("empty.account.title")}
+        className={emptyFillClassName}
+      />
+    );
+  } else if (isNoCampaignAccount) {
+    emptyContent = (
+      <EmptyState
+        type="no-list"
+        title={t("empty.account.searchNoCampaign")}
+        className={emptyFillClassName}
+      />
+    );
+  } else if (needsAccountCheck && accountList.isLoading) {
+    emptyContent = <div className={emptyFillClassName} />;
+  } else {
+    emptyContent = (
+      <ListEmptyState
+        kind={emptyKind}
+        keyword={params.keyword}
+        noneTitle={t(`empty.tab.${params.tab}`)}
+        height="fill"
+      />
+    );
+  }
 
   const registerButton = canRegister && (
     <Button onClick={handleClickRegister}>
@@ -135,7 +161,7 @@ export function CampaignStatusPage() {
       <div className="ds-px-5 pt-2">
         <StatusTabs value={params.tab} onChange={params.setTab} />
       </div>
-      <div className="flex flex-1 flex-col gap-3 ds-px-5 ds-pt-6 ds-pb-5 tablet:gap-4 desktop:gap-3">
+      <div className="flex flex-1 flex-col gap-4 ds-px-5 ds-pt-6 ds-pb-5 desktop:gap-3">
         {!isTabletUp && registerButton}
         <FilterToolbar
           fields={params.fields}

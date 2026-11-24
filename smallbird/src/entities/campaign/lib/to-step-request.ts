@@ -98,6 +98,13 @@ const RAW_STEP_REQUEST_BUILDERS = {
   }),
   product: toProductRequest,
   creator: ({ creator }: CampaignDraft) => ({ ...creator }),
+  groupBuy: ({ groupBuy }: CampaignDraft) => ({
+    groupBuyingProductName: textOrNull(groupBuy.productName),
+    productCategoryIdx: groupBuy.categoryIdx,
+    productMiddleCategoryIdx: groupBuy.middleCategoryIdx,
+    recommendedConsumerPrice: groupBuy.recommendedPrice,
+    purchasePrice: groupBuy.price,
+  }),
   addOns: ({ addOns }: CampaignDraft) => ({ addOns }),
   intro: ({ intro }: CampaignDraft) => ({
     mainImage: intro.mainImage ? toAttachmentRequest(intro.mainImage) : null,

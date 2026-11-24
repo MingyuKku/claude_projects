@@ -1,5 +1,5 @@
 {
-  "listTitle": "お問い合わせ一覧",
+  "listTitle": "お問合せ一覧",
   "all": "すべて",
   "waiting": "返信待ち",
   "consulting": "相談中",
@@ -11,20 +11,20 @@
     "done": "回答済み"
   },
   "source": {
-    "purchaser": "購入者問い合わせ",
+    "purchaser": "購入者問合せ",
     "qna": "商品Q&A",
-    "creator": "クリエイター問い合わせ",
+    "creator": "クリエイター問合せ",
     "campaignQna": "キャンペーンQ&A"
   },
-  "empty": "お問い合わせはありません。",
-  "loadError": "お問い合わせ一覧を読み込めませんでした。",
+  "empty": "お問合せはありません。",
+  "loadError": "お問合せ一覧を読み込めませんでした。",
   "unknownWriter": "名前なし",
   "conversation": "会話",
   "detail": "詳細情報",
   "backToList": "一覧に戻る",
   "closeDetail": "詳細を閉じる",
   "advertiser": "広告主",
-  "messagePlaceholder": "お問い合わせ内容を入力（最大3,000字）",
+  "messagePlaceholder": "お問合せ内容を入力（最大3,000字）",
   "send": "送信",
   "orderInfo": "注文・商品情報",
   "orderNumber": "注文番号",
@@ -32,7 +32,7 @@
   "filter": {
     "action": "フィルター",
     "title": "フィルター設定",
-    "source": "問い合わせ種別",
+    "source": "問合せ種別",
     "campaign": "キャンペーン",
     "campaignPlaceholder": "キャンペーンを選択",
     "creator": "クリエイター",
@@ -48,9 +48,9 @@
     "all": "すべて",
     "sourceType": {
       "ALL": "すべて",
-      "PURCHASER_QUESTION": "購入者問い合わせ",
+      "PURCHASER_QUESTION": "購入者問合せ",
       "PRODUCT_QNA": "商品Q&A",
-      "INFLUENCER_QUESTION": "クリエイター問い合わせ",
+      "INFLUENCER_QUESTION": "クリエイター問合せ",
       "CAMPAIGN_QNA": "キャンペーンQ&A"
     }
   },
@@ -61,8 +61,8 @@
   "campaignType": "キャンペーン種別",
   "progressStatus": "進行状況",
   "period": "進行期間",
-  "campaignCode": "キャンペーンコード",
-  "shopCode": "ショップコード",
+  "campaignCode": "CPコード",
+  "shopCode": "共購コード",
   "creator": "クリエイター",
   "campaignShortcut": "キャンペーンへ移動",
   "detailError": "詳細を読み込めませんでした。",
@@ -71,7 +71,7 @@
   "won": "{{amount}}ウォン",
   "conversationError": "会話を読み込めませんでした。",
   "noMessages": "会話がありません。",
-  "questionDeleted": "削除されたお問い合わせです。",
+  "questionDeleted": "削除されたお問合せです。",
   "deletedMessage": "メッセージが削除されました。",
   "reply": {
     "placeholder": "返信を入力 (最大3,000文字)",
@@ -80,7 +80,7 @@
     "exists": "すでに返信があります。"
   },
   "card": {
-    "campaignInquiry": "{{label}} お問い合わせ",
+    "campaignInquiry": "{{label}} お問合せ",
     "unread": "未読メッセージ"
   },
   "realtime": {
@@ -88,6 +88,6 @@
     "ended": "リアルタイム相談が終了しました。",
     "end": "相談終了",
     "endFailed": "相談を終了できませんでした。もう一度お試しください。",
-    "otherDevice": "他の担当者がこのお問い合わせを対応中です。相談終了後に再度ご利用ください。"
+    "otherDevice": "他の担当者がこのお問合せを対応中です。相談終了後に再度ご利用ください。"
   }
 }

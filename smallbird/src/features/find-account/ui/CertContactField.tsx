@@ -1,6 +1,15 @@
-import { AuthButton, AuthInput, AuthText } from "@/shared/components/auth";
+import { useId } from "react";
+
+import {
+  AuthButton,
+  AuthInput,
+  AuthSupportText,
+  AuthText,
+} from "@/shared/components/auth";
 import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
+
+import { toSupportState } from "../lib/support-state";
 
 import type { CertMessage, CertMethod } from "../model/use-cert-flow";
 import type { KeyboardEvent } from "react";
@@ -28,6 +37,7 @@ export function CertContactField({
   className,
 }: CertContactFieldProps) {
   const { t } = useTranslation("features/find-account");
+  const messageId = useId();
 
   const isEmail = method === "email";
 
@@ -38,39 +48,47 @@ export function CertContactField({
   }
 
   return (
-    <div className={cn("flex flex-col gap-2.5", className)}>
-      <AuthText size="md" isRequired>
-        {t("request")}
-      </AuthText>
-      <div className="flex items-center gap-2">
-        <div className="h-11 flex-1">
-          <AuthInput
-            type={isEmail ? "email" : "tel"}
-            inputMode={isEmail ? "email" : "numeric"}
-            autoComplete={isEmail ? "email" : "tel"}
-            aria-label={isEmail ? t("email") : t("phoneAria")}
-            placeholder={placeholder}
-            value={value}
-            onChange={(event) => onChangeValue(event.target.value)}
-            onKeyDown={handleKeyDown}
-          />
-        </div>
-        <div className="h-11 w-[120px] shrink-0">
-          <AuthButton
-            color="primary"
-            disabled={isSendDisabled}
-            onClick={onClickSend}
-          >
-            <AuthText as="span" size="md" tone="inherit">
-              {t("send")}
-            </AuthText>
-          </AuthButton>
+    <div className={cn("flex flex-col gap-2", className)}>
+      <div className="flex flex-col gap-2.5">
+        <AuthText size="md" isRequired>
+          {t("request")}
+        </AuthText>
+        <div className="flex items-center gap-2.5">
+          <div className="h-11 min-w-0 flex-1">
+            <AuthInput
+              type={isEmail ? "email" : "tel"}
+              inputMode={isEmail ? "email" : "numeric"}
+              autoComplete={isEmail ? "email" : "tel"}
+              aria-label={isEmail ? t("email") : t("phoneAria")}
+              aria-describedby={message ? messageId : undefined}
+              state={message?.tone === "negative" ? "error" : "default"}
+              placeholder={placeholder}
+              value={value}
+              onChange={(event) => onChangeValue(event.target.value)}
+              onKeyDown={handleKeyDown}
+            />
+          </div>
+          <div className="h-11 w-28.25 shrink-0">
+            <AuthButton
+              color="primary"
+              disabled={isSendDisabled}
+              onClick={onClickSend}
+            >
+              <AuthText as="span" size="sm" tone="inherit">
+                {t("send")}
+              </AuthText>
+            </AuthButton>
+          </div>
         </div>
       </div>
       {message && (
-        <AuthText size="sm" role="status" tone={message.tone}>
+        <AuthSupportText
+          id={messageId}
+          role="status"
+          state={toSupportState(message.tone)}
+        >
           {t(`message.${message.content.code}`, message.content.values)}
-        </AuthText>
+        </AuthSupportText>
       )}
     </div>
   );

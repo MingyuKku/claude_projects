@@ -2,6 +2,7 @@ import { ChevronRight } from "lucide-react";
 import { useId } from "react";
 
 import { useTranslation } from "@/shared/i18n";
+import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { Checkbox } from "@/shared/ui/checkbox";
@@ -31,8 +32,12 @@ export function PolicyStep() {
   );
 }
 
+interface PolicyAgreementListProps {
+  className?: string;
+}
+
 // 7단계와 8단계 "약관 동의" 카드가 같은 값을 보이고 고침.
-export function PolicyAgreementList() {
+export function PolicyAgreementList({ className }: PolicyAgreementListProps) {
   const { t } = useTranslation("features/register-campaign");
   const allId = useId();
   const policy = useRegisterWizardStore((state) => state.draft.policy);
@@ -51,7 +56,7 @@ export function PolicyAgreementList() {
   }
 
   return (
-    <div className="flex flex-col ds-gap-4">
+    <div className={cn("flex flex-col ds-gap-4", className)}>
       <div className="flex items-center gap-2 rounded-md bg-muted p-4">
         <Checkbox
           id={allId}
@@ -65,7 +70,7 @@ export function PolicyAgreementList() {
           {t("policy.all")}
         </label>
       </div>
-      <ul className="flex flex-col gap-4 pl-4">
+      <ul className="flex flex-col ds-gap-4 pl-4">
         {POLICY_ITEMS.map(({ key, termsKind }) => (
           <PolicyItem
             key={key}

@@ -28,7 +28,7 @@ const authTextVariants = cva("", {
       bold: "font-bold",
     },
     tone: {
-      default: "text-gray-700",
+      default: "text-heading",
       heading: "text-heading",
       // 버튼처럼 부모가 정한 글자색을 그대로 따를 때
       inherit: "text-inherit",

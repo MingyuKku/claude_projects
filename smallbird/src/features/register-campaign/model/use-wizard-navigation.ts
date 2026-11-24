@@ -26,10 +26,11 @@ export function useWizardNavigation() {
   const saver = useDraftSaver();
   const handleFailedSave = useSaveResultHandler();
   const serviceType = useRegisterWizardStore((state) => state.serviceType);
+  const productType = useRegisterWizardStore((state) => state.productType);
   const draft = useRegisterWizardStore((state) => state.draft);
   const openDialog = useRegisterWizardStore((state) => state.openDialog);
 
-  const steps = getRegisterSteps(serviceType);
+  const steps = getRegisterSteps(serviceType, productType);
   const requested = toCampaignRegisterStep(
     searchParams.get(CAMPAIGN_STEP_PARAM),
   );

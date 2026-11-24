@@ -37,8 +37,8 @@
   },
   "empty": {
     "account": {
-      "title": "No campaigns yet.",
-      "description": "Register a campaign to start with creators."
+      "title": "Start your first campaign!",
+      "searchNoCampaign": "No active campaigns."
     },
     "tab": {
       "all": "No campaigns yet.",

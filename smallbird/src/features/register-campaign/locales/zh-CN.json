@@ -2,7 +2,9 @@
   "step": {
     "campaignInfo": "填写活动信息",
     "product": "填写产品信息",
+    "productGroupBuy": "填写赞助产品信息",
     "creator": "创作者条件",
+    "groupBuy": "设置团购条件",
     "addOns": "附加服务",
     "intro": "캠페인 소개서",
     "conditions": "设置执行条件",
@@ -31,6 +33,7 @@
     "fileType": "仅可上传JPG、PNG文件。",
     "fileSize": "仅可上传10MB以下的文件。",
     "videoSize": "仅可上传500MB以下的视频。",
+    "videoConvertFailed": "无法转换该视频，请上传其他文件。",
     "requestFailed": "请求失败，请稍后重试。",
     "addressSearchFailed": "无法加载地址搜索，请稍后重试。",
     "aiCompleted": "AI生成已完成。",
@@ -74,9 +77,12 @@
       "manage": "品牌管理"
     },
     "period": {
-      "label": "期望开始日期",
+      "label": {
+        "brand": "期望开始日期",
+        "groupBuy": "团购期望开始日期"
+      },
       "placeholder": "请选择日期。",
-      "help": "结束日期将自动设为30天后。"
+      "help": "结束日期将自动设为{{days}}天后。"
     }
   },
   "brands": {
@@ -138,6 +144,9 @@
     "TIKTOK": "TikTok",
     "X": "X"
   },
+  "platformGroupBuy": {
+    "NAVER_BLOG": "Naver 博客"
+  },
   "unit": {
     "won": "韩元",
     "count": "个"
@@ -196,6 +205,32 @@
       "emptyDescription": "报道方向和详细指南<br/>请在下一步“캠페인 소개서”中填写。"
     }
   },
+  "groupBuy": {
+    "productName": {
+      "label": "团购产品名称",
+      "placeholder": "请输入团购产品名称。"
+    },
+    "category": {
+      "label": "团购商品大类",
+      "placeholder": "请选择符合电子商务商品信息公告的大类。"
+    },
+    "middleCategory": {
+      "label": "团购商品中类",
+      "placeholder": "请选择符合电子商务商品信息公告的中类。"
+    },
+    "recommendedPrice": {
+      "label": "建议零售价",
+      "placeholder": "请输入建议零售价。"
+    },
+    "price": {
+      "label": "团购价",
+      "placeholder": "请输入团购价格。"
+    },
+    "notice": {
+      "lowestPrice": "建议定价至少比 Naver 购物搜索最低价低 10%。",
+      "mayChange": "团购价可能根据团购开始时 Naver 购物搜索的最低价调整。"
+    }
+  },
   "creator": {
     "platform": "选择平台",
     "gender": {
@@ -235,6 +270,17 @@
       "ASMR": "ASMR",
       "Review": "测评",
       "All": "全部"
+    },
+    "groupBuyTopic": {
+      "All": "不限",
+      "Beauty": "美妆",
+      "LivingHealth": "生活&健康",
+      "PregnancyParenting": "孕产&育儿",
+      "Food": "食品",
+      "DigitalAppliances": "数码&家电",
+      "FurnitureInterior": "家具&家居",
+      "Fashion": "时尚",
+      "TravelCulture": "旅行&文化"
     }
   },
   "addOns": {
@@ -424,6 +470,7 @@
       "info": "活动信息",
       "product": "产品信息",
       "creator": "创作者条件",
+      "groupBuy": "设置团购条件",
       "addOns": "增值服务",
       "intro": "캠페인 소개서",
       "conditions": "进行条件",
@@ -466,6 +513,7 @@
     },
     "addOns": {
       "applied": "已申请",
+      "appliedWithPrice": "已申请（{{amount}}韩元/次）",
       "notApplied": "未申请"
     },
     "intro": {

@@ -5,4 +5,4 @@
 // 널리 알려진 개발 자료(https://css-tricks.com/16px-or-larger-text-prevents-ios-form-zoom/)에 의존함. 확대를 막으려고
 // viewport의 maximum-scale·user-scalable=no를 쓰면 사용자 확대가 막혀 접근성을 해치므로 쓰지 않음.
 export const fieldTextareaClassName =
-  "w-full min-w-0 resize-none bg-transparent text-sm leading-5 text-foreground outline-none scrollbar-slim placeholder:text-muted-foreground disabled:cursor-not-allowed supports-[-webkit-touch-callout:none]:text-base";
+  "w-full min-w-0 resize-none bg-transparent text-sm leading-(--ds-leading-5) text-foreground outline-none scrollbar-slim placeholder:text-muted-foreground disabled:cursor-not-allowed supports-[-webkit-touch-callout:none]:text-base";

@@ -35,7 +35,7 @@ const snsButtonVariants = cva("flex items-center justify-center", {
     },
     size: {
       large: "h-12 w-full rounded-auth-lg",
-      small: "size-10 rounded-full p-2.5",
+      small: "size-10 rounded-md p-2.5",
     },
   },
   defaultVariants: { size: "large" },

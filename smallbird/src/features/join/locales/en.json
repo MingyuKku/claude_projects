@@ -33,8 +33,8 @@
     "passwordMatch": "Passwords match.",
     "idCheckError": "Error checking ID",
     "idStatus": {
-      "wrong": "ID already in use",
-      "possible": "ID available",
+      "wrong": "ID already in use.",
+      "possible": "ID available.",
       "needCheck": "Check ID availability"
     },
     "passwordError": {
@@ -59,7 +59,7 @@
     "emailDuplicate": "An account already uses this email.",
     "emailCheckError": "Error checking email",
     "emailStatus": {
-      "possible": "Email available",
+      "possible": "Email available.",
       "needCheck": "Check email availability"
     },
     "registration": "Business registration certificate",
@@ -90,6 +90,7 @@
     "title": "3. Terms",
     "all": "I agree to all.",
     "view": "View",
+    "viewItem": "View {{label}}",
     "agree": "Agree",
     "submit": "Welcome",
     "joinFailed": "Sign-up failed",

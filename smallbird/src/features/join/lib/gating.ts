@@ -1,5 +1,3 @@
-import { cva } from "class-variance-authority";
-
 import type { AccountFields, CompanyFields, TermsFields } from "../model/types";
 
 export type FieldState = "default" | "error" | "success";
@@ -14,22 +12,16 @@ export function resolveInputState(
   return "default";
 }
 
-const messageVariants = cva("", {
-  variants: {
-    tone: {
-      success: "text-positive!",
-      error: "text-negative!",
-      neutral: "text-gray-400!",
-    },
-  },
-  defaultVariants: { tone: "neutral" },
-});
+export type SupportState = "default" | "pass" | "error";
 
-/** 성공이 오류보다 우선해 안내 문구 색을 정함. */
-export function resolveMessageClass(isError: boolean, isSuccess: boolean) {
-  if (isSuccess) return messageVariants({ tone: "success" });
-  if (isError) return messageVariants({ tone: "error" });
-  return messageVariants({ tone: "neutral" });
+/** 성공이 오류보다 우선해 입력 아래 지원 문구의 상태를 정함. */
+export function resolveSupportState(
+  isError: boolean,
+  isSuccess: boolean,
+): SupportState {
+  if (isSuccess) return "pass";
+  if (isError) return "error";
+  return "default";
 }
 
 interface InfoGateInput extends Pick<

@@ -9,7 +9,7 @@ import type { BrandTheme } from "../model/types";
 const bigbirdTheme: BrandTheme = {
   id: "bigbird",
   logo: bigbirdLogo,
-  logoClassName: "w-[140px] tablet:w-[154px] desktop:w-[174px]",
+  logoClassName: "w-35 tablet:w-42.5",
   primaryColor: null,
   shouldShowQuestion: true,
 };
@@ -17,7 +17,7 @@ const bigbirdTheme: BrandTheme = {
 const petplayTheme: BrandTheme = {
   id: "petplay",
   logo: petplayLogo,
-  logoClassName: "w-[165px] tablet:w-[182px] desktop:w-[206px]",
+  logoClassName: "w-41.25 tablet:w-45.5 desktop:w-51.5",
   primaryColor: "#f79000",
   shouldShowQuestion: false,
 };

@@ -142,9 +142,9 @@ export function ChatMessage({
 
   if (isSmall) {
     return (
-      <div className={cn("flex flex-col gap-3", align, className)}>
+      <div className={cn("@container flex flex-col gap-3", align, className)}>
         {card}
-        {/* 첨부가 있으면 묶음 폭을 행 폭까지 늘려 썸네일 격자가 말풍선 폭(최대 200)에 갇히지 않게 함(Figma 11315:50501 3열 248). */}
+        {/* 첨부가 있으면 묶음 폭을 행 폭까지 늘려 썸네일 격자가 말풍선 폭에 갇히지 않게 함. */}
         <div
           className={cn("flex flex-col gap-2", align, attachments && "w-full")}
         >
@@ -171,7 +171,7 @@ export function ChatMessage({
   }
 
   return (
-    <div className={cn("flex flex-col gap-3", align, className)}>
+    <div className={cn("@container flex flex-col gap-3", align, className)}>
       {card}
       {/* 첨부가 있으면 줄 자체를 가득 채움. 보낸 쪽 정렬(items-end) 안에서는 줄이 내용 폭으로 줄어들어 썸네일 격자가 말풍선 폭에 갇힘. */}
       <div

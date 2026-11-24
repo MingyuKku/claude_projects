@@ -49,15 +49,6 @@ export function RegisterMobileHeader({
         }
         actions={
           <span className="flex gap-2">
-            {preview && (
-              <Button
-                variant="outline-foreground"
-                size="sm"
-                disabled={!preview.isEnabled}
-              >
-                {t("action.preview")}
-              </Button>
-            )}
             {onClickSave && (
               <Button
                 variant="outline-foreground"
@@ -65,6 +56,15 @@ export function RegisterMobileHeader({
                 onClick={onClickSave}
               >
                 {t("action.saveDraft")}
+              </Button>
+            )}
+            {preview && (
+              <Button
+                variant="outline-foreground"
+                size="sm"
+                disabled={!preview.isEnabled}
+              >
+                {t("action.preview")}
               </Button>
             )}
           </span>

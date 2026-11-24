@@ -13,7 +13,7 @@ const TIME: Intl.DateTimeFormatOptions = {
 export function formatListDate(value: Date) {
   return formatDate(value, {
     year: "2-digit",
-    month: "long",
+    month: "short",
     day: "numeric",
     ...TIME,
   });

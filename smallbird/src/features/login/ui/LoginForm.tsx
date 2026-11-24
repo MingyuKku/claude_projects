@@ -1,5 +1,5 @@
 import { tryit } from "radash";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { Link, useNavigate } from "react-router";
 
 import {
@@ -8,16 +8,13 @@ import {
   useNavigateToLanding,
 } from "@/entities/session";
 import { isApiError } from "@/shared/api";
-import {
-  AuthButton,
-  AuthInput,
-  AuthText,
-  PasswordInput,
-} from "@/shared/components/auth";
+import { PasswordInput } from "@/shared/components/form-field";
 import { ROUTES } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
+import { Button } from "@/shared/ui/button";
+import { Input } from "@/shared/ui/input";
+import { Separator } from "@/shared/ui/separator";
 
-import { resolveBrand } from "../lib/brand";
 import { mapLoginError, readLoginErrorData } from "../lib/login-error";
 import { offerToSavePassword } from "../lib/save-credential";
 import {
@@ -28,29 +25,33 @@ import {
 } from "../model/constants";
 
 import type { LoginMessage } from "../model/types";
-import type { FormEvent } from "react";
+import type { FormEvent, MouseEvent } from "react";
 
 interface LoginFormProps {
   onAccountLocked: (userId: string) => void;
+  /** 주면 로그인·찾기·가입 동작 대신 이것만 호출함(서버 호출·검증·이동 없음). */
+  onInterceptAction?: () => void;
 }
 
-export function LoginForm({ onAccountLocked }: LoginFormProps) {
+export function LoginForm({
+  onAccountLocked,
+  onInterceptAction,
+}: LoginFormProps) {
   const { t } = useTranslation("features/login");
   const { t: tCommon } = useTranslation();
   const navigate = useNavigate();
-  const brand = resolveBrand(window.location.hostname, window.location.search);
   const { trigger, isMutating } = useFormLogin();
   const navigateToLanding = useNavigateToLanding();
+  const messageId = useId();
 
   const [id, setId] = useState("");
   const [password, setPassword] = useState("");
   const [message, setMessage] = useState<LoginMessage | null>(null);
 
-  // 어느 필드가 틀렸는지 알 수 없는 에러는 두 입력창을 모두 빨갛게 표시함.
-  const idState =
-    message && message.code !== "passwordRequired" ? "error" : "default";
-  const passwordState =
-    message && message.code !== "idRequired" ? "error" : "default";
+  // 어느 필드가 틀렸는지 알 수 없는 에러는 두 입력창을 모두 오류로 표시함.
+  const isIdInvalid = message !== null && message.code !== "passwordRequired";
+  const isPasswordInvalid = message !== null && message.code !== "idRequired";
+  const passwordLabel = tCommon("field.password");
 
   async function submitLogin() {
     if (id === "") {
@@ -96,87 +97,127 @@ export function LoginForm({ onAccountLocked }: LoginFormProps) {
   // Enter 키도 폼이 처리한다.
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
+    if (onInterceptAction) {
+      onInterceptAction();
+      return;
+    }
     void submitLogin();
   }
 
+  function handleClickLink(event: MouseEvent<HTMLAnchorElement>) {
+    if (!onInterceptAction) return;
+    event.preventDefault();
+    onInterceptAction();
+  }
+
   return (
-    <div className="flex flex-col gap-6 tablet:gap-10">
-      <div className="flex h-[54px] w-full shrink-0 items-center justify-center border-b-[3px] border-heading">
-        <AuthText as="span" size="fixed-base" weight="medium" tone="heading">
-          {t(`brand.${brand.id}.loginTitle`)}
-        </AuthText>
-      </div>
+    <form
+      className="flex flex-col ds-gap-12"
+      noValidate
+      onSubmit={handleSubmit}
+    >
+      <div className="flex flex-col ds-gap-3">
+        <Input
+          name="loginId"
+          autoComplete="username"
+          aria-label={tCommon("field.id")}
+          className="aria-invalid:border-destructive"
+          aria-invalid={isIdInvalid || undefined}
+          aria-describedby={isIdInvalid ? messageId : undefined}
+          placeholder={tCommon("field.id")}
+          value={id}
+          onChange={(event) => {
+            setId(event.target.value);
+            setMessage(null);
+          }}
+        />
 
-      <form className="flex flex-col" noValidate onSubmit={handleSubmit}>
-        <div className="relative flex flex-col gap-2 pb-5 tablet:pb-12">
-          <div className="relative flex flex-col gap-2.5 tablet:gap-5">
-            <AuthInput
-              name="loginId"
-              autoComplete="username"
-              aria-label={tCommon("field.id")}
-              placeholder={tCommon("field.id")}
-              value={id}
-              state={idState}
-              onChange={(event) => {
-                setId(event.target.value);
-                setMessage(null);
-              }}
-            />
-
-            <PasswordInput
-              name="password"
-              autoComplete="current-password"
-              label={tCommon("field.password")}
-              placeholder={tCommon("field.password")}
-              value={password}
-              state={passwordState}
-              onChange={(event) => {
-                setPassword(event.target.value);
-                setMessage(null);
-              }}
-            />
-          </div>
+        <div className="flex flex-col gap-2">
+          <PasswordInput
+            name="password"
+            autoComplete="current-password"
+            aria-label={passwordLabel}
+            className="aria-invalid:border-destructive"
+            aria-invalid={isPasswordInvalid || undefined}
+            aria-describedby={isPasswordInvalid ? messageId : undefined}
+            placeholder={passwordLabel}
+            value={password}
+            showLabel={tCommon("password.show", { label: passwordLabel })}
+            hideLabel={tCommon("password.hide", { label: passwordLabel })}
+            onChange={(event) => {
+              setPassword(event.target.value);
+              setMessage(null);
+            }}
+          />
 
           {message && (
-            <AuthText
-              size="sm"
-              tone="negative"
-              className="whitespace-pre-line"
+            <p
+              id={messageId}
               role="alert"
+              className="ds-text-sm-5-medium whitespace-pre-line text-destructive"
             >
               {t(`error.${message.code}`, message.values)}
-            </AuthText>
+            </p>
           )}
         </div>
+      </div>
 
-        <div className="mb-5 h-12 tablet:mb-6">
-          <AuthButton color="primary" type="submit" disabled={isMutating}>
-            <AuthText as="span" size="md" tone="inherit">
-              {isMutating ? t("submitting") : tCommon("action.login")}
-            </AuthText>
-          </AuthButton>
-        </div>
+      <div className="flex flex-col ds-gap-6">
+        <Button
+          type="submit"
+          disabled={isMutating}
+          className="h-9.5 desktop:h-10"
+        >
+          {isMutating ? t("submitting") : tCommon("action.login")}
+        </Button>
 
-        <div className="flex items-center justify-center gap-5">
-          <Link to={`${ROUTES.find}${FIND_ID_QUERY}`}>
-            <AuthText size="sm" tone="heading">
+        <div className="flex items-center justify-center ds-gap-3">
+          <Button
+            asChild
+            variant="ghost-foreground"
+            size="sm"
+            className="h-8.5 desktop:h-9"
+          >
+            <Link
+              to={`${ROUTES.find}${FIND_ID_QUERY}`}
+              onClick={handleClickLink}
+            >
               {tCommon("link.findId")}
-            </AuthText>
-          </Link>
-          <div className="h-4 w-px shrink-0 bg-gray-200" />
-          <Link to={`${ROUTES.find}${FIND_PASSWORD_QUERY}`}>
-            <AuthText size="sm" tone="heading">
+            </Link>
+          </Button>
+          <Separator
+            orientation="vertical"
+            className="data-[orientation=vertical]:h-6"
+          />
+          <Button
+            asChild
+            variant="ghost-foreground"
+            size="sm"
+            className="h-8.5 desktop:h-9"
+          >
+            <Link
+              to={`${ROUTES.find}${FIND_PASSWORD_QUERY}`}
+              onClick={handleClickLink}
+            >
               {tCommon("link.findPassword")}
-            </AuthText>
-          </Link>
-          <div className="h-4 w-px shrink-0 bg-gray-200" />
-          <Link to={`${ROUTES.join}${JOIN_QUERY}`}>
-            <AuthText size="sm" tone="heading">
+            </Link>
+          </Button>
+          <Separator
+            orientation="vertical"
+            className="data-[orientation=vertical]:h-6"
+          />
+          <Button
+            asChild
+            variant="ghost-foreground"
+            size="sm"
+            className="h-8.5 desktop:h-9"
+          >
+            <Link to={`${ROUTES.join}${JOIN_QUERY}`} onClick={handleClickLink}>
               {tCommon("link.signup")}
-            </AuthText>
-          </Link>
+            </Link>
+          </Button>
         </div>
-      </form>
-    </div>
+      </div>
+    </form>
   );
 }

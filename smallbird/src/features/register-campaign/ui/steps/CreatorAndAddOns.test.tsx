@@ -8,16 +8,23 @@ import { RegisterWizardProvider } from "../RegisterWizardProvider";
 import { AddOnsStep } from "./add-ons/AddOnsStep";
 import { CreatorStep } from "./creator/CreatorStep";
 
-import type { CampaignDetail, CampaignDraft } from "@/entities/campaign";
+import type {
+  CampaignDetail,
+  CampaignDraft,
+  CampaignProductType,
+} from "@/entities/campaign";
 
-function createDetail(patch?: (draft: CampaignDraft) => void): CampaignDetail {
+function createDetail(
+  patch?: (draft: CampaignDraft) => void,
+  productType: CampaignProductType = "BRAND",
+): CampaignDetail {
   const draft = createEmptyDraft();
   patch?.(draft);
   return {
     campaignIdx: 15,
     campaignCode: "PB-00000000000015",
     serviceType: "PICK",
-    productType: "BRAND",
+    productType,
     stage: "DRAFT",
     rawStatus: "DRAFT",
     isDemo: false,
@@ -62,6 +69,73 @@ describe("CreatorStep", () => {
 
     expect(screen.getByRole("radio", { name: "블로그" })).toHaveAttribute(
       "aria-checked",
+      "false",
+    );
+  });
+
+  it("공구형은 플랫폼을 시안 순서와 '네이버 블로그'로, 포스팅 주제는 9개만 보인다", () => {
+    render(
+      <RegisterWizardProvider detail={createDetail(undefined, "GROUP_BUY")}>
+        <CreatorStep />
+      </RegisterWizardProvider>,
+    );
+
+    expect(
+      Array.from(
+        screen
+          .getByRole("radiogroup", { name: "플랫폼 선택" })
+          .querySelectorAll("[role=radio]"),
+        (item) => item.textContent,
+      ),
+    ).toEqual([
+      "인스타그램",
+      "네이버 블로그",
+      "유튜브",
+      "틱톡",
+      "페이스북",
+      "엑스",
+    ]);
+    expect(
+      Array.from(
+        screen
+          .getByRole("toolbar", { name: "포스팅 주제(복수선택 가능)" })
+          .querySelectorAll("button"),
+        (item) => item.textContent,
+      ),
+    ).toEqual([
+      "무관",
+      "뷰티",
+      "생활/건강",
+      "출산/육아",
+      "식품",
+      "디지털/가전",
+      "가구/인테리어",
+      "패션",
+      "여행/문화",
+    ]);
+  });
+
+  it("공구형도 '무관'을 고르면 다른 주제를 풀고, 다른 주제를 고르면 '무관'을 푼다", async () => {
+    const user = userEvent.setup();
+    render(
+      <RegisterWizardProvider detail={createDetail(undefined, "GROUP_BUY")}>
+        <CreatorStep />
+      </RegisterWizardProvider>,
+    );
+
+    await user.click(screen.getByRole("button", { name: "무관" }));
+    expect(screen.getByRole("button", { name: "무관" })).toHaveAttribute(
+      "aria-pressed",
+      "true",
+    );
+    expect(screen.getByRole("button", { name: "뷰티" })).toHaveAttribute(
+      "aria-pressed",
+      "false",
+    );
+
+    await user.click(screen.getByRole("button", { name: "패션" }));
+    expect(screen.getByRole("button", { name: "무관" })).toHaveAttribute(
+      "aria-pressed",
       "false",
     );
   });

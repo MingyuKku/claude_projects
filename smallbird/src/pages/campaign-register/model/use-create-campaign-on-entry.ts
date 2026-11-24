@@ -4,6 +4,8 @@ import { useNavigate } from "react-router";
 
 import { createCampaign, getCampaignRegisterPath } from "@/entities/campaign";
 
+import type { CampaignProductType } from "@/entities/campaign";
+
 /**
  * 진입하자마자 캠페인을 한 번 만들고(A-1) 작성 경로로 바꿈(replace). 서버가 중복 생성을 막지 않아, 개발 모드의 effect
  * 이중 실행에도 한 번만 보냄. 실패하면 오류를 돌려주고 화면이 라우트 오류 화면으로 넘김.
@@ -11,9 +13,11 @@ import { createCampaign, getCampaignRegisterPath } from "@/entities/campaign";
 export function useCreateCampaignOnEntry({
   isEnabled,
   isDemo,
+  productType,
 }: {
   isEnabled: boolean;
   isDemo: boolean;
+  productType: CampaignProductType;
 }) {
   const navigate = useNavigate();
   const hasStartedRef = useRef(false);
@@ -26,7 +30,7 @@ export function useCreateCampaignOnEntry({
     void (async () => {
       const [createError, created] = await tryit(createCampaign)({
         serviceType: "PICK",
-        productType: "BRAND",
+        productType,
         demo: isDemo,
       });
       if (createError) {
@@ -38,7 +42,7 @@ export function useCreateCampaignOnEntry({
         { replace: true },
       );
     })();
-  }, [isEnabled, isDemo, navigate]);
+  }, [isEnabled, isDemo, productType, navigate]);
 
   return { error };
 }

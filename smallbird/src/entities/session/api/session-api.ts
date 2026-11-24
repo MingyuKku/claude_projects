@@ -5,6 +5,7 @@ import {
   serverApiV3,
   revokeFirebaseToken,
   signOutFirebase,
+  unregisterWebPushDevice,
 } from "@/shared/api";
 
 import { clearLoginCredential } from "../lib/login-handoff";
@@ -69,6 +70,8 @@ export function useFormLogin() {
 export async function logout(): Promise<void> {
   // 세션이 살아 있을 때 이 기기의 채팅방 잠금을 먼저 풂. 실패해도 로그아웃은 이어 감.
   await revokeFirebaseToken();
+  // 끄기도 세션이 필요해 로그아웃 요청 전에 함. 실패해도 로그아웃은 이어 감.
+  await unregisterWebPushDevice();
   const response = await serverApiV3.post("/auth/logout");
   logoutResponseSchema.parse(response);
   clearLoginCredential();

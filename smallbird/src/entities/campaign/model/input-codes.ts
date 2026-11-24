@@ -1,3 +1,5 @@
+import type { CampaignProductType } from "./codes";
+
 // 등록 단계 입력값의 서버 코드(API 요구 명세 "코드" 표). 화면 문구는 코드마다 번역 키를 둠.
 
 /** 캠페인 유형. 구매리뷰형은 스펙아웃(2026-11-13). */
@@ -57,7 +59,29 @@ export const POSTING_TOPICS = [
 ] as const;
 export type PostingTopic = (typeof POSTING_TOPICS)[number];
 
-/** 4단계 부가서비스. PICK형은 둘 다 고를 수 있고 등록 결제는 AI 포스팅 가이드만(원고컨펌은 매칭 때 결제). */
+/** 공구형 포스팅 주제(시안 순서). 서버 코드 중 이 9개만 고르게 하고 "무관"은 `All`. */
+export const GROUP_BUY_POSTING_TOPICS = [
+  "All",
+  "Beauty",
+  "LivingHealth",
+  "PregnancyParenting",
+  "Food",
+  "DigitalAppliances",
+  "FurnitureInterior",
+  "Fashion",
+  "TravelCulture",
+] as const satisfies readonly PostingTopic[];
+
+/** 상품 유형에서 고를 수 있는 포스팅 주제. */
+export function getPostingTopics(
+  productType: CampaignProductType | null,
+): readonly PostingTopic[] {
+  return productType === "GROUP_BUY"
+    ? GROUP_BUY_POSTING_TOPICS
+    : POSTING_TOPICS;
+}
+
+/** 부가서비스. PICK형은 둘 다 고를 수 있고 등록 결제는 AI 포스팅 가이드만(원고컨펌은 매칭 때 결제). */
 export const CAMPAIGN_ADD_ONS = [
   "POSTING_GUIDE",
   "MANUSCRIPT_CONFIRM",

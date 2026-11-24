@@ -356,27 +356,36 @@ function MessageRowMatrix() {
         const side: MessageSide = column.startsWith("Me") ? "me" : "other";
         const hasCard = column.includes("Card");
         const hasThumbnail = column.includes("Thumbnail");
+        // 말풍선 최대 폭이 메시지 행 폭의 비율이라, 내용 폭으로 줄어드는 표 칸 안에서는 행 폭을 정해 둠.
         return (
-          <ChatMessage
-            side={side}
-            size={size}
-            name="Name Value"
-            message="Message Text"
-            time="00:00"
-            card={
-              hasCard && <SampleCodeCard size={size === "sm" ? "sm" : "md"} />
-            }
-            attachments={
-              hasThumbnail && (
-                <SampleThumbnails size={size === "sm" ? "sm" : "md"} />
-              )
-            }
-          />
+          <div className={MESSAGE_ROW_WIDTH[size]}>
+            <ChatMessage
+              side={side}
+              size={size}
+              name="Name Value"
+              message="Message Text"
+              time="00:00"
+              card={
+                hasCard && <SampleCodeCard size={size === "sm" ? "sm" : "md"} />
+              }
+              attachments={
+                hasThumbnail && (
+                  <SampleThumbnails size={size === "sm" ? "sm" : "md"} />
+                )
+              }
+            />
+          </div>
         );
       }}
     />
   );
 }
+
+const MESSAGE_ROW_WIDTH: Record<MessageSize, string> = {
+  lg: "w-183",
+  md: "w-125",
+  sm: "w-75",
+};
 
 function MessageBubbleMatrix() {
   const columns = [
@@ -393,13 +402,16 @@ function MessageBubbleMatrix() {
       columns={columns}
       rowLabel={(row) => row}
       renderCell={(size, column) => (
-        <MessageBubble
-          message="Message Text"
-          size={size}
-          side={column.startsWith("Me") ? "me" : "other"}
-          time={column.includes("·") ? "00:00" : undefined}
-          editedLabel={column.includes("Edited") ? "편집됨" : undefined}
-        />
+        // 말풍선 최대 폭(cqw)의 기준이 되는 메시지 행을 흉내 냄.
+        <div className={`@container ${MESSAGE_ROW_WIDTH[size]}`}>
+          <MessageBubble
+            message="Message Text"
+            size={size}
+            side={column.startsWith("Me") ? "me" : "other"}
+            time={column.includes("·") ? "00:00" : undefined}
+            editedLabel={column.includes("Edited") ? "편집됨" : undefined}
+          />
+        </div>
       )}
     />
   );
@@ -551,7 +563,8 @@ export function ChatSection() {
       </Section>
 
       <Section title="Message toolbar · hover (Tooltip variant=toolbar)">
-        <div className="rounded-lg bg-muted p-6 pt-16">
+        {/* 섹션이 내용 폭으로 줄어들어, 말풍선 폭 기준인 메시지 행이 0이 되지 않게 폭을 정해 둠. */}
+        <div className="w-183 max-w-full rounded-lg bg-muted p-6 pt-16">
           <ChatMessage
             name="빅버드 담당자"
             message="말풍선에 마우스를 올리면 답장·수정·삭제 툴바가 뜹니다."

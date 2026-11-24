@@ -1,17 +1,9 @@
 {
-  "brand": {
-    "bigbird": {
-      "loginTitle": "Bigbird 合作伙伴中心登录"
-    },
-    "petplay": {
-      "loginTitle": "Petplay 合作伙伴中心登录"
-    }
-  },
   "submitting": "正在登录",
   "error": {
     "idRequired": "输入账号。",
     "passwordRequired": "输入密码。",
-    "mismatch": "账号或密码不匹配。",
+    "mismatch": "未找到会员信息。",
     "unknown": "发生错误，请稍后重试。",
     "exited": "该会员已注销。",
     "noAccount": "账号不存在或该会员已退出。",

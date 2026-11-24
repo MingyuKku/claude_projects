@@ -5,11 +5,13 @@
   "brand": {
     "bigbird": {
       "logoAlt": "Bigbirdロゴ",
-      "tagline": "マーケターの勘ではなく、\nビッグデータAIマーケティングを体験してください。"
+      "tagline": "マーケターの勘ではなく、\nビッグデータAIマーケティングを体験してください。",
+      "partnerTab": "Bigbird パートナーセンター"
     },
     "petplay": {
       "logoAlt": "Petplayロゴ",
-      "tagline": "ペットフレンドリーな情報がいっぱいの\nPetplayで遊ぼう！"
+      "tagline": "ペットフレンドリーな情報がいっぱいの\nPetplayで遊ぼう！",
+      "partnerTab": "Petplay パートナーセンター"
     }
   },
   "startFailed": "ログインを開始できませんでした。",
@@ -23,5 +25,9 @@
     "kakao": "KakaoTalkで相談する",
     "tel": "電話 {{phone}}",
     "hours": "平日：10:00 ~ 18:30\n休憩時間：12:30 ~ 13:30\n（祝日休業）"
+  },
+  "creatorTab": "クリエイター",
+  "comingSoon": {
+    "title": "お知らせ"
   }
 }

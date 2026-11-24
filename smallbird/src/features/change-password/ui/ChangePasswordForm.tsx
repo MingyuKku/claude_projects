@@ -1,11 +1,16 @@
 import { tryit } from "radash";
-import { useState } from "react";
+import { useId, useState } from "react";
 
 import { getPasswordError } from "@/entities/account";
 import { isApiError } from "@/shared/api";
 import checkCircle from "@/shared/assets/img/system/check-circle.svg";
-import chevronRight from "@/shared/assets/img/system/chevron-right.svg";
-import { AuthButton, AuthText, PasswordInput } from "@/shared/components/auth";
+import chevronRightWhite from "@/shared/assets/img/system/chevron-right-white.svg";
+import {
+  AuthButton,
+  AuthSupportText,
+  AuthText,
+  PasswordInput,
+} from "@/shared/components/auth";
 import { Trans, useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
 
@@ -35,6 +40,8 @@ export function ChangePasswordForm({
   const { t } = useTranslation("features/change-password");
   const { t: tCommon } = useTranslation();
   const { trigger, isMutating } = useChangePassword();
+  const passwordMessageId = useId();
+  const checkMessageId = useId();
 
   const [password, setPassword] = useState("");
   const [passwordCheck, setPasswordCheck] = useState("");
@@ -86,58 +93,65 @@ export function ChangePasswordForm({
 
   return (
     <div className={cn("flex flex-1 flex-col", className)}>
-      <div className="flex w-80 flex-1 flex-col pt-5 tablet:w-96">
+      <div className="flex w-80 flex-1 flex-col tablet:w-96 tablet:pt-12 tablet:pb-17.5 desktop:pb-30">
         <div className="flex flex-1 flex-col tablet:flex-none tablet:gap-12">
           <div className="flex flex-col gap-5">
-            <div className="flex flex-col gap-2.5">
-              <AuthText size="md" isRequired>
-                {tCommon("field.password")}
-              </AuthText>
-              <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2.5">
+                <AuthText size="md" isRequired>
+                  {tCommon("field.password")}
+                </AuthText>
                 <PasswordInput
                   label={tCommon("field.password")}
+                  aria-describedby={passwordMessageId}
                   placeholder={t("placeholder")}
                   maxLength={PASSWORD_MAX_LENGTH}
                   value={password}
                   state={passwordError ? "error" : "default"}
                   onChange={handleChangePassword}
                 />
-                <AuthText size="sm" tone={passwordError ? "negative" : "faint"}>
-                  {passwordError
-                    ? t(`passwordError.${passwordError}`)
-                    : t("hint")}
-                </AuthText>
               </div>
+              <AuthSupportText
+                id={passwordMessageId}
+                role={passwordError ? "alert" : undefined}
+                state={passwordError ? "error" : "default"}
+              >
+                {passwordError
+                  ? t(`passwordError.${passwordError}`)
+                  : t("hint")}
+              </AuthSupportText>
             </div>
 
-            <div className="flex flex-col gap-2.5">
-              <AuthText size="md" isRequired>
-                {t("checkLabel")}
-              </AuthText>
-              <div className="flex flex-col gap-2">
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2.5">
+                <AuthText size="md" isRequired>
+                  {t("checkLabel")}
+                </AuthText>
                 <PasswordInput
                   label={t("checkLabel")}
+                  aria-describedby={checkMessageId}
                   placeholder={t("checkPlaceholder")}
                   maxLength={PASSWORD_MAX_LENGTH}
                   value={passwordCheck}
                   state={isCheckMismatch ? "error" : "default"}
                   onChange={handleChangePasswordCheck}
                 />
-                <AuthText
-                  size="sm"
-                  tone={isCheckMismatch ? "negative" : "faint"}
-                >
-                  {isCheckMismatch ? t("mismatch") : t("hint")}
-                </AuthText>
               </div>
+              <AuthSupportText
+                id={checkMessageId}
+                role={isCheckMismatch ? "alert" : undefined}
+                state={isCheckMismatch ? "error" : "default"}
+              >
+                {isCheckMismatch ? t("mismatch") : t("hint")}
+              </AuthSupportText>
             </div>
           </div>
 
-          <div className="mt-auto flex flex-col gap-5 tablet:mt-0">
+          <div className="mt-auto flex flex-col gap-3 tablet:mt-0">
             {submitError && (
-              <AuthText size="sm" role="alert" tone="negative">
+              <AuthSupportText state="error" role="alert">
                 {t(`submitError.${submitError}`)}
-              </AuthText>
+              </AuthSupportText>
             )}
             <div className="mb-5 h-12 tablet:mb-0">
               <AuthButton
@@ -145,7 +159,7 @@ export function ChangePasswordForm({
                 onClick={handleClickSubmit}
                 disabled={!canSubmit || isMutating}
               >
-                <AuthText as="span" size="md" tone="inherit">
+                <AuthText as="span" size="fixed-base" tone="inherit">
                   {t("submit")}
                 </AuthText>
               </AuthButton>
@@ -155,40 +169,46 @@ export function ChangePasswordForm({
       </div>
 
       {isSuccess && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-dark/60">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-dark/30">
           <div
             role="dialog"
             aria-modal="true"
             aria-labelledby="change-password-done"
-            className="flex w-[300px] flex-col items-center gap-6 rounded-auth-xl bg-light p-5 shadow-normal tablet:w-80"
+            className="flex w-80 flex-col gap-6 rounded-xl bg-light p-5 shadow-normal"
           >
             <div className="flex flex-col items-center gap-3 text-center">
-              <img src={checkCircle} alt="" className="size-11" />
-              <AuthText id="change-password-done" size="xl" weight="bold">
-                {t("done.title")}
-              </AuthText>
-              <AuthText size="md">
-                <Trans
-                  t={t}
-                  i18nKey="done.message"
-                  components={{ br: <br /> }}
-                />
-              </AuthText>
-              <AuthText size="sm" tone="faint">
-                <Trans
-                  t={t}
-                  i18nKey="done.notice"
-                  components={{ br: <br /> }}
-                />
-              </AuthText>
+              <img src={checkCircle} alt="" className="size-10.5" />
+              <div className="flex flex-col gap-2">
+                <AuthText
+                  id="change-password-done"
+                  size="fixed-xl"
+                  weight="medium"
+                >
+                  {t("done.title")}
+                </AuthText>
+                <AuthText size="fixed-base">
+                  <Trans
+                    t={t}
+                    i18nKey="done.message"
+                    components={{ br: <br /> }}
+                  />
+                </AuthText>
+                <AuthText size="sm" tone="lined">
+                  <Trans
+                    t={t}
+                    i18nKey="done.notice"
+                    components={{ br: <br /> }}
+                  />
+                </AuthText>
+              </div>
             </div>
             <div className="h-12 w-full">
               <AuthButton color="primary" onClick={onClickLogin}>
                 <div className="flex items-center gap-2">
-                  <AuthText as="span" size="md" tone="inherit">
+                  <AuthText as="span" size="fixed-base" tone="inherit">
                     {t("done.login")}
                   </AuthText>
-                  <img src={chevronRight} alt="" className="size-4 invert" />
+                  <img src={chevronRightWhite} alt="" className="size-6" />
                 </div>
               </AuthButton>
             </div>

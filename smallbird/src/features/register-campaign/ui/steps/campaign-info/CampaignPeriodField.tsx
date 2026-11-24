@@ -1,5 +1,6 @@
 import { useState } from "react";
 
+import { getCampaignPeriodDays } from "@/entities/campaign";
 import { DatePicker } from "@/shared/components/date-picker";
 import { formatNumericDate, useTranslation } from "@/shared/i18n";
 import { fromIsoDate, toIsoDate } from "@/shared/lib";
@@ -12,12 +13,13 @@ function getToday() {
   return today;
 }
 
-// 종료일은 시작일 + 30일로 자동 정해지므로 칸으로 두지 않고 도움말로만 안내함. 캘린더는 오늘 이전만 막음(v2와 같음). MO는 바텀시트.
+// 종료일은 시작일 + 상품 유형별 일수(브랜드형 30일·공구형 60일)로 자동 정해지므로 칸으로 두지 않고 도움말로만 안내함. 캘린더는 오늘 이전만 막음(v2와 같음). MO는 바텀시트.
 export function CampaignPeriodField() {
   const { t } = useTranslation("features/register-campaign");
   const startDate = useRegisterWizardStore(
     (state) => state.draft.info.startDate,
   );
+  const productType = useRegisterWizardStore((state) => state.productType);
   const patchStepDraft = useRegisterWizardStore(
     (state) => state.patchStepDraft,
   );
@@ -31,10 +33,16 @@ export function CampaignPeriodField() {
 
   return (
     <DatePicker
-      label={t("info.period.label")}
+      label={
+        productType === "GROUP_BUY"
+          ? t("info.period.label.groupBuy")
+          : t("info.period.label.brand")
+      }
       isRequired
       placeholder={t("info.period.placeholder")}
-      helpText={t("info.period.help")}
+      helpText={t("info.period.help", {
+        days: getCampaignPeriodDays(productType),
+      })}
       value={start}
       formatValue={formatNumericDate}
       onValueChange={handleChangeStart}

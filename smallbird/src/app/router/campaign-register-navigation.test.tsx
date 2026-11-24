@@ -5,12 +5,24 @@ import { createCampaign, fetchCampaignDetail } from "@/entities/campaign";
 import { serverApiV3 } from "@/shared/api";
 import { ROUTES } from "@/shared/config";
 
+import {
+  createDetailResponse,
+  createFilledDetailResponse,
+} from "./campaign-fixtures";
+import { createCampaignServerFake } from "./campaign-server-fake";
 import { mockV3Get, renderRoute, resetSession } from "./test-utils";
+
+import type { CampaignServerFake } from "./campaign-server-fake";
 
 vi.mock("@/shared/api", async (importOriginal) => ({
   ...(await importOriginal<Record<string, unknown>>()),
   serverApi: { get: vi.fn(), post: vi.fn() },
-  serverApiV3: { get: vi.fn(), post: vi.fn() },
+  serverApiV3: {
+    get: vi.fn(),
+    post: vi.fn(),
+    put: vi.fn(),
+    delete: vi.fn(),
+  },
 }));
 
 const session = {
@@ -24,45 +36,71 @@ const session = {
   email: "test@example.com",
 };
 
-// 목 저장소 시드(entities/campaign mock/campaign-seeds): 14개, 3 작성 완료 데모 · 6 승인 검토중 · 14 모집형 등록 중
-const SEED_COUNT = 14;
+// 가짜 서버(campaign-server-fake)에 미리 넣어 둔 캠페인: 3 작성 완료 데모 · 6 승인 검토중 · 7 반려(모두 입력) · 14 모집형 등록 중.
+// 새로 만드는 캠페인은 15번부터 번호를 받음.
+const FIRST_NEW_IDX = 15;
+const ALL_AGREED = {
+  agreements: { service: true, privacy: true, operation: true, reward: true },
+};
+const NONE_AGREED = {
+  agreements: {
+    service: false,
+    privacy: false,
+    operation: false,
+    reward: false,
+  },
+};
 
-function readMockCampaignCount() {
-  const raw = window.sessionStorage.getItem("bigbird:mock:campaign-db");
-  const db = JSON.parse(raw ?? "{}") as { campaigns?: unknown[] };
-  return db.campaigns?.length ?? 0;
-}
+let fake: CampaignServerFake;
 
-// 1단계(기본 정보)를 마친 PICK 캠페인을 목 저장소에 만듦. 결제 단계 등 1단계 뒤 단계는 이 상태여야 열림.
-async function createInfoCompleteCampaign(name: string, status?: string) {
-  const { campaignIdx } = await createCampaign({
-    serviceType: "PICK",
-    productType: "BRAND",
-    demo: false,
+// 1단계(기본 정보)를 마친 PICK 캠페인을 만듦. 결제 단계 등 1단계 뒤 단계는 이 상태여야 열림.
+function createInfoCompleteCampaign(name: string, status = "DRAFT") {
+  return fake.add({
+    status,
+    info: {
+      name,
+      brandIdx: 1,
+      brandName: "데일리 스튜디오",
+      campaignType: "PRODUCT_DELIVERY",
+      startDate: "2099-01-01",
+    },
   });
-  const key = "bigbird:mock:campaign-db";
-  const db = JSON.parse(window.sessionStorage.getItem(key) ?? "{}") as {
-    campaigns: { campaignIdx: number; status: string; info: object }[];
-  };
-  const record = db.campaigns.find(
-    (campaign) => campaign.campaignIdx === campaignIdx,
-  );
-  if (!record) throw new Error("mock campaign not found");
-  if (status) record.status = status;
-  record.info = {
-    ...record.info,
-    name,
-    brandIdx: 1,
-    campaignType: "PRODUCT_DELIVERY",
-    startDate: "2099-01-01",
-  };
-  window.sessionStorage.setItem(key, JSON.stringify(db));
-  return campaignIdx;
 }
 
 beforeEach(() => {
-  window.sessionStorage.clear();
   resetSession(session);
+  fake = createCampaignServerFake(FIRST_NEW_IDX);
+  fake.seed(createFilledDetailResponse(3, { demo: true, demoCompleted: true }));
+  fake.seed(
+    createFilledDetailResponse(6, {
+      status: "REVIEWING",
+      policy: ALL_AGREED,
+      payment: { paidAmount: 11000, paidAt: "2026-11-16 10:00:00" },
+    }),
+  );
+  fake.seed(
+    createFilledDetailResponse(7, {
+      status: "REJECTED",
+      rejectReason: "금액 확인",
+      policy: NONE_AGREED,
+    }),
+  );
+  fake.seed(
+    createDetailResponse(14, {
+      serviceType: "RECRUIT",
+      info: { name: "비글로우 신제품 런칭 캠페인" },
+    }),
+  );
+  mockV3Get(fake.get);
+  vi.mocked(serverApiV3.post)
+    .mockReset()
+    .mockImplementation(fake.post as never);
+  vi.mocked(serverApiV3.put)
+    .mockReset()
+    .mockImplementation(fake.put as never);
+  vi.mocked(serverApiV3.delete)
+    .mockReset()
+    .mockImplementation(fake.delete as never);
 });
 
 describe("캠페인 등록 진입", () => {
@@ -71,7 +109,7 @@ describe("캠페인 등록 진입", () => {
 
     await waitFor(() =>
       expect(router.state.location.pathname).toBe(
-        `${ROUTES.campaignRegister}/${SEED_COUNT + 1}`,
+        `${ROUTES.campaignRegister}/${FIRST_NEW_IDX}`,
       ),
     );
     expect(router.state.location.search).toBe("?step=campaign-info");
@@ -82,7 +120,7 @@ describe("캠페인 등록 진입", () => {
         screen.getByRole("heading", { name: "캠페인 등록" }),
       ).toBeInTheDocument(),
     );
-    expect(readMockCampaignCount()).toBe(SEED_COUNT + 1);
+    expect(fake.created()).toEqual([FIRST_NEW_IDX]);
   });
 
   it("모집형은 준비 중 화면이다", async () => {
@@ -91,7 +129,7 @@ describe("캠페인 등록 진입", () => {
     expect(
       await screen.findByText("준비 중인 기능입니다."),
     ).toBeInTheDocument();
-    expect(readMockCampaignCount()).toBe(0);
+    expect(fake.created()).toEqual([]);
   });
 
   it("type이 없거나 잘못되면 not-found다", async () => {
@@ -138,8 +176,8 @@ describe("작성 주소의 상태별 진입", () => {
 });
 
 // 단계 잠금·첫 미완 단계·사이드바 상태 규칙은 step-status.test.ts, 저장 대기열은 draft-saver.test.ts가 맡음.
-// 여기서는 화면을 떠나는 이동(방문 기록) 하나만 봄. 방문 기록은 원래 E2E 대상이지만 등록 화면은 개발 서버 목에서만 열려
-// 빌드로 도는 E2E에서 열 수 없어, API 연결 뒤 E2E로 옮김(스펙 §9).
+// 여기서는 화면을 떠나는 이동(방문 기록) 하나만 봄. 방문 기록은 원래 E2E 대상이지만 등록 API가 서버(stage 인증 필요)에 있어
+// 빌드로 도는 E2E에서 열 수 없어 가짜 서버로 검증함(스펙 §9).
 describe("등록 마법사 골격", () => {
   it("입력을 바꾼 채 앱 안에서 떠나면 먼저 저장하고 한 번만 이동한다", async () => {
     const user = userEvent.setup();
@@ -170,7 +208,7 @@ describe("등록 마법사 골격", () => {
 describe("8단계 충전 복귀", () => {
   it("결제창에서 isPaid=true로 돌아오면 접수 알럿을 띄우고 결제 서버가 붙인 쿼리를 지운 뒤 결제 단계에 남는다", async () => {
     // 결제창으로 떠나기 전처럼 결제 단계를 열 수 있는 캠페인에서 시작함.
-    const campaignIdx = await createInfoCompleteCampaign("결제 복귀 캠페인");
+    const campaignIdx = createInfoCompleteCampaign("결제 복귀 캠페인");
     const router = await renderRoute(
       `${ROUTES.campaignRegister}/${campaignIdx}?isPaid=true&gopaymethod=VBank&accountNumber=1234567890`,
     );
@@ -218,40 +256,14 @@ describe("반려 뒤 수정 모드", () => {
     return createInfoCompleteCampaign("반려된 캠페인", "REJECTED");
   }
 
-  /** 모두 입력된 시드 캠페인(PICK형 승인 검토중)을 서버처럼 반려해 동의 기록을 지움. */
-  async function rejectFilledCampaign() {
-    // 시드는 처음 읽을 때 저장소에 들어가므로 먼저 읽음.
-    await fetchCampaignDetail(6);
-    const key = "bigbird:mock:campaign-db";
-    const db = JSON.parse(window.sessionStorage.getItem(key) ?? "{}") as {
-      campaigns: {
-        campaignIdx: number;
-        status: string;
-        policy: object | null;
-        rejectReason: string | null;
-        intro: { mainImage: object | null; detailMedia: object[] };
-      }[];
-    };
-    const record = db.campaigns.find((campaign) => campaign.campaignIdx === 6);
-    if (!record) throw new Error("mock campaign not found");
-    record.status = "REJECTED";
-    record.policy = null;
-    record.rejectReason = "금액 확인";
-    // 시드는 소개서 이미지가 없어 작성 완료로 보이지 않으므로 채움.
-    const image = {
-      attachmentIdx: 1,
-      url: "https://example.com/a.png",
-      mediaType: "IMAGE",
-    };
-    record.intro.mainImage = image;
-    record.intro.detailMedia = [image];
-    window.sessionStorage.setItem(key, JSON.stringify(db));
-    return 6;
+  /** 모두 입력된 반려 캠페인. 서버가 반려할 때 정책 동의 기록을 지운 상태. */
+  function rejectFilledCampaign() {
+    return 7;
   }
 
   it("잠긴 단계는 읽기 전용 안내와 함께 열리고, 하단은 임시저장 없이 이전·다음이다", async () => {
     const user = userEvent.setup();
-    const campaignIdx = await createRejectedCampaign();
+    const campaignIdx = createRejectedCampaign();
     const router = await renderRoute(
       `${ROUTES.campaignRegister}/${campaignIdx}?step=add-ons`,
     );
@@ -270,13 +282,13 @@ describe("반려 뒤 수정 모드", () => {
     await user.click(screen.getByRole("button", { name: /다음/ }));
 
     await waitFor(() =>
-      expect(router.state.location.search).toContain("step=intro"),
+      expect(router.state.location.search).toContain("step=policy"),
     );
   });
 
   it("7단계는 열려 있어 동의를 다시 받고, 8단계에서 결제 없이 재승인을 요청한다", async () => {
     const user = userEvent.setup();
-    const campaignIdx = await rejectFilledCampaign();
+    const campaignIdx = rejectFilledCampaign();
     const router = await renderRoute(
       `${ROUTES.campaignRegister}/${campaignIdx}?step=policy`,
     );
@@ -311,7 +323,7 @@ describe("반려 뒤 수정 모드", () => {
 
   it("동의 없이 8단계에서 재승인을 요청하면 필수 항목 알럿 뒤 7단계로 보낸다", async () => {
     const user = userEvent.setup();
-    const campaignIdx = await rejectFilledCampaign();
+    const campaignIdx = rejectFilledCampaign();
     const router = await renderRoute(
       `${ROUTES.campaignRegister}/${campaignIdx}?step=payment`,
     );
@@ -370,10 +382,10 @@ describe("현황 바로 가기의 구독 만료 안내", () => {
   });
 
   function mockSubscriptions(productTypes: string[]) {
-    mockV3Get((path) =>
+    mockV3Get((path, ...rest) =>
       path === "/mypage/subscription/subscriptions"
         ? Promise.resolve(productTypes.map(subscription))
-        : Promise.reject(new Error("unmocked")),
+        : fake.get(path, rest[0]),
     );
   }
 

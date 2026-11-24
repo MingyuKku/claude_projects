@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { digitsOnly, isValidCompanyUrl } from "@/entities/account";
 import {
-  AuthButton,
   AuthHeader,
   AuthInput,
+  AuthSupportText,
   AuthText,
+  AuthTextButton,
 } from "@/shared/components/auth";
 import { ROUTES } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
@@ -18,7 +19,7 @@ import {
 import {
   canProceedFromCompany,
   resolveInputState,
-  resolveMessageClass,
+  resolveSupportState,
 } from "../lib/gating";
 import { useEmailDuplicateCheck } from "../lib/use-email-duplicate-check";
 import {
@@ -29,6 +30,7 @@ import {
 import { useJoinStore } from "../model/join-store-context";
 import { CategorySelect } from "./CategorySelect";
 import { FileUploadField } from "./FileUploadField";
+import { JoinStepFooter } from "./JoinStepFooter";
 import { MailorderNumberField } from "./MailorderNumberField";
 
 import type { ChangeEvent } from "react";
@@ -41,6 +43,8 @@ export function JoinCompanyStep() {
   const patchCompany = useJoinStore((state) => state.patchCompany);
   const setStage = useJoinStore((state) => state.setStage);
   const navigate = useNavigate();
+  const emailMessageId = useId();
+  const urlMessageId = useId();
   const { emailError, changeEmail, blurEmail } = useEmailDuplicateCheck({
     email: account.email,
     emailStatus: account.emailStatus,
@@ -89,9 +93,9 @@ export function JoinCompanyStep() {
         progress={JOIN_STEP_PROGRESS.company}
       />
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="flex flex-col gap-5 pt-[30px] tablet:gap-6 tablet:pt-6">
-          <AuthText size="xl" weight="bold" tone="heading">
+      <div className="min-h-0 flex-1 overflow-y-auto tablet:flex-none tablet:overflow-visible">
+        <div className="flex flex-col gap-5 pt-7.5 tablet:gap-6 tablet:pt-6 tablet:pb-12">
+          <AuthText size="xl" weight="medium" tone="heading">
             {t("company.title")}
           </AuthText>
 
@@ -140,6 +144,7 @@ export function JoinCompanyStep() {
                   type="email"
                   autoComplete="email"
                   aria-label={t("company.email")}
+                  aria-describedby={emailMessage ? emailMessageId : undefined}
                   placeholder={t("company.emailPlaceholder")}
                   value={account.email}
                   onChange={handleChangeEmail}
@@ -148,13 +153,13 @@ export function JoinCompanyStep() {
                 />
               </div>
               {emailMessage && (
-                <AuthText
-                  size="sm"
+                <AuthSupportText
+                  id={emailMessageId}
                   role="status"
-                  className={resolveMessageClass(isEmailError, isEmailPossible)}
+                  state={resolveSupportState(isEmailError, isEmailPossible)}
                 >
                   {emailMessage}
-                </AuthText>
+                </AuthSupportText>
               )}
             </div>
 
@@ -222,53 +227,44 @@ export function JoinCompanyStep() {
               />
             </div>
 
-            <div className="flex flex-col gap-2.5">
-              <AuthText size="md">{t("company.url")}</AuthText>
-              <AuthInput
-                type="url"
-                aria-label={t("company.url")}
-                placeholder="https://"
-                value={company.companyUrl}
-                state={isCompanyUrlInvalid ? "error" : "default"}
-                onChange={(event) =>
-                  patchCompany({ companyUrl: event.target.value })
-                }
-                onBlur={handleBlurCompanyUrl}
-              />
+            <div className="flex flex-col gap-2">
+              <div className="flex flex-col gap-2.5">
+                <AuthText size="md">{t("company.url")}</AuthText>
+                <AuthInput
+                  type="url"
+                  aria-label={t("company.url")}
+                  aria-describedby={
+                    isCompanyUrlInvalid ? urlMessageId : undefined
+                  }
+                  placeholder="https://"
+                  value={company.companyUrl}
+                  state={isCompanyUrlInvalid ? "error" : "default"}
+                  onChange={(event) =>
+                    patchCompany({ companyUrl: event.target.value })
+                  }
+                  onBlur={handleBlurCompanyUrl}
+                />
+              </div>
               {isCompanyUrlInvalid && (
-                <AuthText size="sm" role="alert" tone="negative">
+                <AuthSupportText id={urlMessageId} state="error" role="alert">
                   {t("company.urlError")}
-                </AuthText>
+                </AuthSupportText>
               )}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="shrink-0 py-5 tablet:pb-[70px] desktop:pb-[120px]">
-        <div className="h-12">
-          <AuthButton
-            color="primary"
-            disabled={!canSubmit}
-            onClick={handleClickNext}
-          >
-            <AuthText as="span" tone="light">
-              {t("next")}
-            </AuthText>
-          </AuthButton>
-        </div>
-      </div>
+      <JoinStepFooter
+        label={t("next")}
+        disabled={!canSubmit}
+        onClick={handleClickNext}
+      />
 
       {import.meta.env.DEV && (
-        <button
-          type="button"
-          className="text-gray-400 underline"
-          onClick={handleClickNext}
-        >
-          <AuthText as="span" size="sm">
-            {t("dev.skipStep")}
-          </AuthText>
-        </button>
+        <AuthTextButton onClick={handleClickNext}>
+          {t("dev.skipStep")}
+        </AuthTextButton>
       )}
     </div>
   );

@@ -23,6 +23,7 @@ interface ServiceCardProps {
 }
 
 // 모집형·PICK형 서비스 카드. 카드(머리글·설명)를 누르면 선택되고, 아래 버튼은 각자 동작함.
+// 선택 시 제목 위 파란 서비스명은 시안 오류라 표시하지 않고 링만 둠.
 // 구독 중이면 "서비스 이용 중" 비활성 버튼과 "이용 중" 뱃지, 아니면 데모 체험하기·구독하기.
 export function ServiceCard({
   type,
@@ -51,7 +52,6 @@ export function ServiceCard({
         onClick={() => onSelect(type)}
       >
         <CardTitleBlock
-          eyebrow={isSelected ? t(`service.${type}.name`) : undefined}
           title={t(`service.${type}.name`)}
           badges={badges.map((badge) => (
             <Badge

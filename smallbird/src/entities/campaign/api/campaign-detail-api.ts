@@ -1,5 +1,4 @@
 import { isApiError, serverApiV3 } from "@/shared/api";
-import { isCampaignApiMock } from "@/shared/config";
 
 import { toStepRequest } from "../lib/to-step-request";
 import { transformCampaignDetail } from "../lib/transform-campaign-detail";
@@ -13,12 +12,6 @@ import {
   campaignReapprovalRequestedSchema,
 } from "../model/detail-schema";
 import { SERVER_STEP_PATHS } from "../model/server-steps";
-import { loadCampaignDetailMock, loadCampaignShadowMock } from "./mock-loader";
-import {
-  applyShadowToLiveDetail,
-  fetchLiveCampaignResponse,
-  runShadowOperation,
-} from "./shadow-operation";
 
 import type { CampaignProductType, CampaignServiceType } from "../model/codes";
 import type { CampaignDetail } from "../model/detail-types";
@@ -34,10 +27,6 @@ export async function createCampaign(input: {
   productType: CampaignProductType;
   demo: boolean;
 }) {
-  if (isCampaignApiMock()) {
-    const mock = await loadCampaignDetailMock();
-    return campaignCreatedSchema.parse(await mock.createCampaign(input));
-  }
   return campaignCreatedSchema.parse(
     await serverApiV3.post("/campaign", input),
   );
@@ -47,14 +36,11 @@ export async function createCampaign(input: {
 export async function fetchCampaignDetail(
   campaignIdx: number,
 ): Promise<CampaignDetail> {
-  if (isCampaignApiMock()) {
-    const mock = await loadCampaignDetailMock();
-    return transformCampaignDetail(
-      campaignDetailSchema.parse(await mock.getCampaignDetail(campaignIdx)),
-    );
-  }
-  const response = await fetchLiveCampaignResponse(campaignIdx);
-  return transformCampaignDetail(await applyShadowToLiveDetail(response));
+  return transformCampaignDetail(
+    campaignDetailSchema.parse(
+      await serverApiV3.get(`/campaign/${campaignIdx}`),
+    ),
+  );
 }
 
 /**
@@ -68,18 +54,6 @@ export async function saveCampaignStep(
 ): Promise<void> {
   // 정책 동의는 임시저장하지 않음(서버가 결제할 때 기록함).
   if (step === "policy") return;
-  if (isCampaignApiMock()) {
-    await runShadowOperation(campaignIdx, async (mock) => {
-      const response = await mock.saveCampaignStep(
-        campaignIdx,
-        step,
-        toStepRequest(step, draft),
-      );
-      if (step === "info") campaignInfoSavedSchema.parse(response);
-    });
-    return;
-  }
-  await assertLiveCampaignEditable(campaignIdx);
   const response = await serverApiV3.put(
     `/campaign/${campaignIdx}/${SERVER_STEP_PATHS[step]}`,
     toStepRequest(step, draft),
@@ -87,24 +61,11 @@ export async function saveCampaignStep(
   if (step === "info") campaignInfoSavedSchema.parse(response);
 }
 
-/** 목이 결제·승인으로 바꾼 캠페인은 서버가 아직 모르므로 서버로 보내기 전에 수정할 수 없게 막음. */
-async function assertLiveCampaignEditable(campaignIdx: number) {
-  if (!import.meta.env.DEV) return;
-  const shadow = await loadCampaignShadowMock();
-  shadow.assertShadowEditable(campaignIdx);
-}
-
 /** A-8 `POST /v3/campaign/{campaignIdx}/copy`. 서버가 1~6단계를 복사하고 본문 없이 답함. */
 export async function copyCampaign(
   campaignIdx: number,
   sourceCampaignIdx: number,
 ): Promise<void> {
-  if (isCampaignApiMock()) {
-    const mock = await loadCampaignDetailMock();
-    await mock.copyCampaign(campaignIdx, sourceCampaignIdx);
-    return;
-  }
-  await assertLiveCampaignEditable(campaignIdx);
   await serverApiV3.post(`/campaign/${campaignIdx}/copy`, {
     sourceCampaignIdx,
   });
@@ -118,10 +79,6 @@ export async function payCampaign(
   campaignIdx: number,
   body: { expectedTotalAmount: number; agreements: CampaignPolicyAgreements },
 ) {
-  if (isCampaignApiMock()) {
-    const mock = await loadCampaignDetailMock();
-    return campaignPaidSchema.parse(await mock.payCampaign(campaignIdx, body));
-  }
   return campaignPaidSchema.parse(
     await serverApiV3.post(`/campaign/${campaignIdx}/payment`, body),
   );
@@ -140,12 +97,6 @@ export function readCampaignPaymentError(error: unknown) {
 
 /** `POST /v3/campaign/{campaignIdx}/payment/cancel`. 결제 금액 전액을 빅버드 머니로 환불하고 등록 중으로 돌림. */
 export async function cancelCampaignApproval(campaignIdx: number) {
-  if (isCampaignApiMock()) {
-    const mock = await loadCampaignDetailMock();
-    return campaignApprovalCanceledSchema.parse(
-      await mock.cancelCampaignApproval(campaignIdx),
-    );
-  }
   return campaignApprovalCanceledSchema.parse(
     await serverApiV3.post(`/campaign/${campaignIdx}/payment/cancel`),
   );
@@ -159,12 +110,6 @@ export async function requestCampaignReapproval(
   campaignIdx: number,
   agreements: CampaignPolicyAgreements,
 ) {
-  if (isCampaignApiMock()) {
-    const mock = await loadCampaignDetailMock();
-    return campaignReapprovalRequestedSchema.parse(
-      await mock.requestCampaignReapproval(campaignIdx, agreements),
-    );
-  }
   return campaignReapprovalRequestedSchema.parse(
     await serverApiV3.post(`/campaign/${campaignIdx}/approval`, {
       agreements,
@@ -180,11 +125,6 @@ export async function reviewCampaignForDev(
   campaignIdx: number,
   decision: { type: "reject"; reason: string } | { type: "approve" },
 ) {
-  if (isCampaignApiMock()) {
-    const mock = await loadCampaignDetailMock();
-    await mock.reviewCampaignForDev(campaignIdx, decision);
-    return;
-  }
   if (decision.type === "approve") {
     await serverApiV3.post(`/campaign/${campaignIdx}/test/approve`);
     return;
@@ -196,26 +136,10 @@ export async function reviewCampaignForDev(
 
 /** `POST /v3/campaign/{campaignIdx}/demo/complete`. 데모 작성을 마침(결제·승인 요청 없음). 이후 수정할 수 없음. */
 export async function completeCampaignDemo(campaignIdx: number) {
-  if (isCampaignApiMock()) {
-    const mock = await loadCampaignDetailMock();
-    await mock.completeCampaignDemo(campaignIdx);
-    return;
-  }
   await serverApiV3.post(`/campaign/${campaignIdx}/demo/complete`);
-  if (!import.meta.env.DEV) return;
-  const shadow = await loadCampaignShadowMock();
-  shadow.markShadowDemoCompleted(campaignIdx);
 }
 
 /** `POST /v3/campaign/{campaignIdx}/demo/convert`. 작성을 마친 데모를 실제 등록 중 캠페인으로 바꿈(구독 필요). */
 export async function convertCampaignDemo(campaignIdx: number) {
-  if (isCampaignApiMock()) {
-    const mock = await loadCampaignDetailMock();
-    await mock.convertCampaignDemo(campaignIdx);
-    return;
-  }
   await serverApiV3.post(`/campaign/${campaignIdx}/demo/convert`);
-  if (!import.meta.env.DEV) return;
-  const shadow = await loadCampaignShadowMock();
-  shadow.markShadowDemoConverted(campaignIdx);
 }

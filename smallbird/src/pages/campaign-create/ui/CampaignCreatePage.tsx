@@ -20,9 +20,14 @@ import { ProductCard } from "./ProductCard";
 import { ServiceCard } from "./ServiceCard";
 
 import type { ProductType } from "../model/services";
+import type { CampaignProductType } from "@/entities/campaign";
 import type { ActiveProductType } from "@/entities/subscription";
 
 const SERVICE_PARAM = "service";
+const PRODUCT_TYPE_CODES: Record<ProductType, CampaignProductType> = {
+  brand: "BRAND",
+  groupBuy: "GROUP_BUY",
+};
 // 본문의 최대 폭(시안 PC 1440 화면의 본문 폭 1170 + 좌우 여백 20씩). 더 넓은 화면에서는 가운데 정렬함.
 // 셸 본문은 여백이 없어 여기서 둠(MO 16, TAB·PC 20).
 const CONTENT_WIDTH_CLASS_NAME = "mx-auto w-full max-w-302.5 ds-p-5";
@@ -30,8 +35,8 @@ const SECTION_CLASS_NAME = "flex flex-col ds-gap-4";
 const SECTION_TITLE_CLASS_NAME = "ds-text-base-none-semibold";
 
 // 캠페인 개설: 서비스(모집형·PICK형)와 상품(브랜드형·공구형)을 고르기만 하고 저장하는 것은 없음.
-// 선택한 서비스는 `?service=`가 소유함. 브랜드형은 등록 마법사로 가고(구독 중이면 실제 등록, PICK형 미구독은 데모),
-// 공구형과 모집형 데모는 아직 없어 "준비 중" 토스트를 띄움(스펙 status §3 상품 카드).
+// 선택한 서비스는 `?service=`가 소유함. 상품 카드는 등록 마법사로 가고(구독 중이면 실제 등록, PICK형 미구독은 데모),
+// 모집형 공구형과 모집형 데모는 아직 없어 "준비 중" 토스트를 띄움(스펙 status §3 상품 카드).
 export function CampaignCreatePage() {
   const { t } = useTranslation("pages/campaign-create");
   const { t: tCommon } = useTranslation();
@@ -56,16 +61,25 @@ export function CampaignCreatePage() {
   }
 
   function handleClickProduct(product: ProductType) {
-    if (selectedService === null || product !== "brand") {
+    // 모집형 공구형은 아직 없음.
+    if (
+      selectedService === null ||
+      (selectedService === "recruit" && product !== "brand")
+    ) {
       toast(tCommon("status.comingSoon"));
       return;
     }
+    const productType = PRODUCT_TYPE_CODES[product];
     if (isSelectedServiceSubscribed) {
-      void navigate(getNewCampaignRegisterPath(selectedService));
+      void navigate(
+        getNewCampaignRegisterPath(selectedService, { productType }),
+      );
       return;
     }
     if (selectedService === "pick") {
-      void navigate(getNewCampaignRegisterPath("pick", { isDemo: true }));
+      void navigate(
+        getNewCampaignRegisterPath("pick", { isDemo: true, productType }),
+      );
       return;
     }
     toast(tCommon("status.comingSoon"));

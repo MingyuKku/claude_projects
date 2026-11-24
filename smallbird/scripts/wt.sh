@@ -11,7 +11,7 @@ set -euo pipefail
 MAIN="$(cd "$(git rev-parse --git-common-dir)/.." && pwd)"
 PREFIX="$(basename "$MAIN")"
 # 메인의 gitignore 로컬 파일. 복사하지 않고 링크해서 한 곳에서만 고친다.
-LINKS=(.env.local .claude/settings.local.json CLAUDE.local.md NOTES.local.md .claude/figma-cache)
+LINKS=(.env.local .claude/settings.local.json CLAUDE.local.md NOTES.local.md .claude/figma-cache .claude/device-test)
 
 die() { echo "오류: $*" >&2; exit 1; }
 name_of() { local n="${1#*/}"; echo "${n//\//-}"; }

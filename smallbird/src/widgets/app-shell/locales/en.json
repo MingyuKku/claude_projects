@@ -60,7 +60,17 @@
     "title": "Notifications",
     "close": "Close notifications",
     "emptyTitle": "No new notifications",
-    "emptyDescription": "Important updates from the service will appear here."
+    "emptyDescription": "Important updates from the service will appear here.",
+    "item": {
+      "approved": {
+        "title": "Campaign approved",
+        "description": "{{name}} has been approved."
+      },
+      "rejected": {
+        "title": "Campaign rejected",
+        "description": "{{name}} has been rejected."
+      }
+    }
   },
   "logoutFailed": "Couldn't log out. Please try again.",
   "session": {

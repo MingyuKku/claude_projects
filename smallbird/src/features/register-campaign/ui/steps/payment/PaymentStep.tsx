@@ -1,7 +1,7 @@
 import { BalanceCard, useBigbirdMoneyBalance } from "@/entities/bigbird-money";
 import {
-  CAMPAIGN_PERIOD_DAYS,
   getCampaignEndDate,
+  getCampaignPeriodDays,
   toCampaignTypeFilter,
   useCampaignTypeLabel,
 } from "@/entities/campaign";
@@ -46,7 +46,7 @@ export function PaymentStep({ chargeSlot }: PaymentStepProps) {
       />
       <PaymentCard title="terms" className="order-4 desktop:order-0">
         <div className="ds-px-6 ds-pb-6">
-          <PolicyAgreementList />
+          <PolicyAgreementList className="ds-gap-5" />
         </div>
       </PaymentCard>
     </div>
@@ -87,14 +87,19 @@ function SummaryRow({ label, children, isEmphasized }: SummaryRowProps) {
   return (
     <div
       className={cn(
-        "flex min-h-12 items-center justify-between gap-4 px-4",
-        isEmphasized ? "ds-text-base-7-semibold" : "ds-text-sm-5-normal",
+        "flex min-h-12 items-center gap-8 px-4",
+        isEmphasized ? "ds-text-base-6-semibold" : "ds-text-sm-5-normal",
       )}
     >
-      <dt className={cn("shrink-0", !isEmphasized && "font-semibold")}>
+      <dt
+        className={cn(
+          "flex-1 whitespace-nowrap",
+          !isEmphasized && "font-semibold",
+        )}
+      >
         {label}
       </dt>
-      <dd className="min-w-0 text-right">{children}</dd>
+      <dd className="min-w-0 flex-1 text-right">{children}</dd>
     </div>
   );
 }
@@ -111,7 +116,7 @@ function CampaignSummaryCard() {
 
   const typeFilter = toCampaignTypeFilter(serviceType, productType);
   const startDate = fromIsoDate(info.startDate);
-  const endDate = fromIsoDate(getCampaignEndDate(info.startDate));
+  const endDate = fromIsoDate(getCampaignEndDate(info.startDate, productType));
   const hasReward = info.campaignType === "PRODUCT_DELIVERY";
 
   return (
@@ -140,7 +145,7 @@ function CampaignSummaryCard() {
             ? t("payment.campaignSummary.periodValue", {
                 start: formatNumericDate(startDate),
                 end: formatNumericDate(endDate),
-                days: CAMPAIGN_PERIOD_DAYS,
+                days: getCampaignPeriodDays(productType),
               })
             : "-"}
         </SummaryRow>
@@ -215,12 +220,14 @@ function PaymentMethodCard({ chargeSlot, className }: PaymentMethodCardProps) {
         >
           <span className="size-2 rounded-full bg-primary" />
         </span>
-        <span className="ds-text-base-7-semibold">
-          {t("payment.method.bigbirdMoney")}
+        <span className="flex items-center gap-1">
+          <span className="ds-text-base-7-semibold">
+            {t("payment.method.bigbirdMoney")}
+          </span>
+          <Badge size="sm">{t("payment.method.required")}</Badge>
         </span>
-        <Badge size="sm">{t("payment.method.required")}</Badge>
       </p>
-      <div className="flex flex-col gap-4 ds-px-5 ds-pb-5">
+      <div className="flex flex-col ds-gap-4 ds-px-5 ds-pb-5">
         <BalanceCard amount={balance?.amount} titleAs="h3" />
         <div id={CHARGE_AREA_ID}>{chargeSlot}</div>
       </div>

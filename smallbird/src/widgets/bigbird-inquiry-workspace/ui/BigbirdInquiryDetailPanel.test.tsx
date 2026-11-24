@@ -92,7 +92,7 @@ describe("BigbirdInquiryDetailPanel", () => {
     ).toBeDisabled();
   });
 
-  it("공구샵이 없으면 공구샵 코드를 -로 보이고 복사하지 않는다", async () => {
+  it("공구샵이 없으면 공구샵 코드 줄을 그리지 않는다", async () => {
     renderPanel(vi.fn(), {
       result: true,
       mainImageUrl: null,
@@ -103,9 +103,10 @@ describe("BigbirdInquiryDetailPanel", () => {
       shopCode: null,
     });
 
-    const shopCode = await screen.findByRole("button", { name: /공구샵 코드/ });
-    expect(shopCode).toHaveTextContent("-");
-    expect(shopCode).toBeDisabled();
+    expect(await screen.findByText("진행 중")).toBeInTheDocument();
+    expect(
+      screen.queryByRole("button", { name: /공구샵 코드/ }),
+    ).not.toBeInTheDocument();
   });
 
   it("캠페인 정보 API가 실패하면 목록 값으로 보이고 진행 상태·공구샵 코드는 그리지 않는다", async () => {

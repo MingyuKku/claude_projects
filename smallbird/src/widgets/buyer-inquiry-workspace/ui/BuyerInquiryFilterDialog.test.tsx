@@ -50,6 +50,32 @@ beforeEach(() => {
 afterEach(() => vi.unstubAllGlobals());
 
 describe("BuyerInquiryFilterDialog", () => {
+  it("TAB 이상에서 필터가 열린 동안만 세로 고무줄 스크롤을 끄고 닫거나 화면을 떠나면 되돌린다", async () => {
+    const user = userEvent.setup();
+    const root = document.documentElement;
+    const { unmount } = render(
+      <SWRConfig value={{ provider: () => new Map() }}>
+        <BuyerInquiryFilterDialog
+          menu="buyer"
+          value={{ sourceType: "ALL" }}
+          threadUserIdx={5971}
+          onApply={() => {}}
+        />
+      </SWRConfig>,
+    );
+    expect(root.style.overscrollBehaviorY).toBe("");
+
+    await user.click(screen.getByRole("button", { name: "필터" }));
+    expect(root.style.overscrollBehaviorY).toBe("none");
+    await user.keyboard("{Escape}");
+    await waitFor(() => expect(root.style.overscrollBehaviorY).toBe(""));
+
+    await user.click(screen.getByRole("button", { name: "필터" }));
+    expect(root.style.overscrollBehaviorY).toBe("none");
+    unmount();
+    expect(root.style.overscrollBehaviorY).toBe("");
+  });
+
   it("캠페인은 검색 입력 없이 목록에서 고른다(Figma Select)", async () => {
     const user = userEvent.setup();
     render(

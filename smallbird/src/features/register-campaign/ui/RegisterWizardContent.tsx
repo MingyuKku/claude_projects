@@ -5,7 +5,7 @@ import { useMediaQuery } from "@/shared/lib";
 
 import { isLockedInRevision } from "../model/revision";
 import { isStepStarted } from "../model/step-completion";
-import { STEP_LABEL_KEYS } from "../model/step-labels";
+import { getStepLabelKey } from "../model/step-labels";
 import { useIntroGenerationNotice } from "../model/use-intro-generation";
 import { usePaymentFlow } from "../model/use-payment-flow";
 import { useRegisterPanel } from "../model/use-register-panel";
@@ -33,10 +33,13 @@ import type { ReactNode } from "react";
 interface RegisterWizardContentProps {
   /** 8단계 충전 입력. feature끼리 가져올 수 없어 페이지가 채움. */
   chargeSlot?: ReactNode;
+  /** 결제 완료·재승인 요청 완료 알럿의 "확인" 클릭 때 부름. feature끼리 가져올 수 없어 페이지가 채움(알림 권한 요청). */
+  onApprovalRequested?: () => void;
 }
 
 export function RegisterWizardContent({
   chargeSlot,
+  onApprovalRequested,
 }: RegisterWizardContentProps) {
   const { t } = useTranslation("features/register-campaign");
   const {
@@ -61,11 +64,12 @@ export function RegisterWizardContent({
     (state) => state.isRevisionMode,
   );
   const isDemo = useRegisterWizardStore((state) => state.isDemo);
+  const productType = useRegisterWizardStore((state) => state.productType);
   const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
   const isTabletUp = useMediaQuery(MEDIA_QUERY.tabletUp);
   const { panel } = useRegisterPanel();
 
-  const title = t(STEP_LABEL_KEYS[currentStep]);
+  const title = t(getStepLabelKey(currentStep, productType));
   const isLocked = isRevisionMode && isLockedInRevision(currentStep);
   // 미리보기 화면은 시안이 없어 버튼만 둠.
   const preview = currentStep === "intro" ? { isEnabled: hasIntroInput } : null;
@@ -99,7 +103,7 @@ export function RegisterWizardContent({
         key={currentStep}
         className="min-h-0 flex-1 overflow-y-auto px-4 tablet:ds-p-5"
       >
-        <section className="flex flex-col ds-gap-4">
+        <section className="flex flex-col gap-3 tablet:gap-5 desktop:gap-6">
           {isDemo && (
             <Inform
               variant="filled"
@@ -107,16 +111,18 @@ export function RegisterWizardContent({
             />
           )}
           <RegisterStepNotice step={currentStep} />
-          <h2 className="hidden ds-text-base-none-semibold tablet:block">
-            {title}
-          </h2>
-          {/* 수정 모드의 잠긴 단계는 열어서 보되 입력은 모두 막음(fieldset이 안의 입력·버튼을 한꺼번에 비활성화). */}
-          <fieldset disabled={isLocked} className="contents">
-            <RegisterStepBody
-              step={currentStep}
-              chargeSlot={isRevisionMode ? undefined : chargeSlot}
-            />
-          </fieldset>
+          <div className="flex flex-col ds-gap-4">
+            <h2 className="hidden ds-text-base-none-semibold tablet:block">
+              {title}
+            </h2>
+            {/* 수정 모드의 잠긴 단계는 열어서 보되 입력은 모두 막음(fieldset이 안의 입력·버튼을 한꺼번에 비활성화). */}
+            <fieldset disabled={isLocked} className="contents">
+              <RegisterStepBody
+                step={currentStep}
+                chargeSlot={isRevisionMode ? undefined : chargeSlot}
+              />
+            </fieldset>
+          </div>
         </section>
       </div>
       {isRevisionMode ? (
@@ -152,6 +158,7 @@ export function RegisterWizardContent({
         onLeaveToDetail={payment.leaveToDetail}
         onCompleteDemo={() => void payment.completeDemo()}
         isBusy={payment.isPaying}
+        onApprovalRequested={onApprovalRequested}
       />
       {isDesktop && <RegisterPanelDrawer />}
       {isTabletUp && <RegisterTermsDialog />}

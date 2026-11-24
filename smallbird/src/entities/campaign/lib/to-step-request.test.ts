@@ -78,3 +78,34 @@ describe("toStepRequest", () => {
     expect(request.description).toBeNull();
   });
 });
+
+describe("toStepRequest 공동구매 조건", () => {
+  it("서버 필드 이름으로 보낸다(공동구매가는 purchasePrice)", () => {
+    const draft = createEmptyDraft();
+    draft.groupBuy = {
+      productName: "신라호텔 숙박권",
+      categoryIdx: 8,
+      middleCategoryIdx: 36,
+      recommendedPrice: 60000,
+      price: 45000,
+    };
+
+    expect(toStepRequest("groupBuy", draft)).toEqual({
+      groupBuyingProductName: "신라호텔 숙박권",
+      productCategoryIdx: 8,
+      productMiddleCategoryIdx: 36,
+      recommendedConsumerPrice: 60000,
+      purchasePrice: 45000,
+    });
+  });
+
+  it("입력 전 칸은 null로 보낸다", () => {
+    expect(toStepRequest("groupBuy", createEmptyDraft())).toEqual({
+      groupBuyingProductName: null,
+      productCategoryIdx: null,
+      productMiddleCategoryIdx: null,
+      recommendedConsumerPrice: null,
+      purchasePrice: null,
+    });
+  });
+});

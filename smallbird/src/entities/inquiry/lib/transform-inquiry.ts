@@ -463,7 +463,9 @@ export function transformBuyerInquiryDetailToViewModel(
     email: detail.email,
     phoneNumber: detail.phoneNumber,
     orderNumber: detail.orderNumber,
-    orderDate: detail.orderDate,
+    // Figma 주문일은 날짜만 YYYY.MM.DD. 서버는 `yyyy-MM-dd HH:mm:ss`라 앞 10자리만 씀.
+    orderDate:
+      detail.orderDate && detail.orderDate.slice(0, 10).replaceAll("-", "."),
     paymentAmount: detail.paymentAmount,
     campaignType: detail.campaignType,
     campaignCode: detail.campaignCode,

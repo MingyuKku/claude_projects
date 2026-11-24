@@ -43,7 +43,7 @@ describe("LoginForm", () => {
   });
   afterEach(() => vi.unstubAllGlobals());
 
-  it("asks for an id before calling the server", async () => {
+  it("서버를 부르기 전에 아이디를 먼저 요구한다", async () => {
     renderForm();
     await userEvent
       .setup()
@@ -55,7 +55,7 @@ describe("LoginForm", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 
-  it("goes to the main screen when an admin logs in", async () => {
+  it("관리자가 로그인하면 메인 화면으로 이동한다", async () => {
     fetchMock.mockResolvedValue(
       jsonResponse(200, { result: true, authority: "MASTER", userIdx: 1 }),
     );
@@ -67,7 +67,7 @@ describe("LoginForm", () => {
     expect(body).toBeInstanceOf(FormData);
   });
 
-  it("logs in with the Enter key through the form submit", async () => {
+  it("엔터 키로 폼을 제출해 로그인한다", async () => {
     fetchMock.mockResolvedValue(
       jsonResponse(200, { result: true, authority: "MASTER", userIdx: 1 }),
     );
@@ -80,17 +80,17 @@ describe("LoginForm", () => {
     expect(fetchMock).toHaveBeenCalledTimes(1);
   });
 
-  it("shows the mismatch message when the server answers result=false", async () => {
+  it("서버가 result=false로 답하면 불일치 문구를 보여 준다", async () => {
     fetchMock.mockResolvedValue(jsonResponse(200, { result: false }));
     renderForm();
     await submit("tester", "wrong");
 
     expect(await screen.findByRole("alert")).toHaveTextContent(
-      "아이디 또는 비밀번호가 일치하지 않습니다.",
+      "입력하신 회원정보를 찾을 수 없습니다.",
     );
   });
 
-  it("maps a 401 exited account to its message", async () => {
+  it("401 탈퇴 계정은 해당 문구로 보여 준다", async () => {
     fetchMock.mockResolvedValue(jsonResponse(401, { reason: "accountExited" }));
     renderForm();
     await submit("tester", "pw");
@@ -100,7 +100,7 @@ describe("LoginForm", () => {
     );
   });
 
-  it("reports a locked account to the parent instead of showing text", async () => {
+  it("잠긴 계정은 문구 대신 부모에게 알린다", async () => {
     fetchMock.mockResolvedValue(
       jsonResponse(401, { reason: "accountRejected" }),
     );
@@ -111,7 +111,7 @@ describe("LoginForm", () => {
     expect(screen.queryByRole("alert")).not.toBeInTheDocument();
   });
 
-  it("sends an expired account to /expired and stashes the credential", async () => {
+  it("만료 계정은 자격 증명을 보관하고 /expired로 보낸다", async () => {
     fetchMock.mockResolvedValue(
       jsonResponse(403, { reason: "ACCOUNT_EXPIRED" }),
     );
@@ -120,5 +120,96 @@ describe("LoginForm", () => {
 
     expect(await screen.findByText("expired page")).toBeInTheDocument();
     expect(readLoginCredential()).toEqual({ id: "tester", password: "pw" });
+  });
+
+  it("아이디만 채우면 비밀번호를 요구한다", async () => {
+    renderForm();
+    const user = userEvent.setup();
+    await user.type(screen.getByLabelText("아이디"), "tester");
+    await user.click(screen.getByRole("button", { name: "로그인" }));
+
+    expect(screen.getByRole("alert")).toHaveTextContent(
+      "비밀번호를 입력해 주세요.",
+    );
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
+  it("입력을 고치면 문구를 지운다", async () => {
+    renderForm();
+    const user = userEvent.setup();
+    await user.click(screen.getByRole("button", { name: "로그인" }));
+    expect(screen.getByRole("alert")).toBeInTheDocument();
+
+    await user.type(screen.getByLabelText("아이디"), "t");
+    expect(screen.queryByRole("alert")).not.toBeInTheDocument();
+  });
+
+  it("403 noAccount는 해당 문구로 보여 준다", async () => {
+    fetchMock.mockResolvedValue(
+      jsonResponse(403, { reason: "ACCOUNT_BANNED" }),
+    );
+    renderForm();
+    await submit("tester", "pw");
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "계정이 없거나 탈퇴한 회원입니다.",
+    );
+  });
+
+  it("잠금 남은 시간(분)을 보여 준다", async () => {
+    fetchMock.mockResolvedValue(
+      jsonResponse(401, {
+        reason: "accountLocked",
+        time: new Date(Date.now() + 5 * 60_000 + 5_000).toISOString(),
+      }),
+    );
+    renderForm();
+    await submit("tester", "pw");
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "계정이 잠김 상태입니다. 5분 뒤에 다시 로그인을 시도해주세요.",
+    );
+  });
+
+  it("휴면 만료 계정은 법적 고지를 보여 준다", async () => {
+    fetchMock.mockResolvedValue(
+      jsonResponse(401, {
+        reason: "accountDestroyed",
+        time: "2025-03-04T05:06:00",
+      }),
+    );
+    renderForm();
+    await submit("tester", "pw");
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "정보통신망 이용촉진 및 정보보호 등에 관한 법률 제29조",
+    );
+  });
+
+  it("응답 없이 요청이 실패하면 일반 문구를 보여 준다", async () => {
+    fetchMock.mockRejectedValue(new TypeError("network"));
+    renderForm();
+    await submit("tester", "pw");
+
+    expect(await screen.findByRole("alert")).toHaveTextContent(
+      "오류가 발생했습니다. 잠시후 다시 시도해 주세요.",
+    );
+  });
+
+  it("요청 중에는 제출 버튼을 비활성화한다", async () => {
+    let resolveFetch: (response: Response) => void = () => undefined;
+    fetchMock.mockReturnValue(
+      new Promise<Response>((resolve) => {
+        resolveFetch = resolve;
+      }),
+    );
+    renderForm();
+    await submit("tester", "pw");
+
+    expect(
+      await screen.findByRole("button", { name: "로그인 중" }),
+    ).toBeDisabled();
+    resolveFetch(jsonResponse(200, { result: true, authority: "MASTER" }));
+    expect(await screen.findByText("main page")).toBeInTheDocument();
   });
 });

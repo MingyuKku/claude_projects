@@ -1,5 +1,5 @@
 import { tryit } from "radash";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { clearLoginCredential, readLoginCredential } from "@/entities/session";
@@ -7,6 +7,7 @@ import { isApiError } from "@/shared/api";
 import {
   AuthButton,
   AuthHeader,
+  AuthSupportText,
   AuthText,
   PasswordInput,
 } from "@/shared/components/auth";
@@ -45,6 +46,9 @@ export function ExpiredPasswordForm({ className }: ExpiredPasswordFormProps) {
   const { trigger: delayExpired, isMutating: isDelaying } =
     useDelayExpiredPassword();
   const fields = usePasswordFields(password);
+  const originMessageId = useId();
+  const newMessageId = useId();
+  const checkMessageId = useId();
 
   const [submitError, setSubmitError] = useState<ExpiredSubmitErrorCode | null>(
     null,
@@ -108,13 +112,13 @@ export function ExpiredPasswordForm({ className }: ExpiredPasswordFormProps) {
   return (
     <main
       className={cn(
-        "flex min-h-dvh flex-col items-center gap-5 bg-background",
+        "flex min-h-dvh flex-col items-center bg-background tablet:gap-12",
         className,
       )}
     >
-      <AuthHeader title={t("header")} onClickBack={goToLogin} />
+      <AuthHeader title={t("header")} onClickBack={goToLogin} isBorderHidden />
 
-      <div className="flex w-80 flex-1 flex-col pb-40 tablet:w-96 tablet:pb-0">
+      <div className="flex w-80 flex-1 flex-col pb-40 tablet:w-96 tablet:pb-17.5 desktop:pb-30">
         <div className="flex flex-1 flex-col tablet:flex-none tablet:gap-12">
           <div className="flex flex-col gap-5 tablet:gap-12">
             <AuthText size="md">
@@ -123,65 +127,80 @@ export function ExpiredPasswordForm({ className }: ExpiredPasswordFormProps) {
 
             <div className="flex flex-col gap-5">
               <div className="flex flex-col gap-2">
-                <AuthText size="md">{t("current.label")}</AuthText>
-                <PasswordInput
-                  label={t("current.label")}
-                  autoComplete="current-password"
-                  placeholder={t("current.placeholder")}
-                  value={fields.originPassword}
-                  state={fields.isOriginWrong ? "error" : "default"}
-                  onChange={fields.onChangeOrigin}
-                />
+                <div className="flex flex-col gap-2.5">
+                  <AuthText size="md">{t("current.label")}</AuthText>
+                  <PasswordInput
+                    label={t("current.label")}
+                    aria-describedby={
+                      fields.isOriginWrong ? originMessageId : undefined
+                    }
+                    autoComplete="current-password"
+                    placeholder={t("current.placeholder")}
+                    value={fields.originPassword}
+                    state={fields.isOriginWrong ? "error" : "default"}
+                    onChange={fields.onChangeOrigin}
+                  />
+                </div>
                 {fields.isOriginWrong && (
-                  <AuthText size="sm" role="alert" tone="negative">
+                  <AuthSupportText
+                    id={originMessageId}
+                    role="alert"
+                    state="error"
+                  >
                     {t("current.wrong")}
-                  </AuthText>
+                  </AuthSupportText>
                 )}
               </div>
 
               <div className="flex flex-col gap-2">
-                <AuthText size="md">{t("new.label")}</AuthText>
-                <PasswordInput
-                  label={t("new.label")}
-                  autoComplete="new-password"
-                  placeholder={t("new.placeholder")}
-                  value={fields.newPassword}
+                <div className="flex flex-col gap-2.5">
+                  <AuthText size="md">{t("new.label")}</AuthText>
+                  <PasswordInput
+                    label={t("new.label")}
+                    aria-describedby={newMessageId}
+                    autoComplete="new-password"
+                    placeholder={t("new.placeholder")}
+                    value={fields.newPassword}
+                    state={fields.hasNewPasswordError ? "error" : "default"}
+                    onChange={fields.onChangeNew}
+                  />
+                </div>
+                <AuthSupportText
+                  id={newMessageId}
                   state={fields.hasNewPasswordError ? "error" : "default"}
-                  onChange={fields.onChangeNew}
-                />
-                <AuthText
-                  size="sm"
-                  tone={fields.hasNewPasswordError ? "negative" : "faint"}
                 >
                   {fields.hasNewPasswordError ? t("formatError") : t("hint")}
-                </AuthText>
+                </AuthSupportText>
               </div>
 
               <div className="flex flex-col gap-2">
-                <AuthText size="md">{t("check.label")}</AuthText>
-                <PasswordInput
-                  label={t("check.label")}
-                  autoComplete="new-password"
-                  placeholder={t("check.placeholder")}
-                  value={fields.newPasswordCheck}
+                <div className="flex flex-col gap-2.5">
+                  <AuthText size="md">{t("check.label")}</AuthText>
+                  <PasswordInput
+                    label={t("check.label")}
+                    aria-describedby={checkMessageId}
+                    autoComplete="new-password"
+                    placeholder={t("check.placeholder")}
+                    value={fields.newPasswordCheck}
+                    state={fields.isCheckMismatch ? "error" : "default"}
+                    onChange={fields.onChangeCheck}
+                  />
+                </div>
+                <AuthSupportText
+                  id={checkMessageId}
                   state={fields.isCheckMismatch ? "error" : "default"}
-                  onChange={fields.onChangeCheck}
-                />
-                <AuthText
-                  size="sm"
-                  tone={fields.isCheckMismatch ? "negative" : "faint"}
                 >
                   {fields.isCheckMismatch ? t("mismatch") : t("hint")}
-                </AuthText>
+                </AuthSupportText>
               </div>
             </div>
           </div>
 
           <div className="fixed bottom-5 left-1/2 flex w-80 -translate-x-1/2 flex-col gap-3 tablet:static tablet:left-auto tablet:w-full tablet:translate-x-0">
             {submitError && (
-              <AuthText size="sm" role="alert" tone="negative">
+              <AuthSupportText state="error" role="alert">
                 {t(`submitError.${submitError}`)}
-              </AuthText>
+              </AuthSupportText>
             )}
             <div className="h-12">
               <AuthButton
@@ -189,7 +208,7 @@ export function ExpiredPasswordForm({ className }: ExpiredPasswordFormProps) {
                 onClick={handleDelay}
                 disabled={isDelaying}
               >
-                <AuthText as="span" size="md" tone="inherit">
+                <AuthText as="span" size="fixed-base" tone="inherit">
                   {t("delay")}
                 </AuthText>
               </AuthButton>
@@ -200,7 +219,7 @@ export function ExpiredPasswordForm({ className }: ExpiredPasswordFormProps) {
                 onClick={handleSubmit}
                 disabled={!fields.canSubmit || isChanging}
               >
-                <AuthText as="span" size="md" tone="inherit">
+                <AuthText as="span" size="fixed-base" tone="inherit">
                   {t("submit")}
                 </AuthText>
               </AuthButton>

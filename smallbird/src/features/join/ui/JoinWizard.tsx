@@ -36,8 +36,9 @@ function JoinSteps({ onLinkSocial }: JoinStepsProps) {
   }
 
   return (
-    // 다른 단계는 하단 버튼을 고정하므로 안쪽만 스크롤됨.
-    <div className="flex h-dvh flex-col items-center overflow-hidden bg-background">
+    // 모바일은 하단 버튼을 고정하고 안쪽만 스크롤함. 태블릿 이상은 시안대로 버튼이
+    // 본문 아래를 따라가고 문서가 스크롤됨(안쪽 스크롤바로 폭이 줄지 않음).
+    <div className="flex h-dvh flex-col items-center overflow-hidden bg-background tablet:h-auto tablet:min-h-dvh tablet:overflow-visible">
       <div className="flex min-h-0 w-80 flex-1 flex-col tablet:w-96">
         {stage === "info" && <JoinInfoStep />}
         {stage === "company" && <JoinCompanyStep />}

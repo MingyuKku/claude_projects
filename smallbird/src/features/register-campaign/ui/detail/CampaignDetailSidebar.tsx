@@ -4,7 +4,7 @@ import { getCampaignRegisterPath } from "@/entities/campaign";
 import { StepSidebar } from "@/shared/components/step-sidebar";
 import { useTranslation } from "@/shared/i18n";
 
-import { STEP_LABEL_KEYS } from "../../model/step-labels";
+import { getStepLabelKey } from "../../model/step-labels";
 import { getRegisterSteps } from "../../model/steps";
 
 import type { CampaignDetail } from "@/entities/campaign";
@@ -23,7 +23,10 @@ export function CampaignDetailSidebar({
 }: CampaignDetailSidebarProps) {
   const { t } = useTranslation("features/register-campaign");
   const navigate = useNavigate();
-  const steps = getRegisterSteps(detail.serviceType ?? "PICK");
+  const steps = getRegisterSteps(
+    detail.serviceType ?? "PICK",
+    detail.productType ?? "BRAND",
+  );
   const isEditable = canManage && detail.stage === "REJECTED";
 
   function handleSelect(id: string) {
@@ -49,7 +52,7 @@ export function CampaignDetailSidebar({
         items={steps.map(({ step }, index) => ({
           id: step,
           number: index + 1,
-          label: t(STEP_LABEL_KEYS[step]),
+          label: t(getStepLabelKey(step, detail.productType)),
           state: isEditable ? "default" : "disabled",
         }))}
         onSelect={handleSelect}

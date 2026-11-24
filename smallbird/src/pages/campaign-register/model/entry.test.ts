@@ -4,10 +4,28 @@ import type { CampaignDetail } from "@/entities/campaign";
 
 describe("parseRegisterEntry", () => {
   it.each([
-    ["type=pick", { kind: "create", isDemo: false }],
-    ["type=pick&demo=true", { kind: "create", isDemo: true }],
-    ["type=pick&demo=1", { kind: "create", isDemo: false }],
+    ["type=pick", { kind: "create", isDemo: false, productType: "BRAND" }],
+    [
+      "type=pick&demo=true",
+      { kind: "create", isDemo: true, productType: "BRAND" },
+    ],
+    [
+      "type=pick&demo=1",
+      { kind: "create", isDemo: false, productType: "BRAND" },
+    ],
+    [
+      "type=pick&product=group-buy",
+      { kind: "create", isDemo: false, productType: "GROUP_BUY" },
+    ],
+    [
+      "type=pick&product=group-buy&demo=true",
+      { kind: "create", isDemo: true, productType: "GROUP_BUY" },
+    ],
+    ["type=pick&product=brand", { kind: "invalid" }],
+    ["type=pick&product=", { kind: "invalid" }],
     ["type=recruit", { kind: "comingSoon" }],
+    ["type=recruit&product=group-buy", { kind: "comingSoon" }],
+    ["type=recruit&product=other", { kind: "invalid" }],
     ["type=PICK", { kind: "invalid" }],
     ["", { kind: "invalid" }],
   ])("%s → %o", (query, expected) => {

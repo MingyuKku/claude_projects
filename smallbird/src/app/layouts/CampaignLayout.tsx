@@ -9,7 +9,12 @@ export function CampaignLayout() {
   const session = useLoaderData<typeof sessionLoader>();
 
   return (
-    <AppShell session={session} activeNavId="campaign" mainClassName="p-0">
+    <AppShell
+      session={session}
+      activeNavId="campaign"
+      isTitleVisibleOnMobile
+      mainClassName="p-0"
+    >
       <Outlet context={session} />
     </AppShell>
   );

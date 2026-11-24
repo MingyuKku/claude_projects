@@ -2,7 +2,9 @@
   "step": {
     "campaignInfo": "캠페인 정보 입력",
     "product": "제품 정보 입력",
+    "productGroupBuy": "협찬 제품 정보 입력",
     "creator": "크리에이터 조건",
+    "groupBuy": "공동구매 조건 설정",
     "addOns": "부가서비스",
     "intro": "캠페인 소개서",
     "conditions": "진행 조건 설정",
@@ -31,6 +33,7 @@
     "fileType": "JPG, PNG 파일만 올릴 수 있습니다.",
     "fileSize": "10MB 이하 파일만 올릴 수 있습니다.",
     "videoSize": "500MB 이하 동영상만 올릴 수 있습니다.",
+    "videoConvertFailed": "동영상을 변환할 수 없습니다. 다른 파일로 올려 주세요.",
     "requestFailed": "요청에 실패했습니다. 잠시 후 다시 시도해 주세요.",
     "addressSearchFailed": "주소 검색을 불러오지 못했습니다. 잠시 후 다시 시도해 주세요.",
     "aiCompleted": "AI 생성이 완료되었습니다.",
@@ -74,9 +77,12 @@
       "manage": "브랜드 관리"
     },
     "period": {
-      "label": "캠페인 희망 시작 일자",
+      "label": {
+        "brand": "캠페인 희망 시작 일자",
+        "groupBuy": "공동구매 희망 시작 일자"
+      },
       "placeholder": "날짜를 선택해 주세요.",
-      "help": "종료 날짜는 자동으로 30일 후로 세팅됩니다."
+      "help": "종료 날짜는 자동으로 {{days}}일 후로 세팅됩니다."
     }
   },
   "brands": {
@@ -138,6 +144,9 @@
     "TIKTOK": "틱톡",
     "X": "엑스"
   },
+  "platformGroupBuy": {
+    "NAVER_BLOG": "네이버 블로그"
+  },
   "unit": {
     "won": "원",
     "count": "개"
@@ -160,7 +169,7 @@
       "label": "반품 회수 여부",
       "no": "회수 안함",
       "yes": "회수 있음",
-      "notice": "최종선정된 크리에이터가 캠페인을 취소할 경우, 협찬제품 회수 반품 택배 주소를 입력해주세요.",
+      "notice": "최종 선정된 크리에이터가 캠페인을 취소할 경우, 협찬제품 회수 반품 택배 주소를 입력해 주세요.",
       "addressLabel": "협찬제품 반품 회수 택배 주소",
       "addressPlaceholder": "회수 주소를 입력해 주세요.",
       "feeLabel": "반품 회수 택배 비용",
@@ -189,11 +198,37 @@
       "couponPlaceholder": "방문쿠폰 인증번호를 입력해 주세요."
     },
     "press": {
-      "noticeTitle": "다음 단계에서 입력해주세요.",
+      "noticeTitle": "다음 단계에서 입력해 주세요.",
       "noticeAbout": "기자단형 캠페인은 제품 제공, 매장 방문, 구매가 아닌 브랜드 및 서비스에 대한 취재·기사 작성을 진행하는 캠페인입니다.",
       "noticeGuide": "콘텐츠 주제, 키워드, 참고자료 등 기사 작성 가이드는 '캠페인 소개서' 단계에서 자세히 안내할 수 있습니다.",
       "emptyTitle": "기자단형은 별도의 협찬 정보 입력이 없습니다.",
       "emptyDescription": "기사의 방향성과 상세 가이드는<br/>다음 단계인 '캠페인 소개서'에서 입력해 주세요."
+    }
+  },
+  "groupBuy": {
+    "productName": {
+      "label": "공동구매 제품명",
+      "placeholder": "공동구매 제품명을 입력해 주세요."
+    },
+    "category": {
+      "label": "공동구매 상품 대분류",
+      "placeholder": "전자상거래 등에서의 상품 등의 정보 제공에 관한 고시에 해당하는 대분류를 선택해 주세요."
+    },
+    "middleCategory": {
+      "label": "공동구매 상품 중분류",
+      "placeholder": "전자상거래 등에서의 상품 등의 정보 제공에 관한 고시에 해당하는 중분류를 선택해 주세요."
+    },
+    "recommendedPrice": {
+      "label": "권장소비자가",
+      "placeholder": "권장소비자가를 입력해 주세요."
+    },
+    "price": {
+      "label": "공동구매가",
+      "placeholder": "공동구매 가격을 입력해 주세요."
+    },
+    "notice": {
+      "lowestPrice": "네이버 쇼핑 검색 기준 최저가보다 최소 10% 이상 저렴하게 설정하는 것을 권장합니다.",
+      "mayChange": "공동구매가는 공동구매 진행 시점의 네이버 쇼핑 검색 최저가에 따라 변경될 수 있습니다."
     }
   },
   "creator": {
@@ -235,6 +270,17 @@
       "ASMR": "ASMR",
       "Review": "리뷰",
       "All": "전체"
+    },
+    "groupBuyTopic": {
+      "All": "무관",
+      "Beauty": "뷰티",
+      "LivingHealth": "생활/건강",
+      "PregnancyParenting": "출산/육아",
+      "Food": "식품",
+      "DigitalAppliances": "디지털/가전",
+      "FurnitureInterior": "가구/인테리어",
+      "Fashion": "패션",
+      "TravelCulture": "여행/문화"
     }
   },
   "addOns": {
@@ -424,6 +470,7 @@
       "info": "캠페인 정보",
       "product": "제품 정보",
       "creator": "크리에이터 조건",
+      "groupBuy": "공동구매 조건 설정",
       "addOns": "부가서비스",
       "intro": "캠페인 소개서",
       "conditions": "진행 조건",
@@ -466,6 +513,7 @@
     },
     "addOns": {
       "applied": "신청함",
+      "appliedWithPrice": "신청함 ({{amount}}원/건)",
       "notApplied": "신청 안함"
     },
     "intro": {

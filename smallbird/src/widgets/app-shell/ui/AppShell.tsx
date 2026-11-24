@@ -1,6 +1,7 @@
 import { useRef, useState } from "react";
 import { useLocation, useNavigate } from "react-router";
 
+import { useWebPush } from "@/features/enable-web-push";
 import { AppHeader } from "@/shared/components/app-header";
 import { LoginRequiredAlert } from "@/shared/components/login-required-alert";
 import { SidebarNav } from "@/shared/components/sidebar-nav";
@@ -94,6 +95,7 @@ export function AppShell({
   } = useKeyboardAwareShell(isKeyboardAware);
   const mainRef = useRef<HTMLElement>(null);
   useScrollRestoration(mainRef);
+  useWebPush(session);
   const [isLoginAlertOpen, setIsLoginAlertOpen] = useState(false);
   const {
     items: shellItems,

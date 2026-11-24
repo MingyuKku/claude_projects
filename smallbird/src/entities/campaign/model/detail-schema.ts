@@ -68,6 +68,16 @@ export const campaignDetailSchema = z.object({
     ageGroups: list(z.string()),
     topics: list(z.string()),
   }),
+  /** 공구형 조건. 브랜드형은 null. 공구제품명·권장소비자가는 `product`의 협찬제품명·금액과 별개 값. */
+  groupBuyingConditions: nullable(
+    z.object({
+      groupBuyingProductName: nullable(z.string()),
+      productCategoryIdx: nullable(z.number().int()),
+      productMiddleCategoryIdx: nullable(z.number().int()),
+      recommendedConsumerPrice: nullable(z.number().int()),
+      purchasePrice: nullable(z.number().int()),
+    }),
+  ),
   /** 고른 부가서비스 코드(저장한 순서). */
   addOns: list(z.string()),
   intro: z.object({

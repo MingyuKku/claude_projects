@@ -1,7 +1,14 @@
 import { render, screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
-import { AlertPopup, AuthButton, PasswordInput } from "./index";
+import {
+  AlertPopup,
+  AuthButton,
+  AuthSupportText,
+  AuthTermsFooter,
+  AuthTextButton,
+  PasswordInput,
+} from "./index";
 
 describe("AuthButton", () => {
   it("기본 type 은 button 이라 폼을 제출하지 않는다", () => {
@@ -31,7 +38,7 @@ describe("AuthButton", () => {
     );
     const button = screen.getByRole("button", { name: "확인" });
     expect(button).toHaveClass("bg-negative");
-    expect(button).not.toHaveClass("bg-brand");
+    expect(button).not.toHaveClass("bg-primary");
   });
 });
 
@@ -97,6 +104,7 @@ describe("AlertPopup", () => {
         confirmLabel="확인"
         onClickCancel={onClickCancel}
         onClickConfirm={onClickConfirm}
+        hasCloseButton
       />,
     );
     await userEvent.click(screen.getByRole("button", { name: "취소" }));
@@ -113,22 +121,60 @@ describe("AlertPopup", () => {
         message="내용"
         confirmLabel="확인"
         onClickConfirm={onClickConfirm}
+        hasCloseButton
       />,
     );
     await userEvent.click(screen.getByRole("button", { name: "닫기" }));
     expect(onClickConfirm).toHaveBeenCalledOnce();
   });
 
-  it("isCloseButtonHidden 이면 닫기 버튼이 없다", () => {
+  it("기본은 닫기 버튼이 없다", () => {
     render(
       <AlertPopup
         title="안내"
         message="내용"
         confirmLabel="확인"
         onClickConfirm={vi.fn()}
-        isCloseButtonHidden
       />,
     );
     expect(screen.queryByRole("button", { name: "닫기" })).toBeNull();
+  });
+});
+
+describe("AuthSupportText", () => {
+  it("상태별 글자색을 쓴다", () => {
+    render(<AuthSupportText state="error">오류</AuthSupportText>);
+    expect(screen.getByText("오류")).toHaveClass("text-negative");
+  });
+});
+
+describe("AuthTextButton", () => {
+  it("기본 type 은 button 이라 폼을 제출하지 않는다", () => {
+    render(<AuthTextButton>처음으로</AuthTextButton>);
+    expect(screen.getByRole("button", { name: "처음으로" })).toHaveAttribute(
+      "type",
+      "button",
+    );
+  });
+});
+
+describe("AuthTermsFooter", () => {
+  it("각 링크는 이동하지 않고 해당 콜백만 호출한다", async () => {
+    const onClickPrivacy = vi.fn();
+    const onClickTerms = vi.fn();
+    render(
+      <AuthTermsFooter
+        onClickPrivacy={onClickPrivacy}
+        onClickTerms={onClickTerms}
+      />,
+    );
+    await userEvent.click(
+      screen.getByRole("button", { name: "개인정보처리방침" }),
+    );
+    expect(onClickPrivacy).toHaveBeenCalledOnce();
+    expect(onClickTerms).not.toHaveBeenCalled();
+
+    await userEvent.click(screen.getByRole("button", { name: "이용약관" }));
+    expect(onClickTerms).toHaveBeenCalledOnce();
   });
 });

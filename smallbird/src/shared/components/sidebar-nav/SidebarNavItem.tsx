@@ -1,6 +1,11 @@
 import { ChevronDown } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/shared/ui/collapsible";
 import { Spinner } from "@/shared/ui/spinner";
 
 import type { LucideIcon } from "lucide-react";
@@ -108,43 +113,41 @@ export function SidebarNavItem({
   }
 
   return (
-    <details open={item.isDefaultOpen} className="group/nav-item">
-      <summary
-        className={cn(
-          mainRowClass,
-          "cursor-pointer list-none [&::-webkit-details-marker]:hidden",
-          className,
-        )}
+    <Collapsible defaultOpen={item.isDefaultOpen} className="group/nav-item">
+      <CollapsibleTrigger
+        className={cn(mainRowClass, "cursor-pointer text-left", className)}
         {...props}
       >
         <Icon className="size-4 shrink-0" />
         <span className="flex-1 truncate">{item.label}</span>
-        <NavChevron className="transition-transform group-open/nav-item:rotate-180" />
-      </summary>
-      <div className="py-1.5 pl-5">
-        <ul className="flex flex-col border-l pl-3">
-          {item.subItems.map((subItem) => (
-            <li key={subItem.id}>
-              <Link
-                href={subItem.href ?? FALLBACK_HREF}
-                navId={subItem.id}
-                aria-current={subItem.isActive ? "page" : undefined}
-                className={cn(
-                  "flex min-w-32 items-center gap-1.5 rounded-sm p-1.5 text-sm leading-5 text-sidebar-foreground transition-colors hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:text-primary",
-                  FOCUS_RING,
-                )}
-              >
-                <span className="truncate">{subItem.label}</span>
-                <Spinner
-                  aria-hidden
-                  className="hidden size-3.5 shrink-0 in-data-pending:block"
-                />
-              </Link>
-            </li>
-          ))}
-        </ul>
-      </div>
-    </details>
+        <NavChevron className="transition-transform group-data-[state=open]/nav-item:rotate-180" />
+      </CollapsibleTrigger>
+      <CollapsibleContent className="overflow-hidden animation-duration-150 data-[state=closed]:animate-collapsible-up data-[state=open]:animate-collapsible-down motion-reduce:animate-none">
+        <div className="py-1.5 pl-5">
+          <ul className="flex flex-col border-l pl-3">
+            {item.subItems.map((subItem) => (
+              <li key={subItem.id}>
+                <Link
+                  href={subItem.href ?? FALLBACK_HREF}
+                  navId={subItem.id}
+                  aria-current={subItem.isActive ? "page" : undefined}
+                  className={cn(
+                    "flex min-w-32 items-center gap-1.5 rounded-sm p-1.5 text-sm leading-5 text-sidebar-foreground transition-colors hover:bg-muted aria-[current=page]:bg-muted aria-[current=page]:text-primary",
+                    FOCUS_RING,
+                  )}
+                >
+                  <span className="truncate">{subItem.label}</span>
+                  <Spinner
+                    aria-hidden
+                    className="hidden size-3.5 shrink-0 in-data-pending:block"
+                  />
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </CollapsibleContent>
+    </Collapsible>
   );
 }
 

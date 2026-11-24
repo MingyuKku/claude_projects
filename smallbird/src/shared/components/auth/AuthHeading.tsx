@@ -6,7 +6,7 @@ import type { VariantProps } from "class-variance-authority";
 import type { ComponentProps } from "react";
 
 /**
- * 인증 화면 제목. 회원 Figma 타입 스케일(굵기 700, 행간 150%,
+ * 인증 화면 제목. 회원 Figma 타입 스케일(굵기 500, 행간 150%,
  * 모바일 -> 태블릿 -> 데스크톱으로 커짐)을 씀.
  */
 
@@ -20,7 +20,7 @@ type AuthHeadingType =
 
 type AuthHeadingElement = "h1" | "h2" | "h3" | "h4" | "h5" | "h6" | "span";
 
-const authHeadingVariants = cva("font-bold", {
+const authHeadingVariants = cva("font-medium", {
   variants: {
     type: {
       "headline-1":

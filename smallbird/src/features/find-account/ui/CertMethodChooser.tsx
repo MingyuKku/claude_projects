@@ -22,19 +22,18 @@ export function CertMethodChooser({
   return (
     <div className={cn("flex flex-col gap-5", className)}>
       <div className="flex items-center gap-5">
-        <div className="h-px flex-1 bg-gray-400" />
+        <div className="h-px flex-1 bg-gray-500" />
         <AuthText
           as="span"
           size="sm"
-          weight="bold"
-          tone="faint"
+          tone="muted"
           className="whitespace-nowrap"
         >
           {t("chooser")}
         </AuthText>
-        <div className="h-px flex-1 bg-gray-400" />
+        <div className="h-px flex-1 bg-gray-500" />
       </div>
-      <div className="flex flex-col gap-2.5 tablet:gap-5">
+      <div className="flex flex-col gap-3">
         {CERT_METHODS.map((method) => (
           <div key={method.key} className="h-12">
             <AuthButton
@@ -42,7 +41,7 @@ export function CertMethodChooser({
               disabled={isDisabled}
               onClick={() => onClickSelect(method.key)}
             >
-              <AuthText as="span" size="md" tone="inherit">
+              <AuthText as="span" size="fixed-base" tone="inherit">
                 {t(method.labelKey)}
               </AuthText>
             </AuthButton>

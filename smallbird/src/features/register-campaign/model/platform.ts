@@ -1,4 +1,7 @@
-import type { CampaignPlatform } from "@/entities/campaign";
+import type {
+  CampaignPlatform,
+  CampaignProductType,
+} from "@/entities/campaign";
 import type { PlatformIconName } from "@/shared/components/platform-icon";
 
 /** 캠페인 플랫폼 코드 → 공용 플랫폼 아이콘(스펙 §3 3단계: 아이콘만 `PlatformIcon`을 함께 씀). */
@@ -19,3 +22,24 @@ export const PLATFORM_LABEL_KEYS = {
   TIKTOK: "platform.TIKTOK",
   X: "platform.X",
 } as const satisfies Record<CampaignPlatform, string>;
+
+/** 공구형 3단계 플랫폼 순서(시안 3.0.1). 그 밖은 `CAMPAIGN_PLATFORMS` 순서. */
+export const GROUP_BUY_PLATFORMS = [
+  "INSTAGRAM",
+  "NAVER_BLOG",
+  "YOUTUBE",
+  "TIKTOK",
+  "FACEBOOK",
+  "X",
+] as const satisfies readonly CampaignPlatform[];
+
+/** 공구형은 "네이버 블로그", 그 밖은 "블로그"로 보임. */
+export function getPlatformLabelKey(
+  platform: CampaignPlatform,
+  productType: CampaignProductType | null,
+) {
+  if (productType === "GROUP_BUY" && platform === "NAVER_BLOG") {
+    return "platformGroupBuy.NAVER_BLOG";
+  }
+  return PLATFORM_LABEL_KEYS[platform];
+}

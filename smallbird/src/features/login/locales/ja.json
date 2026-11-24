@@ -1,17 +1,9 @@
 {
-  "brand": {
-    "bigbird": {
-      "loginTitle": "Bigbird パートナーセンター ログイン"
-    },
-    "petplay": {
-      "loginTitle": "Petplay パートナーセンター ログイン"
-    }
-  },
   "submitting": "ログイン中",
   "error": {
     "idRequired": "IDを入力してください。",
     "passwordRequired": "パスワードを入力してください。",
-    "mismatch": "IDまたはパスワードが一致しません。",
+    "mismatch": "会員情報が見つかりません。",
     "unknown": "エラーが発生しました。しばらくしてからもう一度お試しください。",
     "exited": "退会済みの会員です。",
     "noAccount": "アカウントが存在しないか、退会した会員です。",

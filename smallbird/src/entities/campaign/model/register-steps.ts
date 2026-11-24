@@ -2,6 +2,7 @@ import { generatePath } from "react-router";
 
 import { ROUTES } from "@/shared/config";
 
+import type { CampaignProductType } from "./codes";
 import type { CampaignDraftStep } from "./draft";
 
 // 등록 마법사의 단계 주소(`?step=`). 공구형처럼 단계가 늘어도 주소가 바뀌지 않게 번호 대신 이름을 씀(스펙 §3 경로).
@@ -13,6 +14,7 @@ export const CAMPAIGN_REGISTER_STEPS = [
   "campaign-info",
   "product",
   "creator",
+  "group-buy",
   "add-ons",
   "intro",
   "conditions",
@@ -29,6 +31,7 @@ export const DRAFT_STEP_BY_REGISTER_STEP: Record<
   "campaign-info": "info",
   product: "product",
   creator: "creator",
+  "group-buy": "groupBuy",
   "add-ons": "addOns",
   intro: "intro",
   conditions: "conditions",
@@ -44,15 +47,27 @@ export function toCampaignRegisterStep(
 
 export const CAMPAIGN_REGISTER_TYPE_PARAM = "type";
 export const CAMPAIGN_REGISTER_DEMO_PARAM = "demo";
+export const CAMPAIGN_REGISTER_PRODUCT_PARAM = "product";
+/** 상품 유형 파라미터 값. 브랜드형은 파라미터를 쓰지 않음. */
+export const CAMPAIGN_REGISTER_GROUP_BUY_PRODUCT = "group-buy";
 
 /** 새 캠페인 등록 진입 경로. 들어오면 캠페인을 만들고 작성 경로로 바꿈. 서비스 값은 개설 화면의 `service`와 같음. */
 export function getNewCampaignRegisterPath(
   service: "pick" | "recruit",
-  { isDemo = false }: { isDemo?: boolean } = {},
+  {
+    isDemo = false,
+    productType = "BRAND",
+  }: { isDemo?: boolean; productType?: CampaignProductType } = {},
 ) {
   const params = new URLSearchParams({
     [CAMPAIGN_REGISTER_TYPE_PARAM]: service,
   });
+  if (productType === "GROUP_BUY") {
+    params.set(
+      CAMPAIGN_REGISTER_PRODUCT_PARAM,
+      CAMPAIGN_REGISTER_GROUP_BUY_PRODUCT,
+    );
+  }
   if (isDemo) params.set(CAMPAIGN_REGISTER_DEMO_PARAM, "true");
   return `${ROUTES.campaignRegister}?${params.toString()}`;
 }

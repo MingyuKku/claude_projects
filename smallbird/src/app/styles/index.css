@@ -434,6 +434,65 @@
   }
 }
 
+/* iOS 26 Safari는 화면 맨 위에서 4px 안쪽 가운데 점을 hit-test해, 가로가 화면의 90% 이상인 fixed·sticky 요소(와 그 조상)의
+   배경색으로 상단 바를 물들임(WebKit LocalFrameView::fixedContainerEdges, PageColorSampler의 fixedContainerSampleRectMargin = 4).
+   토스트가 그 점에 닿는 순간 상단 바가 토스트 색으로 바뀜: 등장·퇴장 때 화면 위로 지나갈 때, 위로 밀 때, 그리고 sonner가 마우스 hover용으로
+   붙이는 투명 보조 영역(::before·::after)이 토스트 위로 뻗을 때. 투명해도 hit-test에 걸리므로 pointer-events가 아니라 display로 없앰.
+   터치 기기(hover: none)에서만 보조 영역을 없애고 토스트가 화면 위로 움직이는 거리를 제한하며, 토스트 위치(위 16px) 기준으로
+   --toast-touch-lift(8px)만큼만 올라가 상단에서 8px 아래에 머묾. PC(마우스)는 기존 동작 그대로.
+   sonner가 런타임에 뒤늦게 붙이는 스타일을 이기려고 [data-sonner-toaster] 조상으로 우선순위를 높임.
+   sonner를 올리면 아래 data-* 속성·변수 이름이 그대로인지와 iOS 실기기(상단 바 색)를 다시 확인할 것. */
+@media (hover: none) {
+  [data-sonner-toaster] {
+    --toast-touch-lift: 8px;
+  }
+
+  [data-sonner-toaster] [data-sonner-toast]::before,
+  [data-sonner-toaster] [data-sonner-toast]::after {
+    display: none;
+  }
+
+  [data-sonner-toaster]
+    [data-sonner-toast][data-y-position="top"][data-mounted="false"] {
+    --y: translateY(calc(var(--toast-touch-lift) * -1));
+  }
+
+  [data-sonner-toaster]
+    [data-sonner-toast][data-removed="true"][data-front="true"][data-swipe-out="false"] {
+    --y: translateY(calc(var(--toast-touch-lift) * -1));
+  }
+
+  /* 위로 끌 때 눈에 보이는 이동만 제한함. 닫을지는 sonner가 손가락 이동량(--swipe-amount-y)으로 그대로 판단함. */
+  [data-sonner-toaster] [data-sonner-toast][data-swiping="true"] {
+    transform: var(--y)
+      translateY(
+        max(var(--swipe-amount-y, 0px), calc(var(--toast-touch-lift) * -1))
+      )
+      translateX(var(--swipe-amount-x, 0px));
+  }
+
+  /* 위로 밀어 닫을 때 화면 밖으로 날아가지 않고 제자리에서 사라짐. */
+  [data-sonner-toaster]
+    [data-sonner-toast][data-swipe-out="true"][data-swipe-direction="up"] {
+    animation-name: toast-touch-swipe-out-up;
+  }
+}
+
+@keyframes toast-touch-swipe-out-up {
+  from {
+    transform: var(--y)
+      translateY(
+        max(var(--swipe-amount-y, 0px), calc(var(--toast-touch-lift) * -1))
+      );
+    opacity: 1;
+  }
+
+  to {
+    transform: var(--y) translateY(calc(var(--toast-touch-lift) * -1));
+    opacity: 0;
+  }
+}
+
 /* Landing page (/introduction) keyframes. Tailwind has no scoped keyframes, so the
    names carry an intro- prefix; remove this block together with the page. */
 @keyframes intro-s3-left {

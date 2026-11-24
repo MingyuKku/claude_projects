@@ -1,15 +1,17 @@
-import { getMockFileUrl, registerMockFile } from "./mock-files";
+import { registerMockFile } from "./mock-files";
 
 beforeEach(() => {
   URL.createObjectURL = vi.fn(() => "blob:mock-url");
 });
 
-describe("목 파일 보관소", () => {
-  it("올린 파일에 번호를 주고 번호로 미리보기 주소를 찾는다", () => {
-    const { attachmentIdx, url } = registerMockFile(new Blob(["a"]));
-
-    expect(url).toBe("blob:mock-url");
-    expect(getMockFileUrl(attachmentIdx)).toBe("blob:mock-url");
+describe("목 파일", () => {
+  it("올린 파일의 미리보기 주소와 종류를 준다", () => {
+    expect(
+      registerMockFile(new Blob(["a"], { type: "image/png" })),
+    ).toMatchObject({ url: "blob:mock-url", mediaType: "IMAGE" });
+    expect(
+      registerMockFile(new Blob(["v"], { type: "video/mp4" })).mediaType,
+    ).toBe("VIDEO");
   });
 
   it("파일마다 다른 번호를 준다", () => {
@@ -17,9 +19,5 @@ describe("목 파일 보관소", () => {
     const second = registerMockFile(new Blob(["b"]));
 
     expect(first.attachmentIdx).not.toBe(second.attachmentIdx);
-  });
-
-  it("모르는 번호는 null이다", () => {
-    expect(getMockFileUrl(-1)).toBeNull();
   });
 });

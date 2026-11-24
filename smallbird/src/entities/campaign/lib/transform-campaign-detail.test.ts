@@ -38,6 +38,7 @@ function createResponse(): CampaignDetailResponse {
       visitBenefit: null,
     },
     influencer: { platform: null, gender: null, ageGroups: [], topics: [] },
+    groupBuyingConditions: null,
     addOns: [],
     intro: {
       mainImage: null,
@@ -115,5 +116,63 @@ describe("transformCampaignDetail", () => {
       address: "서울 강남구 테헤란로 1",
       detail: "",
     });
+  });
+});
+
+describe("transformCampaignDetail 공동구매 조건", () => {
+  it("공구형의 공동구매 조건을 초안으로 읽고, 제품명·권장소비자가는 협찬 제품 정보와 따로 읽는다", () => {
+    const response = createResponse();
+    response.productType = "GROUP_BUY";
+    response.product.productName = "신라호텔 숙박권";
+    response.product.productPrice = 30000;
+    response.groupBuyingConditions = {
+      groupBuyingProductName: "신라호텔 1박",
+      productCategoryIdx: 8,
+      productMiddleCategoryIdx: 36,
+      recommendedConsumerPrice: 60000,
+      purchasePrice: 45000,
+    };
+
+    const { draft } = transformCampaignDetail(response);
+
+    expect(draft.groupBuy).toEqual({
+      productName: "신라호텔 1박",
+      categoryIdx: 8,
+      middleCategoryIdx: 36,
+      recommendedPrice: 60000,
+      price: 45000,
+    });
+    expect(draft.product.productName).toBe("신라호텔 숙박권");
+    expect(draft.product.productPrice).toBe(30000);
+  });
+
+  it("브랜드형은 null이라 비어 있는 공동구매 조건으로 읽는다", () => {
+    const { draft } = transformCampaignDetail(createResponse());
+
+    expect(draft.groupBuy).toEqual({
+      productName: "",
+      categoryIdx: null,
+      middleCategoryIdx: null,
+      recommendedPrice: null,
+      price: null,
+    });
+  });
+
+  it("공구형은 고를 수 있는 주제 9개에 없는 서버 값을 선택하지 않은 것으로 읽는다", () => {
+    const response = createResponse();
+    response.productType = "GROUP_BUY";
+    response.influencer.topics = ["Education", "Beauty", "All"];
+
+    expect(transformCampaignDetail(response).draft.creator.topics).toEqual([
+      "Beauty",
+      "All",
+    ]);
+
+    response.productType = "BRAND";
+    expect(transformCampaignDetail(response).draft.creator.topics).toEqual([
+      "Education",
+      "Beauty",
+      "All",
+    ]);
   });
 });

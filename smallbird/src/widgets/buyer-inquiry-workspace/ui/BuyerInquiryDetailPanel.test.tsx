@@ -107,11 +107,15 @@ describe("구매자·크리에이터 문의 상세 패널의 캠페인 바로가
     ).toBeDisabled();
   });
 
-  it("크리에이터 문의 상세에는 캠페인 바로가기가 없다", async () => {
+  it("크리에이터 문의 상세에도 공구샵 코드와 비활성 캠페인 바로가기가 있고 공구 진행 크리에이터는 없다", async () => {
     mountPanel(inquiry({ key: "creator-601", source: "creator" }));
     expect(await screen.findByText("캠페인 코드")).toBeInTheDocument();
     expect(
-      screen.queryByRole("button", { name: "캠페인 바로가기" }),
-    ).not.toBeInTheDocument();
+      screen.getByRole("button", { name: /공구샵 코드/ }),
+    ).toBeInTheDocument();
+    expect(screen.queryByText("공구 진행 크리에이터")).not.toBeInTheDocument();
+    expect(
+      screen.getByRole("button", { name: "캠페인 바로가기" }),
+    ).toBeDisabled();
   });
 });

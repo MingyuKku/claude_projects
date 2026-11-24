@@ -1,7 +1,12 @@
 import { useState } from "react";
 import { useNavigate } from "react-router";
 
-import { AuthButton, AuthInput, AuthText } from "@/shared/components/auth";
+import {
+  AuthButton,
+  AuthInput,
+  AuthText,
+  AuthTextButton,
+} from "@/shared/components/auth";
 import { ROUTES } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
@@ -41,7 +46,7 @@ export function PwFind({ className }: PwFindProps) {
     return (
       <div className={cn("h-12", className)}>
         <AuthButton color="primary" onClick={handleClickChangePassword}>
-          <AuthText as="span" size="md" tone="inherit">
+          <AuthText as="span" size="fixed-base" tone="inherit">
             {t("changePassword")}
           </AuthText>
         </AuthButton>
@@ -50,29 +55,25 @@ export function PwFind({ className }: PwFindProps) {
   }
 
   return (
-    <div className={cn("flex min-h-0 flex-1 flex-col", className)}>
-      <div className="flex min-h-0 flex-1 flex-col gap-12 overflow-y-auto tablet:flex-none">
-        <div className="flex flex-col gap-5">
-          <div className="h-11">
-            <AuthInput
-              aria-label={t("pwId")}
-              autoComplete="username"
-              placeholder={t("pwId")}
-              value={id}
-              onChange={(event) => setId(event.target.value)}
-            />
-          </div>
-          <div className="h-11">
-            <AuthInput
-              aria-label={t("name")}
-              autoComplete="name"
-              placeholder={t("name")}
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-            />
-          </div>
+    <div className={cn("flex flex-1 flex-col", className)}>
+      <div className="flex flex-col gap-5 tablet:flex-none">
+        <AuthInput
+          aria-label={t("pwId")}
+          autoComplete="username"
+          placeholder={t("pwId")}
+          value={id}
+          onChange={(event) => setId(event.target.value)}
+        />
+        <AuthInput
+          aria-label={t("name")}
+          autoComplete="name"
+          placeholder={t("name")}
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+        />
 
-          {flow.method && (
+        {flow.method && (
+          <div className="flex flex-col gap-3">
             <CertContactField
               method={flow.method}
               value={flow.contact}
@@ -84,30 +85,24 @@ export function PwFind({ className }: PwFindProps) {
               isSendDisabled={isSendDisabled}
               message={flow.isCertSent ? null : flow.message}
             />
-          )}
 
-          {flow.method === "phone" && flow.isCertSent && (
-            <CertCodeInput
-              countdownText={flow.countdown.text}
-              onClickConfirm={handleVerifyCode}
-              onClickResend={handleSendCode}
-              message={flow.message}
-            />
-          )}
-        </div>
+            {flow.method === "phone" && flow.isCertSent && (
+              <CertCodeInput
+                countdownText={flow.countdown.text}
+                onClickConfirm={handleVerifyCode}
+                onClickResend={handleSendCode}
+                message={flow.message}
+              />
+            )}
+          </div>
+        )}
       </div>
 
-      <div className="flex shrink-0 flex-col py-5 tablet:mt-12 tablet:p-0">
+      <div className="mt-auto flex flex-col py-5 tablet:mt-12 tablet:p-0">
         {flow.method ? (
-          <button
-            type="button"
-            onClick={flow.reset}
-            className="self-center border-b border-gray-300"
-          >
-            <AuthText as="span" size="sm" tone="faint">
-              {t("startOver")}
-            </AuthText>
-          </button>
+          <AuthTextButton onClick={flow.reset} className="self-center">
+            {t("startOver")}
+          </AuthTextButton>
         ) : (
           <CertMethodChooser
             isDisabled={!id || !name}

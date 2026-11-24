@@ -1,9 +1,10 @@
 import { tryit } from "radash";
 
-import { CAMPAIGN_DRAFT_STEPS, saveCampaignStep } from "@/entities/campaign";
+import { saveCampaignStep } from "@/entities/campaign";
 import { readApiErrorReason } from "@/shared/api";
 
 import { uploadPendingIntroMedia } from "./pending-media";
+import { getRegisterSteps } from "./steps";
 import { isStepChanged } from "./store";
 
 import type { RegisterWizardState, RegisterWizardStoreApi } from "./store";
@@ -29,12 +30,23 @@ const STEPS_CLEARED_BY_TYPE_CHANGE: readonly CampaignDraftStep[] = [
   "conditions",
 ];
 
-/** 보낼 단계: 마지막으로 저장한 값과 달라진 단계. 정책 동의는 결제 요청에 실어 보내므로 뺌. */
+/**
+ * 보낼 단계: 이 캠페인 유형에 있는 단계 중 마지막으로 저장한 값과 달라진 단계. 정책 동의는 결제 요청에 실어 보내므로
+ * 뺌. 없는 단계(브랜드형의 공동구매 조건, 공구형의 진행 조건)는 서버가 거절하거나 받지 않는 값이라 보내지 않음.
+ */
 export function getChangedSteps(
-  state: Pick<RegisterWizardState, "draft" | "savedDraft">,
+  state: Pick<
+    RegisterWizardState,
+    "draft" | "savedDraft" | "serviceType" | "productType"
+  >,
 ): CampaignDraftStep[] {
-  return CAMPAIGN_DRAFT_STEPS.filter(
-    (step) => step !== "policy" && isStepChanged(state, step),
+  return getRegisterSteps(state.serviceType, state.productType).flatMap(
+    ({ draftStep }) =>
+      draftStep !== null &&
+      draftStep !== "policy" &&
+      isStepChanged(state, draftStep)
+        ? [draftStep]
+        : [],
   );
 }
 

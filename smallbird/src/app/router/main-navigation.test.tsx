@@ -49,6 +49,18 @@ beforeEach(() => {
     .mockResolvedValue({ result: true, authority: "ADMIN", userIdx: 1 });
 });
 
+// 하위 메뉴는 그룹이 열려 있어야 DOM에 있으므로, 닫혀 있으면 눌러 연다.
+async function openNavGroup(
+  user: ReturnType<typeof userEvent.setup>,
+  scope: HTMLElement,
+  name: string,
+) {
+  const trigger = within(scope).getByRole("button", { name });
+  if (trigger.getAttribute("aria-expanded") === "false") {
+    await user.click(trigger);
+  }
+}
+
 describe("루트 메인과 공통 메뉴", () => {
   it("기존 /main 링크는 쿼리를 유지하며 / 로 이동한다", async () => {
     const router = await renderRoute(`${ROUTES.legacyMain}?login=1`);
@@ -184,10 +196,10 @@ describe("루트 메인과 공통 메뉴", () => {
 
   it("현재 화면이 아닌 LNB 하위 메뉴 그룹은 접혀 있다", async () => {
     await renderRoute(ROUTES.main);
-    const [support] = await screen.findAllByText("고객센터", {
-      selector: "summary span",
+    const [support] = await screen.findAllByRole("button", {
+      name: "고객센터",
     });
-    expect(support?.closest("details")).not.toHaveAttribute("open");
+    expect(support).toHaveAttribute("aria-expanded", "false");
   });
 
   it("크리에이터 관리·채팅은 비로그인이 누르면 로그인 안내 알럿을 띄우고, 취소하면 닫고 로그인하러 가면 로그인으로 이동한다", async () => {
@@ -195,6 +207,7 @@ describe("루트 메인과 공통 메뉴", () => {
     const user = userEvent.setup();
     const router = await renderRoute(ROUTES.main);
     const nav = await screen.findByRole("navigation", { name: "주 메뉴" });
+    await openNavGroup(user, nav, "크리에이터 매칭");
     await user.click(
       within(nav).getByRole("link", { name: "크리에이터 관리" }),
     );
@@ -212,8 +225,10 @@ describe("루트 메인과 공통 메뉴", () => {
   });
 
   it("로그인한 사용자에게 크리에이터 관리·채팅은 준비 중으로 비활성이다", async () => {
+    const user = userEvent.setup();
     await renderRoute(ROUTES.main);
     const nav = await screen.findByRole("navigation", { name: "주 메뉴" });
+    await openNavGroup(user, nav, "크리에이터 매칭");
     for (const name of ["크리에이터 관리", "채팅"]) {
       expect(within(nav).getByRole("link", { name })).toHaveAttribute(
         "aria-disabled",
@@ -389,6 +404,7 @@ describe("메뉴 이동 중 표시", () => {
     await screen.findByRole("heading", { name: "홈" });
     const nav = screen.getByRole("navigation", { name: "주 메뉴" });
 
+    await openNavGroup(user, nav, "고객센터");
     const resolveSession = mockSessionPending();
     await user.click(within(nav).getByRole("link", { name: "빅버드 문의" }));
     expect(
@@ -407,6 +423,7 @@ describe("메뉴 이동 중 표시", () => {
     const router = await renderRoute(ROUTES.main);
     await user.click(await screen.findByRole("button", { name: "메뉴 열기" }));
     const dialog = screen.getByRole("dialog");
+    await openNavGroup(user, dialog, "고객센터");
 
     const resolveSession = mockSessionPending();
     await user.click(within(dialog).getByRole("link", { name: "빅버드 문의" }));

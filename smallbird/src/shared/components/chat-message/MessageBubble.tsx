@@ -11,9 +11,9 @@ const bubbleVariants = cva("rounded-lg text-foreground", {
     },
     size: {
       // Figma 말풍선 글줄: PC 24, TAB·MO 22(Subtitle fs16 lh22)
-      lg: "max-w-125 px-4 py-2.5 text-base leading-5.5 desktop:leading-6",
-      md: "max-w-85 px-4 py-2.5 text-base leading-5.5 desktop:leading-6",
-      sm: "max-w-50 px-3.5 py-2 text-sm leading-4 tablet:leading-5",
+      lg: "px-4 py-2.5 text-base leading-5.5 desktop:leading-6",
+      md: "px-4 py-2.5 text-base leading-5.5 desktop:leading-6",
+      sm: "px-3.5 py-2 text-sm leading-4 tablet:leading-5",
     },
   },
   defaultVariants: { side: "other", size: "lg" },
@@ -46,7 +46,8 @@ export function MessageBubble({
   return (
     <div
       className={cn(
-        "flex items-end gap-2",
+        // cqw는 ChatMessage 루트(@container)인 메시지 행 폭 기준. 바깥에서 쓰면 뷰포트 기준이 됨.
+        "flex max-w-[68cqw] items-end gap-2",
         side === "me" && "flex-row-reverse",
         className,
       )}

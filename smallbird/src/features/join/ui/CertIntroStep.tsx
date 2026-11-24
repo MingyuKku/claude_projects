@@ -4,7 +4,9 @@ import {
   AlertPopup,
   AuthButton,
   AuthHeader,
+  AuthSupportText,
   AuthText,
+  AuthTextButton,
 } from "@/shared/components/auth";
 import { ROUTES } from "@/shared/config";
 import { Trans, useTranslation } from "@/shared/i18n";
@@ -29,67 +31,62 @@ export function CertIntroStep() {
   }
 
   return (
-    <div className="flex flex-col gap-12 pb-12">
+    <div className="flex flex-col">
       <AuthHeader
         title={t("cert.header")}
         onClickBack={() => navigate(ROUTES.login)}
         progress={JOIN_STEP_PROGRESS.cert}
       />
 
-      <AuthText size="xl" weight="bold" tone="heading">
-        <Trans t={t} i18nKey="cert.title" components={{ br: <br /> }} />
-      </AuthText>
-
-      <div className="h-12 w-full">
-        <AuthButton color="primary" onClick={() => void cert.open()}>
-          <AuthText as="span" tone="light">
-            {t("cert.button")}
-          </AuthText>
-        </AuthButton>
-      </div>
-
-      {import.meta.env.DEV && (
-        <button
-          type="button"
-          className="text-gray-400 underline"
-          onClick={handleClickDevSkip}
-        >
-          <AuthText as="span" size="sm">
-            {t("dev.skipCert")}
-          </AuthText>
-        </button>
-      )}
-
-      {cert.result.status === "fail" && (
-        <AuthText size="sm" tone="negative" role="alert">
-          {cert.result.message || t("cert.failFallback")}
+      <div className="flex flex-col gap-12 pt-7.5 pb-12 tablet:pt-12">
+        <AuthText size="xl" weight="medium" tone="heading">
+          <Trans t={t} i18nKey="cert.title" components={{ br: <br /> }} />
         </AuthText>
-      )}
-      {cert.result.status === "exists" && (
-        <AuthText size="sm" tone="negative" role="alert">
-          {t("cert.exists")}
-        </AuthText>
-      )}
 
-      <div className="flex flex-col gap-5">
-        <div className="flex items-center gap-5">
-          <div className="h-px flex-1 bg-gray-400" />
-          <AuthText
-            as="span"
-            size="sm"
-            weight="bold"
-            tone="faint"
-            className="whitespace-nowrap"
-          >
-            {t("cert.noticeTitle")}
-          </AuthText>
-          <div className="h-px flex-1 bg-gray-400" />
+        <div className="h-12 w-full">
+          <AuthButton color="primary" onClick={() => void cert.open()}>
+            <AuthText as="span" size="fixed-base" tone="inherit">
+              {t("cert.button")}
+            </AuthText>
+          </AuthButton>
         </div>
-        {CERT_INTRO_NOTICES.map((notice) => (
-          <div key={notice} className="rounded-[20px] bg-gray-100 p-5">
-            <AuthText size="sm">{t(`cert.notice.${notice}`)}</AuthText>
+
+        {import.meta.env.DEV && (
+          <AuthTextButton onClick={handleClickDevSkip}>
+            {t("dev.skipCert")}
+          </AuthTextButton>
+        )}
+
+        {cert.result.status === "fail" && (
+          <AuthSupportText state="error" role="alert">
+            {cert.result.message || t("cert.failFallback")}
+          </AuthSupportText>
+        )}
+        {cert.result.status === "exists" && (
+          <AuthSupportText state="error" role="alert">
+            {t("cert.exists")}
+          </AuthSupportText>
+        )}
+
+        <div className="flex flex-col gap-5">
+          <div className="flex items-center gap-5">
+            <div className="h-px flex-1 bg-gray-500" />
+            <AuthText
+              as="span"
+              size="sm"
+              tone="muted"
+              className="whitespace-nowrap"
+            >
+              {t("cert.noticeTitle")}
+            </AuthText>
+            <div className="h-px flex-1 bg-gray-500" />
           </div>
-        ))}
+          {CERT_INTRO_NOTICES.map((notice) => (
+            <div key={notice} className="rounded-[20px] bg-gray-100 p-5">
+              <AuthText size="sm">{t(`cert.notice.${notice}`)}</AuthText>
+            </div>
+          ))}
+        </div>
       </div>
 
       {cert.isPopupBlocked && (

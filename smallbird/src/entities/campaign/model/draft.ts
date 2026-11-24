@@ -15,6 +15,7 @@ export const CAMPAIGN_DRAFT_STEPS = [
   "info",
   "product",
   "creator",
+  "groupBuy",
   "addOns",
   "intro",
   "conditions",
@@ -76,6 +77,19 @@ export interface CampaignCreatorDraft {
   topics: PostingTopic[];
 }
 
+/** 공동구매 조건(공구형만). 제품명·권장소비자가는 협찬 제품 정보(2단계)와 별개로 입력받음. */
+export interface CampaignGroupBuyDraft {
+  /** 공동구매 제품명. */
+  productName: string;
+  categoryIdx: number | null;
+  /** 고른 대분류에 딸린 중분류. 대분류를 바꾸면 비움. */
+  middleCategoryIdx: number | null;
+  /** 권장소비자가(원). */
+  recommendedPrice: number | null;
+  /** 공동구매가(원). */
+  price: number | null;
+}
+
 export interface CampaignIntroDraft {
   mainImage: CampaignMedia | null;
   detailMedia: CampaignMedia[];
@@ -105,6 +119,7 @@ export interface CampaignDraft {
   info: CampaignInfoDraft;
   product: CampaignProductDraft;
   creator: CampaignCreatorDraft;
+  groupBuy: CampaignGroupBuyDraft;
   addOns: CampaignAddOn[];
   intro: CampaignIntroDraft;
   conditions: CampaignConditionsDraft;
@@ -131,11 +146,22 @@ export function createEmptyProductDraft(): CampaignProductDraft {
   };
 }
 
+export function createEmptyGroupBuyDraft(): CampaignGroupBuyDraft {
+  return {
+    productName: "",
+    categoryIdx: null,
+    middleCategoryIdx: null,
+    recommendedPrice: null,
+    price: null,
+  };
+}
+
 export function createEmptyDraft(): CampaignDraft {
   return {
     info: { name: "", brandIdx: null, campaignType: null, startDate: null },
     product: createEmptyProductDraft(),
     creator: { platform: null, gender: null, ageGroups: [], topics: [] },
+    groupBuy: createEmptyGroupBuyDraft(),
     addOns: [],
     intro: {
       mainImage: null,

@@ -2,6 +2,7 @@ import { tryit } from "radash";
 import { toast } from "sonner";
 
 import { useLogout } from "@/entities/session";
+import { registerThisDevice } from "@/features/enable-web-push";
 import { ROUTES } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { hardNavigate } from "@/shared/lib";
@@ -14,6 +15,8 @@ export function useLogoutAction() {
     const [error] = await tryit(logout)();
     if (error) {
       console.error("로그아웃 요청 실패", error);
+      // 로그아웃 요청 전에 이 기기의 푸시를 꺼 두었는데 로그인 상태로 남으므로 다시 켬. 등록 가드는 같은 사용자라 재등록하지 않음.
+      void registerThisDevice();
       toast.error(t("logoutFailed"));
       return;
     }

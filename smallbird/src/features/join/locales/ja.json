@@ -33,8 +33,8 @@
     "passwordMatch": "パスワードが一致します。",
     "idCheckError": "ID確認中にエラーが発生しました",
     "idStatus": {
-      "wrong": "すでに使用中のIDです",
-      "possible": "使用可能なIDです",
+      "wrong": "すでに使用中のIDです。",
+      "possible": "使用可能なIDです。",
       "needCheck": "IDの重複確認が必要です"
     },
     "passwordError": {
@@ -59,7 +59,7 @@
     "emailDuplicate": "このメールアドレスを使用中のアカウントがあります。",
     "emailCheckError": "メールアドレス確認中にエラーが発生しました",
     "emailStatus": {
-      "possible": "使用可能なメールアドレスです",
+      "possible": "使用可能なメールアドレスです。",
       "needCheck": "メールアドレスの重複確認が必要です"
     },
     "registration": "事業者登録証",
@@ -90,6 +90,7 @@
     "title": "3. 規約への同意",
     "all": "すべての項目に同意します。",
     "view": "表示",
+    "viewItem": "{{label}}を見る",
     "agree": "同意",
     "submit": "ようこそ",
     "joinFailed": "登録に失敗しました",

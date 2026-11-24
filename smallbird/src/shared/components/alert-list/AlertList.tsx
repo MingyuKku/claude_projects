@@ -17,6 +17,8 @@ interface AlertListProps {
   closeLabel: string;
   onClickClose?: () => void;
   items: AlertListItemData[];
+  /** 항목을 눌렀을 때. 넘기면 항목이 버튼이 됨. */
+  onClickItem?: (id: string) => void;
   emptyTitle: string;
   emptyDescription?: string;
   className?: string;
@@ -27,6 +29,7 @@ export function AlertList({
   closeLabel,
   onClickClose,
   items,
+  onClickItem,
   emptyTitle,
   emptyDescription,
   className,
@@ -72,7 +75,7 @@ export function AlertList({
           <ul className="flex flex-col py-4">
             {items.map((item) => (
               <li key={item.id}>
-                <AlertListItem item={item} />
+                <AlertListItem item={item} onClick={onClickItem} />
               </li>
             ))}
           </ul>

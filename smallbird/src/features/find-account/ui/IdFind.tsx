@@ -1,6 +1,11 @@
 import { useState } from "react";
 
-import { AuthButton, AuthInput, AuthText } from "@/shared/components/auth";
+import {
+  AuthButton,
+  AuthInput,
+  AuthText,
+  AuthTextButton,
+} from "@/shared/components/auth";
 import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
 
@@ -32,41 +37,47 @@ export function IdFind({
 
   if (foundId) {
     return (
-      <div className={cn("flex flex-col gap-4", className)}>
-        <AuthText size="md">{t("foundId", { id: foundId })}</AuthText>
-        <div className="h-12">
-          <AuthButton color="primary" onClick={onClickGoLogin}>
-            <AuthText as="span" size="md" tone="inherit">
-              {tCommon("action.login")}
-            </AuthText>
-          </AuthButton>
+      <div className={cn("flex flex-1 flex-col", className)}>
+        {/* 모바일은 남는 높이의 가운데, 태블릿 이상은 탭 바로 아래에 놓임. */}
+        <div className="flex flex-1 flex-col items-center justify-center gap-2.5 text-center tablet:flex-none tablet:justify-start">
+          <AuthText size="md">{t("foundIdIntro", { name })}</AuthText>
+          <AuthText size="md" weight="bold">
+            {t("foundId", { id: foundId })}
+          </AuthText>
         </div>
-        <div className="h-12">
-          <AuthButton color="light" onClick={onClickGoFindPassword}>
-            <AuthText as="span" size="md" tone="inherit">
-              {tCommon("link.findPassword")}
-            </AuthText>
-          </AuthButton>
+        <div className="flex flex-col gap-3 py-5 tablet:mt-12 tablet:p-0">
+          <div className="h-12">
+            <AuthButton color="primary" onClick={onClickGoLogin}>
+              <AuthText as="span" size="fixed-base" tone="inherit">
+                {t("goLogin")}
+              </AuthText>
+            </AuthButton>
+          </div>
+          <div className="h-12">
+            <AuthButton color="light" onClick={onClickGoFindPassword}>
+              <AuthText as="span" size="fixed-base" tone="inherit">
+                {tCommon("link.findPassword")}
+              </AuthText>
+            </AuthButton>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className={cn("flex min-h-0 flex-1 flex-col", className)}>
-      <div className="flex min-h-0 flex-1 flex-col gap-12 overflow-y-auto tablet:flex-none">
-        <div className="flex flex-col gap-5">
-          <div className="h-11">
-            <AuthInput
-              aria-label={t("name")}
-              autoComplete="name"
-              placeholder={t("name")}
-              value={name}
-              onChange={(event) => setName(event.target.value)}
-            />
-          </div>
+    <div className={cn("flex flex-1 flex-col", className)}>
+      <div className="flex flex-col gap-5 tablet:flex-none">
+        <AuthInput
+          aria-label={t("name")}
+          autoComplete="name"
+          placeholder={t("name")}
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+        />
 
-          {flow.method && (
+        {flow.method && (
+          <div className="flex flex-col gap-3">
             <CertContactField
               method={flow.method}
               value={flow.contact}
@@ -79,30 +90,24 @@ export function IdFind({
               // 인증번호 입력란이 보이면 문구는 그쪽에서 그림.
               message={flow.isCertSent ? null : flow.message}
             />
-          )}
 
-          {flow.isCertSent && (
-            <CertCodeInput
-              countdownText={flow.countdown.text}
-              onClickConfirm={handleVerifyCode}
-              onClickResend={handleSendCode}
-              message={flow.message}
-            />
-          )}
-        </div>
+            {flow.isCertSent && (
+              <CertCodeInput
+                countdownText={flow.countdown.text}
+                onClickConfirm={handleVerifyCode}
+                onClickResend={handleSendCode}
+                message={flow.message}
+              />
+            )}
+          </div>
+        )}
       </div>
 
-      <div className="flex shrink-0 flex-col py-5 tablet:mt-12 tablet:p-0">
+      <div className="mt-auto flex flex-col py-5 tablet:mt-12 tablet:p-0">
         {flow.method ? (
-          <button
-            type="button"
-            onClick={flow.reset}
-            className="self-center border-b border-gray-300"
-          >
-            <AuthText as="span" size="sm" tone="faint">
-              {t("startOver")}
-            </AuthText>
-          </button>
+          <AuthTextButton onClick={flow.reset} className="self-center">
+            {t("startOver")}
+          </AuthTextButton>
         ) : (
           <CertMethodChooser
             isDisabled={!name}

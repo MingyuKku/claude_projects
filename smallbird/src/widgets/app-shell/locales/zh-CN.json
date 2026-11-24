@@ -60,7 +60,17 @@
     "title": "通知",
     "close": "关闭通知",
     "emptyTitle": "暂无新通知",
-    "emptyDescription": "服务使用中的重要通知会显示在这里。"
+    "emptyDescription": "服务使用中的重要通知会显示在这里。",
+    "item": {
+      "approved": {
+        "title": "活动已通过",
+        "description": "{{name}}已通过审核。"
+      },
+      "rejected": {
+        "title": "活动已驳回",
+        "description": "{{name}}已被驳回。"
+      }
+    }
   },
   "logoutFailed": "退出登录失败，请重试。",
   "session": {

@@ -1,17 +1,21 @@
-import { Link } from "react-router";
-
-import { TERMS_LINKS } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
 
-import { AuthText } from "./AuthText";
+import { AuthTextButton } from "./AuthTextButton";
 
 interface AuthTermsFooterProps {
+  /** 약관을 어떻게 보여 줄지는 화면이 정함(이 컴포넌트는 entities를 알 수 없음). */
+  onClickPrivacy: () => void;
+  onClickTerms: () => void;
   className?: string;
 }
 
 /** 태블릿 이상에서 화면 아래에 약관 링크를 보여 주는 푸터. 모바일에서는 숨김. */
-export function AuthTermsFooter({ className }: AuthTermsFooterProps) {
+export function AuthTermsFooter({
+  onClickPrivacy,
+  onClickTerms,
+  className,
+}: AuthTermsFooterProps) {
   const { t } = useTranslation();
 
   return (
@@ -21,13 +25,12 @@ export function AuthTermsFooter({ className }: AuthTermsFooterProps) {
         className,
       )}
     >
-      {TERMS_LINKS.map((link) => (
-        <Link key={link.to} to={link.to}>
-          <AuthText size="sm" tone="heading">
-            {t(link.labelKey)}
-          </AuthText>
-        </Link>
-      ))}
+      <AuthTextButton variant="plain" onClick={onClickPrivacy}>
+        {t("link.privacy")}
+      </AuthTextButton>
+      <AuthTextButton variant="plain" onClick={onClickTerms}>
+        {t("link.terms")}
+      </AuthTextButton>
     </footer>
   );
 }

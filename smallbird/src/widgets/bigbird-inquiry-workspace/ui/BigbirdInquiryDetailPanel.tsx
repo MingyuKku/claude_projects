@@ -84,10 +84,13 @@ export function BigbirdInquiryDetailPanel({
                 src={imageUrl}
                 alt={campaign.name}
                 loading="lazy"
-                className="h-18.25 w-full rounded-sm object-cover"
+                className="h-18.25 w-full rounded-md border border-border object-cover"
               />
             ) : (
-              <div aria-hidden className="h-18.25 w-full rounded-sm bg-muted" />
+              <div
+                aria-hidden
+                className="h-18.25 w-full rounded-md border border-border bg-muted"
+              />
             )}
             <div className="flex flex-col gap-1.5">
               <strong className="text-sm leading-4 font-semibold tablet:leading-5">
@@ -107,12 +110,10 @@ export function BigbirdInquiryDetailPanel({
                 onCopyValue={() => toast.success(t("copied"))}
                 onCopyError={() => toast.error(t("copyFailed"))}
               />
-              {/* 공구샵이 없으면 "-"(사용자 결정), 복사할 값이 없어 비활성. 캠페인 정보를 못 받으면 줄을 그리지 않음 */}
-              {detail && (
+              {detail?.shopCode && (
                 <ClipboardButton
                   label={t("shopCode")}
-                  value={detail.shopCode ?? "-"}
-                  disabled={!detail.shopCode}
+                  value={detail.shopCode}
                   hasValueIcon={false}
                   onCopyValue={() => toast.success(t("copied"))}
                   onCopyError={() => toast.error(t("copyFailed"))}
@@ -145,7 +146,9 @@ function Row({ label, value }: { label: string; value: string | null }) {
   if (!value) return null;
   return (
     <dl className="flex justify-between gap-2 text-xs leading-4">
-      <dt className="font-medium text-muted-foreground">{label}</dt>
+      <dt className="shrink-0 font-medium whitespace-nowrap text-muted-foreground">
+        {label}
+      </dt>
       <dd className="truncate text-right">{value}</dd>
     </dl>
   );

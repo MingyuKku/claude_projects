@@ -1,67 +1,104 @@
-import { isApiError } from "@/shared/api";
+import { serverApiV3 } from "@/shared/api";
 
-import { deleteCampaign, fetchCampaigns } from "./campaign-api";
+import {
+  deleteCampaign,
+  fetchCampaigns,
+  fetchCopySources,
+} from "./campaign-api";
 
-import type { CampaignListQuery } from "../model/types";
+import type * as SharedApi from "@/shared/api";
 
-const ALL: CampaignListQuery = {
-  statuses: [],
-  type: null,
-  keyword: "",
-  page: 1,
-};
+// 목록 조회·삭제 요청을 서버로 보내는지 검증함.
+vi.mock("@/shared/api", async (importOriginal) => ({
+  ...(await importOriginal<typeof SharedApi>()),
+  serverApiV3: { get: vi.fn(), delete: vi.fn() },
+}));
 
-beforeEach(() => window.sessionStorage.clear());
+const mockGet = vi.mocked(serverApiV3.get);
+const mockDelete = vi.mocked(serverApiV3.delete);
 
-describe("fetchCampaigns", () => {
-  it("한 쪽 6개를 최신순으로 주고 전체 건수와 쪽 수를 계산한다", async () => {
-    const first = await fetchCampaigns(ALL);
+function item(campaignIdx: number, overrides: Record<string, unknown> = {}) {
+  return {
+    campaignIdx,
+    campaignCode: `PB-${campaignIdx}`,
+    serviceType: "PICK",
+    productType: "BRAND",
+    status: "DRAFT",
+    name: `캠페인 ${campaignIdx}`,
+    productName: "톤업크림",
+    createdDate: "2026-11-16 10:00:00",
+    ...overrides,
+  };
+}
 
-    expect(first.records).toHaveLength(6);
-    expect(first.totalCount).toBe(14);
-    expect(first.totalPages).toBe(3);
-    const ids = first.records.map((record) => record.campaignIdx);
-    expect(ids).toEqual([...ids].sort((a, b) => b - a));
-  });
+function listResponse(items: unknown[]) {
+  return { list: items, count: items.length, currentPage: 1, entrySize: 6 };
+}
 
-  it("진행 단계·유형·검색어를 함께 건다", async () => {
-    const draft = await fetchCampaigns({ ...ALL, statuses: ["DRAFT"] });
-    expect(draft.records.every((record) => record.stage === "DRAFT")).toBe(
-      true,
-    );
-
-    const pick = await fetchCampaigns({ ...ALL, type: "pickBrand" });
-    expect(pick.records.every((record) => record.type === "pickBrand")).toBe(
-      true,
-    );
-
-    const keyword = await fetchCampaigns({ ...ALL, keyword: "초록숲" });
-    expect(keyword.totalCount).toBeGreaterThan(0);
-    expect(keyword.totalCount).toBeLessThan(14);
-  });
+beforeEach(() => {
+  window.sessionStorage.clear();
+  vi.resetAllMocks();
 });
 
-describe("deleteCampaign", () => {
-  it("등록 중 캠페인을 지우면 목록에서 빠진다", async () => {
-    const [draft] = (await fetchCampaigns({ ...ALL, statuses: ["DRAFT"] }))
-      .records;
-    if (!draft) throw new Error("seed draft campaign is missing");
-
-    await deleteCampaign(draft.campaignIdx);
-
-    const after = await fetchCampaigns(ALL);
-    expect(after.totalCount).toBe(13);
-  });
-
-  it("등록 중이 아니면 409로 거절한다", async () => {
-    const [ended] = (await fetchCampaigns({ ...ALL, statuses: ["ENDED"] }))
-      .records;
-    if (!ended) throw new Error("seed ended campaign is missing");
-
-    const error = await deleteCampaign(ended.campaignIdx).catch(
-      (thrown: unknown) => thrown,
+describe("목록", () => {
+  it("현황 조건을 쿼리로 보내고 부제를 제품명으로 읽는다", async () => {
+    mockGet.mockResolvedValue(
+      listResponse([item(7, { name: null, serviceType: null })]),
     );
 
-    expect(isApiError(error) && error.status).toBe(409);
+    const page = await fetchCampaigns({
+      statuses: ["REVIEWING", "REJECTED"],
+      type: "pickBrand",
+      keyword: "톤업",
+      page: 2,
+    });
+
+    expect(mockGet).toHaveBeenCalledWith("/campaign", {
+      params: {
+        status: "REVIEWING,REJECTED",
+        serviceType: "PICK",
+        productType: "BRAND",
+        keyword: "톤업",
+        page: 2,
+        entrySize: 6,
+      },
+    });
+    expect(page.records[0]).toMatchObject({
+      name: "",
+      productName: "톤업크림",
+      type: null,
+    });
+  });
+
+  it("이전 캠페인 불러오기는 상태를 보내지 않고 지금 캠페인을 뺀다", async () => {
+    mockGet.mockResolvedValue(listResponse([item(5)]));
+
+    await fetchCopySources(
+      {
+        serviceType: "PICK",
+        productType: "BRAND",
+        excludeCampaignIdx: 7,
+        keyword: "",
+      },
+      1,
+    );
+
+    expect(mockGet).toHaveBeenCalledWith("/campaign", {
+      params: {
+        serviceType: "PICK",
+        productType: "BRAND",
+        excludeCampaignIdx: 7,
+        page: 1,
+        entrySize: 20,
+      },
+    });
+  });
+
+  it("삭제는 서버의 삭제 API로 보낸다", async () => {
+    mockDelete.mockResolvedValue(undefined);
+
+    await deleteCampaign(7);
+
+    expect(mockDelete).toHaveBeenCalledExactlyOnceWith("/campaign/7");
   });
 });

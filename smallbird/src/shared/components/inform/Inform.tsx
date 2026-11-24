@@ -14,12 +14,12 @@ const informVariants = cva("flex w-full flex-col", {
       filled: "rounded-lg border bg-muted/40",
     },
     size: {
-      md: "gap-5",
+      md: "ds-gap-5",
       sm: "gap-4",
     },
   },
   compoundVariants: [
-    { variant: "filled", size: "md", className: "p-5" },
+    { variant: "filled", size: "md", className: "ds-p-5" },
     { variant: "filled", size: "sm", className: "gap-3.5 px-4 py-3" },
   ],
   defaultVariants: { variant: "line", size: "md" },
@@ -27,14 +27,14 @@ const informVariants = cva("flex w-full flex-col", {
 
 const SIZE_STYLES = {
   md: {
-    container: "gap-4",
+    container: "ds-gap-4",
     title: "text-base",
     list: "gap-2",
-    row: "text-sm leading-5",
+    row: "ds-text-sm-5-normal",
     icon: "size-4",
   },
   sm: {
-    container: "gap-3",
+    container: "ds-gap-3",
     title: "text-sm",
     list: "gap-1",
     row: "text-xs leading-4",

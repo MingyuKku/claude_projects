@@ -12,7 +12,7 @@ import {
   filterKnownCodes,
   CREATOR_AGE_GROUPS,
   CREATOR_GENDERS,
-  POSTING_TOPICS,
+  getPostingTopics,
   toKnownCode,
 } from "../model/input-codes";
 
@@ -50,6 +50,7 @@ export function transformCampaignDetail(
   response: CampaignDetailResponse,
 ): CampaignDetail {
   const { info, product, influencer, intro, conditions } = response;
+  const groupBuying = response.groupBuyingConditions;
   const emptyDraft = createEmptyDraft();
 
   return {
@@ -95,7 +96,19 @@ export function transformCampaignDetail(
         platform: toKnownCode(CAMPAIGN_PLATFORMS, influencer.platform),
         gender: toKnownCode(CREATOR_GENDERS, influencer.gender),
         ageGroups: filterKnownCodes(CREATOR_AGE_GROUPS, influencer.ageGroups),
-        topics: filterKnownCodes(POSTING_TOPICS, influencer.topics),
+        topics: filterKnownCodes(
+          getPostingTopics(
+            toKnownCode(CAMPAIGN_PRODUCT_TYPES, response.productType),
+          ),
+          influencer.topics,
+        ),
+      },
+      groupBuy: {
+        productName: groupBuying?.groupBuyingProductName ?? "",
+        categoryIdx: groupBuying?.productCategoryIdx ?? null,
+        middleCategoryIdx: groupBuying?.productMiddleCategoryIdx ?? null,
+        recommendedPrice: groupBuying?.recommendedConsumerPrice ?? null,
+        price: groupBuying?.purchasePrice ?? null,
       },
       addOns: filterKnownCodes(CAMPAIGN_ADD_ONS, response.addOns),
       intro: {

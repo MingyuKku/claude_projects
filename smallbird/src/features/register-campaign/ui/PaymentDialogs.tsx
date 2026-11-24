@@ -27,6 +27,11 @@ interface PaymentDialogsProps {
   onCompleteDemo: () => void;
   /** 작성 완료 요청 중이면 "확인"을 막음. */
   isBusy: boolean;
+  /**
+   * 결제 완료·재승인 요청 완료 알럿의 "확인"을 눌렀을 때 등록 내역으로 가기 전에 부름(승인 결과를 기다리는 순간).
+   * 클릭 핸들러 안에서 동기로 불러서, 알림 권한 창처럼 직접 동작이 필요한 일을 할 수 있음.
+   */
+  onApprovalRequested?: () => void;
 }
 
 const DIALOG_KEYS = {
@@ -54,6 +59,7 @@ export function PaymentDialogs({
   onLeaveToDetail,
   onCompleteDemo,
   isBusy,
+  onApprovalRequested,
 }: PaymentDialogsProps) {
   const { t } = useTranslation("features/register-campaign");
   const { t: tCommon } = useTranslation();
@@ -76,6 +82,7 @@ export function PaymentDialogs({
         return;
       case "completed":
       case "reapprovalCompleted":
+        onApprovalRequested?.();
         onLeaveToDetail();
         return;
       case "invalidStartDate":

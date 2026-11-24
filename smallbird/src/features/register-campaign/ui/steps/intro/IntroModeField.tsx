@@ -58,7 +58,7 @@ export function IntroModeField({
             {icon}
             {t(`intro.mode.${key}.title`)}
           </span>
-          <span className="ds-px-5 ds-pb-5 ds-text-sm-5-normal">
+          <span className="ds-px-5 ds-pb-5 ds-text-sm-5-normal ko:break-keep">
             {t(`intro.mode.${key}.description`)}
           </span>
         </RadioGroup.Item>

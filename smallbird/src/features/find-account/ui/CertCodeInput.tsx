@@ -1,9 +1,17 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 
 import chevronRight from "@/shared/assets/img/system/chevron-right.svg";
-import { AuthButton, AuthInput, AuthText } from "@/shared/components/auth";
+import {
+  AuthButton,
+  AuthInput,
+  AuthSupportText,
+  AuthText,
+  AuthTextButton,
+} from "@/shared/components/auth";
 import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
+
+import { toSupportState } from "../lib/support-state";
 
 import type { CertMessage } from "../model/use-cert-flow";
 
@@ -16,8 +24,8 @@ interface CertCodeInputProps {
 }
 
 /**
- * 문구는 두 줄일 수 있음. 둘째 줄(남은 횟수)은 재발송 버튼과 같은 행에 놓여야 해서
- * `\n`으로 나눠 따로 그림.
+ * 문구는 두 줄일 수 있음(둘째 줄이 남은 횟수). `\n`을 줄바꿈으로 그대로 보여 주고,
+ * 태블릿 이상은 문구 옆에, 모바일은 문구 아래 오른쪽에 재전송 버튼을 둠.
  */
 export function CertCodeInput({
   countdownText,
@@ -27,24 +35,20 @@ export function CertCodeInput({
   className,
 }: CertCodeInputProps) {
   const { t } = useTranslation("features/find-account");
+  const messageId = useId();
   const [code, setCode] = useState("");
 
   const text = message
     ? t(`message.${message.content.code}`, message.content.values)
     : undefined;
-  const newlineIndex = text?.indexOf("\n") ?? -1;
-  const leadLine = newlineIndex >= 0 ? text?.slice(0, newlineIndex) : text;
-  const tailLine =
-    newlineIndex >= 0 ? text?.slice(newlineIndex + 1) : undefined;
-  // 톤이 없으면 부정 안내로 봄.
-  const tone = message?.tone ?? "negative";
 
   return (
     <div className={cn("flex flex-col gap-2", className)}>
-      <div className="flex items-center gap-2">
-        <div className="relative h-11 flex-1">
+      <div className="flex items-center gap-2.5">
+        <div className="relative h-11 min-w-0 flex-1">
           <AuthInput
             aria-label={t("codeLabel")}
+            aria-describedby={text ? messageId : undefined}
             placeholder={t("codePlaceholder")}
             value={code}
             className="pr-14"
@@ -60,44 +64,38 @@ export function CertCodeInput({
             {countdownText}
           </AuthText>
         </div>
-        <div className="h-11 w-[120px] shrink-0">
+        <div className="h-11 w-28.25 shrink-0">
           <AuthButton
             color="primary"
             disabled={!code}
             onClick={() => onClickConfirm(code)}
           >
-            <AuthText as="span" size="md" tone="inherit">
+            <AuthText as="span" size="sm" tone="inherit">
               {t("confirmCode")}
             </AuthText>
           </AuthButton>
         </div>
       </div>
 
-      <div className="flex flex-col">
-        {leadLine && (
-          <AuthText size="sm" tone={tone} role="status">
-            {leadLine}
-          </AuthText>
-        )}
-        <div className="flex items-end justify-between gap-2">
-          <div className="min-w-0 flex-1">
-            {tailLine && (
-              <AuthText size="sm" tone={tone}>
-                {tailLine}
-              </AuthText>
-            )}
-          </div>
-          <button
-            type="button"
-            onClick={onClickResend}
-            className="flex shrink-0 items-center gap-2"
+      <div className="flex flex-col gap-2 tablet:flex-row tablet:items-start tablet:justify-between">
+        {message && text && (
+          <AuthSupportText
+            id={messageId}
+            role="status"
+            state={toSupportState(message.tone)}
+            className="min-w-0 whitespace-pre-line"
           >
-            <AuthText as="span" size="sm" tone="faint">
-              {t("resendRequest")}
-            </AuthText>
-            <img src={chevronRight} alt="" className="size-4" />
-          </button>
-        </div>
+            {text}
+          </AuthSupportText>
+        )}
+        <AuthTextButton
+          variant="plain"
+          className="ml-auto shrink-0 gap-2"
+          onClick={onClickResend}
+        >
+          {t("resendRequest")}
+          <img src={chevronRight} alt="" className="size-4" />
+        </AuthTextButton>
       </div>
     </div>
   );

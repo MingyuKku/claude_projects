@@ -53,7 +53,7 @@ export function ShellHeaderActions({
           void navigate(ROUTES.mypageMoney);
         }}
       />
-      <AlertPopover />
+      <AlertPopover canReceive={session.authority !== "SUB"} />
       <UserMenu
         name={session.displayName}
         email={session.email}

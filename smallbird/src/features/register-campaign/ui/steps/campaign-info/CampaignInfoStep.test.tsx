@@ -4,16 +4,39 @@ import { MemoryRouter } from "react-router";
 import { SWRConfig } from "swr";
 
 import { createEmptyDraft } from "@/entities/campaign";
+import { serverApiV3 } from "@/shared/api";
 
 import { useRegisterWizardStore } from "../../../model/wizard-context";
 import { RegisterWizardProvider } from "../../RegisterWizardProvider";
 import { CampaignInfoStep } from "./CampaignInfoStep";
 
-import type { CampaignDetail, CampaignDraft } from "@/entities/campaign";
+import type {
+  CampaignDetail,
+  CampaignDraft,
+  CampaignProductType,
+} from "@/entities/campaign";
+import type * as SharedApi from "@/shared/api";
+
+vi.mock("@/shared/api", async (importOriginal) => ({
+  ...(await importOriginal<typeof SharedApi>()),
+  serverApiV3: { get: vi.fn() },
+}));
 
 // PC·TAB(768 이상)으로 그림. 브랜드 메뉴가 팝오버로 열림.
 beforeEach(() => {
-  window.sessionStorage.clear();
+  vi.mocked(serverApiV3.get)
+    .mockReset()
+    .mockImplementation((async (path: string) => {
+      if (path === "/brand") {
+        return {
+          brands: [
+            { brandIdx: 2, name: "초록숲", imageUrl: null },
+            { brandIdx: 1, name: "데일리 스튜디오", imageUrl: null },
+          ],
+        };
+      }
+      throw new Error(`unmocked GET ${path}`);
+    }) as never);
   vi.stubGlobal("matchMedia", (query: string) => ({
     matches: query === "(min-width: 768px)",
     addEventListener: () => {},
@@ -23,14 +46,17 @@ beforeEach(() => {
 
 afterEach(() => vi.unstubAllGlobals());
 
-function createDetail(patch?: (draft: CampaignDraft) => void): CampaignDetail {
+function createDetail(
+  patch?: (draft: CampaignDraft) => void,
+  productType: CampaignProductType = "BRAND",
+): CampaignDetail {
   const draft = createEmptyDraft();
   patch?.(draft);
   return {
     campaignIdx: 15,
     campaignCode: "PB-00000000000015",
     serviceType: "PICK",
-    productType: "BRAND",
+    productType,
     stage: "DRAFT",
     rawStatus: "DRAFT",
     isDemo: false,
@@ -131,6 +157,21 @@ describe("CampaignInfoStep", () => {
     expect(screen.getByRole("button", { name: /브랜드명/ })).toHaveTextContent(
       "초록숲",
     );
+  });
+
+  it("공구형은 제품발송형 하나가 선택된 활성 모양(비활성 아님)으로 고정이고 눌러도 바뀌지 않는다", async () => {
+    const user = userEvent.setup();
+    renderStep(createDetail(undefined, "GROUP_BUY"));
+    const group = screen.getByRole("radiogroup", { name: "캠페인 유형" });
+    const button = within(group).getByRole("radio", { name: "제품발송형" });
+
+    expect(within(group).getAllByRole("radio")).toHaveLength(1);
+    expect(button).toHaveAttribute("aria-checked", "true");
+    expect(button).not.toBeDisabled();
+
+    await user.click(button);
+
+    expect(button).toHaveAttribute("aria-checked", "true");
   });
 
   it("시작일을 골라도 라벨과 한 칸이 그대로고 종료일 칸은 없다", () => {

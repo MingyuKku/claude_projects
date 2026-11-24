@@ -14,7 +14,7 @@ export function addVat(supplyAmount: number) {
   return supplyAmount + Math.floor(supplyAmount * VAT_RATE);
 }
 
-/** 금액에 쓰는 입력값(서비스 유형, 4단계 부가서비스, 6단계 인원·리워드). */
+/** 금액에 쓰는 입력값(서비스 유형, 부가서비스, 진행 조건의 인원·리워드). */
 export interface CampaignPaymentInput {
   serviceType: CampaignServiceType;
   addOns: readonly CampaignAddOn[];

@@ -5,11 +5,13 @@
   "brand": {
     "bigbird": {
       "logoAlt": "Bigbird标志",
-      "tagline": "告别营销人员的直觉，\n体验大数据 AI 营销。"
+      "tagline": "告别营销人员的直觉，\n体验大数据 AI 营销。",
+      "partnerTab": "Bigbird 合作伙伴中心"
     },
     "petplay": {
       "logoAlt": "Petplay标志",
-      "tagline": "来 Petplay 玩吧，\n这里有满满的宠物友好信息！"
+      "tagline": "来 Petplay 玩吧，\n这里有满满的宠物友好信息！",
+      "partnerTab": "Petplay 合作伙伴中心"
     }
   },
   "startFailed": "无法开始登录。",
@@ -23,5 +25,9 @@
     "kakao": "通过 KakaoTalk 咨询",
     "tel": "电话 {{phone}}",
     "hours": "工作日：10:00 ~ 18:30\n休息时间：12:30 ~ 13:30\n（公休日休息）"
+  },
+  "creatorTab": "创作者",
+  "comingSoon": {
+    "title": "提示"
   }
 }

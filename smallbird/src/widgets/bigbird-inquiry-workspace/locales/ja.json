@@ -1,6 +1,6 @@
 {
-  "listTitle": "お問い合わせ一覧",
-  "newInquiry": "新しいお問い合わせ",
+  "listTitle": "お問合せ一覧",
+  "newInquiry": "新しいお問合せ",
   "all": "すべて",
   "waiting": "返信待ち",
   "consulting": "相談中",
@@ -8,10 +8,10 @@
   "requestedBadge": "相談リクエスト中",
   "done": "回答済み",
   "empty": {
-    "title": "お問い合わせはありません。",
-    "description": "新しいお問い合わせを登録してください。"
+    "title": "お問合せはありません。",
+    "description": "新しいお問合せを登録してください。"
   },
-  "loadError": "お問い合わせ一覧を読み込めませんでした。",
+  "loadError": "お問合せ一覧を読み込めませんでした。",
   "inquiryTitle": {
     "campaign": "{{name}}の問合せ",
     "campaignUnknown": "キャンペーン問合せ",
@@ -27,9 +27,9 @@
   "realtimeHistory": "相談メッセージはありません。",
   "conversationError": "会話を読み込めませんでした。",
   "realtimeLoadError": "相談メッセージを読み込めませんでした。",
-  "campaignCode": "キャンペーンコード",
+  "campaignCode": "CPコード",
   "campaignShortcut": "キャンペーンへ移動",
-  "copyCode": "キャンペーンコードをコピー",
+  "copyCode": "CPコードをコピー",
   "copied": "クリップボードにコピーしました。",
   "backToList": "一覧へ",
   "copyFailed": "コピーできませんでした。",
@@ -43,19 +43,19 @@
     },
     "failed": {
       "title": "リアルタイム相談不可",
-      "description": "現在お問い合わせが多く、リアルタイム相談の対応が難しい状況です。",
-      "caption": "一般お問い合わせに切り替わり、順次ご回答いたします。"
+      "description": "現在お問合せが多く、リアルタイム相談の対応が難しい状況です。",
+      "caption": "一般お問合せに切り替わり、順次ご回答いたします。"
     },
     "end": "相談終了",
     "composer": "リアルタイム相談メッセージ",
-    "composerPlaceholder": "お問い合わせ内容を入力してください。（最大3,000文字）",
+    "composerPlaceholder": "お問合せ内容を入力してください。（最大3,000文字）",
     "attach": "添付",
     "send": "送信",
     "request": "リアルタイム相談",
-    "otherDevice": "他の担当者がこのお問い合わせを対応中です。相談終了後に再度ご利用ください。"
+    "otherDevice": "他の担当者がこのお問合せを対応中です。相談終了後に再度ご利用ください。"
   },
   "composer": {
-    "placeholder": "お問い合わせ内容を入力してください。（最大3,000文字）",
+    "placeholder": "お問合せ内容を入力してください。（最大3,000文字）",
     "send": "送信",
     "failed": "処理できませんでした。もう一度お試しください。"
   },
@@ -65,7 +65,7 @@
   "campaignType": "キャンペーン種別",
   "period": "進行期間",
   "progressStatus": "進行状況",
-  "shopCode": "ショップコード",
+  "shopCode": "共購コード",
   "otherTag": "その他",
   "campaignTag": "キャンペーン",
   "withdrawal": {

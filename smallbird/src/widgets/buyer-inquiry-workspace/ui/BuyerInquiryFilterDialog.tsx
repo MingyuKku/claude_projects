@@ -1,5 +1,5 @@
 import { ChevronDown, RefreshCcw, Settings2, X } from "lucide-react";
-import { useId, useState } from "react";
+import { useEffect, useId, useState } from "react";
 
 import {
   INQUIRY_SOURCE_TYPE,
@@ -71,6 +71,18 @@ export function BuyerInquiryFilterDialog({
     draft.creatorThreadUserIdx !== value.creatorThreadUserIdx ||
     toRangeKey(draft) !== toRangeKey(value);
 
+  // PC·TAB 팝오버는 화면에 고정되고 필터 버튼은 문서와 함께 움직임. macOS 관성 스크롤(매직마우스·트랙패드)이 목록 끝에서
+  // 문서 전체를 고무줄처럼 늘이면 둘이 벌어져 흔들려 보이므로, 열린 동안만 세로 고무줄 효과를 끔(가로 스와이프 뒤로 가기는 유지).
+  useEffect(() => {
+    if (!open || !isTabletUp) return;
+    const root = document.documentElement;
+    const previous = root.style.overscrollBehaviorY;
+    root.style.overscrollBehaviorY = "none";
+    return () => {
+      root.style.overscrollBehaviorY = previous;
+    };
+  }, [open, isTabletUp]);
+
   function handleOpenChange(next: boolean) {
     if (next) setDraft(value);
     setOpen(next);
@@ -82,11 +94,11 @@ export function BuyerInquiryFilterDialog({
   }
 
   const trigger = (
-    // Figma 26/10/29: 필터 버튼은 늘 파랑 글자, 설정창이 열리면 파랑 테두리("필터 버튼 활성화 시"). 적용된 조건은 칩이 보여 줌.
+    // 적용된 조건은 칩이 보여 주므로 버튼 글자색은 늘 같게 둠.
     <Button
       variant="outline"
       size="default"
-      className="min-w-20 gap-1.5 data-[state=open]:border-primary"
+      className="min-w-20 gap-1.5 transition-[color,background-color,border-color,box-shadow,transform] data-[state=open]:ring-2 data-[state=open]:ring-primary data-[state=open]:ring-offset-2"
     >
       <Settings2 className="size-4" />
       {t("filter.action")}
@@ -101,7 +113,7 @@ export function BuyerInquiryFilterDialog({
           <legend className="mb-2 text-sm font-medium">
             {t("filter.source")}
           </legend>
-          {/* 토글 간격 8, 3개(크리에이터 메뉴)도 한 줄에 들어가도록 최소 폭 없이 균등 분배, 선택은 흰 2px을 띄운 primary 링(Figma Toggle focus ring) */}
+          {/* 토글 간격 8, 3개(크리에이터 메뉴)도 한 줄에 들어가도록 최소 폭 없이 균등 분배, 선택은 흰 2px을 띄운 primary 링(Figma Toggle focus ring). 문구가 폭보다 길면(ja) 시안에 없는 두 줄로 늘어남 */}
           <div className="flex gap-2">
             {sourceTypes.map((sourceType) => (
               <Button
@@ -111,7 +123,7 @@ export function BuyerInquiryFilterDialog({
                 size="sm"
                 aria-pressed={draft.sourceType === sourceType}
                 className={cn(
-                  "min-w-0 flex-1 border-input px-1",
+                  "h-auto min-h-9 min-w-0 flex-1 border-input px-1 py-1.25 text-center whitespace-normal ko:break-keep",
                   draft.sourceType === sourceType &&
                     "ring-2 ring-primary ring-offset-2",
                 )}

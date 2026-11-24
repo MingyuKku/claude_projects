@@ -1,12 +1,13 @@
-import { useState } from "react";
+import { useId, useState } from "react";
 import { useNavigate } from "react-router";
 
 import { getPasswordError } from "@/entities/account";
 import {
-  AuthButton,
   AuthHeader,
   AuthInput,
+  AuthSupportText,
   AuthText,
+  AuthTextButton,
   PasswordInput,
 } from "@/shared/components/auth";
 import { ROUTES } from "@/shared/config";
@@ -16,7 +17,7 @@ import {
   canProceedFromInfo,
   isPasswordAgainMatching,
   resolveInputState,
-  resolveMessageClass,
+  resolveSupportState,
 } from "../lib/gating";
 import { useIdDuplicateCheck } from "../lib/use-id-duplicate-check";
 import { useValidatePassword } from "../lib/use-validate-password";
@@ -25,6 +26,7 @@ import {
   JOIN_STEP_PROGRESS,
 } from "../model/constants";
 import { useJoinStore } from "../model/join-store-context";
+import { JoinStepFooter } from "./JoinStepFooter";
 
 import type { CheckStatus, PasswordErrorCode } from "@/entities/account";
 import type { ChangeEvent, FocusEvent } from "react";
@@ -61,6 +63,9 @@ export function JoinInfoStep() {
   const patchAccount = useJoinStore((state) => state.patchAccount);
   const setStage = useJoinStore((state) => state.setStage);
   const navigate = useNavigate();
+  const idMessageId = useId();
+  const passwordMessageId = useId();
+  const passwordAgainMessageId = useId();
   const { idFormatError, clearIdFormatError, verifyId } = useIdDuplicateCheck({
     patchAccount,
   });
@@ -84,14 +89,14 @@ export function JoinInfoStep() {
   else if (isIdStatusWithMessage(idStatus)) {
     idMessage = t(`info.idStatus.${idStatus}`);
   }
-  const idMessageClass = resolveMessageClass(isIdError, isIdPossible);
+  const idMessageState = resolveSupportState(isIdError, isIdPossible);
 
   let passwordMessage = t("info.passwordHint");
   if (passwordError === "empty") passwordMessage = t("info.empty");
   else if (passwordError) {
     passwordMessage = t(`info.passwordError.${passwordError}`);
   }
-  const passwordMessageClass = resolveMessageClass(
+  const passwordMessageState = resolveSupportState(
     Boolean(passwordError),
     false,
   );
@@ -105,7 +110,7 @@ export function JoinInfoStep() {
     isPasswordAgainMismatch,
     isPasswordAgainMatch,
   );
-  const passwordAgainMessageClass = resolveMessageClass(
+  const passwordAgainMessageState = resolveSupportState(
     !isPasswordAgainMatch,
     isPasswordAgainMatch,
   );
@@ -167,8 +172,8 @@ export function JoinInfoStep() {
         progress={JOIN_STEP_PROGRESS.info}
       />
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="flex flex-col gap-5 pt-[30px] tablet:gap-6 tablet:pt-6">
+      <div className="min-h-0 flex-1 overflow-y-auto tablet:flex-none tablet:overflow-visible">
+        <div className="flex flex-col gap-5 pt-7.5 tablet:gap-6 tablet:pt-6 tablet:pb-12">
           <AuthText size="xl" weight="medium" tone="heading">
             {t("info.title")}
           </AuthText>
@@ -183,6 +188,7 @@ export function JoinInfoStep() {
                   name="joinId"
                   autoComplete="off"
                   aria-label={tCommon("field.id")}
+                  aria-describedby={idMessage ? idMessageId : undefined}
                   placeholder={tCommon("field.id")}
                   maxLength={ACCOUNT_INPUT_MAX_LENGTH}
                   value={id}
@@ -192,9 +198,13 @@ export function JoinInfoStep() {
                 />
               </div>
               {idMessage && (
-                <AuthText size="sm" role="status" className={idMessageClass}>
+                <AuthSupportText
+                  id={idMessageId}
+                  role="status"
+                  state={idMessageState}
+                >
                   {idMessage}
-                </AuthText>
+                </AuthSupportText>
               )}
             </div>
 
@@ -207,6 +217,7 @@ export function JoinInfoStep() {
                   name="joinPassword"
                   autoComplete="new-password"
                   label={tCommon("field.password")}
+                  aria-describedby={passwordMessageId}
                   placeholder={t("info.passwordPlaceholder")}
                   maxLength={ACCOUNT_INPUT_MAX_LENGTH}
                   value={password}
@@ -215,10 +226,13 @@ export function JoinInfoStep() {
                   onBlur={handleBlurPassword}
                 />
               </div>
-              {/* 규칙 안내는 항상 보이고, 위반하면 같은 자리가 빨간 글씨로 바뀜. */}
-              <AuthText size="sm" className={passwordMessageClass}>
+              {/* 규칙 안내는 항상 보이고, 위반하면 같은 자리가 오류 상태로 바뀜. */}
+              <AuthSupportText
+                id={passwordMessageId}
+                state={passwordMessageState}
+              >
                 {passwordMessage}
-              </AuthText>
+              </AuthSupportText>
             </div>
 
             <div className="flex flex-col gap-2">
@@ -230,6 +244,9 @@ export function JoinInfoStep() {
                   name="joinPasswordConfirm"
                   autoComplete="new-password"
                   label={t("info.checkLabel")}
+                  aria-describedby={
+                    passwordAgainMessage ? passwordAgainMessageId : undefined
+                  }
                   placeholder={t("info.checkPlaceholder")}
                   maxLength={ACCOUNT_INPUT_MAX_LENGTH}
                   value={passwordAgain}
@@ -242,49 +259,35 @@ export function JoinInfoStep() {
                 />
               </div>
               {passwordAgainMessage && (
-                <AuthText
-                  size="sm"
+                <AuthSupportText
+                  id={passwordAgainMessageId}
                   role="status"
-                  className={passwordAgainMessageClass}
+                  state={passwordAgainMessageState}
                 >
                   {t(`info.${passwordAgainMessage}`)}
-                </AuthText>
+                </AuthSupportText>
               )}
             </div>
           </div>
-        </div>
 
-        {serverError && (
-          <AuthText size="sm" role="alert" tone="negative">
-            {t(`info.serverPasswordError.${serverError}`)}
-          </AuthText>
-        )}
-      </div>
-
-      <div className="shrink-0 py-5 tablet:pb-[70px] desktop:pb-[120px]">
-        <div className="h-12">
-          <AuthButton
-            color="primary"
-            onClick={handleClickNext}
-            disabled={!canSubmit || isValidating}
-          >
-            <AuthText as="span" tone="light">
-              {t("next")}
-            </AuthText>
-          </AuthButton>
+          {serverError && (
+            <AuthSupportText state="error" role="alert">
+              {t(`info.serverPasswordError.${serverError}`)}
+            </AuthSupportText>
+          )}
         </div>
       </div>
+
+      <JoinStepFooter
+        label={t("next")}
+        onClick={handleClickNext}
+        disabled={!canSubmit || isValidating}
+      />
 
       {import.meta.env.DEV && (
-        <button
-          type="button"
-          className="text-gray-400 underline"
-          onClick={handleClickSkip}
-        >
-          <AuthText as="span" size="sm">
-            {t("dev.skipStep")}
-          </AuthText>
-        </button>
+        <AuthTextButton onClick={handleClickSkip}>
+          {t("dev.skipStep")}
+        </AuthTextButton>
       )}
     </div>
   );

@@ -1,7 +1,7 @@
 import { StepSidebar } from "@/shared/components/step-sidebar";
 import { useTranslation } from "@/shared/i18n";
 
-import { STEP_LABEL_KEYS } from "../model/step-labels";
+import { getStepLabelKey } from "../model/step-labels";
 import { getStepStatuses } from "../model/step-status";
 import { useLeaveToOverview } from "../model/use-leave-to-overview";
 import { useWizardNavigation } from "../model/use-wizard-navigation";
@@ -25,6 +25,7 @@ export function RegisterStepNav({
   const { t } = useTranslation("features/register-campaign");
   const { steps, currentStep, goToStep } = useWizardNavigation();
   const draft = useRegisterWizardStore((state) => state.draft);
+  const productType = useRegisterWizardStore((state) => state.productType);
   const hasVisitedPayment = useRegisterWizardStore(
     (state) => state.hasVisitedPayment,
   );
@@ -66,7 +67,7 @@ export function RegisterStepNav({
       items={statuses.map((status, index) => ({
         id: status.step,
         number: index + 1,
-        label: t(STEP_LABEL_KEYS[status.step]),
+        label: t(getStepLabelKey(status.step, productType)),
         state: status.state,
         indicator: status.indicator,
       }))}

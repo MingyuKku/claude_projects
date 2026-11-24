@@ -5,7 +5,7 @@ import { ENV } from "@/shared/config";
 import { serverApiV3 } from "./clients";
 import { deviceHeaders } from "./device-id";
 
-import type { FirebaseApp } from "firebase/app";
+import type { FirebaseApp, FirebaseOptions } from "firebase/app";
 import type { Auth } from "firebase/auth";
 import type { Firestore } from "firebase/firestore";
 
@@ -14,11 +14,39 @@ const firebaseTokenSchema = z.object({
   token: z.string().min(1),
 });
 
+const DEFAULT_APP_NAME = "[DEFAULT]";
+const HELPDESK_APP_OPTIONS: FirebaseOptions = {
+  apiKey: ENV.firebaseApiKey,
+  authDomain: ENV.firebaseAuthDomain,
+  projectId: ENV.firebaseProjectId,
+  appId: ENV.firebaseAppId,
+};
+
+const appPromises = new Map<string, Promise<FirebaseApp>>();
 let appPromise: Promise<{ app: FirebaseApp; db: Firestore }> | null = null;
 let authPromise: Promise<Auth> | null = null;
 let signInPromise: Promise<void> | null = null;
 // 로그아웃마다 올림. 로그아웃 전에 시작한 로그인이 뒤늦게 끝나 이전 계정으로 남지 않게 함.
 let signInGeneration = 0;
+
+/**
+ * 이름별 Firebase 앱. 앱 생성은 이 함수 한 곳에서만 하며, SDK는 처음 필요할 때 동적 import하고
+ * 같은 이름은 한 번만 만든다. 이름으로 찾으므로 다른 앱이 먼저 만들어져도 기본 앱과 섞이지 않는다.
+ */
+export function getFirebaseApp(
+  name: string,
+  options: FirebaseOptions,
+): Promise<FirebaseApp> {
+  const cached = appPromises.get(name);
+  if (cached) return cached;
+  const created = createFirebaseApp(name, options).catch((error: unknown) => {
+    // 실패를 캐시하면 새로고침 전까지 복구할 수 없으므로, 다음 호출에서 다시 시도하게 둔다.
+    appPromises.delete(name);
+    throw error;
+  });
+  appPromises.set(name, created);
+  return created;
+}
 
 /**
  * 헬프데스크 Firestore. 고객센터에서만 쓰므로 SDK를 처음 호출할 때 동적 import해서
@@ -65,20 +93,21 @@ export async function signOutFirebase(): Promise<void> {
   });
 }
 
+async function createFirebaseApp(name: string, options: FirebaseOptions) {
+  const { getApps, initializeApp } = await import("firebase/app");
+  const existing = getApps().find((app) => app.name === name);
+  if (existing) return existing;
+  return name === DEFAULT_APP_NAME
+    ? initializeApp(options)
+    : initializeApp(options, name);
+}
+
 async function connectFirestore() {
   // 동적 import(청크 로드)가 실패할 수 있어 위에서 재시도를 허용한다.
-  const [{ getApps, initializeApp }, { getFirestore }] = await Promise.all([
-    import("firebase/app"),
+  const [app, { getFirestore }] = await Promise.all([
+    getFirebaseApp(DEFAULT_APP_NAME, HELPDESK_APP_OPTIONS),
     import("firebase/firestore"),
   ]);
-  const app =
-    getApps()[0] ??
-    initializeApp({
-      apiKey: ENV.firebaseApiKey,
-      authDomain: ENV.firebaseAuthDomain,
-      projectId: ENV.firebaseProjectId,
-      appId: ENV.firebaseAppId,
-    });
   return { app, db: getFirestore(app) };
 }
 

@@ -2,7 +2,9 @@
   "step": {
     "campaignInfo": "Campaign info",
     "product": "Product info",
+    "productGroupBuy": "Sponsored product info",
     "creator": "Creator criteria",
+    "groupBuy": "Group buy terms",
     "addOns": "Add-ons",
     "intro": "캠페인 소개서",
     "conditions": "Campaign terms",
@@ -31,6 +33,7 @@
     "fileType": "Only JPG and PNG files can be uploaded.",
     "fileSize": "Only files up to 10MB can be uploaded.",
     "videoSize": "Only videos up to 500MB can be uploaded.",
+    "videoConvertFailed": "Couldn't convert the video. Please upload a different file.",
     "requestFailed": "Request failed. Please try again later.",
     "addressSearchFailed": "Couldn't load address search. Please try again later.",
     "aiCompleted": "AI generation is complete.",
@@ -74,9 +77,12 @@
       "manage": "Manage brands"
     },
     "period": {
-      "label": "Preferred start date",
+      "label": {
+        "brand": "Preferred start date",
+        "groupBuy": "Preferred group buy start date"
+      },
       "placeholder": "Select a date.",
-      "help": "The end date is set 30 days later automatically."
+      "help": "The end date is set {{days}} days later automatically."
     }
   },
   "brands": {
@@ -139,6 +145,9 @@
     "TIKTOK": "TikTok",
     "X": "X"
   },
+  "platformGroupBuy": {
+    "NAVER_BLOG": "Naver Blog"
+  },
   "unit": {
     "won": "KRW",
     "count": "ea"
@@ -197,6 +206,32 @@
       "emptyDescription": "Enter the article direction and guide<br/>in the next step, '캠페인 소개서'."
     }
   },
+  "groupBuy": {
+    "productName": {
+      "label": "Group buy product name",
+      "placeholder": "Enter the group buy product name."
+    },
+    "category": {
+      "label": "Group buy main category",
+      "placeholder": "Select the main category under the e-commerce product info notice."
+    },
+    "middleCategory": {
+      "label": "Group buy sub category",
+      "placeholder": "Select the sub category under the e-commerce product info notice."
+    },
+    "recommendedPrice": {
+      "label": "Recommended retail price",
+      "placeholder": "Enter the recommended retail price."
+    },
+    "price": {
+      "label": "Group buy price",
+      "placeholder": "Enter the group buy price."
+    },
+    "notice": {
+      "lowestPrice": "We recommend pricing at least 10% below the lowest price on Naver Shopping.",
+      "mayChange": "The group buy price may change based on the lowest Naver Shopping price when the group buy starts."
+    }
+  },
   "creator": {
     "platform": "Platform",
     "gender": {
@@ -236,6 +271,17 @@
       "ASMR": "ASMR",
       "Review": "Reviews",
       "All": "All"
+    },
+    "groupBuyTopic": {
+      "All": "Any",
+      "Beauty": "Beauty",
+      "LivingHealth": "Living & Health",
+      "PregnancyParenting": "Pregnancy & Parenting",
+      "Food": "Groceries",
+      "DigitalAppliances": "Digital & Appliances",
+      "FurnitureInterior": "Furniture & Interior",
+      "Fashion": "Fashion",
+      "TravelCulture": "Travel & Culture"
     }
   },
   "addOns": {
@@ -426,6 +472,7 @@
       "info": "Campaign info",
       "product": "Product info",
       "creator": "Creator criteria",
+      "groupBuy": "Group buy terms",
       "addOns": "Add-on services",
       "intro": "캠페인 소개서",
       "conditions": "Conditions",
@@ -469,6 +516,7 @@
     },
     "addOns": {
       "applied": "Applied",
+      "appliedWithPrice": "Applied ({{amount}} KRW/case)",
       "notApplied": "Not applied"
     },
     "intro": {

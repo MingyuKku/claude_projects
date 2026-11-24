@@ -30,6 +30,7 @@
       "Read(./.env.*)",
       "Read(./**/.env)",
       "Read(./**/.env.*)",
+      "Read(!.env.example)",
       "Edit(./pnpm-lock.yaml)",
       "Edit(./src/shared/api/generated/**)",
       "Bash(cat .env*)",
@@ -40,7 +41,8 @@
       "Bash(git commit -n:*)"
     ],
     "ask": [
-      "Bash(git push:*)",
+      "Bash(git push *stage*)",
+      "Bash(glab mr merge:*)",
       "Bash(pnpm add:*)",
       "Bash(pnpm remove:*)",
       "Bash(rm -rf:*)",

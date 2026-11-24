@@ -69,12 +69,13 @@ export function CampaignCardList({
             <div className="flex flex-col gap-3 p-4">
               <div className="flex items-center gap-3">
                 <CampaignThumbnail imageUrl={campaign.thumbnailUrl} />
-                <div className="flex min-w-0 flex-1 flex-col gap-1 ds-text-base-none-medium">
+                {/* Figma에 ds-text-base-6-medium 스타일이 없어 normal에 굵기만 덧댐 */}
+                <div className="flex min-w-0 flex-1 flex-col gap-1 ds-text-base-6-normal font-medium">
                   <p className="line-clamp-2 text-foreground">
                     {campaign.name}
                   </p>
                   {campaign.productName && (
-                    <p className="line-clamp-2 ds-text-base-none-normal text-muted-foreground">
+                    <p className="line-clamp-2 ds-text-base-6-normal text-muted-foreground">
                       {campaign.productName}
                     </p>
                   )}

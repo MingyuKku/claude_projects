@@ -30,7 +30,7 @@ export function formatMessageTime(value: Date) {
 export function formatListDate(value: Date) {
   return formatDate(value, {
     year: "2-digit",
-    month: "long",
+    month: "short",
     day: "numeric",
     hour: "2-digit",
     minute: "2-digit",

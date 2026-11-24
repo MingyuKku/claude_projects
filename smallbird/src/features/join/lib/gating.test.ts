@@ -3,7 +3,7 @@ import {
   canProceedFromInfo,
   canSubmitTerms,
   resolveInputState,
-  resolveMessageClass,
+  resolveSupportState,
 } from "./gating";
 
 const validInfo = {
@@ -76,8 +76,8 @@ describe("field state helpers", () => {
     expect(resolveInputState(true, true)).toBe("error");
     expect(resolveInputState(false, true)).toBe("success");
     expect(resolveInputState(false, false)).toBe("default");
-    expect(resolveMessageClass(true, true)).toBe("text-positive!");
-    expect(resolveMessageClass(true, false)).toBe("text-negative!");
-    expect(resolveMessageClass(false, false)).toBe("text-gray-400!");
+    expect(resolveSupportState(true, true)).toBe("pass");
+    expect(resolveSupportState(true, false)).toBe("error");
+    expect(resolveSupportState(false, false)).toBe("default");
   });
 });

@@ -25,7 +25,8 @@ interface AlertPopupProps {
   confirmLabel: string;
   onClickCancel?: () => void;
   onClickConfirm: () => void;
-  isCloseButtonHidden?: boolean;
+  /** 시안의 경고 팝업에는 닫기(X)가 없어 기본은 숨김. */
+  hasCloseButton?: boolean;
   className?: string;
 }
 
@@ -36,23 +37,23 @@ export function AlertPopup({
   confirmLabel,
   onClickCancel,
   onClickConfirm,
-  isCloseButtonHidden = false,
+  hasCloseButton = false,
   className,
 }: AlertPopupProps) {
   const { t } = useTranslation();
 
   return (
-    <div className="fixed inset-0 z-9998 flex items-center justify-center bg-dark/60">
+    <div className="fixed inset-0 z-9998 flex items-center justify-center bg-dark/30">
       <div
         role="alertdialog"
         aria-modal="true"
         aria-labelledby={TITLE_ID}
         className={cn(
-          "flex w-80 flex-col items-start rounded-auth-xl bg-light p-5 shadow-normal",
+          "flex w-80 flex-col items-start rounded-xl bg-light p-5 shadow-normal",
           className,
         )}
       >
-        {!isCloseButtonHidden && (
+        {hasCloseButton && (
           <button
             type="button"
             aria-label={t("action.close")}
@@ -68,10 +69,10 @@ export function AlertPopup({
           <div className="flex w-full flex-col items-center gap-3">
             <img src={warningTriangle} alt="" className="size-[42px]" />
             <div className="flex w-full flex-col items-center gap-2 text-center">
-              <AuthText id={TITLE_ID} size="fixed-xl" weight="medium">
+              <AuthText id={TITLE_ID} size="fixed-base" weight="medium">
                 {title}
               </AuthText>
-              <AuthText size="fixed-base">{message}</AuthText>
+              <AuthText size="sm">{message}</AuthText>
             </div>
           </div>
           <div className="flex w-full items-center gap-2">

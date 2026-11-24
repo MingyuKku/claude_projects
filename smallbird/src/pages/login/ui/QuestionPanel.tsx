@@ -33,7 +33,12 @@ export function QuestionPanel({ onClickClose }: QuestionPanelProps) {
 
       <div className="flex flex-col gap-5 rounded-auth-xl bg-light p-6 shadow-normal">
         <div className="flex flex-col items-center gap-4">
-          <AuthHeading type="subtitle-2" as="h2" tone="heading">
+          <AuthHeading
+            type="subtitle-2"
+            as="h2"
+            tone="heading"
+            className="font-bold"
+          >
             {t("question.title")}
           </AuthHeading>
           <img src={askKakaoIcon} alt="" className="size-16" />

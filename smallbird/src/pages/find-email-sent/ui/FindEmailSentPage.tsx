@@ -19,10 +19,10 @@ export function FindEmailSentPage() {
       <AuthHeader
         title={t("title")}
         onClickBack={handleClickGoLogin}
-        isBackHiddenOnMobile
+        isBorderHidden
       />
 
-      <div className="flex w-80 flex-1 flex-col tablet:w-96">
+      <div className="flex w-80 flex-1 flex-col tablet:w-96 tablet:pb-17.5 desktop:pb-30">
         <div className="flex flex-1 flex-col tablet:flex-none tablet:gap-12">
           <div className="flex flex-1 items-center tablet:flex-none tablet:py-10">
             <AuthText size="md" className="w-full text-center">
@@ -32,7 +32,7 @@ export function FindEmailSentPage() {
 
           <div className="mb-5 h-12 tablet:mb-0">
             <AuthButton color="primary" onClick={handleClickGoLogin}>
-              <AuthText as="span" size="md" tone="inherit">
+              <AuthText as="span" size="fixed-base" tone="inherit">
                 {t("start")}
               </AuthText>
             </AuthButton>

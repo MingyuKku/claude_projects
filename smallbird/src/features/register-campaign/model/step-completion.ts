@@ -18,6 +18,8 @@ import type {
 export const RENTAL_MIN_PRODUCT_PRICE = 1_000_000;
 /** 방문 시 제공 혜택 및 수량 최대 글자 수. */
 export const VISIT_BENEFIT_MAX_LENGTH = 300;
+/** 공동구매 제품명 최대 글자 수(API A-5.4). */
+export const GROUP_BUY_PRODUCT_NAME_MAX_LENGTH = 100;
 /** 소개서 캠페인 설명·유의사항 최대 글자 수. */
 export const INTRO_TEXT_MAX_LENGTH = 1000;
 /** 소개서 상세 이미지·동영상 최대 개수. */
@@ -123,6 +125,14 @@ const conditionsSchema = z.object({
   secondaryCopyright: z.boolean(),
 });
 
+const groupBuySchema = z.object({
+  productName: requiredText.max(GROUP_BUY_PRODUCT_NAME_MAX_LENGTH),
+  categoryIdx: z.number().int(),
+  middleCategoryIdx: z.number().int(),
+  recommendedPrice: positiveAmount,
+  price: positiveAmount,
+});
+
 const STEP_CHECKERS: Record<
   CampaignDraftStep,
   (draft: CampaignDraft) => boolean
@@ -130,6 +140,7 @@ const STEP_CHECKERS: Record<
   info: ({ info }) => infoSchema.safeParse(info).success,
   product: isProductComplete,
   creator: ({ creator }) => creatorSchema.safeParse(creator).success,
+  groupBuy: ({ groupBuy }) => groupBuySchema.safeParse(groupBuy).success,
   // 부가서비스는 선택사항이라 늘 통과함.
   addOns: () => true,
   intro: isIntroComplete,
@@ -160,9 +171,13 @@ const STEPS_RESET_BY_TYPE_CHANGE: readonly CampaignDraftStep[] = [
   "policy",
 ];
 
-/** 1~7단계에 입력한 값이 하나라도 있는지. 있을 때만 이전 캠페인 불러오기 덮어쓰기 알럿을 띄움(P-33 답 전 처리). */
+/** 입력한 값이 하나라도 있는지. 있을 때만 이전 캠페인 불러오기 덮어쓰기 알럿을 띄움(P-33 답 전 처리). */
 export function hasAnyInput(draft: CampaignDraft) {
-  return isStepStarted("info", draft) || hasInputAfterInfo(draft);
+  return (
+    isStepStarted("info", draft) ||
+    isStepStarted("groupBuy", draft) ||
+    hasInputAfterInfo(draft)
+  );
 }
 
 /** 2~7단계에 입력한 값이 하나라도 있는지. 있을 때만 유형 변경 확인 알럿을 띄움. */

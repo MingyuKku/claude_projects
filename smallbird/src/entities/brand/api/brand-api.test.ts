@@ -1,69 +1,51 @@
-import { isApiError } from "@/shared/api";
-import { registerMockFile } from "@/shared/lib";
+import { serverApiV3 } from "@/shared/api";
 
 import { addBrand, deleteBrand, fetchBrands } from "./brand-api";
 
-beforeEach(() => window.sessionStorage.clear());
+import type * as SharedApi from "@/shared/api";
 
-describe("목 브랜드 API", () => {
-  it("등록된 브랜드를 최근 추가순으로 준다", async () => {
+// 브랜드 API를 서버로 보내는지 검증함.
+vi.mock("@/shared/api", async (importOriginal) => ({
+  ...(await importOriginal<typeof SharedApi>()),
+  serverApiV3: { get: vi.fn(), post: vi.fn(), delete: vi.fn() },
+}));
+
+beforeEach(() => vi.resetAllMocks());
+
+describe("브랜드 API", () => {
+  it("목록을 서버에서 읽는다", async () => {
+    vi.mocked(serverApiV3.get).mockResolvedValue({
+      brands: [{ brandIdx: 4, name: "비글로우", imageUrl: null }],
+    });
+
     const brands = await fetchBrands();
 
-    expect(brands.length).toBeGreaterThan(0);
-    const indexes = brands.map((brand) => brand.brandIdx);
-    expect(indexes).toEqual([...indexes].sort((a, b) => b - a));
+    expect(serverApiV3.get).toHaveBeenCalledWith("/brand");
+    expect(brands).toEqual([{ brandIdx: 4, name: "비글로우", imageUrl: null }]);
   });
 
-  it("브랜드를 추가하면 목록 맨 위에 새 번호로 들어간다", async () => {
+  it("브랜드 추가는 이름과 이미지 번호를 보내고 새 브랜드를 받는다", async () => {
+    vi.mocked(serverApiV3.post).mockResolvedValue({
+      brandIdx: 9,
+      name: "새 브랜드",
+      imageUrl: "https://example.com/a.png",
+    });
+
     const created = await addBrand({
       name: "새 브랜드",
-      imageAttachmentIdx: null,
+      imageAttachmentIdx: 3,
     });
 
-    const brands = await fetchBrands();
-
-    expect(brands[0]).toEqual(created);
-    expect(created.imageUrl).toBeNull();
+    expect(serverApiV3.post).toHaveBeenCalledWith("/brand", {
+      name: "새 브랜드",
+      imageAttachmentIdx: 3,
+    });
+    expect(created.brandIdx).toBe(9);
   });
 
-  it("같은 브랜드명도 또 추가할 수 있다", async () => {
-    const first = await addBrand({
-      name: "같은 이름",
-      imageAttachmentIdx: null,
-    });
-    const second = await addBrand({
-      name: "같은 이름",
-      imageAttachmentIdx: null,
-    });
+  it("브랜드 삭제는 번호 경로로 보낸다", async () => {
+    await deleteBrand(4);
 
-    expect(second.brandIdx).not.toBe(first.brandIdx);
-  });
-
-  it("올린 이미지를 붙이면 그 미리보기 주소를 브랜드 이미지로 쓴다", async () => {
-    URL.createObjectURL = vi.fn(() => "blob:brand-image");
-    const { attachmentIdx } = registerMockFile(new Blob(["x"]));
-
-    const created = await addBrand({
-      name: "이미지 브랜드",
-      imageAttachmentIdx: attachmentIdx,
-    });
-
-    expect(created.imageUrl).toBe("blob:brand-image");
-  });
-
-  it("지운 브랜드는 목록에서 빠지고, 다시 지우면 404다", async () => {
-    const [target] = await fetchBrands();
-    if (!target) throw new Error("시드 브랜드가 없음");
-
-    await deleteBrand(target.brandIdx);
-
-    const brands = await fetchBrands();
-    expect(brands.some((brand) => brand.brandIdx === target.brandIdx)).toBe(
-      false,
-    );
-    const error: unknown = await deleteBrand(target.brandIdx).catch(
-      (caught: unknown) => caught,
-    );
-    expect(isApiError(error) && error.status).toBe(404);
+    expect(serverApiV3.delete).toHaveBeenCalledWith("/brand/4");
   });
 });

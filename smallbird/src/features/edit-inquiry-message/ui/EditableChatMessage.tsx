@@ -33,7 +33,7 @@ interface EditableChatMessageProps {
   avatarSrc?: string;
   avatarClassName?: string;
   time: string;
-  /** 말풍선 크기. 대화 패널 폭에 따라 시안이 다릅니다(구매자 문의 PC 340 = md). */
+  /** 말풍선 크기(여백·글자 크기). 최대 폭은 크기와 상관없이 메시지 행 폭의 비율입니다. */
   size?: MessageSize;
   /** ChatMessage의 rowClassName(아바타 간격). */
   rowClassName?: string;

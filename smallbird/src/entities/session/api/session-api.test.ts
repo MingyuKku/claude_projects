@@ -3,6 +3,7 @@ import {
   revokeFirebaseToken,
   serverApi,
   serverApiV3,
+  unregisterWebPushDevice,
 } from "@/shared/api";
 
 import { fetchSession, formLogin, logout } from "./session-api";
@@ -14,6 +15,7 @@ vi.mock("@/shared/api", async (importOriginal) => {
     serverApi: { get: vi.fn(), post: vi.fn(), put: vi.fn(), patch: vi.fn() },
     serverApiV3: { get: vi.fn(), post: vi.fn() },
     revokeFirebaseToken: vi.fn(async () => {}),
+    unregisterWebPushDevice: vi.fn(async () => {}),
   };
 });
 
@@ -84,6 +86,21 @@ describe("logout", () => {
     expect(serverApiV3.post).toHaveBeenCalledWith("/auth/logout");
     // 세션이 살아 있을 때 이 기기의 채팅방 잠금부터 풂(가이드 2026-11-03 5번)
     expect(revokeFirebaseToken).toHaveBeenCalledOnce();
+  });
+
+  it("세션이 살아 있을 때 이 기기의 웹푸시를 먼저 끈다", async () => {
+    const calls: string[] = [];
+    vi.mocked(unregisterWebPushDevice).mockImplementationOnce(async () => {
+      calls.push("unregister");
+    });
+    vi.mocked(serverApiV3.post).mockImplementationOnce(async () => {
+      calls.push("logout");
+      return { result: true };
+    });
+
+    await logout();
+
+    expect(calls).toEqual(["unregister", "logout"]);
   });
 
   it.each([401, 500])("%s 응답이면 오류를 던진다", async (status) => {

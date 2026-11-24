@@ -41,8 +41,7 @@ export function BuyerInquiryDetailPanel({
   const campaign = campaigns?.find(
     (item) => item.campaignIdx === inquiry.campaignIdx,
   );
-  // Figma 크리에이터 문의 상세(PC 10819:40984·TAB 10819:40998)는 주문/상품 정보·공구샵 코드·공구 진행 크리에이터가 없음.
-  // MO 시안(10819:40238)에는 남아 있으나 PC·TAB 기준으로 둠(디자인 확인 필요).
+  // 크리에이터 문의에는 주문/상품 정보와 공구 진행 크리에이터를 두지 않음.
   const isBuyerMenu = toInquiryMenu(inquiry.source) === "buyer";
 
   if (isLoading) {
@@ -161,10 +160,13 @@ export function BuyerInquiryDetailPanel({
               src={campaignImageUrl}
               alt={campaignName ?? ""}
               loading="lazy"
-              className="h-18.25 w-full rounded-sm object-cover"
+              className="h-18.25 w-full rounded-md border border-border object-cover"
             />
           ) : (
-            <div aria-hidden className="h-18.25 w-full rounded-sm bg-muted" />
+            <div
+              aria-hidden
+              className="h-18.25 w-full rounded-md border border-border bg-muted"
+            />
           )}
           {/* Figma Wrap(6756:41105): 캠페인명과 정보 줄·복사 버튼은 6px 간격입니다. */}
           <div className="flex flex-col gap-1.5">
@@ -176,7 +178,7 @@ export function BuyerInquiryDetailPanel({
             <Row label={t("progressStatus")} value={detail.progressStatus} />
             <Row label={t("period")} value={period} />
             {isBuyerMenu && detail.creatorNickname && (
-              // 요구명세서 24 I26: 공구 진행 크리에이터는 닉네임만 보임(플랫폼 아이디·표시 삭제). 진행 기간 바로 아래(사용자 요청 2026-11-13).
+              // 공구 진행 크리에이터는 닉네임만 보임.
               <div className="flex items-center justify-between gap-2">
                 <span className="shrink-0 text-xs leading-4 font-medium whitespace-nowrap text-muted-foreground">
                   {t("creator")}
@@ -193,26 +195,23 @@ export function BuyerInquiryDetailPanel({
                 {...copyProps}
               />
             )}
-            {isBuyerMenu && detail.shopCode && (
+            {detail.shopCode && (
               <ClipboardButton
                 label={t("shopCode")}
                 value={detail.shopCode}
                 {...copyProps}
               />
             )}
-            {isBuyerMenu && (
-              // Figma 캠페인 바로가기(11315:50441). 캠페인 화면이 만들어지기 전까지 빅버드 문의 상세와 같이 비활성(사용자 결정
-              // 2026-11-06). 크리에이터 문의 상세에는 두지 않음.
-              <Button
-                variant="outline-foreground"
-                size="sm"
-                className="w-full"
-                disabled
-              >
-                {t("campaignShortcut")}
-                <ChevronRight className="size-4" />
-              </Button>
-            )}
+            {/* 이동할 캠페인 화면이 아직 없어 항상 비활성. */}
+            <Button
+              variant="outline-foreground"
+              size="sm"
+              className="w-full"
+              disabled
+            >
+              {t("campaignShortcut")}
+              <ChevronRight className="size-4" />
+            </Button>
           </div>
         </Section>
       )}
@@ -243,7 +242,9 @@ function Row({ label, value }: { label: string; value: string | null }) {
   if (!value) return null;
   return (
     <dl className="flex justify-between gap-2 text-xs">
-      <dt className="font-medium text-muted-foreground">{label}</dt>
+      <dt className="shrink-0 font-medium whitespace-nowrap text-muted-foreground">
+        {label}
+      </dt>
       <dd className="truncate text-right">{value}</dd>
     </dl>
   );

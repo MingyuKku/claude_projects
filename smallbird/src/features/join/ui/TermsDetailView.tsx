@@ -1,6 +1,8 @@
 import { TermsDocument } from "@/entities/terms";
-import { AuthButton, AuthHeader, AuthText } from "@/shared/components/auth";
+import { AuthHeader, AuthText } from "@/shared/components/auth";
 import { useTranslation } from "@/shared/i18n";
+
+import { JoinStepFooter } from "./JoinStepFooter";
 
 import type { TermsKind } from "@/entities/terms";
 
@@ -13,7 +15,7 @@ interface TermsDetailViewProps {
   onClickConfirm: () => void;
 }
 
-/** Full-text terms reader shown when an item is opened from the consent step. */
+/** 약관 동의 단계에서 항목을 열면 보이는 약관 전문 화면. */
 export function TermsDetailView({
   title,
   kind,
@@ -32,28 +34,20 @@ export function TermsDetailView({
         progress={progress}
       />
 
-      {/* Mobile scrolls the whole screen; tablet and up scrolls only inside the text box. */}
-      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto tablet:overflow-visible">
-        <div className="flex flex-col gap-6 pt-[30px] tablet:min-h-0 tablet:flex-1 tablet:pt-6">
-          <AuthText size="md" weight="bold" tone="heading">
+      {/* 모바일은 화면 전체가 스크롤되고, 태블릿 이상은 문서가 스크롤되며 본문 상자 안쪽만 따로 스크롤됨. */}
+      <div className="flex min-h-0 flex-1 flex-col overflow-y-auto tablet:flex-none tablet:overflow-visible">
+        <div className="flex flex-col gap-5 pt-7.5 tablet:gap-6 tablet:pt-6 tablet:pb-12">
+          <AuthText size="xl" weight="medium" tone="heading">
             {title}
           </AuthText>
 
-          <div className="flex flex-col gap-4 rounded-[20px] border border-gray-200 bg-light p-5 tablet:min-h-0 tablet:flex-1 tablet:overflow-y-auto">
+          <div className="flex flex-col gap-4 rounded-[20px] border border-line1 bg-light p-5 tablet:h-140.5 tablet:flex-none tablet:overflow-y-auto">
             <TermsDocument kind={kind} />
           </div>
         </div>
       </div>
 
-      <div className="shrink-0 py-5 tablet:mt-12 tablet:pt-0 tablet:pb-20">
-        <div className="h-12">
-          <AuthButton color="primary" onClick={onClickConfirm}>
-            <AuthText as="span" tone="light">
-              {confirmLabel}
-            </AuthText>
-          </AuthButton>
-        </div>
-      </div>
+      <JoinStepFooter label={confirmLabel} onClick={onClickConfirm} />
     </div>
   );
 }

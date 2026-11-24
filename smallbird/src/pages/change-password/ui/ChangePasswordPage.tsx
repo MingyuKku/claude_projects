@@ -20,7 +20,11 @@ export function ChangePasswordPage() {
   return (
     <main className="flex min-h-dvh flex-col items-center bg-background">
       <title>{t("title")}</title>
-      <AuthHeader title={t("title")} onClickBack={handleClickBack} />
+      <AuthHeader
+        title={t("title")}
+        onClickBack={handleClickBack}
+        isBorderHidden
+      />
       <ChangePasswordForm
         className="items-center"
         onClickLogin={handleClickLogin}

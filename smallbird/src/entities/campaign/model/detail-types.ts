@@ -22,7 +22,7 @@ export interface CampaignDetail {
   brand: { name: string; logoUrl: string | null } | null;
   /** 서버 캠페인 유형 원문. 모르는 코드라 `draft.info.campaignType`이 null일 때 표시용. */
   rawCampaignType: string | null;
-  /** 서버가 정한 종료일(희망 시작일 + 30일). */
+  /** 서버가 정한 종료일(희망 시작일 + 상품 유형별 일수: 브랜드형 30일·공구형 60일). */
   endDate: string | null;
   draft: CampaignDraft;
   /** 결제 전이면 null. */

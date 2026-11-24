@@ -33,8 +33,8 @@
     "passwordMatch": "密码一致。",
     "idCheckError": "确认账号时发生错误",
     "idStatus": {
-      "wrong": "该账号已被使用",
-      "possible": "该账号可用",
+      "wrong": "该账号已被使用。",
+      "possible": "该账号可用。",
       "needCheck": "需要确认账号是否重复"
     },
     "passwordError": {
@@ -59,7 +59,7 @@
     "emailDuplicate": "已有账号使用该邮箱。",
     "emailCheckError": "确认邮箱时发生错误",
     "emailStatus": {
-      "possible": "该邮箱可用",
+      "possible": "该邮箱可用。",
       "needCheck": "需要确认邮箱是否重复"
     },
     "registration": "营业执照",
@@ -90,6 +90,7 @@
     "title": "3. 同意条款",
     "all": "同意全部条款。",
     "view": "查看",
+    "viewItem": "查看{{label}}",
     "agree": "同意",
     "submit": "欢迎加入",
     "joinFailed": "注册失败",

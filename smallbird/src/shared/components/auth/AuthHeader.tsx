@@ -26,7 +26,7 @@ const mobileHeaderVariants = cva(
 );
 
 const tabletHeaderVariants = cva(
-  "sticky top-0 z-10 hidden flex-col gap-5 bg-background tablet:flex tablet:w-96 tablet:pt-[70px] desktop:pt-30",
+  "hidden flex-col gap-5 bg-background tablet:flex tablet:w-96 tablet:pt-[70px] desktop:pt-30",
   {
     variants: {
       hasBorder: { true: "border-b border-gray-200 tablet:pb-5", false: "" },
@@ -107,7 +107,7 @@ export function AuthHeader({
         >
           {!isBackHiddenOnMobile && <BackButton onClick={onClickBack} />}
           <AuthHeading
-            type="subtitle-1"
+            type="headline-3"
             as="h1"
             tone="heading"
             className={mobileTitleVariants({
@@ -124,10 +124,10 @@ export function AuthHeader({
       <header className={cn(tabletHeaderVariants({ hasBorder }), className)}>
         <div className="flex items-center justify-between">
           <BackButton onClick={onClickBack} />
-          <AuthHeading type="subtitle-1" as="h1" tone="heading">
+          <AuthHeading type="headline-3" as="h1" tone="heading">
             {title}
           </AuthHeading>
-          <div className="size-6" />
+          <div className="size-7.5" />
         </div>
         {progress !== undefined && <ProgressBar progress={progress} />}
       </header>

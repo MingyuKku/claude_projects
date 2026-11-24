@@ -19,20 +19,11 @@ export function WelcomePage() {
     <main className="flex min-h-dvh flex-col items-center bg-background">
       <title>{t("title")}</title>
       <div className="flex w-80 flex-1 flex-col items-center tablet:w-96 tablet:justify-center tablet:gap-12">
-        <div className="flex w-full flex-1 flex-col items-center justify-center gap-6 tablet:flex-none">
-          <img
-            src={bigbirdLogo}
-            alt={t("logoAlt")}
-            className="h-auto w-[174px] tablet:w-[154px] desktop:w-[174px]"
-          />
+        <div className="flex w-full flex-1 flex-col items-center justify-center gap-12 pt-17 tablet:flex-none tablet:pt-0">
+          <img src={bigbirdLogo} alt={t("logoAlt")} className="h-auto w-44.5" />
 
           <div className="flex flex-col items-center gap-5 p-10 text-center">
-            <AuthHeading
-              type="headline-3"
-              as="h1"
-              tone="heading"
-              className="font-medium tracking-[1px]"
-            >
+            <AuthHeading type="headline-3" as="h1" tone="heading">
               {t("heading")}
             </AuthHeading>
             <AuthText size="md">
@@ -47,7 +38,7 @@ export function WelcomePage() {
             className="gap-2"
             onClick={handleClickBrowse}
           >
-            <AuthText as="span" size="fixed-base" tone="inherit">
+            <AuthText as="span" size="md" tone="inherit">
               {t("browse")}
             </AuthText>
             <img src={chevronRightWhite} alt="" className="size-4" />

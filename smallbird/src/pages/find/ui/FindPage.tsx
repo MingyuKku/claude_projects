@@ -43,7 +43,8 @@ export function FindPage() {
         isBorderHidden
       />
 
-      <div className="flex w-80 flex-1 flex-col gap-10 tablet:w-96 tablet:gap-12 tablet:pt-12">
+      {/* 모바일은 탭 아래 40, 태블릿 이상은 헤더·탭·본문 사이 48이고 바닥 여백이 따로 있음. */}
+      <div className="flex w-80 flex-1 flex-col gap-10 tablet:w-96 tablet:gap-12 tablet:pt-12 tablet:pb-17.5 desktop:pb-30">
         <div role="tablist" className="flex">
           {FIND_TABS.map((findTab) => (
             <AuthTab

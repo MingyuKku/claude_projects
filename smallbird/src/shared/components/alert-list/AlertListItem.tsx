@@ -16,6 +16,8 @@ export interface AlertListItemData {
 
 interface AlertListItemProps {
   item: AlertListItemData;
+  /** 넘기면 항목 전체가 눌리는 버튼이 됨. */
+  onClick?: (id: string) => void;
   className?: string;
 }
 
@@ -24,16 +26,14 @@ const TYPE_ICON = {
   destructive: { Icon: CircleX, className: "text-destructive" },
 } as const;
 
-export function AlertListItem({ item, className }: AlertListItemProps) {
+export function AlertListItem({
+  item,
+  onClick,
+  className,
+}: AlertListItemProps) {
   const { Icon, className: iconClassName } = TYPE_ICON[item.type];
-  return (
-    <article
-      className={cn(
-        "flex items-start gap-3 bg-card px-5 pt-3 pb-4 text-card-foreground",
-        item.isRead && "opacity-50",
-        className,
-      )}
-    >
+  const content = (
+    <>
       <div className="flex min-w-0 flex-1 flex-col gap-2">
         <div className="flex flex-col gap-1">
           <h3 className="flex items-center gap-1.5 text-sm leading-none font-semibold">
@@ -57,6 +57,30 @@ export function AlertListItem({ item, className }: AlertListItemProps) {
           className="size-2 shrink-0 rounded-full bg-blue-500"
         />
       )}
+    </>
+  );
+  const itemClassName = cn(
+    "flex items-start gap-3 bg-card px-5 pt-3 pb-4 text-card-foreground",
+    item.isRead && "opacity-50",
+    className,
+  );
+
+  if (!onClick) return <article className={itemClassName}>{content}</article>;
+  // 제목·설명이 제목 요소라 버튼 안에 넣을 수 없어, 항목 전체를 덮는 빈 버튼을 겹침.
+  return (
+    <article
+      className={cn(
+        itemClassName,
+        "relative hover:bg-accent has-focus-visible:outline-2 has-focus-visible:-outline-offset-2 has-focus-visible:outline-ring",
+      )}
+    >
+      {content}
+      <button
+        type="button"
+        className="absolute inset-0 outline-none"
+        aria-label={`${item.title} ${item.description}`}
+        onClick={() => onClick(item.id)}
+      />
     </article>
   );
 }

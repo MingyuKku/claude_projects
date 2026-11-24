@@ -10,6 +10,7 @@ export const SERVER_STEP_PATHS = {
   info: "info",
   product: "product",
   creator: "influencer",
+  groupBuy: "group-buying-conditions",
   addOns: "add-ons",
   intro: "intro",
   conditions: "conditions",

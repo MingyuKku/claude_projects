@@ -7,7 +7,7 @@ const authTabVariants = cva(
   {
     variants: {
       isSelected: {
-        true: "border-b-[3px] border-brand",
+        true: "border-b-[3px] border-heading",
         false: "border-b border-gray-200",
       },
     },
@@ -20,7 +20,7 @@ interface AuthTabProps {
   onClick: () => void;
 }
 
-/** 탭 목록(`role="tablist"`) 안에서 쓰는 탭 버튼. 선택된 탭은 굵은 글씨와 브랜드색 밑줄. */
+/** 탭 목록(`role="tablist"`) 안에서 쓰는 탭 버튼. 선택된 탭은 굵은 밑줄. */
 export function AuthTab({ isSelected, label, onClick }: AuthTabProps) {
   return (
     <button
@@ -32,9 +32,10 @@ export function AuthTab({ isSelected, label, onClick }: AuthTabProps) {
     >
       <AuthText
         as="span"
-        size="lg"
-        weight={isSelected ? "bold" : "normal"}
+        size="fixed-base"
+        weight="medium"
         tone="heading"
+        className="desktop:text-lg"
       >
         {label}
       </AuthText>

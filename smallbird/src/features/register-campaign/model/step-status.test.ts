@@ -10,7 +10,7 @@ import { getRegisterSteps } from "./steps";
 
 import type { CampaignDraft } from "@/entities/campaign";
 
-const steps = getRegisterSteps("PICK");
+const steps = getRegisterSteps("PICK", "BRAND");
 
 function draftWithInfo(patch?: (draft: CampaignDraft) => void) {
   const draft = createEmptyDraft();
@@ -217,5 +217,79 @@ describe("열 단계 정하기", () => {
 
     const allDone = createEmptyDraft();
     expect(getFirstIncompleteStep([], allDone)).toBe("payment");
+  });
+});
+
+describe("공구형 단계 구성", () => {
+  const groupBuySteps = getRegisterSteps("PICK", "GROUP_BUY");
+
+  it("진행 조건이 없고 공동구매 조건이 4번, 부가서비스가 6번이다", () => {
+    expect(groupBuySteps.map(({ step }) => step)).toEqual([
+      "campaign-info",
+      "product",
+      "creator",
+      "group-buy",
+      "intro",
+      "add-ons",
+      "policy",
+      "payment",
+    ]);
+  });
+
+  it("브랜드형은 진행 조건이 4번, 부가서비스가 6번이다", () => {
+    expect(steps.map(({ step }) => step)).toEqual([
+      "campaign-info",
+      "product",
+      "creator",
+      "conditions",
+      "intro",
+      "add-ons",
+      "policy",
+      "payment",
+    ]);
+  });
+
+  it("공동구매 조건은 제품명·대분류·중분류·권장소비자가·공동구매가(1원 이상)가 모두 있어야 끝난다", () => {
+    const draft = createEmptyDraft();
+    const complete = {
+      productName: "숙박권",
+      categoryIdx: 8,
+      middleCategoryIdx: 36,
+      recommendedPrice: 60000,
+      price: 45000,
+    };
+    expect(isStepComplete("groupBuy", draft)).toBe(false);
+
+    draft.groupBuy = { ...complete };
+    expect(isStepComplete("groupBuy", draft)).toBe(true);
+
+    for (const patch of [
+      { productName: "  " },
+      { middleCategoryIdx: null },
+      { recommendedPrice: null },
+      { recommendedPrice: 0 },
+      { price: 0 },
+    ]) {
+      draft.groupBuy = { ...complete, ...patch };
+      expect(isStepComplete("groupBuy", draft)).toBe(false);
+    }
+  });
+
+  it("첫 미완 단계는 공구형 순서로 찾고, 진행 조건은 건너뛴다", () => {
+    const draft = draftWithInfo();
+    draft.product = {
+      ...draft.product,
+      productName: "숙박권",
+      quantityPerCreator: 1,
+      productPrice: 30000,
+    };
+    draft.creator = {
+      platform: "INSTAGRAM",
+      gender: "FEMALE",
+      ageGroups: ["AGE_20S"],
+      topics: ["Beauty"],
+    };
+
+    expect(getFirstIncompleteStep(groupBuySteps, draft)).toBe("group-buy");
   });
 });

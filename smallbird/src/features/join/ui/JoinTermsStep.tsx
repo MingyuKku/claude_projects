@@ -3,7 +3,12 @@ import { useState } from "react";
 import { useNavigate } from "react-router";
 
 import checkWhite from "@/shared/assets/img/system/check-white.svg";
-import { AuthButton, AuthHeader, AuthText } from "@/shared/components/auth";
+import {
+  AuthHeader,
+  AuthSupportText,
+  AuthText,
+  AuthTextButton,
+} from "@/shared/components/auth";
 import { ROUTES } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
@@ -13,6 +18,7 @@ import { canSubmitTerms } from "../lib/gating";
 import { useSubmitJoin } from "../lib/use-submit-join";
 import { JOIN_STEP_PROGRESS, TERMS_ITEMS } from "../model/constants";
 import { useJoinStore } from "../model/join-store-context";
+import { JoinStepFooter } from "./JoinStepFooter";
 import { TermsDetailView } from "./TermsDetailView";
 
 import type { SocialLinker } from "../lib/use-submit-join";
@@ -27,11 +33,11 @@ interface CheckMarkProps {
 }
 
 const checkMarkVariants = cva(
-  "flex size-5 shrink-0 items-center justify-center rounded border",
+  "flex size-5 shrink-0 items-center justify-center rounded-sm border",
   {
     variants: {
       checked: {
-        true: "border-brand bg-brand",
+        true: "border-primary bg-primary",
         false: "border-gray-200 bg-light",
       },
     },
@@ -113,19 +119,19 @@ export function JoinTermsStep({ onLinkSocial }: JoinTermsStepProps) {
         progress={JOIN_STEP_PROGRESS.terms}
       />
 
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <div className="flex flex-col gap-5 pt-[30px] tablet:gap-6 tablet:pt-6">
-          <AuthText size="xl" weight="bold" tone="heading">
+      <div className="min-h-0 flex-1 overflow-y-auto tablet:flex-none tablet:overflow-visible">
+        <div className="flex flex-col gap-5 pt-7.5 tablet:gap-6 tablet:pt-6 tablet:pb-12">
+          <AuthText size="xl" weight="medium" tone="heading">
             {t("terms.title")}
           </AuthText>
 
-          <div className="flex w-full flex-col items-start mobile:px-2.5">
+          <div className="flex w-full flex-col items-start">
             <button
               type="button"
               role="checkbox"
               aria-checked={isAllChecked}
               onClick={handleClickAll}
-              className="flex w-full items-center gap-2 px-2.5 py-2.5 mobile:px-0 tablet:px-5 tablet:py-5"
+              className="flex w-full items-center gap-2 py-5 tablet:p-5"
             >
               <CheckMark isChecked={isAllChecked} />
               <AuthText as="span" size="md">
@@ -133,11 +139,11 @@ export function JoinTermsStep({ onLinkSocial }: JoinTermsStepProps) {
               </AuthText>
             </button>
 
-            <div className="flex w-full flex-col items-start pl-5">
+            <div className="flex w-full flex-col items-start tablet:pl-5">
               {TERMS_ITEMS.map((item) => (
                 <div
                   key={item.key}
-                  className="flex w-full items-center justify-between px-2.5 py-2.5 mobile:px-0 tablet:px-5 tablet:py-4"
+                  className="flex w-full items-center justify-between px-2.5 py-4 tablet:px-5"
                 >
                   <button
                     type="button"
@@ -151,41 +157,32 @@ export function JoinTermsStep({ onLinkSocial }: JoinTermsStepProps) {
                       {t(`terms.item.${item.key}.label`)}
                     </AuthText>
                   </button>
-                  <button
-                    type="button"
+                  <AuthTextButton
+                    aria-label={t("terms.viewItem", {
+                      label: t(`terms.item.${item.key}.label`),
+                    })}
                     onClick={() => setViewingTerm(item.key)}
-                    className="border-b border-gray-300"
                   >
-                    <AuthText as="span" size="sm" tone="faint">
-                      {t("terms.view")}
-                    </AuthText>
-                  </button>
+                    {t("terms.view")}
+                  </AuthTextButton>
                 </div>
               ))}
             </div>
           </div>
-        </div>
 
-        {isJoinFailed && (
-          <AuthText size="sm" role="alert" tone="negative">
-            {t("terms.joinFailed")}
-          </AuthText>
-        )}
-      </div>
-
-      <div className="shrink-0 py-5 tablet:pb-[70px] desktop:pb-[120px]">
-        <div className="h-12">
-          <AuthButton
-            color="primary"
-            onClick={handleClickSubmit}
-            disabled={!canSubmit || isSubmitting}
-          >
-            <AuthText as="span" tone="light">
-              {t("terms.submit")}
-            </AuthText>
-          </AuthButton>
+          {isJoinFailed && (
+            <AuthSupportText state="error" role="alert">
+              {t("terms.joinFailed")}
+            </AuthSupportText>
+          )}
         </div>
       </div>
+
+      <JoinStepFooter
+        label={t("terms.submit")}
+        onClick={handleClickSubmit}
+        disabled={!canSubmit || isSubmitting}
+      />
     </div>
   );
 }

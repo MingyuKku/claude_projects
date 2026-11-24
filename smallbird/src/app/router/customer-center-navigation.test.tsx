@@ -44,6 +44,18 @@ beforeEach(() => {
   mockV3GetError(new ApiError(404, undefined));
 });
 
+// 하위 메뉴는 그룹이 열려 있어야 DOM에 있으므로, 닫혀 있으면 눌러 연다.
+async function openNavGroup(
+  user: ReturnType<typeof userEvent.setup>,
+  scope: HTMLElement,
+  name: string,
+) {
+  const trigger = within(scope).getByRole("button", { name });
+  if (trigger.getAttribute("aria-expanded") === "false") {
+    await user.click(trigger);
+  }
+}
+
 describe("고객센터 진입", () => {
   it.each([
     { label: "빅버드 문의", isMobileMenu: false },
@@ -62,6 +74,7 @@ describe("고객센터 진입", () => {
       const menu = isMobileMenu
         ? screen.getByRole("dialog", { name: "전체 메뉴" })
         : screen.getByRole("navigation", { name: "주 메뉴" });
+      await openNavGroup(user, menu, "고객센터");
       const link = within(menu).getByRole("link", { name: label });
       expect(link).toHaveAttribute("href", ROUTES.login);
       await user.click(link);
@@ -159,10 +172,10 @@ describe("고객센터 진입", () => {
 
     it("고객센터 화면에서는 LNB 고객센터 그룹이 펼쳐져 있다", async () => {
       await renderRoute(ROUTES.customerCenterBigbird);
-      const [support] = await screen.findAllByText("고객센터", {
-        selector: "summary span",
+      const [support] = await screen.findAllByRole("button", {
+        name: "고객센터",
       });
-      expect(support?.closest("details")).toHaveAttribute("open");
+      expect(support).toHaveAttribute("aria-expanded", "true");
     });
 
     it("문의를 고르지 않고 들어오면 최신 문의 대화를 보여 준다", async () => {

@@ -22,7 +22,7 @@ export function ExpiredPasswordDone({
       )}
     >
       <div className="flex w-80 flex-col items-center gap-6 text-center tablet:w-96">
-        <AuthText size="lg" weight="bold">
+        <AuthText size="lg" weight="medium">
           {t("done.title")}
         </AuthText>
         <AuthText size="sm">
@@ -30,7 +30,9 @@ export function ExpiredPasswordDone({
         </AuthText>
         <div className="h-12 w-full">
           <AuthButton color="primary" onClick={onClickLogin}>
-            <AuthText as="span">{t("done.login")}</AuthText>
+            <AuthText as="span" size="fixed-base" tone="inherit">
+              {t("done.login")}
+            </AuthText>
           </AuthButton>
         </div>
       </div>

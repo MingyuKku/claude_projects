@@ -30,6 +30,7 @@ export {
   useCampaignDetail,
 } from "./api/use-campaign-detail";
 export { useCopySources } from "./api/use-copy-sources";
+export { useProductCategories } from "./api/use-product-categories";
 export {
   useCampaignPage,
   useCampaignScrollList,
@@ -58,6 +59,7 @@ export type { CampaignDetail } from "./model/detail-types";
 export {
   CAMPAIGN_DRAFT_STEPS,
   createEmptyDraft,
+  createEmptyGroupBuyDraft,
   createEmptyProductDraft,
 } from "./model/draft";
 export type {
@@ -66,6 +68,7 @@ export type {
   CampaignDraft,
   CampaignDraftStep,
   CampaignCreatorDraft,
+  CampaignGroupBuyDraft,
   CampaignInfoDraft,
   CampaignIntroDraft,
   CampaignMedia,
@@ -78,6 +81,8 @@ export {
   CAMPAIGN_TYPES,
   CREATOR_AGE_GROUPS,
   CREATOR_GENDERS,
+  getPostingTopics,
+  GROUP_BUY_POSTING_TOPICS,
   POSTING_TOPICS,
 } from "./model/input-codes";
 export type {
@@ -89,9 +94,11 @@ export type {
   CreatorGender,
   PostingTopic,
 } from "./model/input-codes";
-export { CAMPAIGN_PERIOD_DAYS, getCampaignEndDate } from "./model/period";
+export { getCampaignEndDate, getCampaignPeriodDays } from "./model/period";
 export {
   CAMPAIGN_REGISTER_DEMO_PARAM,
+  CAMPAIGN_REGISTER_GROUP_BUY_PRODUCT,
+  CAMPAIGN_REGISTER_PRODUCT_PARAM,
   CAMPAIGN_REGISTER_STEPS,
   CAMPAIGN_REGISTER_TYPE_PARAM,
   CAMPAIGN_STEP_PARAM,
@@ -110,6 +117,8 @@ export type {
   CampaignSummary,
   CopySourceCampaign,
   CopySourceQuery,
+  ProductCategory,
+  ProductMiddleCategory,
 } from "./model/types";
 export { CampaignDemoTag } from "./ui/CampaignDemoTag";
 export { CampaignStageBadge } from "./ui/CampaignStageBadge";

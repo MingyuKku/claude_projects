@@ -37,8 +37,8 @@
   },
   "empty": {
     "account": {
-      "title": "暂无已注册的活动。",
-      "description": "注册活动，与创作者一起开始吧。"
+      "title": "开始您的第一个活动吧!",
+      "searchNoCampaign": "暂无进行中的活动。"
     },
     "tab": {
       "all": "暂无已注册的活动。",

@@ -21,6 +21,8 @@ import { useRegisterWizardStore } from "../../../model/wizard-context";
 
 import type { CampaignType } from "@/entities/campaign";
 
+const GROUP_BUY_CAMPAIGN_TYPE = "PRODUCT_DELIVERY";
+
 function isCampaignType(value: string): value is CampaignType {
   return CAMPAIGN_TYPES.some((type) => type === value);
 }
@@ -37,6 +39,7 @@ export function CampaignTypeField() {
   const changeCampaignType = useRegisterWizardStore(
     (state) => state.changeCampaignType,
   );
+  const productType = useRegisterWizardStore((state) => state.productType);
   const [pendingType, setPendingType] = useState<CampaignType | null>(null);
 
   function handleValueChange(value: string) {
@@ -51,6 +54,28 @@ export function CampaignTypeField() {
   function handleConfirmChange() {
     if (pendingType) changeCampaignType(pendingType);
     setPendingType(null);
+  }
+
+  // 공구형은 제품발송형 하나로 고정이라 고를 수도 바꿀 수도 없음. `disabled`는 토글을 반투명하게 그려 시안의 활성 모양과
+  // 달라지므로 쓰지 않고, 값이 고정이라 눌러도 바뀌지 않는 것을 `aria-disabled`로 알림.
+  if (productType === "GROUP_BUY") {
+    return (
+      <FormField label={t("info.type.label")} isRequired>
+        {({ id }) => (
+          <ToggleGroup
+            id={id}
+            type="single"
+            variant="outline"
+            aria-label={t("info.type.label")}
+            value={GROUP_BUY_CAMPAIGN_TYPE}
+          >
+            <ToggleGroupItem value={GROUP_BUY_CAMPAIGN_TYPE} aria-disabled>
+              {t(CAMPAIGN_TYPE_LABEL_KEYS[GROUP_BUY_CAMPAIGN_TYPE])}
+            </ToggleGroupItem>
+          </ToggleGroup>
+        )}
+      </FormField>
+    );
   }
 
   return (

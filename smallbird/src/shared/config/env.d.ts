@@ -10,11 +10,13 @@ interface ImportMetaEnv {
   readonly VITE_GOOGLE_CLIENT_ID: string;
   readonly VITE_APPLE_CLIENT_ID: string;
   readonly VITE_DOMAIN: string;
-  readonly VITE_CAMPAIGN_API?: string;
   readonly VITE_FIREBASE_API_KEY: string;
   readonly VITE_FIREBASE_AUTH_DOMAIN: string;
   readonly VITE_FIREBASE_PROJECT_ID: string;
   readonly VITE_FIREBASE_APP_ID: string;
+  readonly VITE_FIREBASE_PUSH_APP_ID?: string;
+  readonly VITE_FIREBASE_MESSAGING_SENDER_ID?: string;
+  readonly VITE_FIREBASE_VAPID_KEY?: string;
 }
 
 interface ImportMeta {

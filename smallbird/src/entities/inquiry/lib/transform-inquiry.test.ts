@@ -537,6 +537,18 @@ describe("transformBuyerInquiryDetailToViewModel: 대표 이미지·상품명·�
     ).toBeNull();
   });
 
+  it("주문일은 날짜만 YYYY.MM.DD로 바꾼다", () => {
+    expect(
+      transformBuyerInquiryDetailToViewModel({
+        ...detail(null),
+        orderDate: "2026-10-16 16:24:00",
+      }).orderDate,
+    ).toBe("2026.10.16");
+    expect(
+      transformBuyerInquiryDetailToViewModel(detail(null)).orderDate,
+    ).toBeNull();
+  });
+
   it("크리에이터 닉네임을 그대로 쓰고 비면 null", () => {
     expect(
       transformBuyerInquiryDetailToViewModel({

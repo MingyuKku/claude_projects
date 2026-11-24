@@ -15,6 +15,9 @@ describe("getUploadErrorKey", () => {
     expect(getUploadErrorKey(failure("max upload size error"))).toBe(
       "toast.videoSize",
     );
+    expect(getUploadErrorKey(failure("VIDEO_CONVERT_FAILED"))).toBe(
+      "toast.videoConvertFailed",
+    );
   });
 
   it("그 밖의 오류는 일반 실패 문구로 보낸다", () => {

@@ -87,3 +87,30 @@ describe("SnsLoginRow 애플 로그인", () => {
     await vi.waitFor(() => expect(onErrorStart).toHaveBeenCalledOnce());
   });
 });
+
+describe("SnsLoginRow 공급자 버튼", () => {
+  it("카카오·네이버·애플·구글 4개를 보인다", () => {
+    renderRow();
+    for (const name of [
+      "카카오로 시작하기",
+      "네이버로 시작하기",
+      "애플로 시작하기",
+      "구글로 시작하기",
+    ]) {
+      expect(screen.getByRole("button", { name })).toBeInTheDocument();
+    }
+  });
+
+  it("저장소를 쓸 수 없어 카카오를 시작하지 못하면 시작 실패로 알린다", async () => {
+    vi.spyOn(console, "error").mockImplementation(() => undefined);
+    vi.spyOn(Storage.prototype, "setItem").mockImplementation(() => {
+      throw new Error("blocked");
+    });
+    const { onErrorStart } = renderRow();
+    await userEvent.click(
+      screen.getByRole("button", { name: "카카오로 시작하기" }),
+    );
+    await vi.waitFor(() => expect(onErrorStart).toHaveBeenCalledOnce());
+    vi.restoreAllMocks();
+  });
+});

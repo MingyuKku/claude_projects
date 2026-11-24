@@ -116,6 +116,18 @@ afterEach(() => {
   Reflect.deleteProperty(window, "matchMedia");
 });
 
+// 하위 메뉴는 그룹이 열려 있어야 DOM에 있으므로, 닫혀 있으면 눌러 연다.
+async function openNavGroup(
+  user: ReturnType<typeof userEvent.setup>,
+  scope: HTMLElement,
+  name: string,
+) {
+  const trigger = within(scope).getByRole("button", { name });
+  if (trigger.getAttribute("aria-expanded") === "false") {
+    await user.click(trigger);
+  }
+}
+
 function mainNav() {
   return screen.getByRole("navigation", { name: "주 메뉴" });
 }
@@ -453,6 +465,7 @@ describe("마이페이지 · 계정 설정 셸", () => {
     const user = userEvent.setup();
     const router = await renderRoute(ROUTES.main);
     await screen.findByRole("button", { name: "로그인" });
+    await openNavGroup(user, mainNav(), "마이페이지");
     const link = within(mainNav()).getByRole("link", { name: "계정 설정" });
     expect(link).toHaveAttribute("href", ROUTES.login);
     await user.click(link);
@@ -477,15 +490,15 @@ describe("마이페이지 · 계정 설정 셸", () => {
       });
       expect(router.state.location.pathname).toBe(ROUTES.main);
       expect(
-        within(fullMenu).getByText("마이페이지").closest("details"),
-      ).toHaveAttribute("open");
+        within(fullMenu).getByRole("button", { name: "마이페이지" }),
+      ).toHaveAttribute("aria-expanded", "true");
       expect(
         within(fullMenu).getByRole("link", { name: "빅버드 머니" }),
       ).toBeVisible();
       // 눌러 펼친 그룹만 열림.
       expect(
-        within(fullMenu).getByText("고객센터").closest("details"),
-      ).not.toHaveAttribute("open");
+        within(fullMenu).getByRole("button", { name: "고객센터" }),
+      ).toHaveAttribute("aria-expanded", "false");
     });
 
     it("하위 메뉴가 없는 홈 아이콘은 그대로 이동하는 링크다", async () => {
@@ -518,6 +531,7 @@ describe("마이페이지 · 계정 설정 셸", () => {
     const user = userEvent.setup();
     const router = await renderRoute(ROUTES.main);
     await screen.findByRole("button", { name: "로그인" });
+    await openNavGroup(user, mainNav(), "마이페이지");
     const link = within(mainNav()).getByRole("link", { name: "빅버드 머니" });
     expect(link).toHaveAttribute("href", ROUTES.login);
     await user.click(link);
@@ -541,6 +555,10 @@ describe("마이페이지 · 계정 설정 셸", () => {
       });
       await renderRoute(ROUTES.mypageAccount);
       await screen.findByRole("tab", { name: "Sub ID 관리" });
+      const user = userEvent.setup();
+      await openNavGroup(user, mainNav(), "마이페이지");
+      await openNavGroup(user, mainNav(), "고객센터");
+      await openNavGroup(user, mainNav(), "크리에이터 매칭");
       for (const name of ["빅버드 머니", "구매자 문의", "크리에이터 검색"]) {
         expect(within(mainNav()).getByRole("link", { name })).toHaveAttribute(
           "aria-disabled",
@@ -557,6 +575,10 @@ describe("마이페이지 · 계정 설정 셸", () => {
       });
       await renderRoute(ROUTES.mypageAccount);
       await screen.findByRole("tab", { name: "Sub ID 관리" });
+      const user = userEvent.setup();
+      await openNavGroup(user, mainNav(), "마이페이지");
+      await openNavGroup(user, mainNav(), "고객센터");
+      await openNavGroup(user, mainNav(), "크리에이터 매칭");
       for (const name of ["빅버드 머니", "구매자 문의", "크리에이터 검색"]) {
         expect(
           within(mainNav()).getByRole("link", { name }),

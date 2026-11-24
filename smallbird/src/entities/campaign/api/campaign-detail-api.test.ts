@@ -1,8 +1,11 @@
-import { isApiError } from "@/shared/api";
-import { mockBrandDb, registerMockFile } from "@/shared/lib";
+import { ApiError, serverApiV3 } from "@/shared/api";
 
 import { createEmptyDraft } from "../model/draft";
+import { deleteCampaign } from "./campaign-api";
 import {
+  cancelCampaignApproval,
+  completeCampaignDemo,
+  convertCampaignDemo,
   copyCampaign,
   createCampaign,
   fetchCampaignDetail,
@@ -13,40 +16,50 @@ import {
 } from "./campaign-detail-api";
 
 import type { CampaignDraft } from "../model/draft";
+import type * as SharedApi from "@/shared/api";
 
-// 시드 캠페인 번호(mock/campaign-seeds): 3 PICK형 작성 완료 데모 · 4 모집형 반려 · 6 PICK형 승인 검토중(브랜드 2 초록숲, 모두 입력됨)
-const DEMO_COMPLETED_IDX = 3;
-const REJECTED_IDX = 4;
-const PICK_REVIEWING_IDX = 6;
-const RECRUIT_REVIEWING_IDX = 5;
+// 캠페인 API가 서버로 보내는 요청과 응답·오류 처리를 검증함.
+vi.mock("@/shared/api", async (importOriginal) => ({
+  ...(await importOriginal<typeof SharedApi>()),
+  serverApiV3: { get: vi.fn(), post: vi.fn(), put: vi.fn(), delete: vi.fn() },
+}));
 
-beforeEach(() => window.sessionStorage.clear());
+const AGREED = { service: true, privacy: true, operation: true, reward: true };
 
-async function readReason(promise: Promise<unknown>) {
-  const error: unknown = await promise.then(
-    () => undefined,
-    (caught: unknown) => caught,
-  );
-  if (!isApiError(error)) return undefined;
-  const data = error.data as { reason?: string };
-  return data.reason;
-}
+const mockGet = vi.mocked(serverApiV3.get);
+const mockPost = vi.mocked(serverApiV3.post);
+const mockPut = vi.mocked(serverApiV3.put);
+const mockDelete = vi.mocked(serverApiV3.delete);
 
-async function createPickCampaign() {
-  const { campaignIdx } = await createCampaign({
+function liveDetail(overrides: Record<string, unknown> = {}) {
+  return {
+    campaignIdx: 7,
     serviceType: "PICK",
     productType: "BRAND",
+    status: "DRAFT",
     demo: false,
-  });
-  return campaignIdx;
-}
-
-/** 브랜드 API(A-6.3)처럼 삭제 표시만 함. 다른 슬라이스라 브랜드 API 대신 같은 목 저장소를 씀. */
-function deleteBrand(brandIdx: number) {
-  mockBrandDb.update((db) => {
-    const brand = db.brands.find((item) => item.brandIdx === brandIdx);
-    if (brand) brand.isDeleted = true;
-  });
+    demoCompleted: false,
+    info: {
+      campaignCode: "PB-00000000000007",
+      name: "봄 신제품",
+      brandIdx: 3,
+      brandName: "비글로우",
+      campaignType: "PRODUCT_DELIVERY",
+      startDate: "2099-01-01",
+      endDate: "2099-01-31",
+    },
+    product: { productName: "톤업크림", quantityPerInfluencer: 1 },
+    influencer: {
+      platform: "INSTAGRAM",
+      gender: "ALL",
+      ageGroups: ["AGE_20S"],
+      topics: ["Beauty"],
+    },
+    addOns: [],
+    intro: {},
+    conditions: { postingPeriodMonths: 3, secondaryCopyright: false },
+    ...overrides,
+  };
 }
 
 function draftWith(patch: (draft: CampaignDraft) => void) {
@@ -55,401 +68,295 @@ function draftWith(patch: (draft: CampaignDraft) => void) {
   return draft;
 }
 
-describe("캠페인 생성·상세", () => {
-  it("새 캠페인은 등록 중이고 유형별 접두사 코드와 빈 입력값을 갖는다", async () => {
-    const campaignIdx = await createPickCampaign();
+async function readReason(promise: Promise<unknown>) {
+  const error: unknown = await promise.then(
+    () => undefined,
+    (caught: unknown) => caught,
+  );
+  return (error as ApiError | undefined)?.data as
+    { reason?: string } | undefined;
+}
 
-    const detail = await fetchCampaignDetail(campaignIdx);
+beforeEach(() => {
+  window.sessionStorage.clear();
+  vi.resetAllMocks();
+});
 
-    expect(detail.stage).toBe("DRAFT");
-    expect(detail.campaignCode).toMatch(/^PB-\d{14}$/);
-    expect(detail.isDemo).toBe(false);
-    expect(detail.draft).toEqual(createEmptyDraft());
-  });
+describe("캠페인 생성·조회·저장·결제", () => {
+  it("캠페인 생성은 서버로 보낸다", async () => {
+    mockPost.mockResolvedValue({
+      campaignIdx: 7,
+      campaignCode: "PB-00000000000007",
+    });
 
-  it("데모로 만들면 데모 표시가 붙는다", async () => {
-    const { campaignIdx } = await createCampaign({
+    const created = await createCampaign({
       serviceType: "PICK",
       productType: "BRAND",
       demo: true,
     });
 
-    const detail = await fetchCampaignDetail(campaignIdx);
-
-    expect(detail.isDemo).toBe(true);
-    expect(detail.isDemoCompleted).toBe(false);
+    expect(mockPost).toHaveBeenCalledWith("/campaign", {
+      serviceType: "PICK",
+      productType: "BRAND",
+      demo: true,
+    });
+    expect(created.campaignIdx).toBe(7);
   });
 
-  it("없는 캠페인은 404 CAMPAIGN_NOT_FOUND다", async () => {
-    expect(await readReason(fetchCampaignDetail(9999))).toBe(
-      "CAMPAIGN_NOT_FOUND",
-    );
-  });
-});
+  it("상세는 서버가 생략한 값도 빈 값으로 채워 읽는다", async () => {
+    mockGet.mockResolvedValue(liveDetail());
 
-describe("단계별 수정", () => {
-  it("1단계를 저장하면 종료일은 시작일 + 30일이고 브랜드명을 이어 붙인다", async () => {
-    const campaignIdx = await createPickCampaign();
+    const detail = await fetchCampaignDetail(7);
+
+    expect(mockGet).toHaveBeenCalledWith("/campaign/7");
+    expect(detail.draft.creator.ageGroups).toEqual(["AGE_20S"]);
+    expect(detail.draft.intro).toMatchObject({
+      mainImage: null,
+      detailMedia: [],
+      titleHashtags: [],
+    });
+    expect(detail.draft.product.returnRequired).toBe(false);
+  });
+
+  it("1~6단계 저장은 단계 경로로 보내고 1단계는 종료일을 읽는다", async () => {
+    mockPut.mockResolvedValue({ endDate: "2099-01-31" });
 
     await saveCampaignStep(
-      campaignIdx,
+      7,
       "info",
       draftWith((draft) => {
         draft.info = {
-          name: " 봄 체험단 ",
-          brandIdx: 2,
+          name: "봄 신제품",
+          brandIdx: 3,
           campaignType: "PRODUCT_DELIVERY",
-          startDate: "2026-12-01",
+          startDate: "2099-01-01",
         };
       }),
     );
-
-    const detail = await fetchCampaignDetail(campaignIdx);
-    expect(detail.draft.info.name).toBe("봄 체험단");
-    expect(detail.endDate).toBe("2026-12-31");
-    expect(detail.brand?.name).toBe("초록숲");
-  });
-
-  it("지운 브랜드로 1단계를 저장하면 400 INVALID_BRAND다", async () => {
-    const campaignIdx = await createPickCampaign();
-    deleteBrand(1);
-
-    const reason = await readReason(
-      saveCampaignStep(
-        campaignIdx,
-        "info",
-        draftWith((draft) => {
-          draft.info.brandIdx = 1;
-        }),
-      ),
-    );
-
-    expect(reason).toBe("INVALID_BRAND");
-  });
-
-  it("유형을 바꾸면 2~6단계를 비우고 1단계는 남긴다. 처음 고를 때는 비우지 않는다", async () => {
-    const campaignIdx = await createPickCampaign();
-    const draft = draftWith((value) => {
-      value.info = {
-        name: "캠페인",
-        brandIdx: 2,
-        campaignType: "PRODUCT_DELIVERY",
-        startDate: null,
-      };
-      value.product.productName = "앰플";
-      value.addOns = ["POSTING_GUIDE"];
-    });
-    await saveCampaignStep(campaignIdx, "product", draft);
-    await saveCampaignStep(campaignIdx, "addOns", draft);
-    await saveCampaignStep(campaignIdx, "info", draft);
-
-    const kept = await fetchCampaignDetail(campaignIdx);
-    expect(kept.draft.product.productName).toBe("앰플");
-
-    draft.info.campaignType = "PRESS";
-    await saveCampaignStep(campaignIdx, "info", draft);
-
-    const cleared = await fetchCampaignDetail(campaignIdx);
-    expect(cleared.draft.info.name).toBe("캠페인");
-    expect(cleared.draft.product.productName).toBe("");
-    expect(cleared.draft.addOns).toEqual([]);
-  });
-
-  it("2단계는 유형에 맞는 칸만 저장하고, 회수 칸이 있으면 반품 회수 있음으로 읽힌다", async () => {
-    const campaignIdx = await createPickCampaign();
-    const draft = draftWith((value) => {
-      value.info.campaignType = "PRODUCT_DELIVERY";
-      value.product.productName = "앰플";
-      value.product.storeName = "다른 유형 칸";
-      value.product.returnRequired = true;
-      value.product.returnContact = "010-0000-0000";
-    });
-
-    await saveCampaignStep(campaignIdx, "product", draft);
-
-    const detail = await fetchCampaignDetail(campaignIdx);
-    expect(detail.draft.product.storeName).toBe("");
-    expect(detail.draft.product.returnRequired).toBe(true);
-    expect(detail.draft.product.rental).toBe(false);
-  });
-
-  it("3단계는 연령대·주제가 비면 400 INVALID_FIELD다", async () => {
-    const campaignIdx = await createPickCampaign();
-
-    const reason = await readReason(
-      saveCampaignStep(
-        campaignIdx,
-        "creator",
-        draftWith((draft) => {
-          draft.creator.platform = "INSTAGRAM";
-        }),
-      ),
-    );
-
-    expect(reason).toBe("INVALID_FIELD");
-  });
-
-  it("올린 파일 번호로 소개서를 저장하면 그 파일 주소·종류로 읽히고, 모르는 번호는 거절한다", async () => {
-    URL.createObjectURL = vi.fn(() => "blob:video");
-    const campaignIdx = await createPickCampaign();
-    const video = registerMockFile(new Blob(["v"], { type: "video/mp4" }));
-
+    mockPut.mockResolvedValue(undefined);
     await saveCampaignStep(
-      campaignIdx,
-      "intro",
+      7,
+      "addOns",
+      draftWith(() => {}),
+    );
+
+    expect(mockPut).toHaveBeenNthCalledWith(1, "/campaign/7/info", {
+      name: "봄 신제품",
+      brandIdx: 3,
+      campaignType: "PRODUCT_DELIVERY",
+      startDate: "2099-01-01",
+    });
+    expect(mockPut).toHaveBeenNthCalledWith(2, "/campaign/7/add-ons", {
+      addOns: [],
+    });
+  });
+
+  it("정책 동의는 저장하지 않고 서버로도 보내지 않는다", async () => {
+    await saveCampaignStep(
+      7,
+      "policy",
       draftWith((draft) => {
-        draft.intro.detailMedia = [video];
+        draft.policy = { ...AGREED };
       }),
     );
 
-    const detail = await fetchCampaignDetail(campaignIdx);
-    expect(detail.draft.intro.detailMedia).toEqual([
-      {
-        attachmentIdx: video.attachmentIdx,
-        url: "blob:video",
-        mediaType: "VIDEO",
-      },
-    ]);
-    const reason = await readReason(
-      saveCampaignStep(
-        campaignIdx,
-        "intro",
-        draftWith((draft) => {
-          draft.intro.mainImage = {
-            attachmentIdx: -1,
-            url: "",
-            mediaType: "IMAGE",
-          };
-        }),
-      ),
-    );
-    expect(reason).toBe("INVALID_ATTACHMENT");
+    expect(mockPut).not.toHaveBeenCalled();
+    expect(mockPost).not.toHaveBeenCalled();
+    expect(mockGet).not.toHaveBeenCalled();
   });
 
-  it("승인 검토중·작성 완료 데모는 409 NOT_EDITABLE이다", async () => {
-    const draft = createEmptyDraft();
-
-    expect(
-      await readReason(saveCampaignStep(PICK_REVIEWING_IDX, "product", draft)),
-    ).toBe("NOT_EDITABLE");
-    expect(
-      await readReason(saveCampaignStep(DEMO_COMPLETED_IDX, "product", draft)),
-    ).toBe("NOT_EDITABLE");
-  });
-
-  it("반려 중에는 유형·부가서비스·인원·리워드를 바꿀 수 없고, 같은 값은 저장된다", async () => {
-    const { draft } = await fetchCampaignDetail(REJECTED_IDX);
-
-    await saveCampaignStep(REJECTED_IDX, "addOns", draft);
-    await saveCampaignStep(REJECTED_IDX, "conditions", {
-      ...draft,
-      conditions: { ...draft.conditions, postingPeriodMonths: 6 },
+  it("결제는 서버로 보내고 총액과 정책 동의를 함께 실어 보낸다", async () => {
+    const paidAt = "2099-01-01 10:00:00";
+    mockPost.mockResolvedValue({
+      status: "REVIEWING",
+      paidAmount: 11_000,
+      paidAt,
+      balance: 5_000,
     });
 
-    const locked = [
-      saveCampaignStep(REJECTED_IDX, "info", {
-        ...draft,
-        info: { ...draft.info, campaignType: "PRESS" },
-      }),
-      saveCampaignStep(REJECTED_IDX, "addOns", { ...draft, addOns: [] }),
-      saveCampaignStep(REJECTED_IDX, "conditions", {
-        ...draft,
-        conditions: { ...draft.conditions, headcount: 99 },
-      }),
-    ];
-    for (const request of locked) {
-      expect(await readReason(request)).toBe("LOCKED_FIELD");
-    }
+    const paid = await payCampaign(7, {
+      expectedTotalAmount: 11_000,
+      agreements: AGREED,
+    });
+
+    expect(mockPost).toHaveBeenCalledExactlyOnceWith("/campaign/7/payment", {
+      expectedTotalAmount: 11_000,
+      agreements: AGREED,
+    });
+    expect(paid).toEqual({
+      status: "REVIEWING",
+      paidAmount: 11_000,
+      paidAt,
+      balance: 5_000,
+    });
+  });
+
+  it("결제가 거절되면 reason과 서버 계산 금액을 그대로 전한다", async () => {
+    mockPost.mockRejectedValue(
+      new ApiError(409, { reason: "AMOUNT_CHANGED", totalAmount: 11_000 }),
+    );
+
+    expect(
+      await readReason(
+        payCampaign(7, { expectedTotalAmount: 10_000, agreements: AGREED }),
+      ),
+    ).toEqual({ reason: "AMOUNT_CHANGED", totalAmount: 11_000 });
+  });
+
+  it("재승인 요청은 서버로 보내고 정책 동의 4개를 함께 싣는다", async () => {
+    mockPost.mockResolvedValue({ status: "REVIEWING" });
+
+    const result = await requestCampaignReapproval(7, AGREED);
+
+    expect(mockPost).toHaveBeenCalledExactlyOnceWith("/campaign/7/approval", {
+      agreements: AGREED,
+    });
+    expect(result).toEqual({ status: "REVIEWING" });
+  });
+
+  it("재승인 요청이 거절되면 reason을 그대로 전한다", async () => {
+    mockPost.mockRejectedValue(
+      new ApiError(400, { reason: "POLICY_NOT_AGREED" }),
+    );
+
+    expect(
+      await readReason(
+        requestCampaignReapproval(7, { ...AGREED, reward: false }),
+      ),
+    ).toEqual({ reason: "POLICY_NOT_AGREED" });
+  });
+
+  it("승인 요청 취소는 서버로 보내고 환불 금액을 읽는다", async () => {
+    mockPost.mockResolvedValue({
+      status: "DRAFT",
+      refundedAmount: 11_000,
+      balance: 16_000,
+    });
+
+    const result = await cancelCampaignApproval(7);
+
+    expect(mockPost).toHaveBeenCalledExactlyOnceWith(
+      "/campaign/7/payment/cancel",
+    );
+    expect(result).toEqual({
+      status: "DRAFT",
+      refundedAmount: 11_000,
+      balance: 16_000,
+    });
+  });
+
+  it("승인 요청 취소가 거절되면 reason과 현재 상태를 그대로 전한다", async () => {
+    mockPost.mockRejectedValue(
+      new ApiError(409, { reason: "NOT_CANCELABLE", status: "IN_PROGRESS" }),
+    );
+
+    expect(await readReason(cancelCampaignApproval(7))).toEqual({
+      reason: "NOT_CANCELABLE",
+      status: "IN_PROGRESS",
+    });
+  });
+
+  it("개발용 승인·반려는 stage 전용 API로 보낸다", async () => {
+    mockPost.mockResolvedValue(undefined);
+
+    await reviewCampaignForDev(7, { type: "approve" });
+    await reviewCampaignForDev(7, { type: "reject", reason: "금액 확인" });
+
+    expect(mockPost).toHaveBeenNthCalledWith(1, "/campaign/7/test/approve");
+    expect(mockPost).toHaveBeenNthCalledWith(2, "/campaign/7/test/reject", {
+      rejectReason: "금액 확인",
+    });
+  });
+});
+
+describe("삭제", () => {
+  it("서버의 삭제 API로 보낸다", async () => {
+    mockDelete.mockResolvedValue(undefined);
+
+    await deleteCampaign(7);
+
+    expect(mockDelete).toHaveBeenCalledExactlyOnceWith("/campaign/7");
+  });
+
+  it("서버가 거절하면 reason을 그대로 전한다", async () => {
+    mockDelete.mockRejectedValue(
+      new ApiError(409, { reason: "NOT_DELETABLE", status: "REVIEWING" }),
+    );
+
+    expect(await readReason(deleteCampaign(7))).toEqual({
+      reason: "NOT_DELETABLE",
+      status: "REVIEWING",
+    });
   });
 });
 
 describe("이전 캠페인 불러오기", () => {
-  it("1~6단계를 복사하고 코드·상태는 유지하며 정책 동의는 복사하지 않는다", async () => {
-    const campaignIdx = await createPickCampaign();
-    const before = await fetchCampaignDetail(campaignIdx);
-    const source = await fetchCampaignDetail(PICK_REVIEWING_IDX);
+  it("복사 API 한 번으로 원본 번호를 보낸다", async () => {
+    mockPost.mockResolvedValue(undefined);
 
-    await copyCampaign(campaignIdx, PICK_REVIEWING_IDX);
+    await copyCampaign(7, 5);
 
-    const copied = await fetchCampaignDetail(campaignIdx);
-    expect(copied.campaignCode).toBe(before.campaignCode);
-    expect(copied.stage).toBe("DRAFT");
-    expect(copied.payment).toBeNull();
-    expect(copied.draft.product).toEqual(source.draft.product);
-    expect(copied.draft.creator).toEqual(source.draft.creator);
-    expect(copied.draft.policy).toEqual(createEmptyDraft().policy);
+    expect(mockPost).toHaveBeenCalledExactlyOnceWith("/campaign/7/copy", {
+      sourceCampaignIdx: 5,
+    });
+    expect(mockPut).not.toHaveBeenCalled();
   });
 
-  it("원본 브랜드가 지워졌으면 브랜드를 비운다", async () => {
-    const campaignIdx = await createPickCampaign();
-    deleteBrand(2);
+  it("서버 오류의 reason을 그대로 전한다", async () => {
+    mockPost.mockRejectedValue(
+      new ApiError(404, { reason: "SOURCE_NOT_FOUND" }),
+    );
 
-    await copyCampaign(campaignIdx, PICK_REVIEWING_IDX);
-
-    const copied = await fetchCampaignDetail(campaignIdx);
-    expect(copied.draft.info.brandIdx).toBeNull();
-    expect(copied.brand).toBeNull();
-  });
-
-  it("서비스 유형이 다른 캠페인은 400 SERVICE_TYPE_MISMATCH다", async () => {
-    const campaignIdx = await createPickCampaign();
-
-    expect(
-      await readReason(copyCampaign(campaignIdx, RECRUIT_REVIEWING_IDX)),
-    ).toBe("SERVICE_TYPE_MISMATCH");
+    expect(await readReason(copyCampaign(7, 5))).toEqual({
+      reason: "SOURCE_NOT_FOUND",
+    });
   });
 });
 
-describe("브랜드 삭제와 캠페인", () => {
-  it("결제 전 캠페인은 브랜드가 비고, 결제한 캠페인은 지운 브랜드를 그대로 보인다", async () => {
-    const campaignIdx = await createPickCampaign();
-    await saveCampaignStep(
-      campaignIdx,
-      "info",
-      draftWith((draft) => {
-        draft.info.brandIdx = 2;
+describe("데모 작성 완료", () => {
+  it("서버의 작성 완료 API로 보낸다", async () => {
+    mockPost.mockResolvedValue(undefined);
+
+    await completeCampaignDemo(7);
+
+    expect(mockPost).toHaveBeenCalledExactlyOnceWith(
+      "/campaign/7/demo/complete",
+    );
+  });
+
+  it("서버 오류의 reason과 빈 단계를 그대로 전한다", async () => {
+    mockPost.mockRejectedValue(
+      new ApiError(400, {
+        reason: "INCOMPLETE_DRAFT",
+        missingSteps: ["product", "intro"],
       }),
     );
 
-    deleteBrand(2);
-
-    const draftCampaign = await fetchCampaignDetail(campaignIdx);
-    const paidCampaign = await fetchCampaignDetail(PICK_REVIEWING_IDX);
-    expect(draftCampaign.draft.info.brandIdx).toBeNull();
-    expect(draftCampaign.brand).toBeNull();
-    expect(paidCampaign.brand?.name).toBe("초록숲");
+    expect(await readReason(completeCampaignDemo(7))).toEqual({
+      reason: "INCOMPLETE_DRAFT",
+      missingSteps: ["product", "intro"],
+    });
   });
 });
 
-describe("결제", () => {
-  const AGREED = {
-    service: true,
-    privacy: true,
-    operation: true,
-    reward: true,
-  };
+describe("데모 전환", () => {
+  it("서버의 전환 API로 보낸다", async () => {
+    mockPost.mockResolvedValue(undefined);
 
-  it("동의가 하나라도 빠지면 400 POLICY_NOT_AGREED이고 상태가 바뀌지 않는다", async () => {
-    const campaignIdx = await createPickCampaign();
+    await convertCampaignDemo(7);
 
-    const reason = await readReason(
-      payCampaign(campaignIdx, {
-        expectedTotalAmount: 0,
-        agreements: { ...AGREED, reward: false },
-      }),
+    expect(mockPost).toHaveBeenCalledExactlyOnceWith(
+      "/campaign/7/demo/convert",
     );
-
-    expect(reason).toBe("POLICY_NOT_AGREED");
-    expect((await fetchCampaignDetail(campaignIdx)).stage).toBe("DRAFT");
   });
 
-  it("보낸 총액이 계산과 다르면 409 AMOUNT_CHANGED이다", async () => {
-    const campaignIdx = await createPickCampaign();
-
-    const reason = await readReason(
-      payCampaign(campaignIdx, {
-        expectedTotalAmount: 10_000,
-        agreements: AGREED,
-      }),
+  it("서버 오류의 reason을 그대로 전한다", async () => {
+    mockPost.mockRejectedValue(
+      new ApiError(403, { reason: "SUBSCRIPTION_REQUIRED" }),
     );
 
-    expect(reason).toBe("AMOUNT_CHANGED");
-  });
-
-  it("포스팅가이드를 고르면 부가세를 포함한 11,000원을 결제하고 동의를 기록한다", async () => {
-    const campaignIdx = await createPickCampaign();
-    await saveCampaignStep(
-      campaignIdx,
-      "addOns",
-      draftWith((draft) => {
-        draft.addOns = ["POSTING_GUIDE"];
-      }),
-    );
-
-    const paid = await payCampaign(campaignIdx, {
-      expectedTotalAmount: 11_000,
-      agreements: AGREED,
+    expect(await readReason(convertCampaignDemo(7))).toEqual({
+      reason: "SUBSCRIPTION_REQUIRED",
     });
-    const detail = await fetchCampaignDetail(campaignIdx);
-
-    expect(paid.paidAmount).toBe(11_000);
-    expect(detail.stage).toBe("REVIEWING");
-    expect(detail.payment?.paidAmount).toBe(11_000);
-    expect(detail.draft.policy).toEqual(AGREED);
-  });
-
-  it("포스팅가이드를 고르지 않으면 0원이어도 승인 요청으로 결제된다", async () => {
-    const campaignIdx = await createPickCampaign();
-
-    const paid = await payCampaign(campaignIdx, {
-      expectedTotalAmount: 0,
-      agreements: AGREED,
-    });
-
-    expect(paid.status).toBe("REVIEWING");
-    expect(paid.paidAmount).toBe(0);
-  });
-});
-
-describe("반려 뒤 재승인 요청", () => {
-  const AGREED = {
-    service: true,
-    privacy: true,
-    operation: true,
-    reward: true,
-  };
-
-  async function rejectPickReviewing() {
-    await reviewCampaignForDev(PICK_REVIEWING_IDX, {
-      type: "reject",
-      reason: "금액 확인",
-    });
-  }
-
-  it("반려하면 서버처럼 정책 동의 기록이 지워진다", async () => {
-    await rejectPickReviewing();
-
-    const detail = await fetchCampaignDetail(PICK_REVIEWING_IDX);
-
-    expect(detail.stage).toBe("REJECTED");
-    expect(detail.draft.policy).toEqual({
-      service: false,
-      privacy: false,
-      operation: false,
-      reward: false,
-    });
-  });
-
-  it("동의가 하나라도 빠지면 400 POLICY_NOT_AGREED이고 반려 상태가 그대로다", async () => {
-    await rejectPickReviewing();
-
-    const reason = await readReason(
-      requestCampaignReapproval(PICK_REVIEWING_IDX, {
-        ...AGREED,
-        reward: false,
-      }),
-    );
-
-    expect(reason).toBe("POLICY_NOT_AGREED");
-    expect((await fetchCampaignDetail(PICK_REVIEWING_IDX)).stage).toBe(
-      "REJECTED",
-    );
-  });
-
-  it("동의를 다시 보내면 승인 검토중이 되고 동의를 기록하며 반려 사유를 지운다", async () => {
-    await rejectPickReviewing();
-
-    await requestCampaignReapproval(PICK_REVIEWING_IDX, AGREED);
-    const detail = await fetchCampaignDetail(PICK_REVIEWING_IDX);
-
-    expect(detail.stage).toBe("REVIEWING");
-    expect(detail.draft.policy).toEqual(AGREED);
-    expect(detail.rejectReason).toBeNull();
-  });
-
-  it("반려가 아닌 캠페인은 409 NOT_REQUESTABLE이다", async () => {
-    expect(
-      await readReason(requestCampaignReapproval(PICK_REVIEWING_IDX, AGREED)),
-    ).toBe("NOT_REQUESTABLE");
   });
 });
