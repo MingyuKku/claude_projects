@@ -196,7 +196,8 @@ function CarouselPrevious({
       onClick={scrollPrev}
       {...props}
     >
-      <ArrowLeft />
+      {/* Figma 예외: 화살표 선 1.5px(전역 1px 규칙과 다름). */}
+      <ArrowLeft strokeWidth={1.5} />
       <span className="sr-only">Previous slide</span>
     </Button>
   )
@@ -227,7 +228,7 @@ function CarouselNext({
       onClick={scrollNext}
       {...props}
     >
-      <ArrowRight />
+      <ArrowRight strokeWidth={1.5} />
       <span className="sr-only">Next slide</span>
     </Button>
   )

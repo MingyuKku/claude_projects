@@ -51,9 +51,14 @@ export function ProfileTableCard({
           <div className="flex min-w-0 flex-1 items-center gap-3">
             {avatar}
             <div className="flex min-w-0 flex-1 flex-col gap-1 text-base leading-none">
-              <p className="truncate font-medium text-foreground">{name}</p>
+              {/* 줄 높이가 글자 크기와 같아 truncate가 g·y의 아래 획을 자르므로, 자르는 영역만 아래로 넓힘. */}
+              <p className="-mb-1 truncate pb-1 font-medium text-foreground">
+                {name}
+              </p>
               {description && (
-                <p className="truncate text-muted-foreground">{description}</p>
+                <p className="-mb-1 truncate pb-1 text-muted-foreground">
+                  {description}
+                </p>
               )}
             </div>
           </div>

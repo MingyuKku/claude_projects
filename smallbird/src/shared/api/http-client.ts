@@ -34,7 +34,11 @@ export interface HttpClient {
   post<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T>;
   put<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T>;
   patch<T>(path: string, body?: unknown, options?: RequestOptions): Promise<T>;
-  delete<T>(path: string, options?: RequestOptions): Promise<T>;
+  /** `body`는 본문을 받는 DELETE(대상 목록 해제 등)에만 씀. */
+  delete<T>(
+    path: string,
+    options?: RequestOptions & { body?: unknown },
+  ): Promise<T>;
   /** 파일(이진 응답)을 받음. 본문을 글자로 읽는 다른 메서드와 달리 이진 데이터를 그대로 보존함. */
   download(path: string, options?: RequestOptions): Promise<DownloadedFile>;
 }
@@ -126,6 +130,7 @@ export function createHttpClient(
     post: (path, body, options) => request("POST", path, body, options),
     put: (path, body, options) => request("PUT", path, body, options),
     patch: (path, body, options) => request("PATCH", path, body, options),
-    delete: (path, options) => request("DELETE", path, undefined, options),
+    delete: (path, { body, ...options } = {}) =>
+      request("DELETE", path, body, options),
   };
 }

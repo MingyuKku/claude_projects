@@ -71,7 +71,7 @@ describe("CreatorSearchForm", () => {
     await user.type(screen.getByRole("textbox"), " 스킨케어 ");
     await user.click(getSubmit());
     expect(await screen.findByTestId("location")).toHaveTextContent(
-      "/creators/search?q=%EC%8A%A4%ED%82%A8%EC%BC%80%EC%96%B4&platform=instagram",
+      "/creators/search?keyword=%EC%8A%A4%ED%82%A8%EC%BC%80%EC%96%B4&platform=instagram",
     );
   });
 
@@ -85,7 +85,9 @@ describe("CreatorSearchForm", () => {
       expect(router.state.location.pathname).toBe("/");
       await user.keyboard("{Enter}");
       expect(router.state.location.pathname).toBe("/creators/search");
-      expect(router.state.location.search).toBe("?q=a%0Ab&platform=instagram");
+      expect(router.state.location.search).toBe(
+        "?keyword=a%0Ab&platform=instagram",
+      );
     });
 
     it("한글 조합 중 Enter는 제출하지 않는다", () => {
@@ -125,7 +127,7 @@ describe("CreatorSearchForm", () => {
       expect(getPlatform()).toHaveTextContent("네이버");
       await user.type(screen.getByRole("textbox"), "hi");
       await user.click(getSubmit());
-      expect(router.state.location.search).toBe("?q=hi&platform=naver");
+      expect(router.state.location.search).toBe("?keyword=hi&platform=naver");
     });
 
     it("선택한 플랫폼을 다시 눌러도 해제되지 않는다", async () => {
@@ -298,7 +300,7 @@ describe("CreatorSearchForm", () => {
       await user.click(getSubmit());
       await waitFor(() =>
         expect(screen.getByTestId("location")).toHaveTextContent(
-          "/creators/search?q=",
+          "/creators/search?keyword=",
         ),
       );
     });

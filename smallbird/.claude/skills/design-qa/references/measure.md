@@ -11,7 +11,7 @@
 
 **디자인 QA는 `scripts/design/qa.mjs`가 만든 `run.js`가 설치·측정·저장을 모두 합니다**(`workflow.md`). 아래 수동 사용법은 구현 중 한 화면·한 구역만 빠르게 확인할 때(figma-to-component 검증)나 원인을 따로 볼 때 씁니다.
 
-측정 함수 원본은 같은 폴더의 `measure.js`입니다(측정 코드는 이 파일에만 둡니다). 측정은 `() => window.__qaMeasure('<CSS 선택자>')`로 부릅니다(예: `main`, `main section:nth-of-type(2)`). 로그인 등 `<main>`이 없는 화면은 `body`나 화면 최상위 요소를 씁니다. 다이얼로그·시트·드롭다운은 Radix 포털로 `<body>` 끝에 붙으므로 `[role="dialog"]`·`[role="alertdialog"]`·`[role="menu"]`로 잽니다(열림 애니메이션이 끝난 뒤). 설치하면 스크롤바도 숨깁니다(헤드리스 스크롤바 15px는 실기기 overlay 스크롤바에 없는 폭이라 위치·폭이 어긋남).
+측정 함수 원본은 같은 폴더의 `measure.js`입니다(측정 코드는 이 파일에만 둡니다). 측정은 `() => window.__qaMeasure('<CSS 선택자>')`로 부릅니다(예: `main`, `main section:nth-of-type(2)`). 로그인 등 `<main>`이 없는 화면은 `body`나 화면 최상위 요소를 씁니다. 다이얼로그·시트·드롭다운은 Radix 포털로 `<body>` 끝에 붙으므로 `[role="dialog"]`·`[role="alertdialog"]`·`[role="menu"]`로 잽니다(열림 애니메이션이 끝난 뒤). 스크롤바는 숨기지 않습니다. 결과의 `nativeScroll`에 영역이 나오면 브라우저 기본 스크롤바로 넘치는 것이므로(시안의 Scroll-area는 겹치는 스크롤바) 차이로 판정합니다.
 
 ### 설치 (브라우저를 연 뒤 한 번)
 

@@ -1,0 +1,23 @@
+{
+  "title": "创作者管理",
+  "group": {
+    "title": "收藏分组",
+    "total_other": "共<em>{{value}}</em>个",
+    "settings": "设置",
+    "all": "全部",
+    "previous": "上一个分组",
+    "next": "下一个分组"
+  },
+  "empty": {
+    "all": {
+      "title": "还没有收藏的创作者。",
+      "description": "在创作者搜索中找到心仪的创作者并加入收藏吧。",
+      "action": "前往创作者搜索"
+    },
+    "folder": {
+      "title": "没有收藏的创作者。",
+      "description": "请从其他文件夹移入，或添加新的创作者。",
+      "action": "浏览创作者"
+    }
+  }
+}

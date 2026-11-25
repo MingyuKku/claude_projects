@@ -1,0 +1,55 @@
+{
+  "mobileTitle": "高级筛选设置",
+  "tab": {
+    "quantity": "数量指标",
+    "value": "Value"
+  },
+  "range": {
+    "krFollower": "韩国粉丝数",
+    "krFollowerRatio": "韩国粉丝占比",
+    "last3MonthRatio": "近3个月活跃率",
+    "visit": "日均访客数",
+    "body": "帖子数",
+    "replyPeople": "评论者数"
+  },
+  "input": {
+    "min": "最小值",
+    "max": "最大值",
+    "minLabel": "{{label}} 最小值",
+    "maxLabel": "{{label}} 最大值",
+    "unlimited": "不限"
+  },
+  "profile": {
+    "serviceType": "创作者属性",
+    "gender": "性别",
+    "age": "年龄",
+    "agePlaceholder": "选择年龄",
+    "ageGroupPlaceholder": "初/中/末",
+    "hopeProductPlaceholder": "选择品类",
+    "area": "活动地区",
+    "areaPlaceholder": "市/区",
+    "subAreaPlaceholder": "详细地区"
+  },
+  "invalidRange": {
+    "title": "请检查输入值",
+    "description": "最小值不能大于最大值。"
+  },
+  "toolbar": {
+    "aiCost": "AI预测费用",
+    "selected": "{{label}}: {{value}}"
+  },
+  "category": {
+    "more": "{{name}} 等{{count}}个"
+  },
+  "basicFilter": {
+    "title": "基础筛选设置",
+    "platformPlaceholder": "选择平台",
+    "categoryPlaceholder": "选择类别",
+    "aiCostPlaceholder": "选择预测费用",
+    "desiredCostPlaceholder": "选择期望费用"
+  },
+  "cost": {
+    "title": "选择金额",
+    "range": "{{min}} ~ {{max}}"
+  }
+}

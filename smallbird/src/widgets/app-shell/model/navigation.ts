@@ -66,10 +66,10 @@ export const SHELL_NAV_ITEMS: ShellNavItem[] = [
   {
     id: "creatorMatching",
     icon: Users,
-    // 관리·채팅은 화면이 생기기 전까지 목적지 없이 두고, 비로그인이 누르면 로그인 안내 알럿(ShellLink)을 띄움.
+    // 채팅은 화면이 생기기 전까지 목적지 없이 두고, 비로그인이 누르면 로그인 안내 알럿(ShellLink)을 띄움.
     subItems: [
       { id: "search", href: ROUTES.creatorSearch },
-      { id: "creatorManage" },
+      { id: "creatorManage", href: ROUTES.creatorManage },
       { id: "chat" },
     ],
   },

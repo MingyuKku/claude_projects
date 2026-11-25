@@ -1,0 +1,29 @@
+{
+  "title": {
+    "batch": "Bulk proposal"
+  },
+  "campaign": {
+    "title": "Campaigns",
+    "previous": "Previous campaign",
+    "next": "Next campaign",
+    "empty": {
+      "title": "No active campaigns.",
+      "description": "Register a campaign to match creators.",
+      "action": "New campaign"
+    }
+  },
+  "form": {
+    "title": "Proposal",
+    "amount": "Amount",
+    "fee": "Group buy fee",
+    "feePlaceholder": "e.g. 20%"
+  },
+  "preview": {
+    "title": "Message preview",
+    "creatorToken": "{Creator name}"
+  },
+  "result": {
+    "sent": "Campaign proposal sent.",
+    "duplicated": "Not sent: a creator was already proposed to."
+  }
+}

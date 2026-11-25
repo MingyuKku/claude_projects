@@ -1,0 +1,23 @@
+{
+  "title": "分组设置",
+  "row": {
+    "all": "全部",
+    "handle": "调整{{name}}顺序",
+    "edit": "重命名{{name}}",
+    "remove": "删除{{name}}",
+    "name": "文件夹名称",
+    "submit": "完成"
+  },
+  "remove": {
+    "title": "删除文件夹",
+    "description": "仅保存在此文件夹的创作者将从收藏中删除。\n(同时保存在其他文件夹的创作者不会被删除。)",
+    "confirm": "移除"
+  },
+  "sort": {
+    "instructions": "按空格键拿起，用方向键移动，再按空格键放下。",
+    "pickedUp": "已拿起第{{index}}个文件夹。",
+    "moved": "已移到第{{index}}位。",
+    "dropped": "已放到第{{index}}位。",
+    "cancelled": "已取消调整顺序。"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "all": {
+    "description": "The creator will be removed from every folder, including All."
+  },
+  "folder": {
+    "title": "Remove from this folder",
+    "description": "The creator will be removed from the selected folder only.\nYou can still find them in All."
+  },
+  "confirm": "Remove"
+}

@@ -122,6 +122,19 @@
       index.set(el, row.i);
       rows.push(row);
     }
+    // 브라우저 기본 스크롤바로 실제 넘치는 영역. 시안의 Scroll-area는 겹치는 스크롤바라 폭을 차지하지 않음.
+    // 헤드리스는 스크롤바를 그리지 않아 폭으로는 알 수 없으므로 스타일로 가림.
+    const nativeScroll = (area) =>
+      [area, ...area.querySelectorAll('*')].flatMap((el) => {
+        const cs = getComputedStyle(el);
+        const overflows =
+          (/auto|scroll/.test(cs.overflowY) && el.scrollHeight > el.clientHeight + 1) ||
+          (/auto|scroll/.test(cs.overflowX) && el.scrollWidth > el.clientWidth + 1);
+        const isHidden = cs.scrollbarWidth === 'none' || getComputedStyle(el, '::-webkit-scrollbar').display === 'none';
+        return overflows && !isHidden && !el.hasAttribute('data-radix-scroll-area-viewport')
+          ? [`${el.tagName.toLowerCase()}.${String(el.className).slice(0, 80)}`]
+          : [];
+      });
     return {
       root: ROOT,
       viewport: `${globalThis.innerWidth}x${globalThis.innerHeight}`,
@@ -129,22 +142,12 @@
       // 측정 구역의 화면(viewport) 위치. 보고서 캡처 위에 차이 위치를 그릴 때 더함
       origin: [px(base.left), px(base.top)],
       scroll: root.scrollHeight > root.clientHeight + 1 ? `${root.clientHeight}/${root.scrollHeight}` : undefined,
+      nativeScroll: nativeScroll(root),
       count: rows.length,
       truncated: rows.length >= MAX,
       rows,
     };
   };
-  // 헤드리스 스크롤바(15px)가 측정값을 흩트려서 숨김(실기기는 overlay 스크롤바).
-  // 초기화 스크립트로 넣으면 <head>가 생기기 전에 실행되므로 DOM이 준비된 뒤 넣음
-  const hideScrollbar = () => {
-    if (document.getElementById('qa-no-scrollbar')) return;
-    const st = document.createElement('style');
-    st.id = 'qa-no-scrollbar';
-    st.textContent = '*{scrollbar-width:none!important}*::-webkit-scrollbar{display:none!important}';
-    (document.head || document.documentElement).appendChild(st);
-  };
-  if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', hideScrollbar);
-  else hideScrollbar();
   // 설치만 함. 측정은 구역을 정해 따로 부름(화면마다 <main>이 없을 수도 있음)
   return { installed: true, main: !!document.querySelector('main') };
 })();

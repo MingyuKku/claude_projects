@@ -20,6 +20,10 @@ const toggleVariants = cva(
         lg: "h-11 px-5 py-3",
       },
     },
+    // Figma 폭에는 안쪽 테두리 1px이 들어 있어, 테두리가 있는 sm은 여백에서 그만큼 뺌(아이콘만 있으면 36×36).
+    compoundVariants: [
+      { variant: "outline", size: "sm", className: "px-2.25" },
+    ],
     defaultVariants: {
       variant: "default",
       size: "default",

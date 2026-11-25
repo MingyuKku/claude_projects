@@ -1,0 +1,61 @@
+{
+  "title": "クリエイター詳細",
+  "tab": {
+    "metrics": "主要指標",
+    "intro": "紹介",
+    "feed": "最近の投稿",
+    "creatorInfo": "クリエイター情報"
+  },
+  "profile": {
+    "serviceType": "キャンペーン種別",
+    "platformNickname": "ニックネーム"
+  },
+  "metrics": {
+    "title": {
+      "performance": "主要成果と費用",
+      "index": "指数分析",
+      "categoryIndex": "カテゴリ別指数",
+      "follower": "フォロワー分析",
+      "activity": "活動分析",
+      "followerMix": "フォロワー構成",
+      "activityIndex": "活動指数",
+      "demographic": "年齢層比率",
+      "trend": "最近の活動推移",
+      "topCommenters": "コメント投稿 TOP 10"
+    },
+    "change": "前月比",
+    "categoryDetail": "カテゴリ別指数の詳細",
+    "axis": {
+      "reach": "リーチ数"
+    },
+    "commentCount": "{{value}}件"
+  },
+  "intro": {
+    "region": "主な活動地域",
+    "map": "韓国地図",
+    "profile": "プロフィール情報",
+    "job": "職業",
+    "currentJob": "現職: {{value}}",
+    "pastJob": "前職: {{value}}",
+    "genderAge": "性別/年齢",
+    "marriage": "婚姻状況",
+    "married": "既婚",
+    "single": "未婚",
+    "children": "子ども",
+    "hasChildren": "あり",
+    "noChildren": "なし",
+    "pet": "ペット",
+    "skinType": "肌タイプ",
+    "interests": "関心事"
+  },
+  "feed": {
+    "back": "一覧に戻る",
+    "comments": "コメント <em>{{value}}</em>",
+    "media": "投稿メディア",
+    "mediaItem": "メディア {{order}}",
+    "previous": "前のメディア",
+    "next": "次のメディア",
+    "empty": "最近の投稿はありません。",
+    "likes": "いいね"
+  }
+}

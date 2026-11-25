@@ -102,7 +102,7 @@ function runScript() {
       m.url = url.pathname + url.search;
       await page.evaluate(([k, v]) => localStorage.setItem(k, JSON.stringify(v)), ['__qa:' + s.id, m]);
       await page.screenshot({ path: OUT + '/' + s.id + '-impl.png' });
-      lines.push(s.id + ' ok rows=' + m.count + (m.scroll ? ' scroll=' + m.scroll : '') + (m.truncated ? ' TRUNCATED' : '') + ' ' + (Date.now() - started) + 'ms');
+      lines.push(s.id + ' ok rows=' + m.count + (m.scroll ? ' scroll=' + m.scroll : '') + (m.nativeScroll?.length ? ' NATIVE_SCROLL=' + m.nativeScroll.length : '') + (m.truncated ? ' TRUNCATED' : '') + ' ' + (Date.now() - started) + 'ms');
     } catch (e) {
       lines.push(s.id + ' FAIL ' + String(e.message || e).split('\\n')[0].slice(0, 160));
     }

@@ -5,6 +5,7 @@ import type { ComponentProps, ReactNode } from "react";
 
 // Figma Card / Avatar(6987:112262)·Card / Badge(6987:112408): 작은 제목 + 하단 요약 한 줄.
 // children 자리에 아바타 묶음이나 `<Badge size="sm">`를, aside에 오른쪽 보조 문구(예: "50명")를 넣음.
+// 시안 테두리는 크기에 포함되는 안쪽 선이라 inset-ring으로 그림.
 interface SummaryCardProps extends Omit<ComponentProps<"div">, "title"> {
   title: ReactNode;
   icon?: ReactNode;
@@ -22,10 +23,16 @@ export function SummaryCard({
   ...props
 }: SummaryCardProps) {
   return (
-    <Card interactive={interactive} className={className} {...props}>
-      <CardHeader>
+    <Card
+      interactive={interactive}
+      className={cn("border-0 inset-ring inset-ring-border", className)}
+      {...props}
+    >
+      <CardHeader className="max-tablet:px-4">
         {icon}
-        <CardTitle className="text-sm leading-6">{title}</CardTitle>
+        <CardTitle className="text-sm leading-5.5 desktop:leading-6">
+          {title}
+        </CardTitle>
       </CardHeader>
       <CardContent
         className={cn(

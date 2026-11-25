@@ -39,7 +39,8 @@ function ScrollArea({
 const scrollBarVariants = cva("flex touch-none p-0.5 transition-colors select-none", {
   variants: {
     orientation: {
-      vertical: "h-full",
+      // 높이는 Radix가 주는 top·bottom으로 정해짐(h-full을 주면 top을 내렸을 때 아래로 빠져나감).
+      vertical: "",
       horizontal: "flex-col",
     },
     size: {

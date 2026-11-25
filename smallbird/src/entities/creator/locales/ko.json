@@ -1,0 +1,69 @@
+{
+  "list": {
+    "label": "크리에이터 목록",
+    "error": "크리에이터 목록을 불러오지 못했습니다."
+  },
+  "toolbar": {
+    "basicFilter": "기본 필터"
+  },
+  "column": {
+    "brandIndex": "브랜드 지수",
+    "groupBuyIndex": "공구 지수",
+    "actions": "동작"
+  },
+  "select": {
+    "all": "전체 선택",
+    "row": "{{name}} 선택"
+  },
+  "selection": {
+    "count_other": "<em>{{count}}</em>개 선택 됨"
+  },
+  "action": {
+    "propose": "{{name}} 캠페인 제안"
+  },
+  "cost": {
+    "approx": "약 {{man}}만 원"
+  },
+  "newFolder": {
+    "title": "새 폴더",
+    "placeholder": "폴더명을 입력하세요",
+    "submit": "생성"
+  },
+  "selected": {
+    "title": "선택 크리에이터",
+    "row": "{{name}} 선택",
+    "count_other": "<em>{{count}}</em>개 선택 됨"
+  },
+  "platform": {
+    "instagram": "인스타그램",
+    "naver": "네이버 블로그",
+    "youtube": "유튜브",
+    "tiktok": "틱톡",
+    "x": "엑스"
+  },
+  "term": {
+    "platform": "플랫폼",
+    "category": "카테고리",
+    "profile": "프로필",
+    "followerCount": "팔로워 수",
+    "avgViewCount": "평균 조회수",
+    "avgLikeCount": "평균 좋아요 수",
+    "avgCommentCount": "평균 댓글 수",
+    "avgShareRatio": "평균 공유 수",
+    "avgCommentWriterCount": "평균 댓글 작성자 수",
+    "expectedCost": "예상 비용",
+    "desiredCost": "희망비용",
+    "brandInfluenceIndex": "브랜드 영향력 지수",
+    "groupBuyInfluenceIndex": "공구 영향력 지수",
+    "detailFilter": "상세 필터",
+    "propose": "캠페인 제안",
+    "saveBookmark": "즐겨찾기 저장",
+    "removeBookmark": "즐겨찾기 해제",
+    "moveGroup": "그룹 이동",
+    "newFolder": "새 폴더 만들기",
+    "bookmark": "{{name}} 즐겨찾기",
+    "won": "원",
+    "nextStep": "다음",
+    "hopeProducts": "희망 공구 품목"
+  }
+}

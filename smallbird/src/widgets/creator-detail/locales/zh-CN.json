@@ -1,0 +1,61 @@
+{
+  "title": "创作者详情",
+  "tab": {
+    "metrics": "主要指标",
+    "intro": "简介",
+    "feed": "最近动态",
+    "creatorInfo": "创作者信息"
+  },
+  "profile": {
+    "serviceType": "活动类型",
+    "platformNickname": "平台昵称"
+  },
+  "metrics": {
+    "title": {
+      "performance": "核心成果与费用",
+      "index": "指数分析",
+      "categoryIndex": "分类指数",
+      "follower": "粉丝分析",
+      "activity": "活动分析",
+      "followerMix": "粉丝构成",
+      "activityIndex": "活动指数",
+      "demographic": "年龄段占比",
+      "trend": "近期活动趋势",
+      "topCommenters": "评论 TOP 10"
+    },
+    "change": "环比",
+    "categoryDetail": "分类指数详情",
+    "axis": {
+      "reach": "曝光数"
+    },
+    "commentCount": "{{value}}条"
+  },
+  "intro": {
+    "region": "主要活动地区",
+    "map": "韩国地图",
+    "profile": "资料信息",
+    "job": "职业",
+    "currentJob": "现职: {{value}}",
+    "pastJob": "前职: {{value}}",
+    "genderAge": "性别/年龄",
+    "marriage": "婚姻状况",
+    "married": "已婚",
+    "single": "未婚",
+    "children": "子女",
+    "hasChildren": "有",
+    "noChildren": "无",
+    "pet": "宠物",
+    "skinType": "肤质",
+    "interests": "兴趣"
+  },
+  "feed": {
+    "back": "返回列表",
+    "comments": "评论 <em>{{value}}</em>",
+    "media": "帖子媒体",
+    "mediaItem": "媒体 {{order}}",
+    "previous": "上一个媒体",
+    "next": "下一个媒体",
+    "empty": "暂无最近帖子。",
+    "likes": "点赞"
+  }
+}

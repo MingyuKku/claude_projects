@@ -55,6 +55,8 @@ interface AppShellProps {
    * 시안이 없는 화면을 임시로 특정 메뉴 아래에 둘 때 씀.
    */
   activeNavId?: ShellNavId;
+  /** PC에서도 접힌 레일로 두고, 펼치면 본문을 밀지 않고 위를 덮음. 다른 화면의 접힘 상태는 바꾸지 않음. */
+  isSidebarOverlay?: boolean;
   children: ReactNode;
   className?: string;
   /** `<main>` 여백을 바꿈. 기본은 p-5이고, 배경이 영역을 꽉 채우는 화면은 "p-0"을 넘김. */
@@ -82,6 +84,7 @@ export function AppShell({
   icon,
   isTitleVisibleOnMobile,
   activeNavId,
+  isSidebarOverlay = false,
   isKeyboardAware = false,
   keyboardGapClassName = "bg-background",
 }: AppShellProps) {
@@ -141,7 +144,7 @@ export function AppShell({
     expandSidebar();
   }
 
-  function handleClickTabletRailGroup(itemId: string) {
+  function handleClickOverlayRailGroup(itemId: string) {
     setExpandedNavId(findNavId(itemId));
     openMenu();
   }
@@ -221,14 +224,25 @@ export function AppShell({
         )}
       >
         <div className="hidden shrink-0 desktop:block">
-          <SidebarNav
-            {...sidebarProps}
-            navLabel={t("menu.main")}
-            isCollapsed={isCollapsed}
-            toggleLabel={isCollapsed ? t("menu.expand") : t("menu.collapse")}
-            onClickRailGroup={handleClickDesktopRailGroup}
-            onClickToggle={handleToggleDesktopSidebar}
-          />
+          {isSidebarOverlay ? (
+            <SidebarNav
+              {...sidebarProps}
+              navLabel={t("menu.main")}
+              isCollapsed
+              toggleLabel={t("menu.openFull")}
+              onClickRailGroup={handleClickOverlayRailGroup}
+              onClickToggle={handleOpenFullMenu}
+            />
+          ) : (
+            <SidebarNav
+              {...sidebarProps}
+              navLabel={t("menu.main")}
+              isCollapsed={isCollapsed}
+              toggleLabel={isCollapsed ? t("menu.expand") : t("menu.collapse")}
+              onClickRailGroup={handleClickDesktopRailGroup}
+              onClickToggle={handleToggleDesktopSidebar}
+            />
+          )}
         </div>
         <div className="hidden shrink-0 tablet:block desktop:hidden">
           <SidebarNav
@@ -238,7 +252,7 @@ export function AppShell({
             className="w-14.25"
             isCollapsed
             toggleLabel={t("menu.openFull")}
-            onClickRailGroup={handleClickTabletRailGroup}
+            onClickRailGroup={handleClickOverlayRailGroup}
             onClickToggle={handleOpenFullMenu}
           />
         </div>

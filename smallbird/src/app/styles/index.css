@@ -144,6 +144,7 @@
 @theme {
   --color-blue-600: #2563eb;
   --color-emerald-600: #059669;
+  --color-green-500: #22c55e;
   --color-slate-400: #94a3b8;
   --color-slate-600: #475569;
 }
@@ -238,34 +239,6 @@
   --breakpoint-desktop: 1440px;
   /* Landing page only: the old landing used 1240px. */
   --breakpoint-introtab: 1240px;
-}
-
-/* Skeleton 빛 줄기. Figma Skeleton(4733:6553)에 모션 정의가 없어 코드에서 정함(디자인 확인 대기).
-   막대마다 자기 폭 안에서 빛이 지나가게 함. 뷰포트 기준으로 하면 이동 거리가 길어, 스켈레톤이 짧게 노출될 때
-   빛이 막대에 닿기 전에 사라짐. 줄기는 그림(200%) 가운데 10% 폭이고, 막대 왼쪽 밖에서 오른쪽 밖까지 이동함. */
-@utility skeleton-shimmer {
-  background-image: linear-gradient(
-    105deg,
-    transparent 45%,
-    color-mix(in oklab, var(--background) 80%, transparent) 50%,
-    transparent 55%
-  );
-  background-size: 200% 100%;
-  background-repeat: no-repeat;
-  animation: skeleton-shimmer 1.8s linear infinite;
-  @media (prefers-reduced-motion: reduce) {
-    background-image: none;
-    animation: none;
-  }
-}
-
-@keyframes skeleton-shimmer {
-  from {
-    background-position: 110% 0;
-  }
-  to {
-    background-position: -10% 0;
-  }
 }
 
 /* Figma 디자인 시스템 Typography. 모바일 기준 값에 tablet(768)·desktop(1440)에서 크기만 바뀜. */
@@ -381,6 +354,15 @@
       var(--muted-foreground) 40%,
       transparent
     );
+  }
+}
+
+/* 스크롤은 되고 스크롤바는 보이지 않는 가로 목록(시안에 스크롤바가 없음). */
+@utility scrollbar-hidden {
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
   }
 }
 

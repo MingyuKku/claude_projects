@@ -5,16 +5,26 @@ import { NotFoundPage } from "@/pages/not-found";
 import { useTranslation } from "@/shared/i18n";
 import { NotFoundError } from "@/shared/lib";
 
+import {
+  reloadForStaleChunk,
+  shouldReloadForStaleChunk,
+} from "./stale-chunk-reload";
+
 // 라우트 단위 전역 에러 화면. 사용자에게는 다음 행동(재시도)을 보여주고, 원인은 콘솔에 남긴다.
 // 독립적으로 실패할 수 있는 위젯에는 지역 바운더리를 따로 둔다 (.claude/rules/error-handling.md).
 export function RouteErrorBoundary() {
   const { t } = useTranslation();
   const error = useRouteError();
+  // 배포 전에 연 탭이 사라진 화면 코드를 요청해 실패한 경우. 주소는 이미 이동하려던 화면이라 새로고침하면 그 화면이 열림.
+  const isReloading = shouldReloadForStaleChunk(error);
 
-  // 렌더는 순수해야 하므로(StrictMode에서 두 번 실행됨) 로그는 커밋 뒤에 남긴다.
+  // 렌더는 순수해야 하므로(StrictMode에서 두 번 실행됨) 로그와 새로고침은 커밋 뒤에 한다.
   useEffect(() => {
     console.error(error);
-  }, [error]);
+    if (isReloading) reloadForStaleChunk();
+  }, [error, isReloading]);
+
+  if (isReloading) return null;
 
   // 화면이 없는 대상을 열었다는 오류는 알 수 없는 경로와 같은 화면으로 보냄.
   const isNotFound =

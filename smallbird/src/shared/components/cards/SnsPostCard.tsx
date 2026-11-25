@@ -94,30 +94,26 @@ export function SnsPostCard({
   const authorLine = (
     <div className="flex items-center gap-2">
       <SnsIcon platform={platform} className="size-5" />
-      <span className="text-sm leading-5 font-semibold text-foreground">
-        {author}
-      </span>
+      <span className="ds-text-sm-5-semibold text-foreground">{author}</span>
     </div>
   );
   const media = <PostMedia src={imageSrc} alt={imageAlt} isVideo={isVideo} />;
   const meta = <PostMeta platform={platform} metrics={metrics} date={date} />;
   const titleLine = title && (
-    <p className="truncate text-lg leading-7 font-semibold text-foreground">
-      {title}
-    </p>
+    <p className="truncate ds-text-lg-7-semibold text-foreground">{title}</p>
   );
 
   return (
     <article
       className={cn(
-        "flex h-110 w-76 flex-col overflow-hidden rounded-md border bg-card p-px",
+        "flex h-110 w-76 flex-col overflow-hidden rounded-md border bg-card",
         className,
       )}
       {...props}
     >
       {platform === "instagram" && (
         <>
-          <div className="flex items-center justify-between px-5 py-3.5">
+          <div className="flex h-15 shrink-0 items-center justify-between px-4 tablet:px-5">
             {authorLine}
             {menuLabel && (
               <Button
@@ -131,8 +127,8 @@ export function SnsPostCard({
             )}
           </div>
           {media}
-          <div className="px-5 pt-3">{meta}</div>
-          <p className="min-h-13 px-5 pt-2.5 pb-5 text-sm leading-5 text-foreground">
+          <div className="px-4 pt-3 tablet:px-5">{meta}</div>
+          <p className="px-4 pt-2.5 pb-4 ds-text-sm-5-normal text-foreground tablet:px-5 tablet:pb-5">
             {text}
           </p>
         </>
@@ -141,11 +137,11 @@ export function SnsPostCard({
       {MEDIA_FIRST.includes(platform) && (
         <>
           {media}
-          <div className="flex flex-col gap-1.5 px-5 pt-3 pb-5">
+          <div className="flex flex-col gap-1.5 px-4 pt-3 pb-4 tablet:px-5 tablet:pb-5">
             {authorLine}
             {titleLine}
             {text && (
-              <p className="text-sm leading-5 text-foreground">{text}</p>
+              <p className="ds-text-sm-5-normal text-foreground">{text}</p>
             )}
             {meta}
           </div>
@@ -154,16 +150,16 @@ export function SnsPostCard({
 
       {(platform === "naver" || platform === "x") && (
         <>
-          <div className="flex flex-col gap-1.5 px-5 pt-4 pb-2.5">
+          <div className="flex flex-col gap-1.5 px-4 pt-4 pb-2.5 tablet:px-5">
             {authorLine}
             {titleLine}
             {text && (
-              <p className="line-clamp-3 text-sm leading-5 text-foreground">
+              <p className="line-clamp-3 ds-text-sm-5-normal text-foreground">
                 {text}
               </p>
             )}
           </div>
-          <div className="px-5 pb-3">{meta}</div>
+          <div className="px-4 pb-3 tablet:px-5">{meta}</div>
           {media}
         </>
       )}
@@ -195,7 +191,6 @@ function PostMedia({
   );
 }
 
-// Youtube·Tiktok의 좋아요는 thumbs-up, 나머지는 heart 아이콘.
 function PostMeta({
   platform,
   metrics,
@@ -205,6 +200,21 @@ function PostMeta({
   metrics: SnsPostMetrics;
   date: ReactNode;
 }) {
+  return (
+    <div className="flex items-center justify-between ds-text-xs-4-normal text-muted-foreground">
+      <SnsMetricList platform={platform} metrics={metrics} />
+      <span>{date}</span>
+    </div>
+  );
+}
+
+interface SnsMetricListProps {
+  platform: SnsPlatform;
+  metrics: SnsPostMetrics;
+}
+
+// Youtube·Tiktok의 좋아요는 thumbs-up, 나머지는 heart 아이콘.
+export function SnsMetricList({ platform, metrics }: SnsMetricListProps) {
   const items: { id: string; icon: LucideIcon; value?: ReactNode }[] = [
     { id: "views", icon: Play, value: metrics.views },
     {
@@ -217,18 +227,15 @@ function PostMeta({
   ];
 
   return (
-    <div className="flex items-center justify-between text-xs leading-4 text-muted-foreground">
-      <ul className="flex items-center gap-3">
-        {items
-          .filter((item) => item.value != null)
-          .map(({ id, icon: Icon, value }) => (
-            <li key={id} className="flex items-center gap-1">
-              <Icon aria-hidden className="size-4" />
-              {value}
-            </li>
-          ))}
-      </ul>
-      <span>{date}</span>
-    </div>
+    <ul className="flex items-center gap-3 ds-text-xs-4-normal text-muted-foreground">
+      {items
+        .filter((item) => item.value != null)
+        .map(({ id, icon: Icon, value }) => (
+          <li key={id} className="flex items-center gap-1">
+            <Icon aria-hidden className="size-4" />
+            {value}
+          </li>
+        ))}
+    </ul>
   );
 }

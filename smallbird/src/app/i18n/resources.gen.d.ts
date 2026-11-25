@@ -2,6 +2,7 @@
 // 각 namespace 의 ko.json 을 키 원본으로 삼아 t() 의 키를 타입 검사합니다.
 import type entitiesBigbirdMoney from "../../entities/bigbird-money/locales/ko.json";
 import type entitiesCampaign from "../../entities/campaign/locales/ko.json";
+import type entitiesCreator from "../../entities/creator/locales/ko.json";
 import type entitiesSubscription from "../../entities/subscription/locales/ko.json";
 import type featuresBigbirdMoneyHistory from "../../features/bigbird-money-history/locales/ko.json";
 import type featuresBrowseSubscriptionPlans from "../../features/browse-subscription-plans/locales/ko.json";
@@ -14,18 +15,25 @@ import type featuresEditBankAccount from "../../features/edit-bank-account/local
 import type featuresEditCompanyInfo from "../../features/edit-company-info/locales/ko.json";
 import type featuresEditInquiryMessage from "../../features/edit-inquiry-message/locales/ko.json";
 import type featuresExpiredPassword from "../../features/expired-password/locales/ko.json";
+import type featuresFilterCreators from "../../features/filter-creators/locales/ko.json";
 import type featuresFindAccount from "../../features/find-account/locales/ko.json";
 import type featuresJoin from "../../features/join/locales/ko.json";
 import type featuresLinkSocialAccount from "../../features/link-social-account/locales/ko.json";
 import type featuresLogin from "../../features/login/locales/ko.json";
 import type featuresManageBillingCards from "../../features/manage-billing-cards/locales/ko.json";
+import type featuresManageFolders from "../../features/manage-folders/locales/ko.json";
 import type featuresManageSubAccounts from "../../features/manage-sub-accounts/locales/ko.json";
 import type featuresManageSubscription from "../../features/manage-subscription/locales/ko.json";
+import type featuresMoveBookmark from "../../features/move-bookmark/locales/ko.json";
 import type featuresNewBigbirdInquiry from "../../features/new-bigbird-inquiry/locales/ko.json";
 import type featuresNotificationConsent from "../../features/notification-consent/locales/ko.json";
 import type featuresPaymentHistory from "../../features/payment-history/locales/ko.json";
+import type featuresProposeCampaign from "../../features/propose-campaign/locales/ko.json";
 import type featuresRealtimeConsultation from "../../features/realtime-consultation/locales/ko.json";
+import type featuresRecommendCreators from "../../features/recommend-creators/locales/ko.json";
 import type featuresRegisterCampaign from "../../features/register-campaign/locales/ko.json";
+import type featuresRemoveBookmark from "../../features/remove-bookmark/locales/ko.json";
+import type featuresSaveBookmark from "../../features/save-bookmark/locales/ko.json";
 import type featuresSearchCreator from "../../features/search-creator/locales/ko.json";
 import type featuresSocialLogin from "../../features/social-login/locales/ko.json";
 import type featuresSwitchAccount from "../../features/switch-account/locales/ko.json";
@@ -37,7 +45,8 @@ import type pagesCampaignRegister from "../../pages/campaign-register/locales/ko
 import type pagesCampaignStatus from "../../pages/campaign-status/locales/ko.json";
 import type pagesCertSuccess from "../../pages/cert-success/locales/ko.json";
 import type pagesChangePassword from "../../pages/change-password/locales/ko.json";
-import type pagesComingSoon from "../../pages/coming-soon/locales/ko.json";
+import type pagesCreatorManage from "../../pages/creator-manage/locales/ko.json";
+import type pagesCreatorSearch from "../../pages/creator-search/locales/ko.json";
 import type pagesCustomerCenterBigbirdNew from "../../pages/customer-center-bigbird-new/locales/ko.json";
 import type pagesCustomerCenterBigbird from "../../pages/customer-center-bigbird/locales/ko.json";
 import type pagesCustomerCenterBuyer from "../../pages/customer-center-buyer/locales/ko.json";
@@ -60,6 +69,7 @@ import type common from "../../shared/i18n/locales/ko.json";
 import type widgetsAppShell from "../../widgets/app-shell/locales/ko.json";
 import type widgetsBigbirdInquiryWorkspace from "../../widgets/bigbird-inquiry-workspace/locales/ko.json";
 import type widgetsBuyerInquiryWorkspace from "../../widgets/buyer-inquiry-workspace/locales/ko.json";
+import type widgetsCreatorDetail from "../../widgets/creator-detail/locales/ko.json";
 
 declare module "i18next" {
   interface CustomTypeOptions {
@@ -68,6 +78,7 @@ declare module "i18next" {
       common: typeof common;
       "entities/bigbird-money": typeof entitiesBigbirdMoney;
       "entities/campaign": typeof entitiesCampaign;
+      "entities/creator": typeof entitiesCreator;
       "entities/subscription": typeof entitiesSubscription;
       "features/bigbird-money-history": typeof featuresBigbirdMoneyHistory;
       "features/browse-subscription-plans": typeof featuresBrowseSubscriptionPlans;
@@ -80,18 +91,25 @@ declare module "i18next" {
       "features/edit-company-info": typeof featuresEditCompanyInfo;
       "features/edit-inquiry-message": typeof featuresEditInquiryMessage;
       "features/expired-password": typeof featuresExpiredPassword;
+      "features/filter-creators": typeof featuresFilterCreators;
       "features/find-account": typeof featuresFindAccount;
       "features/join": typeof featuresJoin;
       "features/link-social-account": typeof featuresLinkSocialAccount;
       "features/login": typeof featuresLogin;
       "features/manage-billing-cards": typeof featuresManageBillingCards;
+      "features/manage-folders": typeof featuresManageFolders;
       "features/manage-sub-accounts": typeof featuresManageSubAccounts;
       "features/manage-subscription": typeof featuresManageSubscription;
+      "features/move-bookmark": typeof featuresMoveBookmark;
       "features/new-bigbird-inquiry": typeof featuresNewBigbirdInquiry;
       "features/notification-consent": typeof featuresNotificationConsent;
       "features/payment-history": typeof featuresPaymentHistory;
+      "features/propose-campaign": typeof featuresProposeCampaign;
       "features/realtime-consultation": typeof featuresRealtimeConsultation;
+      "features/recommend-creators": typeof featuresRecommendCreators;
       "features/register-campaign": typeof featuresRegisterCampaign;
+      "features/remove-bookmark": typeof featuresRemoveBookmark;
+      "features/save-bookmark": typeof featuresSaveBookmark;
       "features/search-creator": typeof featuresSearchCreator;
       "features/social-login": typeof featuresSocialLogin;
       "features/switch-account": typeof featuresSwitchAccount;
@@ -103,7 +121,8 @@ declare module "i18next" {
       "pages/campaign-status": typeof pagesCampaignStatus;
       "pages/cert-success": typeof pagesCertSuccess;
       "pages/change-password": typeof pagesChangePassword;
-      "pages/coming-soon": typeof pagesComingSoon;
+      "pages/creator-manage": typeof pagesCreatorManage;
+      "pages/creator-search": typeof pagesCreatorSearch;
       "pages/customer-center-bigbird": typeof pagesCustomerCenterBigbird;
       "pages/customer-center-bigbird-new": typeof pagesCustomerCenterBigbirdNew;
       "pages/customer-center-buyer": typeof pagesCustomerCenterBuyer;
@@ -125,6 +144,7 @@ declare module "i18next" {
       "widgets/app-shell": typeof widgetsAppShell;
       "widgets/bigbird-inquiry-workspace": typeof widgetsBigbirdInquiryWorkspace;
       "widgets/buyer-inquiry-workspace": typeof widgetsBuyerInquiryWorkspace;
+      "widgets/creator-detail": typeof widgetsCreatorDetail;
     };
   }
 }

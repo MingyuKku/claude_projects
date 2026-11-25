@@ -43,6 +43,7 @@ export function ChatbotTextField({
   value,
   defaultValue,
   onChange,
+  disabled,
   ...props
 }: ChatbotTextFieldProps) {
   const { length, handleChange } = useTextLength({
@@ -76,6 +77,7 @@ export function ChatbotTextField({
     <Button
       variant="ghost-muted"
       size="icon-xs"
+      disabled={disabled}
       aria-label={attachLabel}
       onClick={onClickAttach}
     >
@@ -85,6 +87,7 @@ export function ChatbotTextField({
   const submitButton = (
     <Button
       size="icon-xs"
+      disabled={disabled}
       aria-label={submitLabel}
       onClick={onClickSubmit}
       className={cn(
@@ -99,6 +102,7 @@ export function ChatbotTextField({
   const textarea = (
     <textarea
       {...props}
+      disabled={disabled}
       value={value}
       defaultValue={defaultValue}
       onChange={handleChange}

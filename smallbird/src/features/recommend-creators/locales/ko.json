@@ -1,0 +1,7 @@
+{
+  "title": "AI 추천 도우미",
+  "greeting": "안녕하세요, {{name}}님!\n준비 중인 기능입니다.",
+  "placeholder": "추가 요청을 입력하세요.",
+  "attach": "첨부",
+  "submit": "보내기"
+}

@@ -1,0 +1,61 @@
+{
+  "title": "Creator details",
+  "tab": {
+    "metrics": "Metrics",
+    "intro": "About",
+    "feed": "Recent feed",
+    "creatorInfo": "Creator info"
+  },
+  "profile": {
+    "serviceType": "Campaign type",
+    "platformNickname": "Platform name"
+  },
+  "metrics": {
+    "title": {
+      "performance": "Performance & cost",
+      "index": "Index analysis",
+      "categoryIndex": "Index by category",
+      "follower": "Follower analysis",
+      "activity": "Activity analysis",
+      "followerMix": "Follower mix",
+      "activityIndex": "Activity index",
+      "demographic": "Age groups",
+      "trend": "Recent trend",
+      "topCommenters": "Top 10 commenters"
+    },
+    "change": "vs last month",
+    "categoryDetail": "Index by category",
+    "axis": {
+      "reach": "Reach"
+    },
+    "commentCount": "{{value}}"
+  },
+  "intro": {
+    "region": "Main region",
+    "map": "Map of Korea",
+    "profile": "Profile",
+    "job": "Job",
+    "currentJob": "Current: {{value}}",
+    "pastJob": "Past: {{value}}",
+    "genderAge": "Gender/Age",
+    "marriage": "Marital status",
+    "married": "Married",
+    "single": "Single",
+    "children": "Children",
+    "hasChildren": "Yes",
+    "noChildren": "No",
+    "pet": "Pets",
+    "skinType": "Skin type",
+    "interests": "Interests"
+  },
+  "feed": {
+    "back": "Back to list",
+    "comments": "Comments <em>{{value}}</em>",
+    "media": "Post media",
+    "mediaItem": "Media {{order}}",
+    "previous": "Previous media",
+    "next": "Next media",
+    "empty": "No recent posts.",
+    "likes": "Likes"
+  }
+}

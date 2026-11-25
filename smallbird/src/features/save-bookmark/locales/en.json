@@ -1,0 +1,7 @@
+{
+  "folders": {
+    "title": "Choose folders",
+    "member_one": "{{value}} creator",
+    "member_other": "{{value}} creators"
+  }
+}

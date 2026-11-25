@@ -50,6 +50,7 @@ const REGION_BOX: Record<
 };
 // Figma 확대 도형 너비 60px
 const CALLOUT_WIDTH = 60;
+const CALLOUT_STROKE_WIDTH = 2;
 
 const regionHref = (region: KoreaRegion) => `${koreaMapUrl}#${region}`;
 
@@ -62,7 +63,7 @@ interface KoreaMapProps {
   className?: string;
 }
 
-// Figma Map(7119:101630): 선택 지역은 blue-100으로 채우고 왼쪽에 확대 도형과 이름을 표시함.
+// Figma Map(7119:101630): 선택 지역만 blue-100으로 채우고 테두리를 파랗게 하고, 왼쪽에 확대 도형과 이름을 표시함.
 export function KoreaMap({
   selected,
   selectedLabel,
@@ -85,7 +86,7 @@ export function KoreaMap({
             href={regionHref(region)}
             className={cn(
               "fill-background stroke-slate-300",
-              region === selected && "fill-blue-100",
+              region === selected && "fill-blue-100 stroke-primary",
             )}
           />
         ))}
@@ -114,15 +115,15 @@ function RegionCallout({
         strokeLinecap="round"
         strokeLinejoin="round"
       >
-        {/* 확대해도 선 두께가 1px로 보이게 배율만큼 줄임. */}
+        {/* 확대해도 선 두께가 2px로 보이게 배율만큼 줄임. */}
         <use
           href={regionHref(region)}
-          className="fill-blue-100 stroke-slate-300"
-          strokeWidth={width / CALLOUT_WIDTH}
+          className="fill-blue-100 stroke-primary"
+          strokeWidth={(CALLOUT_STROKE_WIDTH * width) / CALLOUT_WIDTH}
         />
       </svg>
       {label && (
-        <span className="text-center text-base leading-none font-medium text-foreground">
+        <span className="text-center text-base leading-none font-medium whitespace-nowrap text-foreground">
           {label}
         </span>
       )}

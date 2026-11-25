@@ -4,6 +4,7 @@ import { ROUTES } from "@/shared/config";
 
 import { AuthenticatedLayout } from "../layouts/AuthenticatedLayout";
 import { CampaignLayout } from "../layouts/CampaignLayout";
+import { CreatorMatchingLayout } from "../layouts/CreatorMatchingLayout";
 import { MypageLayout } from "../layouts/MypageLayout";
 import { OptionalSessionLayout } from "../layouts/OptionalSessionLayout";
 import { PageFallback } from "../layouts/PageFallback";
@@ -70,10 +71,6 @@ export const routes: RouteObject[] = [
               Component: (await import("@/pages/home")).HomePage,
             }),
           },
-          page(
-            ROUTES.creatorSearch,
-            async () => (await import("@/pages/coming-soon")).ComingSoonPage,
-          ),
         ],
       },
       page(ROUTES.introduction, async () => {
@@ -158,6 +155,20 @@ export const routes: RouteObject[] = [
           async () =>
             (await import("@/pages/customer-center-buyer"))
               .CustomerCenterCreatorPage,
+        ),
+      ]),
+
+      // 크리에이터 매칭. 셸은 CreatorMatchingLayout이 맡음.
+      requireSessionRoute(CreatorMatchingLayout, [
+        page(
+          ROUTES.creatorSearch,
+          async () =>
+            (await import("@/pages/creator-search")).CreatorSearchPage,
+        ),
+        page(
+          ROUTES.creatorManage,
+          async () =>
+            (await import("@/pages/creator-manage")).CreatorManagePage,
         ),
       ]),
 

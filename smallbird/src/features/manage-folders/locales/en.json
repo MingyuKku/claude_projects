@@ -1,0 +1,23 @@
+{
+  "title": "Group settings",
+  "row": {
+    "all": "All",
+    "handle": "Reorder {{name}}",
+    "edit": "Rename {{name}}",
+    "remove": "Delete {{name}}",
+    "name": "Folder name",
+    "submit": "Done"
+  },
+  "remove": {
+    "title": "Delete folder",
+    "description": "Creators saved only in this folder will be removed from favorites.\n(Creators also saved in other folders stay in favorites.)",
+    "confirm": "Remove"
+  },
+  "sort": {
+    "instructions": "Press space to pick up, arrow keys to move, space to drop.",
+    "pickedUp": "Picked up folder {{index}}.",
+    "moved": "Moved to position {{index}}.",
+    "dropped": "Dropped at position {{index}}.",
+    "cancelled": "Reorder cancelled."
+  }
+}

@@ -26,6 +26,8 @@ interface ChartLineProps {
   series: ChartLineSeries[];
   /** Y축 눈금. 첫 값과 끝 값이 축 범위가 됨. */
   yTicks?: number[];
+  /** X축 글자. 생략하면 값을 그대로 보임(툴팁은 늘 값 그대로). */
+  formatXTick?: (value: string) => string;
   className?: string;
 }
 
@@ -34,6 +36,7 @@ export function ChartLine({
   xKey,
   series,
   yTicks,
+  formatXTick,
   className,
 }: ChartLineProps) {
   const config: ChartConfig = Object.fromEntries(
@@ -62,6 +65,7 @@ export function ChartLine({
           stroke={AXIS_STROKE}
           tick={AXIS_TICK}
           tickMargin={8}
+          tickFormatter={formatXTick}
         />
         <YAxis
           ticks={yTicks}

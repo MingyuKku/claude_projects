@@ -1,0 +1,7 @@
+{
+  "title": "AI assistant",
+  "greeting": "Hello, {{name}}!\nThis feature is coming soon.",
+  "placeholder": "Enter your request.",
+  "attach": "Attach",
+  "submit": "Send"
+}

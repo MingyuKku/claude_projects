@@ -11,7 +11,7 @@ const leadingVariants = cva("flex min-w-0 flex-1 items-center", {
   variants: {
     type: {
       handle: "gap-2",
-      checkbox: "gap-3",
+      checkbox: "ds-gap-3",
     },
   },
   defaultVariants: { type: "handle" },
@@ -28,6 +28,8 @@ interface ButtonListBaseProps extends Omit<ComponentProps<"div">, "title"> {
   editor?: ReactNode;
   isChecked?: boolean;
   onCheckedChange?: (isChecked: boolean) => void;
+  /** 드래그 핸들 버튼에 펼침(순서 바꾸기 연결). */
+  handleProps?: ComponentProps<typeof Button>;
 }
 
 // 드래그 핸들은 아이콘만 있는 버튼이라 이름(handleLabel)이 필수.
@@ -45,6 +47,7 @@ export function ButtonList({
   actions,
   editor,
   handleLabel,
+  handleProps,
   isChecked,
   onCheckedChange,
   className,
@@ -54,7 +57,7 @@ export function ButtonList({
     <div
       {...props}
       className={cn(
-        "flex min-h-16 min-w-20 items-center gap-3 rounded-md border bg-background p-3 hover:bg-accent/50",
+        "flex min-h-16 min-w-20 items-center gap-3 rounded-md bg-background p-3 inset-ring inset-ring-border hover:bg-accent/50",
         className,
       )}
     >
@@ -63,8 +66,10 @@ export function ButtonList({
           <Button
             variant="ghost-foreground"
             size="icon-xss"
+            {...handleProps}
             aria-label={handleLabel}
-            className="cursor-grab"
+            // 버튼은 20, 시안 아이콘은 16이라 양옆 2px을 상쇄함.
+            className="-mx-0.5 cursor-grab"
           >
             <GripVertical />
           </Button>
@@ -96,7 +101,7 @@ export function ButtonList({
         </span>
       </div>
       {!editor && actions && (
-        <div className="flex shrink-0 items-center gap-3">{actions}</div>
+        <div className="flex shrink-0 items-center ds-gap-3">{actions}</div>
       )}
     </div>
   );

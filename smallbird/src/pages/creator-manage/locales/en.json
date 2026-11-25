@@ -1,0 +1,24 @@
+{
+  "title": "Creator management",
+  "group": {
+    "title": "Favorite groups",
+    "total_one": "<em>{{value}}</em> total",
+    "total_other": "<em>{{value}}</em> total",
+    "settings": "Settings",
+    "all": "All",
+    "previous": "Previous group",
+    "next": "Next group"
+  },
+  "empty": {
+    "all": {
+      "title": "No saved creators yet.",
+      "description": "Find creators you like in creator search and add them to favorites.",
+      "action": "Go to creator search"
+    },
+    "folder": {
+      "title": "No saved creators.",
+      "description": "Move creators from another folder or add new ones.",
+      "action": "Browse creators"
+    }
+  }
+}

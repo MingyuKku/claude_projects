@@ -8,6 +8,6 @@ export { PlanCard } from "./PlanCard";
 export type { PlanCardFeature, PlanCardType } from "./PlanCard";
 export { ProfileTableCard } from "./ProfileTableCard";
 export type { ProfileTableCardRow } from "./ProfileTableCard";
-export { SnsIcon, SnsPostCard } from "./SnsPostCard";
+export { SnsIcon, SnsMetricList, SnsPostCard } from "./SnsPostCard";
 export type { SnsPlatform, SnsPostMetrics } from "./SnsPostCard";
 export { SummaryCard, SummaryCardAvatars } from "./SummaryCard";

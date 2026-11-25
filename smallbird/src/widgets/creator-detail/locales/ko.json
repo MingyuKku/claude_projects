@@ -1,0 +1,61 @@
+{
+  "title": "크리에이터 상세보기",
+  "tab": {
+    "metrics": "주요 지표",
+    "intro": "소개",
+    "feed": "최근 피드",
+    "creatorInfo": "크리에이터 정보"
+  },
+  "profile": {
+    "serviceType": "캠페인 유형",
+    "platformNickname": "플랫폼 닉네임"
+  },
+  "metrics": {
+    "title": {
+      "performance": "핵심 성과 및 비용",
+      "index": "지수 분석",
+      "categoryIndex": "카테고리별 지수",
+      "follower": "팔로워 분석",
+      "activity": "활동 분석",
+      "followerMix": "팔로워 구성",
+      "activityIndex": "활동 지수",
+      "demographic": "연령대 비율",
+      "trend": "최근 활동 추이",
+      "topCommenters": "댓글 작성 TOP 10"
+    },
+    "change": "전월 대비",
+    "categoryDetail": "카테고리별 지수 상세",
+    "axis": {
+      "reach": "노출수"
+    },
+    "commentCount": "{{value}}개"
+  },
+  "intro": {
+    "region": "주요 활동지역",
+    "map": "대한민국 지도",
+    "profile": "프로필 정보",
+    "job": "직업",
+    "currentJob": "현직업: {{value}}",
+    "pastJob": "전직업: {{value}}",
+    "genderAge": "성별/연령",
+    "marriage": "결혼 유무",
+    "married": "기혼",
+    "single": "미혼",
+    "children": "자녀 관계",
+    "hasChildren": "있음",
+    "noChildren": "없음",
+    "pet": "반려동물",
+    "skinType": "피부타입",
+    "interests": "관심사"
+  },
+  "feed": {
+    "back": "목록으로 돌아가기",
+    "comments": "댓글 <em>{{value}}</em>",
+    "media": "게시물 미디어",
+    "mediaItem": "미디어 {{order}}",
+    "previous": "이전 미디어",
+    "next": "다음 미디어",
+    "empty": "최근 게시물이 없습니다.",
+    "likes": "좋아요"
+  }
+}

@@ -1,0 +1,29 @@
+{
+  "title": {
+    "batch": "캠페인 일괄 제안"
+  },
+  "campaign": {
+    "title": "캠페인 리스트",
+    "previous": "이전 캠페인",
+    "next": "다음 캠페인",
+    "empty": {
+      "title": "진행 중인 캠페인이 없습니다.",
+      "description": "캠페인을 등록하여 크리에이터를 매칭하세요.",
+      "action": "캠페인 등록"
+    }
+  },
+  "form": {
+    "title": "제안 작성",
+    "amount": "제안 금액",
+    "fee": "공구 수수료",
+    "feePlaceholder": "예:20%"
+  },
+  "preview": {
+    "title": "메시지 미리보기",
+    "creatorToken": "{크리에이터명}"
+  },
+  "result": {
+    "sent": "캠페인 제안을 보냈습니다.",
+    "duplicated": "이미 제안한 크리에이터가 있어 보내지 못했습니다."
+  }
+}

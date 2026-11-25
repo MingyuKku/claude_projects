@@ -1,0 +1,55 @@
+{
+  "mobileTitle": "상세 필터 설정",
+  "tab": {
+    "quantity": "양적 지수",
+    "value": "Value"
+  },
+  "range": {
+    "krFollower": "한국 팔로워 수",
+    "krFollowerRatio": "한국 팔로워 비중",
+    "last3MonthRatio": "최근 3개월 팔로워 활동 비율",
+    "visit": "일 평균 방문자 수",
+    "body": "본문 수",
+    "replyPeople": "댓글 작성자수"
+  },
+  "input": {
+    "min": "최소값",
+    "max": "최대값",
+    "minLabel": "{{label}} 최소값",
+    "maxLabel": "{{label}} 최대값",
+    "unlimited": "무제한"
+  },
+  "profile": {
+    "serviceType": "크리에이터 속성",
+    "gender": "성별",
+    "age": "연령",
+    "agePlaceholder": "연령 선택",
+    "ageGroupPlaceholder": "초반/중반/후반",
+    "hopeProductPlaceholder": "희망 공구 품목을 선택하세요.",
+    "area": "활동 지역",
+    "areaPlaceholder": "시/군/구",
+    "subAreaPlaceholder": "상세지역"
+  },
+  "invalidRange": {
+    "title": "입력값을 확인해 주세요",
+    "description": "최솟값은 최댓값보다 클 수 없습니다."
+  },
+  "toolbar": {
+    "aiCost": "AI 예측비용",
+    "selected": "{{label}}: {{value}}"
+  },
+  "category": {
+    "more": "{{name}} 외 {{count}}"
+  },
+  "basicFilter": {
+    "title": "기본 필터 설정",
+    "platformPlaceholder": "플랫폼을 선택하세요.",
+    "categoryPlaceholder": "카테고리를 선택하세요.",
+    "aiCostPlaceholder": "예측 비용을 선택하세요.",
+    "desiredCostPlaceholder": "희망 비용을 선택하세요."
+  },
+  "cost": {
+    "title": "금액 선택",
+    "range": "{{min}} ~ {{max}}"
+  }
+}

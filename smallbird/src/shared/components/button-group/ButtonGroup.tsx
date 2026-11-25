@@ -5,9 +5,9 @@ import { cn } from "@/shared/lib/utils";
 import type { ComponentProps, ReactNode } from "react";
 
 // Figma Button / Group(7021:168638)·Button / Group / Mobile(7149:169922).
-// 아이콘 + 제목 + 개수를 담은 선택 버튼. Figma Focus 상태는 포커스 링.
+// 아이콘 + 제목 + 개수를 담은 선택 버튼. Figma Focus 상태는 포커스 링. 시안 테두리는 높이에 포함되는 안쪽 선이라 inset-ring으로 그림.
 const buttonGroupVariants = cva(
-  "flex min-w-20 items-center overflow-hidden rounded-md border bg-background text-left outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+  "flex min-w-20 items-center overflow-hidden rounded-md inset-ring inset-ring-border bg-background text-left outline-none focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
   {
     variants: {
       size: {
@@ -37,7 +37,7 @@ const countVariants = cva(
   {
     variants: {
       size: {
-        default: "leading-6",
+        default: "leading-5.5 desktop:leading-6",
         mobile: "leading-5.5",
       },
     },

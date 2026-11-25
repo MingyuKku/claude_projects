@@ -1,0 +1,71 @@
+{
+  "list": {
+    "label": "Creator list",
+    "error": "Couldn't load creators."
+  },
+  "toolbar": {
+    "basicFilter": "Basic filters"
+  },
+  "column": {
+    "brandIndex": "Brand index",
+    "groupBuyIndex": "Group buy index",
+    "actions": "Actions"
+  },
+  "select": {
+    "all": "Select all",
+    "row": "Select {{name}}"
+  },
+  "selection": {
+    "count_one": "<em>{{count}}</em> selected",
+    "count_other": "<em>{{count}}</em> selected"
+  },
+  "action": {
+    "propose": "Propose campaign to {{name}}"
+  },
+  "cost": {
+    "approx": "~{{won}} KRW"
+  },
+  "newFolder": {
+    "title": "New folder",
+    "placeholder": "Enter a folder name",
+    "submit": "Create"
+  },
+  "selected": {
+    "title": "Selected creators",
+    "row": "Select {{name}}",
+    "count_one": "<em>{{count}}</em> selected",
+    "count_other": "<em>{{count}}</em> selected"
+  },
+  "platform": {
+    "instagram": "Instagram",
+    "naver": "Naver Blog",
+    "youtube": "YouTube",
+    "tiktok": "TikTok",
+    "x": "X"
+  },
+  "term": {
+    "platform": "Platform",
+    "category": "Category",
+    "profile": "Profile",
+    "followerCount": "Followers",
+    "avgViewCount": "Avg. views",
+    "avgLikeCount": "Avg. likes",
+    "avgCommentCount": "Avg. comments",
+    "avgShareRatio": "Avg. shares",
+    "avgCommentWriterCount": "Avg. commenters",
+    "expectedCost": "Est. cost",
+    "desiredCost": "Desired cost",
+    "brandInfluenceIndex": "Brand influence index",
+    "groupBuyInfluenceIndex": "Group buy influence index",
+    "detailFilter": "Advanced filters",
+    "propose": "Propose campaign",
+    "saveBookmark": "Save to favorites",
+    "removeBookmark": "Remove favorite",
+    "moveGroup": "Move group",
+    "newFolder": "New folder",
+    "bookmark": "Favorite {{name}}",
+    "won": "KRW",
+    "nextStep": "Next",
+    "hopeProducts": "Preferred group buy items"
+  }
+}

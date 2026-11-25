@@ -34,6 +34,7 @@ export const ROUTES = {
   inicisClose: "/inicis/close",
   legacyMain: "/main",
   creatorSearch: "/creators/search",
+  creatorManage: "/creators/manage",
   find: "/find",
   findEmailSent: "/find/email-sent",
   join: "/join",

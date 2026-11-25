@@ -1,0 +1,55 @@
+{
+  "mobileTitle": "詳細フィルター設定",
+  "tab": {
+    "quantity": "定量指標",
+    "value": "Value"
+  },
+  "range": {
+    "krFollower": "韓国フォロワー数",
+    "krFollowerRatio": "韓国フォロワー比率",
+    "last3MonthRatio": "直近3か月の活動率",
+    "visit": "1日平均訪問者数",
+    "body": "投稿数",
+    "replyPeople": "コメント投稿者数"
+  },
+  "input": {
+    "min": "最小値",
+    "max": "最大値",
+    "minLabel": "{{label}} 最小値",
+    "maxLabel": "{{label}} 最大値",
+    "unlimited": "無制限"
+  },
+  "profile": {
+    "serviceType": "クリエイター属性",
+    "gender": "性別",
+    "age": "年齢",
+    "agePlaceholder": "年齢を選択",
+    "ageGroupPlaceholder": "前半/半ば/後半",
+    "hopeProductPlaceholder": "品目を選択",
+    "area": "活動地域",
+    "areaPlaceholder": "市/区",
+    "subAreaPlaceholder": "詳細地域"
+  },
+  "invalidRange": {
+    "title": "入力値をご確認ください",
+    "description": "最小値は最大値より大きくできません。"
+  },
+  "toolbar": {
+    "aiCost": "AI予測費用",
+    "selected": "{{label}}: {{value}}"
+  },
+  "category": {
+    "more": "{{name}} 他{{count}}"
+  },
+  "basicFilter": {
+    "title": "基本フィルター設定",
+    "platformPlaceholder": "プラットフォームを選択",
+    "categoryPlaceholder": "カテゴリを選択",
+    "aiCostPlaceholder": "予測費用を選択",
+    "desiredCostPlaceholder": "希望費用を選択"
+  },
+  "cost": {
+    "title": "金額選択",
+    "range": "{{min}} ~ {{max}}"
+  }
+}

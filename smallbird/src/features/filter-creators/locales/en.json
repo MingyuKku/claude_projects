@@ -1,0 +1,55 @@
+{
+  "mobileTitle": "Advanced filters",
+  "tab": {
+    "quantity": "Metrics",
+    "value": "Value"
+  },
+  "range": {
+    "krFollower": "KR followers",
+    "krFollowerRatio": "KR follower share",
+    "last3MonthRatio": "Active followers (3 mo.)",
+    "visit": "Avg. daily visitors",
+    "body": "Posts",
+    "replyPeople": "Commenters"
+  },
+  "input": {
+    "min": "Min",
+    "max": "Max",
+    "minLabel": "{{label}} min",
+    "maxLabel": "{{label}} max",
+    "unlimited": "No limit"
+  },
+  "profile": {
+    "serviceType": "Creator type",
+    "gender": "Gender",
+    "age": "Age",
+    "agePlaceholder": "Select age",
+    "ageGroupPlaceholder": "Early/Mid/Late",
+    "hopeProductPlaceholder": "Select an item.",
+    "area": "Region",
+    "areaPlaceholder": "City/District",
+    "subAreaPlaceholder": "Area"
+  },
+  "invalidRange": {
+    "title": "Check your input",
+    "description": "Min can't be greater than max."
+  },
+  "toolbar": {
+    "aiCost": "AI est. cost",
+    "selected": "{{label}}: {{value}}"
+  },
+  "category": {
+    "more": "{{name}} +{{count}}"
+  },
+  "basicFilter": {
+    "title": "Basic filters",
+    "platformPlaceholder": "Select a platform.",
+    "categoryPlaceholder": "Select a category.",
+    "aiCostPlaceholder": "Select an estimated cost.",
+    "desiredCostPlaceholder": "Select a desired cost."
+  },
+  "cost": {
+    "title": "Amount",
+    "range": "{{min}} ~ {{max}}"
+  }
+}
