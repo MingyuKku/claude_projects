@@ -3,6 +3,7 @@ import { useNavigate } from "react-router";
 
 import { getCampaignRegisterPath } from "@/entities/campaign";
 import { SubHeader } from "@/shared/components/app-header";
+import { ScrollPanel } from "@/shared/components/scroll-panel";
 import { formatNumber, useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
 import {
@@ -89,7 +90,10 @@ export function CampaignDetailContent({
         className="tablet:hidden"
         title={<h2 className="truncate">{t("detail.title")}</h2>}
       />
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4 tablet:ds-p-5">
+      <ScrollPanel
+        className="flex-1"
+        contentClassName="px-4 pb-4 tablet:ds-p-5"
+      >
         <section className="flex flex-col ds-gap-4">
           <h2 className="hidden ds-text-base-none-semibold tablet:block">
             {t("detail.title")}
@@ -150,7 +154,7 @@ export function CampaignDetailContent({
             <DevReviewTools campaignIdx={detail.campaignIdx} />
           )}
         </section>
-      </div>
+      </ScrollPanel>
       {isRejected && canManage && (
         <div className="flex shrink-0 justify-end bg-background p-4 tablet:p-5">
           <Button

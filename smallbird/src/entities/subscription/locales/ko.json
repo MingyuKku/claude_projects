@@ -36,7 +36,8 @@
     "badge": {
       "brand": "브랜드형",
       "groupBuy": "공구형",
-      "undecided": "미정"
+      "undecided": "미정",
+      "inUse": "이용 중"
     },
     "recruit": {
       "features": {

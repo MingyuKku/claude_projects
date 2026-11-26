@@ -16,7 +16,10 @@ export function useCreatorMetricTexts() {
   const { t } = useTranslation("entities/creator");
 
   return (creator: CreatorViewModel) => ({
-    followers: formatCompactCount(creator.followerCount),
+    followers:
+      creator.followerCount === null
+        ? EMPTY_VALUE
+        : formatCompactCount(creator.followerCount),
     brandIndex: formatIndexScore(creator.brandIndex),
     groupBuyIndex: formatIndexScore(creator.groupBuyIndex),
     commentWriters: formatAverageCount(creator.avgCommentWriterCount),

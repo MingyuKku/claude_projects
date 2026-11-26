@@ -2,7 +2,6 @@ import { Mail } from "lucide-react";
 import { useState } from "react";
 
 import {
-  CreatorScrollArea,
   LoadError,
   CreatorPanel,
   creatorKey,
@@ -14,6 +13,7 @@ import {
   useCreatorTerms,
 } from "@/entities/creator";
 import { EmptyState } from "@/shared/components/empty-state";
+import { ScrollPanel } from "@/shared/components/scroll-panel";
 import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
@@ -62,7 +62,7 @@ function toViewModel(detail: CreatorDetail): CreatorViewModel {
     categoryIdx: detail.categoryIdx,
     nickname: detail.nickname,
     profileImageUrl: detail.profileImageUrl,
-    followerCount: 0,
+    followerCount: null,
     brandIndex: null,
     groupBuyIndex: null,
     avgCommentWriterCount: null,
@@ -222,7 +222,7 @@ export function CreatorDetailPanel({
     <div className="relative h-full">
       <div className="h-full" inert={isPostFullScreen}>
         <CreatorPanel title={t("title")} onClose={onClose}>
-          <CreatorScrollArea
+          <ScrollPanel
             className="flex-1"
             contentClassName={cn(
               "flex flex-col",
@@ -254,7 +254,7 @@ export function CreatorDetailPanel({
             <div className="flex shrink-0 grow flex-col ds-gap-6 pb-5">
               {renderBody()}
             </div>
-          </CreatorScrollArea>
+          </ScrollPanel>
           <footer className="flex shrink-0 justify-end ds-p-5">
             <Button
               className="h-9.5 desktop:h-10"
@@ -269,14 +269,14 @@ export function CreatorDetailPanel({
       </div>
       {isPostFullScreen && platformCode && (
         <div className="absolute inset-0 z-10 bg-background">
-          <CreatorScrollArea className="h-full" contentClassName="px-4 pb-4">
+          <ScrollPanel className="h-full" contentClassName="px-4 pb-4">
             <PostDetail
               target={post}
               platformCode={platformCode}
               author={target.platformId}
               onClickBack={() => setPost(null)}
             />
-          </CreatorScrollArea>
+          </ScrollPanel>
         </div>
       )}
     </div>

@@ -98,7 +98,7 @@ export function StickyTabBar({
         "sticky top-0 z-10 -mx-(--mypage-gutter) bg-background pt-2",
         // 스크롤하면 잘리는 위치가 콘텐츠 여백이 아니라 화면 가장자리가 되도록, MO는 첫 탭을 콘텐츠 선에 맞추는 여백을 목록이 가짐.
         scrollable
-          ? "overflow-x-auto tablet:px-(--mypage-gutter)"
+          ? "scrollbar-hidden overflow-x-auto tablet:px-(--mypage-gutter)"
           : "px-(--mypage-gutter)",
         className,
       )}

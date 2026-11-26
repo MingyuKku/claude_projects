@@ -36,7 +36,8 @@
     "badge": {
       "brand": "品牌型",
       "groupBuy": "团购型",
-      "undecided": "待定"
+      "undecided": "待定",
+      "inUse": "使用中"
     },
     "recruit": {
       "features": {

@@ -1,10 +1,11 @@
 import { useNavigate } from "react-router";
 
 import { getCampaignRegisterPath } from "@/entities/campaign";
+import { ScrollPanel } from "@/shared/components/scroll-panel";
 import { StepSidebar } from "@/shared/components/step-sidebar";
 import { useTranslation } from "@/shared/i18n";
 
-import { getStepLabelKey } from "../../model/step-labels";
+import { STEP_LABEL_KEYS } from "../../model/step-labels";
 import { getRegisterSteps } from "../../model/steps";
 
 import type { CampaignDetail } from "@/entities/campaign";
@@ -39,7 +40,10 @@ export function CampaignDetailSidebar({
   }
 
   return (
-    <div className="h-full overflow-y-auto border-r bg-muted/40 px-4 py-5">
+    <ScrollPanel
+      className="h-full border-r bg-muted/40"
+      contentClassName="px-4 py-5"
+    >
       <StepSidebar
         label={t("nav.label")}
         size="md"
@@ -55,11 +59,11 @@ export function CampaignDetailSidebar({
         items={steps.map(({ step }, index) => ({
           id: step,
           number: index + 1,
-          label: t(getStepLabelKey(step, detail.productType)),
+          label: t(STEP_LABEL_KEYS[step]),
           state: isEditable ? "default" : "disabled",
         }))}
         onSelect={handleSelect}
       />
-    </div>
+    </ScrollPanel>
   );
 }

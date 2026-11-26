@@ -3,12 +3,12 @@ import { isEqual } from "radash";
 import { useState } from "react";
 
 import {
-  CreatorScrollArea,
   CreatorPanel,
   RANGE_FILTER_KEYS,
   RANGE_FILTER_RULES,
   useCreatorTerms,
 } from "@/entities/creator";
+import { ScrollPanel } from "@/shared/components/scroll-panel";
 import { useTranslation } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/shared/ui/tabs";
@@ -112,7 +112,7 @@ export function DetailFilterPanel({
       title={isTabletUp ? term("detailFilter") : t("mobileTitle")}
       onClose={onClose}
     >
-      <CreatorScrollArea className="flex-1" contentClassName="ds-px-5 ds-pt-5">
+      <ScrollPanel className="flex-1" contentClassName="ds-px-5 ds-pt-5">
         <Tabs value={tab} onValueChange={handleChangeTab} className="ds-gap-3">
           <TabsList className="w-full">
             <TabsTrigger value="quantity" className={TAB_CLASS_NAME}>
@@ -138,7 +138,7 @@ export function DetailFilterPanel({
             />
           </TabsContent>
         </Tabs>
-      </CreatorScrollArea>
+      </ScrollPanel>
       <div className="flex shrink-0 gap-3 ds-p-5">
         <Button
           variant="outline"

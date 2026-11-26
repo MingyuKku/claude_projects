@@ -1,13 +1,13 @@
 import { ChevronLeft } from "lucide-react";
 
 import {
-  CreatorScrollArea,
   LoadError,
   focusOnMount,
   useCreatorFeedDetail,
 } from "@/entities/creator";
 import { SubHeader } from "@/shared/components/app-header";
 import { SnsIcon, SnsMetricList } from "@/shared/components/cards";
+import { ScrollPanel } from "@/shared/components/scroll-panel";
 import { useTranslation } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
 import { Separator } from "@/shared/ui/separator";
@@ -68,7 +68,7 @@ export function PostDetail({
               metrics={getPostMetrics(post)}
             />
           </div>
-          <CreatorScrollArea
+          <ScrollPanel
             className="flex-1"
             contentClassName="flex flex-col ds-gap-4 ds-px-5 ds-pb-5"
           >
@@ -88,7 +88,7 @@ export function PostDetail({
             </div>
             <Separator />
             <PostComments target={target} count={post.commentCount} />
-          </CreatorScrollArea>
+          </ScrollPanel>
         </section>
       </div>
     );

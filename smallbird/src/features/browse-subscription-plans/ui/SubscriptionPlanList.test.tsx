@@ -93,6 +93,7 @@ describe("SubscriptionPlanList", () => {
   it("구독 중인 상품은 비활성 '구독 중'이고 다른 상품의 '구독하기'는 눌린다", async () => {
     const { user, onSubscribe } = setup();
     expect(screen.getByRole("button", { name: "구독 중" })).toBeDisabled();
+    expect(screen.getAllByText("이용 중")).toHaveLength(1);
 
     await user.click(screen.getByRole("button", { name: "구독하기" }));
 

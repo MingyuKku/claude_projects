@@ -2,11 +2,9 @@ import { tryit } from "radash";
 import { useState } from "react";
 import { useNavigate } from "react-router";
 import { toast } from "sonner";
-import { useSWRConfig } from "swr";
 
 import { useBigbirdMoneyBalance } from "@/entities/bigbird-money";
 import {
-  campaignDetailKey,
   completeCampaignDemo,
   DRAFT_STEP_BY_REGISTER_STEP,
   fetchCampaignDetail,
@@ -66,7 +64,6 @@ export function usePaymentFlow(steps: readonly RegisterStepDefinition[]) {
   const saver = useDraftSaver();
   const handleFailedSave = useSaveResultHandler();
   const navigate = useNavigate();
-  const { mutate } = useSWRConfig();
   const { balance, mutate: reloadBalance } = useBigbirdMoneyBalance();
   const [dialog, setDialog] = useState<PaymentDialog | null>(null);
   const [isPaying, setIsPaying] = useState(false);
@@ -75,8 +72,6 @@ export function usePaymentFlow(steps: readonly RegisterStepDefinition[]) {
     const { campaignIdx, allowLeave } = store.getState();
     allowLeave();
     void navigate(getCampaignDetailPath(campaignIdx), { replace: true });
-    // 떠난 뒤에 다시 읽음. 먼저 읽으면 작성 화면이 승인 대기 상태를 보고 알럿을 띄운 채 등록 내역으로 넘어감.
-    void mutate(campaignDetailKey(campaignIdx));
   }
 
   async function handleFailedPayment(error: unknown) {

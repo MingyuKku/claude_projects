@@ -1,7 +1,4 @@
 import { useEffect, useState } from "react";
-import { useSWRConfig } from "swr";
-
-import { campaignDetailKey } from "@/entities/campaign";
 
 import { createDraftSaver } from "../model/draft-saver";
 import { revokePendingIntroMedia } from "../model/pending-media";
@@ -22,14 +19,9 @@ export function RegisterWizardProvider({
   detail,
   children,
 }: RegisterWizardProviderProps) {
-  const { mutate } = useSWRConfig();
   const [value] = useState(() => {
     const store = createRegisterWizardStore(detail);
-    // 저장 응답은 본문이 없어 상세 캐시만 다시 읽음. store는 다시 채우지 않음(스펙 §5).
-    const saver = createDraftSaver(store, () =>
-      mutate(campaignDetailKey(detail.campaignIdx)),
-    );
-    return { store, saver };
+    return { store, saver: createDraftSaver(store) };
   });
 
   // 저장하지 못한 채 떠나면 올리기 전 파일의 미리보기 주소를 놓아 줌.

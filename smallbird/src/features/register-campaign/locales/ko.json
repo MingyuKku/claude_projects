@@ -1,8 +1,7 @@
 {
   "step": {
     "campaignInfo": "캠페인 정보 입력",
-    "product": "제품 정보 입력",
-    "productGroupBuy": "협찬 제품 정보 입력",
+    "product": "협찬 제품 정보 입력",
     "creator": "크리에이터 조건",
     "groupBuy": "공동구매 조건 설정",
     "addOns": "부가서비스",
@@ -105,7 +104,6 @@
     "image": {
       "label": "브랜드 이미지",
       "title": "브랜드 이미지를 업로드해 주세요.",
-      "description": "미업로드 시 기본 프로필로 대체됩니다.",
       "remove": "브랜드 이미지 삭제"
     },
     "save": "저장"

@@ -16,7 +16,7 @@ export function StatusTabs({ value, onChange }: StatusTabsProps) {
 
   return (
     <Tabs value={value} onValueChange={onChange} className="gap-0">
-      <div className="overflow-x-auto">
+      <div className="scrollbar-hidden overflow-x-auto">
         <TabsList variant="line" className="w-full min-w-max justify-start">
           {STATUS_TABS.map((tab) => (
             <TabsTrigger key={tab} value={tab} className="flex-none">

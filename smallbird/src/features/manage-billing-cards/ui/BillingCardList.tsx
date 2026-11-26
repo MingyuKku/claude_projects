@@ -22,8 +22,10 @@ import type { BillingCard } from "@/entities/subscription";
 
 /** 정기결제 카드는 최대 2장. 2장이면 "카드 추가" 칸이 사라짐. */
 const MAX_CARD_COUNT = 2;
-const CARD_SIZE_CLASS =
-  "w-full max-tablet:aspect-186/100 max-tablet:h-auto tablet:w-46.5";
+// 모바일 비율(186:100)은 패딩 없는 li가 갖고 카드·추가 칸은 그 칸을 채움. 패딩 있는 카드에 aspect-ratio를
+// 직접 주면 iOS Safari에서만 카드가 패딩(24px)만큼 커져 추가 칸과 높이가 어긋남(iPhone iOS 26 실측, 메커니즘은 미확인).
+const ITEM_CLASS = "max-tablet:aspect-186/100 tablet:contents";
+const CARD_SIZE_CLASS = "w-full max-tablet:h-full tablet:w-46.5";
 
 // 섹션명은 "정기결제 카드"로 통일(시안 오기 "정기결제 방법").
 // 카드 추가는 이니시스 카드 등록 페이지로 이동하고, 돌아온 결과는 BillingCardResultHandler가 받음.
@@ -70,7 +72,7 @@ export function BillingCardList() {
       ) : (
         <ul className="grid grid-cols-2 gap-4 tablet:flex tablet:flex-wrap tablet:gap-5">
           {cards.map((card) => (
-            <li key={card.id} className="contents">
+            <li key={card.id} className={ITEM_CLASS}>
               <PayCard
                 name={card.issuer}
                 number={card.maskedNumber}
@@ -100,7 +102,7 @@ export function BillingCardList() {
             </li>
           ))}
           {cards.length < MAX_CARD_COUNT && (
-            <li className="contents">
+            <li className={ITEM_CLASS}>
               <PayCardAddButton
                 label={t("card.add")}
                 className={CARD_SIZE_CLASS}

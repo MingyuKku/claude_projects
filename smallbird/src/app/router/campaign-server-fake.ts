@@ -4,8 +4,8 @@ import { createDetailResponse, FAKE_BRANDS } from "./campaign-fixtures";
 
 import type { Json } from "./campaign-fixtures";
 
-// 캠페인 등록 화면 테스트용 가짜 서버. `serverApiV3`의 get·post·put·delete에 연결해 캠페인 생성·조회·단계 저장·재승인·목록·브랜드를
-// 서버처럼 상태를 가지고 응답함(요청·응답 모양은 API 요구 명세 A-1~A-8, A-10·A-11).
+// 캠페인 등록 화면 테스트용 가짜 서버. `serverApiV3`의 get·post·put·delete에 연결해 캠페인 생성·조회·단계 저장·재승인·승인 요청 취소·목록·브랜드를
+// 서버처럼 상태를 가지고 응답함.
 
 function notFound() {
   return new ApiError(404, { reason: "CAMPAIGN_NOT_FOUND" });
@@ -178,6 +178,16 @@ export function createCampaignServerFake(
         target.rejectReason = null;
         target.policy = { agreements };
         return { status: "REVIEWING" };
+      }
+      if (match?.[2] === "payment/cancel") {
+        const target = find(match[1] as string);
+        target.status = "DRAFT";
+        target.payment = null;
+        return { status: "DRAFT", refundedAmount: 0, balance: 0 };
+      }
+      if (match?.[2] === "demo/complete") {
+        find(match[1] as string).demoCompleted = true;
+        return undefined;
       }
       throw new Error(`unmocked POST ${path}`);
     },

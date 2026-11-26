@@ -1,4 +1,4 @@
-import { Navigate, useOutletContext, useParams } from "react-router";
+import { useOutletContext, useParams } from "react-router";
 
 import { useRefreshBigbirdMoneyBalance } from "@/entities/bigbird-money";
 import {
@@ -21,7 +21,6 @@ import {
 } from "@/features/register-campaign";
 import { NotFoundError } from "@/shared/lib";
 
-import { getRegisterRedirectPath } from "../model/entry";
 import { RegisterComingSoon } from "./RegisterComingSoon";
 import { RegisterShell } from "./RegisterShell";
 
@@ -33,7 +32,9 @@ export function CampaignRegisterPage() {
   const { campaignIdx: campaignIdxParam } = useParams();
   const campaignIdx = parseCampaignIdx(campaignIdxParam);
   const session = useOutletContext<SessionViewModel>();
-  const { detail, error } = useCampaignDetail(campaignIdx);
+  const { detail, error } = useCampaignDetail(campaignIdx, {
+    isFilledByLoader: true,
+  });
   const refreshBalance = useRefreshBigbirdMoneyBalance();
   const paymentReturn = usePaymentReturn({
     onReturned: refreshBalance,
@@ -45,9 +46,6 @@ export function CampaignRegisterPage() {
     if (isUnreadableCampaignError(error)) throw new NotFoundError();
     throw error;
   }
-
-  const redirectPath = detail ? getRegisterRedirectPath(detail) : null;
-  if (redirectPath) return <Navigate to={redirectPath} replace />;
 
   // 마법사는 열 때 주소의 단계를 고쳐 쓰는데, 결제 서버가 붙인 쿼리가 남은 채로 쓰면 지운 쿼리가 되살아남.
   if (!detail || paymentReturn.isClearingQuery) return <RegisterShell />;

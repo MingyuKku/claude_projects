@@ -73,7 +73,7 @@ export function BrandManagePanel() {
         <EmptyState
           type="no-list"
           title={t("brands.empty")}
-          className="h-full justify-center"
+          className="flex-1 justify-center"
         />
       ) : (
         <section className="flex flex-col ds-gap-4 ds-p-5 pb-0">

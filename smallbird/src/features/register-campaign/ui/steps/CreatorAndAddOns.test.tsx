@@ -96,7 +96,7 @@ function AgeGroupsProbe() {
 }
 
 describe("CreatorStep", () => {
-  it("플랫폼 6개를 시안 순서로 보이고 하나만 고른다", async () => {
+  it("플랫폼 8개(숏츠·릴스는 뒤)를 보이고 하나만 고른다", async () => {
     const user = userEvent.setup();
     render(
       <RegisterWizardProvider detail={createDetail()}>
@@ -110,7 +110,16 @@ describe("CreatorStep", () => {
         group.querySelectorAll("[role=radio]"),
         (item) => item.textContent,
       ),
-    ).toEqual(["인스타그램", "블로그", "페이스북", "유튜브", "틱톡", "엑스"]);
+    ).toEqual([
+      "인스타그램",
+      "블로그",
+      "페이스북",
+      "유튜브",
+      "틱톡",
+      "엑스",
+      "숏츠",
+      "릴스",
+    ]);
 
     await user.click(screen.getByRole("radio", { name: "블로그" }));
     await user.click(screen.getByRole("radio", { name: "유튜브" }));
@@ -121,7 +130,7 @@ describe("CreatorStep", () => {
     );
   });
 
-  it("공구형은 플랫폼(숏츠·릴스 포함)을 시안 순서와 '네이버 블로그'로, 연령대는 '무관' 포함, 포스팅 주제는 9개가 보인다", () => {
+  it("공구형은 플랫폼(숏츠·릴스 포함)을 브랜드형과 같은 순서에 '네이버 블로그'로, 연령대는 '무관' 포함, 포스팅 주제는 9개가 보인다", () => {
     render(
       <RegisterWizardProvider detail={createDetail(undefined, "GROUP_BUY")}>
         <CreatorStep />
@@ -138,9 +147,9 @@ describe("CreatorStep", () => {
     ).toEqual([
       "인스타그램",
       "네이버 블로그",
+      "페이스북",
       "유튜브",
       "틱톡",
-      "페이스북",
       "엑스",
       "숏츠",
       "릴스",
@@ -230,7 +239,7 @@ describe("CreatorStep", () => {
     expect(screen.getByLabelText("연령대 값")).toHaveTextContent("AGE_30S");
   });
 
-  it("브랜드형에는 숏츠·릴스가 없고 연령대·포스팅 주제에 '무관'이 있으며 주제는 서버 코드 9개다", async () => {
+  it("브랜드형은 연령대·포스팅 주제에 '무관'이 있으며 주제는 서버 코드 9개다", async () => {
     const user = userEvent.setup();
     render(
       <RegisterWizardProvider detail={createDetail()}>
@@ -254,7 +263,6 @@ describe("CreatorStep", () => {
         .getByRole("toolbar", { name: "포스팅 주제(복수선택 가능)" })
         .querySelectorAll("button"),
     ).toHaveLength(9);
-    expect(screen.queryByRole("radio", { name: "숏츠" })).toBeNull();
     expect(
       getGroup("선호 연령대(복수선택 가능)").getByRole("button", {
         name: "무관",

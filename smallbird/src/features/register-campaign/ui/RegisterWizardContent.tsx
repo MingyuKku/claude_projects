@@ -1,11 +1,12 @@
 import { Inform } from "@/shared/components/inform";
+import { ScrollPanel } from "@/shared/components/scroll-panel";
 import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery } from "@/shared/lib";
 
 import { isLockedInRevision } from "../model/revision";
 import { isStepStarted } from "../model/step-completion";
-import { getStepLabelKey } from "../model/step-labels";
+import { STEP_LABEL_KEYS } from "../model/step-labels";
 import { useIntroGenerationNotice } from "../model/use-intro-generation";
 import { usePaymentFlow } from "../model/use-payment-flow";
 import { useRegisterPanel } from "../model/use-register-panel";
@@ -64,12 +65,12 @@ export function RegisterWizardContent({
     (state) => state.isRevisionMode,
   );
   const isDemo = useRegisterWizardStore((state) => state.isDemo);
-  const productType = useRegisterWizardStore((state) => state.productType);
+  const pendingSave = useRegisterWizardStore((state) => state.pendingSave);
   const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
   const isTabletUp = useMediaQuery(MEDIA_QUERY.tabletUp);
   const { panel } = useRegisterPanel();
 
-  const title = t(getStepLabelKey(currentStep, productType));
+  const title = t(STEP_LABEL_KEYS[currentStep]);
   const isLocked = isRevisionMode && isLockedInRevision(currentStep);
   // 미리보기 화면은 시안이 없어 버튼만 둠.
   const preview = currentStep === "intro" ? { isEnabled: hasIntroInput } : null;
@@ -97,11 +98,13 @@ export function RegisterWizardContent({
         title={title}
         preview={preview}
         onClickSave={isRevisionMode ? undefined : handleClickSave}
+        pendingSave={pendingSave}
       />
-      <div
+      <ScrollPanel
         // 단계를 옮기면 본문 스크롤을 맨 위로 돌림.
         key={currentStep}
-        className="min-h-0 flex-1 overflow-y-auto px-4 tablet:ds-p-5"
+        className="flex-1"
+        contentClassName="px-4 tablet:ds-p-5"
       >
         <section className="flex flex-col gap-3 tablet:gap-5 desktop:gap-6">
           {isDemo && (
@@ -124,11 +127,12 @@ export function RegisterWizardContent({
             </fieldset>
           </div>
         </section>
-      </div>
+      </ScrollPanel>
       {isRevisionMode ? (
         <RegisterBottomBar
           variant="revision"
           preview={preview}
+          pendingSave={pendingSave}
           hasPrevious={previousStep !== null}
           isLastStep={nextStep === null}
           isRequesting={payment.isPaying}
@@ -141,6 +145,7 @@ export function RegisterWizardContent({
         <RegisterBottomBar
           variant="default"
           preview={preview}
+          pendingSave={pendingSave}
           hasPrevious={previousStep !== null}
           isLastStep={nextStep === null}
           isDemo={isDemo}

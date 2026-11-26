@@ -9,7 +9,7 @@ import { useRegisterWizardStore } from "../../../model/wizard-context";
 import type { CampaignAddOn } from "@/entities/campaign";
 
 // 부가서비스(시안 13385:248323). PICK형 카드 2장(AI 포스팅 가이드·원고컨펌), 누르면 선택이 켜지고 꺼짐.
-// 선택된 카드 모양은 시안에 없어 토글과 같은 Pressed 모양(D-2). 고르지 않아도 다음으로 갈 수 있음(선택 단계).
+// 선택된 카드 모양은 시안에 없어 토글과 같은 Pressed 모양에 캠페인 개설 서비스 카드와 같은 링을 더함(D-2, 사용자 결정 2026-11-25). 링은 입력칸처럼 transition-[color,background-color,box-shadow]로 서서히 생김. 고르지 않아도 다음으로 갈 수 있음(선택 단계).
 // 원고컨펌은 등록 때 결제하지 않고 매칭 때 매칭 인원당 결제(REQ-10-0049), 배지는 시안 원문.
 export function AddOnsStep() {
   const { t } = useTranslation("features/register-campaign");
@@ -38,8 +38,9 @@ export function AddOnsStep() {
               role="checkbox"
               aria-checked={isSelected}
               className={cn(
-                "flex w-full cursor-pointer flex-col rounded-lg border bg-card text-left transition-colors outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
-                isSelected && "bg-muted hover:bg-muted",
+                "flex w-full cursor-pointer flex-col rounded-lg border bg-card text-left transition-[color,background-color,box-shadow] outline-none hover:bg-accent focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2",
+                isSelected &&
+                  "bg-muted ring-2 ring-primary ring-offset-2 hover:bg-muted",
               )}
               onClick={() => handleToggle(addOn)}
             >

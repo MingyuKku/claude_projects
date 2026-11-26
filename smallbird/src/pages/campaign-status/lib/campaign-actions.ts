@@ -27,7 +27,7 @@ function toSubAccountShortcut(isDemoCompleted: boolean): ShortcutKind | null {
 
 /**
  * 할당된 Sub ID는 "작성하기"·삭제를 쓰지 못해 숨김. 모르는 진행 단계는 등록 내역으로 둠.
- * 작성을 마친 데모도 "작성하기"이고, 작성 화면이 기본 정보로 보냄.
+ * 작성을 마친 데모도 "작성하기"이고 기본 정보로 감(이동은 화면이 정함).
  */
 export function getRowActions(
   campaign: Pick<CampaignSummary, "stage" | "isDemoCompleted">,

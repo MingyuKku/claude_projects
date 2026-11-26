@@ -1,8 +1,7 @@
 {
   "step": {
     "campaignInfo": "Campaign info",
-    "product": "Product info",
-    "productGroupBuy": "Sponsored product info",
+    "product": "Sponsored product info",
     "creator": "Creator criteria",
     "groupBuy": "Group buy terms",
     "addOns": "Add-ons",
@@ -106,7 +105,6 @@
     "image": {
       "label": "Brand image",
       "title": "Upload a brand image.",
-      "description": "A default profile is used if none is uploaded.",
       "remove": "Remove brand image"
     },
     "save": "Save"

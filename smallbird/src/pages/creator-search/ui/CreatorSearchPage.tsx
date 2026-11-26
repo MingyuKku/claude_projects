@@ -4,7 +4,6 @@ import { useOutletContext } from "react-router";
 import {
   CreatorFullScreen,
   CreatorList,
-  CreatorScrollArea,
   CreatorSelectionBar,
   CreatorToolbar,
   SEARCH_SORTS,
@@ -30,6 +29,7 @@ import {
   RecommendAssistantFullScreen,
 } from "@/features/recommend-creators";
 import { EmptyState } from "@/shared/components/empty-state";
+import { ScrollPanel } from "@/shared/components/scroll-panel";
 import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery } from "@/shared/lib";
@@ -217,12 +217,12 @@ export function CreatorSearchPage() {
             creatorList
           ) : (
             // 스크롤바가 화면 끝에 오도록 본문 좌우 여백까지 넓힘. 툴바와의 간격은 스크롤해도 남도록 스크롤 영역 밖에 둠.
-            <CreatorScrollArea
+            <ScrollPanel
               className="-mx-(--ds-p-5) mt-(--ds-gap-3) flex-1"
               contentClassName="flex flex-col px-(--ds-p-5)"
             >
               {creatorList}
-            </CreatorScrollArea>
+            </ScrollPanel>
           )}
           {!isDesktop && (
             <RecommendAssistantButton

@@ -2,11 +2,8 @@ import { RefreshCcw } from "lucide-react";
 import { isEqual } from "radash";
 import { useState } from "react";
 
-import {
-  CreatorScrollArea,
-  CreatorPanel,
-  useCreatorTerms,
-} from "@/entities/creator";
+import { CreatorPanel, useCreatorTerms } from "@/entities/creator";
+import { ScrollPanel } from "@/shared/components/scroll-panel";
 import { useTranslation } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
 
@@ -65,7 +62,7 @@ export function BasicFilterPanel({
 
   return (
     <CreatorPanel title={t("basicFilter.title")} onClose={onClose}>
-      <CreatorScrollArea
+      <ScrollPanel
         className="flex-1"
         contentClassName="flex flex-col gap-2 px-4 pt-4 pb-3"
       >
@@ -108,7 +105,7 @@ export function BasicFilterPanel({
             }
           />
         </Field>
-      </CreatorScrollArea>
+      </ScrollPanel>
       <div className="flex shrink-0 gap-2 p-4">
         <Button
           variant="outline"

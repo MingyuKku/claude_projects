@@ -5,7 +5,7 @@ import { FormField } from "@/shared/components/form-field";
 import { useTranslation } from "@/shared/i18n";
 import { Input } from "@/shared/ui/input";
 
-import { addHashtag } from "../../../model/hashtags";
+import { addHashtag, stripHashtagComma } from "../../../model/hashtags";
 
 import type { KeyboardEvent } from "react";
 
@@ -41,7 +41,9 @@ export function HashtagField({
             {...control}
             placeholder={t("intro.hashtag.placeholder")}
             value={input}
-            onChange={(event) => setInput(event.target.value)}
+            onChange={(event) =>
+              setInput(stripHashtagComma(event.target.value))
+            }
             onKeyDown={handleKeyDown}
           />
           {value.length > 0 && (

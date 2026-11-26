@@ -7,7 +7,7 @@ import type { ComponentProps } from "react";
 const VIEWPORT_CLASS_NAME =
   "[&>[data-slot=scroll-area-viewport]>div]:flex! [&>[data-slot=scroll-area-viewport]>div]:min-h-full [&>[data-slot=scroll-area-viewport]>div]:flex-col";
 
-interface CreatorScrollAreaProps extends Omit<
+interface ScrollPanelProps extends Omit<
   ComponentProps<typeof ScrollArea>,
   "type"
 > {
@@ -15,13 +15,13 @@ interface CreatorScrollAreaProps extends Omit<
   contentClassName?: string;
 }
 
-// 매칭 창·목록의 세로 스크롤. 스크롤바가 내용 위에 겹쳐 폭을 차지하지 않음.
-export function CreatorScrollArea({
+// 창·목록의 세로 스크롤. 스크롤바가 내용 위에 겹쳐 폭을 차지하지 않음.
+export function ScrollPanel({
   className,
   contentClassName,
   children,
   ...props
-}: CreatorScrollAreaProps) {
+}: ScrollPanelProps) {
   return (
     <ScrollArea
       type="auto"

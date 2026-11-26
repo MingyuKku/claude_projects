@@ -3,11 +3,18 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import { useTranslation } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
 
+import type { PendingSaveAction } from "../model/store";
+
 export interface RegisterPreviewButtonState {
   isEnabled: boolean;
 }
 
-interface DefaultBarProps {
+interface CommonBarProps {
+  /** 저장을 기다리는 동작. 그 버튼은 Loading, 나머지 저장·이동 버튼은 막음. */
+  pendingSave: PendingSaveAction | null;
+}
+
+interface DefaultBarProps extends CommonBarProps {
   variant: "default";
   /** 5단계 "미리보기". 없으면 그리지 않음. */
   preview: RegisterPreviewButtonState | null;
@@ -23,7 +30,7 @@ interface DefaultBarProps {
 }
 
 /** 반려 뒤 수정 모드: 임시저장 없이 "이전·다음"이고, 마지막(결제) 단계는 "다음" 자리에 "재승인 요청". */
-interface RevisionBarProps {
+interface RevisionBarProps extends CommonBarProps {
   variant: "revision";
   preview: RegisterPreviewButtonState | null;
   hasPrevious: boolean;
@@ -48,6 +55,9 @@ export function RegisterBottomBar(props: RegisterBottomBarProps) {
   const { preview } = props;
   const isDefault = props.variant === "default";
   const isBusy = isDefault ? props.isPaying : props.isRequesting;
+  const isSaving = props.pendingSave !== null;
+  const isNextLoading =
+    props.pendingSave === "next" || props.pendingSave === "leave";
   const nextLabelKey = getNextLabelKey(props);
 
   return (
@@ -65,6 +75,8 @@ export function RegisterBottomBar(props: RegisterBottomBarProps) {
         <Button
           variant="outline-foreground"
           className="hidden tablet:inline-flex"
+          isLoading={props.pendingSave === "saveDraft"}
+          disabled={isSaving}
           onClick={props.onClickSave}
         >
           {t("action.saveDraft")}
@@ -74,16 +86,19 @@ export function RegisterBottomBar(props: RegisterBottomBarProps) {
         <Button
           variant="outline"
           className="flex-1 tablet:flex-none"
+          isLoading={props.pendingSave === "previous"}
+          disabled={isSaving}
           onClick={props.onClickPrevious}
         >
-          <ChevronLeft aria-hidden />
+          {props.pendingSave !== "previous" && <ChevronLeft aria-hidden />}
           {t("action.previous")}
         </Button>
       )}
       <Button
         className="flex-1 tablet:flex-none"
-        disabled={isBusy}
-        aria-busy={isBusy || undefined}
+        isLoading={isNextLoading}
+        disabled={isBusy || isSaving}
+        aria-busy={isBusy || isNextLoading || undefined}
         onClick={props.onClickNext}
       >
         {t(nextLabelKey)}

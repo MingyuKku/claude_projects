@@ -1,7 +1,6 @@
-import { Navigate, useOutletContext, useParams } from "react-router";
+import { useOutletContext, useParams } from "react-router";
 
 import {
-  getCampaignRegisterPath,
   parseCampaignIdx,
   isUnreadableCampaignError,
   useCampaignDetail,
@@ -21,7 +20,9 @@ export function CampaignDetailPage() {
   const { campaignIdx: campaignIdxParam } = useParams();
   const campaignIdx = parseCampaignIdx(campaignIdxParam);
   const session = useOutletContext<SessionViewModel>();
-  const { detail, error } = useCampaignDetail(campaignIdx);
+  const { detail, error } = useCampaignDetail(campaignIdx, {
+    isFilledByLoader: true,
+  });
   // 구독 상태가 바뀌었을 수 있어 들어올 때마다 다시 읽음.
   const subscriptions = useSubscriptions({
     isEnabled: Boolean(detail?.isDemo),
@@ -33,11 +34,6 @@ export function CampaignDetailPage() {
     throw error;
   }
   if (!detail) return <RegisterShell />;
-
-  const isWritable = detail.stage === "DRAFT" && !detail.isDemoCompleted;
-  if (isWritable) {
-    return <Navigate to={getCampaignRegisterPath(campaignIdx)} replace />;
-  }
 
   const canManage = session.authority !== "SUB";
   const isPickSubscribed = subscriptions.data

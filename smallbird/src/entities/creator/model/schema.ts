@@ -54,7 +54,8 @@ export const creatorListItemSchema = z.object({
   nickname: z.string(),
   profileImageUrl: z.string().nullable(),
   categoryIdx: z.number(),
-  followerCount: z.number(),
+  /** 공식 API 수집 전인 회원은 null. */
+  followerCount: z.number().nullable(),
   brandIndex: z.number().nullable(),
   groupBuyIndex: z.number().nullable(),
   avgCommentWriterCount: z.number().nullable(),
@@ -66,7 +67,7 @@ export const creatorListItemSchema = z.object({
 
 export type CreatorListItem = z.infer<typeof creatorListItemSchema>;
 
-/** `GET /v3/matching/influencer/search`. `result` 없이 목록만 옴. */
+/** `GET /v3/matching/influencer/merged/search`. `result` 없이 목록만 옴. */
 export const creatorSearchSchema = z.object({
   list: z.array(creatorListItemSchema),
   hasMore: z.boolean(),

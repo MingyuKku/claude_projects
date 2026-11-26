@@ -65,8 +65,6 @@ export function useApprovalActions(campaignIdx: number) {
     }
     toast.success(t("detail.toast.refunded"));
     void refreshBalance();
-    // 작성 화면이 등록 중 상태를 읽어야 열리므로 다시 읽은 뒤 옮김.
-    await reloadDetail();
     void navigate(getCampaignRegisterPath(campaignIdx, "payment"), {
       replace: true,
     });
@@ -108,6 +106,7 @@ export function useApprovalActions(campaignIdx: number) {
     if (dialog?.type === "reapprovalRequired") {
       void navigate(
         getCampaignRegisterPath(campaignIdx, toRegisterStep(dialog.serverStep)),
+        { replace: true },
       );
     }
     setDialog(null);

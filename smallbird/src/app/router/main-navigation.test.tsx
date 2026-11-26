@@ -522,7 +522,7 @@ describe("홈 본문과 검색 경로", () => {
     mockV3Get((path) =>
       Promise.resolve(
         {
-          "/matching/influencer/search": { list: [], hasMore: false },
+          "/matching/influencer/merged/search": { list: [], hasMore: false },
           "/matching/platform": {
             result: true,
             list: [

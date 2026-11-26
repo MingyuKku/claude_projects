@@ -26,6 +26,12 @@ export type WizardDialog = "requiredInfo" | "notEditable";
 /** 5단계 작성 방식. 서버에 저장되지 않음. */
 export type IntroMode = "AI" | "MANUAL";
 
+/**
+ * 사용자가 눌러 저장을 기다리는 동작. 하단 버튼의 Loading 표시와 중복 클릭 막기에 씀. "이전"·"임시저장"은 그 버튼에,
+ * 그 밖의 이동(다음·사이드바)과 떠나기(`leave`, 헤더 "<"·브라우저 뒤로가기)는 "다음"에 표시함.
+ */
+export type PendingSaveAction = "previous" | "next" | "saveDraft" | "leave";
+
 export interface IntroAiState {
   url: string;
   /** 생성 중인 작업 번호. 유형 변경·불러오기로 버린 작업의 결과를 무시하려고 둠. null이면 생성 중 아님. */
@@ -63,6 +69,8 @@ export interface RegisterWizardState {
   draft: CampaignDraft;
   /** 단계별 마지막으로 저장한 값. 바뀐 단계만 보내려고 둠. */
   savedDraft: CampaignDraft;
+  /** 화면에 연 단계. 연 단계는 기본 선택만 있어도 사용자가 본 값이라 이동할 때 저장함(`getChangedSteps`). */
+  shownSteps: CampaignDraftStep[];
   /** 결제 단계에 들어온 뒤로는 필수값이 빠진 단계에 경고를 보임. 저장하지 않음. */
   hasVisitedPayment: boolean;
   /** 저장 없이 나가도 되는 상태(수정 불가 안내 뒤 등록 내역으로 갈 때). */
@@ -71,6 +79,10 @@ export interface RegisterWizardState {
   introMode: IntroMode;
   introAi: IntroAiState;
   uploadProgress: UploadProgress | null;
+  /** 저장을 기다리는 동작들. 이동 저장 중에 떠나기 저장이 겹치면 각자 끝날 때 자기 것만 빼서 표시가 먼저 꺼지지 않게 함. */
+  pendingSaves: PendingSaveAction[];
+  /** 화면에 표시할 동작(`pendingSaves`의 첫 항목). */
+  pendingSave: PendingSaveAction | null;
 }
 
 export interface RegisterWizardActions {
@@ -82,6 +94,7 @@ export interface RegisterWizardActions {
     step: S,
     patch: Partial<CampaignDraft[S]>,
   ) => void;
+  markStepShown: (step: CampaignDraftStep) => void;
   markSaved: <S extends CampaignDraftStep>(
     step: S,
     value: CampaignDraft[S],
@@ -93,6 +106,9 @@ export interface RegisterWizardActions {
   /** 올리기 전 파일(`file`)을 올려서 받은 번호·주소로 바꿈. 그사이 지운 파일이면 아무것도 안 함. */
   resolvePendingMedia: (file: File, uploaded: UploadedCampaignFile) => void;
   setUploadProgress: (progress: UploadProgress | null) => void;
+  startPendingSave: (action: PendingSaveAction) => void;
+  /** `startPendingSave`로 넣은 동작 하나를 뺌. */
+  endPendingSave: (action: PendingSaveAction) => void;
   /** 서버가 비운 단계(유형 변경, A-5.1)를 저장된 값에서도 비움. */
   markServerCleared: (steps: readonly CampaignDraftStep[]) => void;
   markPaymentVisited: () => void;
@@ -138,12 +154,15 @@ export function createRegisterWizardStore(detail: CampaignDetail) {
           productType: detail.productType ?? "BRAND",
         }),
         savedDraft: detail.draft,
+        shownSteps: [],
         hasVisitedPayment: false,
         isLeaveAllowed: false,
         dialog: null,
         introMode: getInitialIntroMode(detail.draft),
         introAi: IDLE_INTRO_AI,
         uploadProgress: null,
+        pendingSaves: [],
+        pendingSave: null,
         setStepDraft: (step, value) =>
           set((state) => ({ draft: { ...state.draft, [step]: value } })),
         patchStepDraft: (step, patch) =>
@@ -153,6 +172,12 @@ export function createRegisterWizardStore(detail: CampaignDetail) {
               [step]: { ...state.draft[step], ...patch },
             },
           })),
+        markStepShown: (step) =>
+          set((state) =>
+            state.shownSteps.includes(step)
+              ? {}
+              : { shownSteps: [...state.shownSteps, step] },
+          ),
         markSaved: (step, value) =>
           set((state) => ({
             savedDraft: { ...state.savedDraft, [step]: value },
@@ -206,6 +231,20 @@ export function createRegisterWizardStore(detail: CampaignDetail) {
             };
           }),
         setUploadProgress: (uploadProgress) => set({ uploadProgress }),
+        startPendingSave: (action) =>
+          set((state) => {
+            const pendingSaves = [...state.pendingSaves, action];
+            return { pendingSaves, pendingSave: pendingSaves[0] ?? null };
+          }),
+        endPendingSave: (action) =>
+          set((state) => {
+            const index = state.pendingSaves.indexOf(action);
+            if (index === -1) return {};
+            const pendingSaves = state.pendingSaves.filter(
+              (_, i) => i !== index,
+            );
+            return { pendingSaves, pendingSave: pendingSaves[0] ?? null };
+          }),
         markServerCleared: (steps) =>
           set((state) => {
             const empty = createEmptyDraft();

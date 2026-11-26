@@ -26,7 +26,7 @@ import type { RouteObject } from "react-router";
 // Routes are declared here only. Each screen is a lazy import of a page's Public API,
 // so every page gets its own bundle.
 // Server data is fetched by each slice's SWR hook, not by route loaders. Loaders only pass the session
-// that decides whether a screen can open (.claude/rules/routing.md).
+// or the data that decides whether a screen can open, and fill the SWR cache with it (.claude/rules/routing.md).
 // Paths come from ROUTES in shared/config/routes.ts; add new ones there first.
 function page(path: string, load: () => Promise<ComponentType>): RouteObject {
   return {
@@ -119,16 +119,29 @@ export const routes: RouteObject[] = [
             (await import("@/pages/campaign-register"))
               .CampaignRegisterEntryPage,
         ),
-        page(
-          ROUTES.campaignRegisterEdit,
-          async () =>
-            (await import("@/pages/campaign-register")).CampaignRegisterPage,
-        ),
-        page(
-          ROUTES.campaignDetail,
-          async () =>
-            (await import("@/pages/campaign-register")).CampaignDetailPage,
-        ),
+        // 작성 화면과 등록 내역 중 어디서 보여 줄지는 그리기 전에 loader가 정함.
+        {
+          path: ROUTES.campaignRegisterEdit,
+          lazy: async () => {
+            const m = await import("@/pages/campaign-register");
+            return {
+              Component: m.CampaignRegisterPage,
+              loader: m.campaignRegisterLoader,
+              shouldRevalidate: m.revalidateOnPathChange,
+            };
+          },
+        },
+        {
+          path: ROUTES.campaignDetail,
+          lazy: async () => {
+            const m = await import("@/pages/campaign-register");
+            return {
+              Component: m.CampaignDetailPage,
+              loader: m.campaignDetailLoader,
+              shouldRevalidate: m.revalidateOnPathChange,
+            };
+          },
+        },
       ]),
 
       requireSessionRoute(AuthenticatedLayout, [

@@ -1,3 +1,4 @@
+import { ScrollPanel } from "@/shared/components/scroll-panel";
 import { Trans, useTranslation } from "@/shared/i18n";
 import { Avatar, AvatarImage, AvatarPlaceholder } from "@/shared/ui/avatar";
 import { Checkbox } from "@/shared/ui/checkbox";
@@ -5,7 +6,6 @@ import { Table, TableBody, TableCell, TableRow } from "@/shared/ui/table";
 
 import { useMatchingPlatforms } from "../api/use-matching";
 import { CreatorChannelButton } from "./CreatorChannelButton";
-import { CreatorScrollArea } from "./CreatorScrollArea";
 
 import type { CreatorViewModel } from "../model/types";
 
@@ -29,7 +29,7 @@ export function SelectedCreatorSection({
       <h3 className="ds-text-sm-none-semibold text-foreground">
         {t("selected.title")}
       </h3>
-      <CreatorScrollArea className="flex-1 overflow-hidden rounded-lg border">
+      <ScrollPanel className="flex-1 overflow-hidden rounded-lg border">
         <Table
           size="xs"
           aria-label={t("selected.title")}
@@ -85,7 +85,7 @@ export function SelectedCreatorSection({
             })}
           </TableBody>
         </Table>
-      </CreatorScrollArea>
+      </ScrollPanel>
       <p className="flex items-center gap-1 ds-text-sm-none-medium text-foreground">
         <Trans
           t={t}

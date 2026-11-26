@@ -1,8 +1,7 @@
 {
   "step": {
     "campaignInfo": "填写活动信息",
-    "product": "填写产品信息",
-    "productGroupBuy": "填写赞助产品信息",
+    "product": "填写赞助产品信息",
     "creator": "创作者条件",
     "groupBuy": "设置团购条件",
     "addOns": "附加服务",
@@ -105,7 +104,6 @@
     "image": {
       "label": "品牌图片",
       "title": "请上传品牌图片。",
-      "description": "未上传时将使用默认头像。",
       "remove": "删除品牌图片"
     },
     "save": "保存"

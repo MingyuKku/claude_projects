@@ -1,9 +1,9 @@
 import { X } from "lucide-react";
 
-import { CreatorScrollArea } from "@/entities/creator";
 import chatbotIcon from "@/shared/assets/img/floating/chatbot.svg";
 import { SubHeader } from "@/shared/components/app-header";
 import { MessageBubble } from "@/shared/components/chat-message";
+import { ScrollPanel } from "@/shared/components/scroll-panel";
 import { ChatbotTextField } from "@/shared/components/text-field";
 import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
@@ -55,13 +55,13 @@ export function RecommendAssistant({
           )
         }
       />
-      <CreatorScrollArea className="flex-1" contentClassName="ds-px-5 ds-pt-5">
+      <ScrollPanel className="flex-1" contentClassName="ds-px-5 ds-pt-5">
         <MessageBubble
           size="sm"
           className="max-w-50"
           message={t("greeting", { name: userName })}
         />
-      </CreatorScrollArea>
+      </ScrollPanel>
       <div className="shrink-0 p-4">
         <ChatbotTextField
           disabled

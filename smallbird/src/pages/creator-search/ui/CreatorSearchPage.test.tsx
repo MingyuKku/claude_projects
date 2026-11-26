@@ -48,7 +48,14 @@ const MINA = {
   bookmarked: false,
 };
 
-let items: (typeof HARU)[] = [];
+let items: (Omit<
+  typeof HARU,
+  "followerCount" | "brandIndex" | "avgCommentWriterCount"
+> & {
+  followerCount: number | null;
+  brandIndex: number | null;
+  avgCommentWriterCount: number | null;
+})[] = [];
 let folders = [
   { folderIdx: null, name: "전체", count: 2, avatarUrls: [] },
   { folderIdx: 11, name: "뷰티 후보군", count: 50, avatarUrls: [] },
@@ -57,7 +64,9 @@ let folders = [
 function searchRequests() {
   return vi
     .mocked(serverApiV3.get)
-    .mock.calls.filter(([path]) => path === "/matching/influencer/search");
+    .mock.calls.filter(
+      ([path]) => path === "/matching/influencer/merged/search",
+    );
 }
 
 function lastSearchParams() {
@@ -71,7 +80,7 @@ function lastSearchParams() {
 function mockApi() {
   vi.mocked(serverApiV3.get).mockImplementation(((path: string) => {
     switch (path) {
-      case "/matching/influencer/search":
+      case "/matching/influencer/merged/search":
         return Promise.resolve({ list: items, hasMore: false });
       case "/matching/platform":
         // 서버 순서: 인스타그램·네이버 블로그·유튜브·X·틱톡
@@ -195,6 +204,26 @@ describe("CreatorSearchPage", () => {
     expect(screen.getByRole("button", { name: /^플랫폼/ })).toHaveTextContent(
       "플랫폼",
     );
+  });
+
+  it("수집 전이라 지표가 모두 null인 크리에이터도 -로 보여 준다", async () => {
+    items = [
+      HARU,
+      {
+        ...MINA,
+        followerCount: null,
+        brandIndex: null,
+        avgCommentWriterCount: null,
+      },
+    ];
+    setup();
+
+    const row = (await screen.findByText("미나홈")).closest("tr");
+    // 팔로워·브랜드·공구·댓글 작성자·예측비용
+    expect(
+      within(row as HTMLElement).getAllByText("-").length,
+    ).toBeGreaterThanOrEqual(5);
+    expect(screen.getByText("하루뷰티")).toBeInTheDocument();
   });
 
   it("플랫폼 메뉴는 시안 순서로 보이고 하나를 고르면 그 플랫폼으로, 다시 누르면 전체로 읽는다", async () => {
@@ -511,7 +540,7 @@ describe("CreatorSearchPage", () => {
       path: string,
       ...rest: unknown[]
     ) => {
-      if (path === "/matching/influencer/search" && !hasFailed) {
+      if (path === "/matching/influencer/merged/search" && !hasFailed) {
         hasFailed = true;
         return Promise.reject(new ApiError(500, null));
       }

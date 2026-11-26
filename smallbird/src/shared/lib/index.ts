@@ -25,7 +25,12 @@ export { useKeyboardViewport } from "./useKeyboardViewport";
 export type { KeyboardViewport } from "./useKeyboardViewport";
 export { usePreventViewportPan } from "./usePreventViewportPan";
 export { usePanelParam } from "./usePanelParam";
-export { useGoBack } from "./useGoBack";
+export {
+  entryRedirect,
+  fillLoaderCache,
+  trackRouterInitialized,
+  useRouteLoaderBridge,
+} from "./route-loader";
 export { openPostcodeSearch } from "./postcode";
 export type { PostcodeResult } from "./postcode";
 export { useTabParam } from "./useTabParam";

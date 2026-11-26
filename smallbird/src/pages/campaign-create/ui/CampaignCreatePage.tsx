@@ -15,6 +15,7 @@ import { Button } from "@/shared/ui/button";
 import { Skeleton } from "@/shared/ui/skeleton";
 
 import { PRODUCT_TYPES, SERVICE_CARDS } from "../model/services";
+import { useScrollToProducts } from "../model/use-scroll-to-products";
 import { ComingSoonServiceCard } from "./ComingSoonServiceCard";
 import { ProductCard } from "./ProductCard";
 import { ServiceCard } from "./ServiceCard";
@@ -52,7 +53,10 @@ export function CampaignCreatePage() {
   const isSelectedServiceSubscribed =
     selectedService !== null && Boolean(subscribedTypes?.has(selectedService));
 
+  const { sectionRef, requestScroll } = useScrollToProducts(selectedService);
+
   function handleSelectService(type: ActiveProductType) {
+    if (type !== selectedService) requestScroll();
     setSearchParams({ [SERVICE_PARAM]: type }, { replace: true });
   }
 
@@ -157,7 +161,7 @@ export function CampaignCreatePage() {
         </div>
       </section>
       {selectedService && (
-        <section className={SECTION_CLASS_NAME}>
+        <section ref={sectionRef} className={SECTION_CLASS_NAME}>
           <h2 className={SECTION_TITLE_CLASS_NAME}>{t("section.product")}</h2>
           <div className="grid ds-gap-5 tablet:grid-cols-2">
             {PRODUCT_TYPES.map((product) => (

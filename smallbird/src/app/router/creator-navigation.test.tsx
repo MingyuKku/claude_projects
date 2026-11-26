@@ -33,7 +33,7 @@ const session = {
 };
 
 const MATCHING_RESPONSES: Record<string, unknown> = {
-  "/matching/influencer/search": { list: [], hasMore: false },
+  "/matching/influencer/merged/search": { list: [], hasMore: false },
   "/matching/bookmark": { list: [], hasMore: false, totalCount: 0 },
   "/matching/bookmark/folder": [
     { folderIdx: null, name: "전체", count: 0, avatarUrls: [] },

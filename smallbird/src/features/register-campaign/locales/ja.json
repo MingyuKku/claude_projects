@@ -1,8 +1,7 @@
 {
   "step": {
     "campaignInfo": "キャンペーン情報入力",
-    "product": "商品情報入力",
-    "productGroupBuy": "協賛商品情報入力",
+    "product": "協賛商品情報入力",
     "creator": "クリエイター条件",
     "groupBuy": "共同購入条件設定",
     "addOns": "オプション",
@@ -105,7 +104,6 @@
     "image": {
       "label": "ブランド画像",
       "title": "ブランド画像をアップロードしてください。",
-      "description": "未アップロードの場合、基本プロフィールに置き換わります。",
       "remove": "ブランド画像を削除"
     },
     "save": "保存"

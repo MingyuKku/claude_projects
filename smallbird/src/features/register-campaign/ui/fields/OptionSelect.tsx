@@ -16,6 +16,7 @@ import {
   DrawerTrigger,
 } from "@/shared/ui/drawer";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
+import { ScrollArea } from "@/shared/ui/scroll-area";
 
 import type { FormFieldControlProps } from "@/shared/components/form-field";
 
@@ -81,30 +82,31 @@ export function OptionSelect({
   }
 
   const menu = (
-    <div
-      role="listbox"
-      aria-label={label}
-      className="flex max-h-72 flex-col overflow-y-auto"
+    <ScrollArea
+      type="auto"
+      className="*:data-[slot=scroll-area-viewport]:max-h-72 [&>[data-slot=scroll-area-viewport]>div]:block!"
     >
-      {options.map((option) => {
-        const isSelected = option.value === value;
-        return (
-          <button
-            key={option.value}
-            type="button"
-            role="option"
-            aria-selected={isSelected}
-            className={cn(
-              "flex min-h-9 w-full shrink-0 items-center rounded-sm px-2 py-1.5 text-left text-sm leading-5 text-foreground outline-none hover:bg-accent focus-visible:bg-accent",
-              isSelected && "bg-accent",
-            )}
-            onClick={() => handleSelect(option.value)}
-          >
-            {option.label}
-          </button>
-        );
-      })}
-    </div>
+      <div role="listbox" aria-label={label} className="flex flex-col">
+        {options.map((option) => {
+          const isSelected = option.value === value;
+          return (
+            <button
+              key={option.value}
+              type="button"
+              role="option"
+              aria-selected={isSelected}
+              className={cn(
+                "flex min-h-9 w-full shrink-0 items-center rounded-sm px-2 py-1.5 text-left text-sm leading-5 text-foreground outline-none hover:bg-accent focus-visible:bg-accent",
+                isSelected && "bg-accent",
+              )}
+              onClick={() => handleSelect(option.value)}
+            >
+              {option.label}
+            </button>
+          );
+        })}
+      </div>
+    </ScrollArea>
   );
 
   return (

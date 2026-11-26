@@ -2,7 +2,6 @@ import { Plus } from "lucide-react";
 import { useState } from "react";
 
 import {
-  CreatorScrollArea,
   LoadError,
   NewFolderCard,
   SelectableCard,
@@ -10,6 +9,7 @@ import {
   useCreatorTerms,
 } from "@/entities/creator";
 import { SummaryCardAvatars } from "@/shared/components/cards";
+import { ScrollPanel } from "@/shared/components/scroll-panel";
 import { SkeletonGroup } from "@/shared/components/skeleton-presets";
 import { formatNumber, useTranslation } from "@/shared/i18n";
 import { Avatar, AvatarImage, AvatarPlaceholder } from "@/shared/ui/avatar";
@@ -67,7 +67,7 @@ export function FolderSelectSection({
         {term("newFolder")}
       </Button>
       {/* 고른 카드의 바깥 링이 스크롤 영역에 잘리지 않게 링 폭만큼 여백을 둠. */}
-      <CreatorScrollArea
+      <ScrollPanel
         className="-m-1 flex-1"
         contentClassName="flex flex-col gap-3 p-1"
       >
@@ -106,7 +106,7 @@ export function FolderSelectSection({
             </SelectableCard>
           );
         })}
-      </CreatorScrollArea>
+      </ScrollPanel>
     </section>
   );
 }

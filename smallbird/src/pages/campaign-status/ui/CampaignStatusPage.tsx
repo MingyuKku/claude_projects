@@ -1,6 +1,6 @@
 import { Plus } from "lucide-react";
-import { useState } from "react";
-import { useNavigate, useOutletContext } from "react-router";
+import { useEffect, useState } from "react";
+import { useLocation, useNavigate, useOutletContext } from "react-router";
 import { toast } from "sonner";
 
 import {
@@ -8,6 +8,7 @@ import {
   getCampaignRegisterPath,
   useCampaignPage,
   useCampaignScrollList,
+  useCampaignStatusReturnStore,
 } from "@/entities/campaign";
 import { getSubscribedTypes, useSubscriptions } from "@/entities/subscription";
 import { EmptyState } from "@/shared/components/empty-state";
@@ -17,7 +18,7 @@ import {
   ListEmptyState,
   resolveEmptyKind,
 } from "@/shared/components/list-filter";
-import { MEDIA_QUERY, ROUTES } from "@/shared/config";
+import { FILTER_PANEL_PARAM, MEDIA_QUERY, ROUTES } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
@@ -40,6 +41,10 @@ export function CampaignStatusPage() {
   const { t } = useTranslation("pages/campaign-status");
   const { t: tCommon } = useTranslation();
   const navigate = useNavigate();
+  const { search } = useLocation();
+  const rememberSearch = useCampaignStatusReturnStore(
+    (state) => state.remember,
+  );
   const session = useOutletContext<SessionViewModel>();
   const isTabletUp = useMediaQuery(MEDIA_QUERY.tabletUp);
   const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
@@ -48,6 +53,14 @@ export function CampaignStatusPage() {
     isTabletUp ? { ...params.baseQuery, page: params.page } : null,
   );
   const scroll = useCampaignScrollList(params.baseQuery, !isTabletUp);
+
+  // 등록 화면의 헤더 "<"가 탭·검색·쪽을 되살려 돌아오도록 마지막 쿼리를 알려 둠(열려 있던 필터 화면은 제외).
+  useEffect(() => {
+    const params = new URLSearchParams(search);
+    params.delete(FILTER_PANEL_PARAM);
+    const rest = params.toString();
+    rememberSearch(rest ? `?${rest}` : "");
+  }, [search, rememberSearch]);
 
   // 할당된 Sub ID는 "+ 캠페인 등록하기"·"작성하기"·삭제를 쓰지 못함(스펙 P-3).
   const isSubAccount = session.authority === "SUB";
@@ -72,7 +85,12 @@ export function CampaignStatusPage() {
           setIsSubscribeAlertOpen(true);
           return;
         }
-        void navigate(getCampaignRegisterPath(campaign.campaignIdx));
+        // 작성을 마친 데모는 고칠 수 없어 기본 정보(조회)로 바로 보냄.
+        void navigate(
+          campaign.isDemoCompleted
+            ? getCampaignDetailPath(campaign.campaignIdx)
+            : getCampaignRegisterPath(campaign.campaignIdx),
+        );
         return;
       case "detail":
       case "rejectReason":

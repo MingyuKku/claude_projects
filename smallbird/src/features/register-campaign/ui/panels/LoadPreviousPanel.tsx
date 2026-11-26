@@ -140,7 +140,7 @@ export function LoadPreviousPanel() {
         </Button>
       }
     >
-      <div className="flex min-h-full flex-col ds-gap-3 ds-p-5 pb-0">
+      <div className="flex flex-1 flex-col ds-gap-3 ds-p-5 pb-0">
         <form
           role="search"
           className="flex gap-2 tablet:gap-3"

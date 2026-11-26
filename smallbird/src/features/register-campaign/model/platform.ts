@@ -28,23 +28,13 @@ export const PLATFORM_LABEL_KEYS = {
   REELS: "platform.REELS",
 } as const satisfies Record<CampaignPlatform, string>;
 
-/** 브랜드형 3단계 플랫폼. 숏츠·릴스는 공구형 시안(3.0.1)에만 있음. */
-export const BRAND_PLATFORMS = [
+/** 3단계 플랫폼 순서. 브랜드형·공구형이 같음. */
+export const CAMPAIGN_PLATFORM_OPTIONS = [
   "INSTAGRAM",
   "NAVER_BLOG",
   "FACEBOOK",
   "YOUTUBE",
   "TIKTOK",
-  "X",
-] as const satisfies readonly CampaignPlatform[];
-
-/** 공구형 3단계 플랫폼 순서(시안 3.0.1). */
-export const GROUP_BUY_PLATFORMS = [
-  "INSTAGRAM",
-  "NAVER_BLOG",
-  "YOUTUBE",
-  "TIKTOK",
-  "FACEBOOK",
   "X",
   "SHORTS",
   "REELS",

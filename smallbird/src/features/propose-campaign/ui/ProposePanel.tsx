@@ -4,7 +4,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import {
-  CreatorScrollArea,
   LoadError,
   CreatorPanel,
   SelectedCreatorSection,
@@ -14,6 +13,7 @@ import {
   useCreatorTerms,
 } from "@/entities/creator";
 import { isApiError } from "@/shared/api";
+import { ScrollPanel } from "@/shared/components/scroll-panel";
 import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
@@ -134,7 +134,7 @@ export function ProposePanel({
         )}
         {isFormVisible && (
           // 고른 카드의 바깥 링이 스크롤 영역에 잘리지 않게 링 폭만큼 여백을 둠.
-          <CreatorScrollArea
+          <ScrollPanel
             className="-m-1 min-w-0 flex-1"
             contentClassName="flex flex-col ds-gap-4 p-1"
           >
@@ -146,7 +146,7 @@ export function ProposePanel({
               />
             )}
             {renderForm()}
-          </CreatorScrollArea>
+          </ScrollPanel>
         )}
       </div>
       <footer

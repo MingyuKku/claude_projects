@@ -18,7 +18,7 @@ React Router는 **data mode**(`createBrowserRouter` + `RouterProvider`)로 `app`
 
 ## 데이터
 
-서버 데이터는 route `loader`/`action`이 아니라 각 슬라이스의 SWR 훅이 가져옵니다. 데이터의 소유자를 `entities`/`features` 한 곳으로 두고 캐시를 SWR 하나로 통일하기 위해서입니다. `loader`는 리다이렉트나 **화면 진입 여부를 정하는 값(세션)을 화면에 넘기는 용도**에만 씁니다. URL 상태(페이지, 검색어, 탭)는 `useSearchParams`입니다.
+서버 데이터는 route `loader`/`action`이 아니라 각 슬라이스의 SWR 훅이 가져옵니다. 데이터의 소유자를 `entities`/`features` 한 곳으로 두고 캐시를 SWR 하나로 통일하기 위해서입니다. `loader`는 리다이렉트나 **화면 진입 여부를 정하는 값(세션)을 화면에 넘기는 용도**에만 씁니다. 리다이렉트 판단에 서버 데이터가 필요하면 loader가 슬라이스의 fetcher로 읽되, 화면 캐시를 둘로 만들지 않게 읽은 값은 SWR 캐시로 넘깁니다. URL 상태(페이지, 검색어, 탭)는 `useSearchParams`입니다.
 
 ## 인증·권한 가드
 

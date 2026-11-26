@@ -71,6 +71,8 @@ export function useScrollRestoration(
     scroller.scrollTop = target;
     if (Math.abs(scroller.scrollTop - target) < 1) return;
 
+    // 겹치는 막대는 본문의 형제라 함께 감싼 부모에서 조작을 받음.
+    const userTarget = scroller.parentElement ?? scroller;
     isRestoringRef.current = true;
     const startedAt = performance.now();
     let frame = 0;
@@ -79,7 +81,7 @@ export function useScrollRestoration(
       cancelAnimationFrame(frame);
       isRestoringRef.current = false;
       for (const name of USER_SCROLL_EVENTS)
-        scroller?.removeEventListener(name, stop);
+        userTarget.removeEventListener(name, stop);
     }
 
     function retry() {
@@ -94,7 +96,7 @@ export function useScrollRestoration(
     }
 
     for (const name of USER_SCROLL_EVENTS)
-      scroller.addEventListener(name, stop, { passive: true });
+      userTarget.addEventListener(name, stop, { passive: true });
     frame = requestAnimationFrame(retry);
     return stop;
   }, [scrollerRef, screenKey]);

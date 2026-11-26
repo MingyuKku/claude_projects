@@ -3,23 +3,36 @@ import { createMemoryRouter, RouterProvider } from "react-router";
 import { SWRConfig } from "swr";
 
 import { serverApiV3 } from "@/shared/api";
+import { trackRouterInitialized } from "@/shared/lib";
 
 import { routes } from "./routes";
 import { resetSessionMiddleware } from "./session-middleware";
+
+interface RenderRouteOptions {
+  /**
+   * false면 첫 진입 loader를 기다리지 않고 바로 그림. 브라우저처럼 loader가 도는 동안 루트 레이아웃이 먼저 그려져야
+   * 드러나는 동작(첫 진입 판단)을 검증할 때 씀.
+   */
+  shouldWaitForLoad?: boolean;
+}
 
 /**
  * 실제 라우트로 화면을 그림. 경로 배열을 넘기면 그 순서로 방문한 기록을 쌓고 마지막 경로에서 시작함
  * (뒤로가기 동작을 앞 화면을 직접 거치지 않고 검증할 때 씀).
  */
-export async function renderRoute(path: string | string[]) {
+export async function renderRoute(
+  path: string | string[],
+  { shouldWaitForLoad = true }: RenderRouteOptions = {},
+) {
   const initialEntries = Array.isArray(path) ? path : [path];
   const router = createMemoryRouter(routes, {
     initialEntries,
     initialIndex: initialEntries.length - 1,
   });
+  trackRouterInitialized(router);
   // CI의 첫 모듈 로딩 시간을 요소 조회 제한 시간에 포함하지 않는다.
   // 실제 라우트의 lazy를 실행하고 초기화가 끝난 뒤 화면 동작을 검증한다.
-  if (!router.state.initialized) {
+  if (shouldWaitForLoad && !router.state.initialized) {
     await new Promise<void>((resolve) => {
       const unsubscribe = router.subscribe((state) => {
         if (state.initialized) {

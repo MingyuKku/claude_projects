@@ -1,7 +1,7 @@
 import type { CampaignDraft, CampaignProductType } from "@/entities/campaign";
 
 // 택1·복수 선택 그룹마다 첫 항목을 기본 선택으로 채움. 서버에 저장된 값이 있으면 그 값을 쓰고, 비어 있는 칸만 채움.
-// 채운 값은 저장한 값(savedDraft)과 달라서 그 단계를 옮길 때 서버에도 저장됨.
+// 채운 값은 저장한 값(savedDraft)과 달라 저장 대상이 됨. 단, 아직 열지 않은 단계는 단계 이동 때 보내지 않고 결제 때 보냄(`getChangedSteps`).
 
 const DEFAULT_PRODUCT_TYPE = "PRODUCT_DELIVERY";
 const DEFAULT_PLATFORM = "INSTAGRAM";

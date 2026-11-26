@@ -4,6 +4,7 @@ import { useLocation, useNavigate } from "react-router";
 import { useWebPush } from "@/features/enable-web-push";
 import { AppHeader } from "@/shared/components/app-header";
 import { LoginRequiredAlert } from "@/shared/components/login-required-alert";
+import { OverlayScrollbar } from "@/shared/components/scroll-panel";
 import { SidebarNav } from "@/shared/components/sidebar-nav";
 import { ToggleTab } from "@/shared/components/toggle-tab";
 import { ROUTES } from "@/shared/config";
@@ -269,17 +270,20 @@ export function AppShell({
               onClickGuide={handleClickGuide}
             />
           </AppHeader>
-          <main
-            ref={mainRef}
-            className={cn(
-              "min-h-0 flex-1 overflow-auto",
-              mainClassName ?? "p-5",
-              isCustomerCenterPath && CUSTOMER_CENTER_MAIN_CLASS,
-              isFittedToViewport && KEYBOARD_FITTED_MAIN_CLASS,
-            )}
-          >
-            {children}
-          </main>
+          <div className="relative flex min-h-0 flex-1 flex-col">
+            <main
+              ref={mainRef}
+              className={cn(
+                "scrollbar-hidden min-h-0 flex-1 overflow-auto",
+                mainClassName ?? "p-5",
+                isCustomerCenterPath && CUSTOMER_CENTER_MAIN_CLASS,
+                isFittedToViewport && KEYBOARD_FITTED_MAIN_CLASS,
+              )}
+            >
+              {children}
+            </main>
+            <OverlayScrollbar scrollerRef={mainRef} />
+          </div>
         </div>
         <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
           <SheetContent

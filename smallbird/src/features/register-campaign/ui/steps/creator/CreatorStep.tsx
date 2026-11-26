@@ -12,9 +12,8 @@ import { Card } from "@/shared/ui/card";
 
 import { applyAllOptionRule } from "../../../model/all-option";
 import {
-  BRAND_PLATFORMS,
+  CAMPAIGN_PLATFORM_OPTIONS,
   getPlatformLabelKey,
-  GROUP_BUY_PLATFORMS,
   PLATFORM_ICON_NAMES,
 } from "../../../model/platform";
 import { needsTitleHashtags } from "../../../model/step-completion";
@@ -28,7 +27,7 @@ import type { CampaignPlatform, CreatorAgeGroup } from "@/entities/campaign";
 const ALL_AGE_GROUP: CreatorAgeGroup = "ALL";
 
 // 3단계 크리에이터 조건. 플랫폼·성별은 하나, 연령대·주제는 여러 개.
-// 숏츠·릴스는 공구형 시안에만 있어 공구형에서만 보임. 주제는 서버가 받는 9개(브랜드형 시안과 다름, P-25).
+// 숏츠·릴스는 브랜드형·공구형 모두 보임. 주제는 서버가 받는 9개(브랜드형 시안과 다름, P-25).
 // 플랫폼은 5단계 필수 해시태그 칸을 정해서, 제목 칸이 없는 플랫폼으로 바꾸면 입력해 둔 제목 해시태그를 지움(P-22 ② 답 전 처리).
 export function CreatorStep() {
   const { t } = useTranslation("features/register-campaign");
@@ -38,8 +37,6 @@ export function CreatorStep() {
   const patchStepDraft = useRegisterWizardStore(
     (state) => state.patchStepDraft,
   );
-
-  const isGroupBuy = productType === "GROUP_BUY";
 
   useEffect(() => {
     if (error) toast(t("toast.requestFailed"));
@@ -68,18 +65,16 @@ export function CreatorStep() {
       <ChoiceField
         label={t("creator.platform")}
         value={creator.platform}
-        options={(isGroupBuy ? GROUP_BUY_PLATFORMS : BRAND_PLATFORMS).map(
-          (platform) => ({
-            value: platform,
-            label: t(getPlatformLabelKey(platform, productType)),
-            icon: (
-              <PlatformIcon
-                platform={PLATFORM_ICON_NAMES[platform]}
-                className="size-4"
-              />
-            ),
-          }),
-        )}
+        options={CAMPAIGN_PLATFORM_OPTIONS.map((platform) => ({
+          value: platform,
+          label: t(getPlatformLabelKey(platform, productType)),
+          icon: (
+            <PlatformIcon
+              platform={PLATFORM_ICON_NAMES[platform]}
+              className="size-4"
+            />
+          ),
+        }))}
         onChangeValue={handleChangePlatform}
       />
       <ChoiceField

@@ -153,7 +153,7 @@ OpenAPI 응답 → Zod 검증 → 트랜스포머 → SWR 훅 → UI. V3는 `ser
 | 엔드포인트 | 메서드 | 쓰는 곳 |
 |---|---|---|
 | `/v3/matching/platform` · `/category` · `/filter-options` | GET | 플랫폼 · 카테고리 · 프로필 필터 옵션(11-12 추가) |
-| `/v3/matching/influencer/search` | GET | 검색 목록(useSWRInfinite) |
+| `/v3/matching/influencer/merged/search` | GET | 검색 목록(useSWRInfinite) |
 | `/v3/matching/bookmark` | GET / POST / DELETE | 관리 목록 / 저장 / 해제(`targets`) |
 | `/v3/matching/bookmark/folder` | GET / POST | 폴더 목록 / 생성 |
 | `/v3/matching/bookmark/folder/sync` | PUT | 그룹 설정 저장(최종 목록, 없는 폴더는 삭제) |

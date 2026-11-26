@@ -85,7 +85,7 @@ describe("getChangedSteps", () => {
   it("정책 동의만 바뀌면 저장할 단계가 없고 저장 요청도 보내지 않는다", async () => {
     const store = createStore();
     store.getState().patchStepDraft("policy", { service: true });
-    const saver = createDraftSaver(store, () => Promise.resolve());
+    const saver = createDraftSaver(store);
 
     expect(getChangedSteps(store.getState())).toEqual([]);
     expect(saver.hasChanges()).toBe(false);
@@ -105,10 +105,9 @@ describe("getChangedSteps", () => {
 });
 
 describe("createDraftSaver", () => {
-  it("바뀐 단계를 하나씩 보내고 저장한 값으로 표시한 뒤 상세를 다시 읽는다", async () => {
+  it("바뀐 단계를 하나씩 보내고 저장한 값으로 표시한다", async () => {
     const store = createStore();
-    const onSaved = vi.fn().mockResolvedValue(undefined);
-    const saver = createDraftSaver(store, onSaved);
+    const saver = createDraftSaver(store);
     store.getState().patchStepDraft("info", { name: "캠페인" });
 
     expect(saver.hasChanges()).toBe(true);
@@ -117,16 +116,13 @@ describe("createDraftSaver", () => {
     expect(saveCampaignStep).toHaveBeenCalledTimes(1);
     expect(saveCampaignStep).toHaveBeenCalledWith(7, "info", expect.anything());
     expect(saver.hasChanges()).toBe(false);
-    expect(onSaved).toHaveBeenCalledTimes(1);
   });
 
-  it("바뀐 것이 없으면 요청 없이 성공하고 상세도 다시 읽지 않는다", async () => {
-    const onSaved = vi.fn();
-    const saver = createDraftSaver(createStore(), onSaved);
+  it("바뀐 것이 없으면 요청 없이 성공한다", async () => {
+    const saver = createDraftSaver(createStore());
 
     await expect(saver.save()).resolves.toEqual({ ok: true });
     expect(saveCampaignStep).not.toHaveBeenCalled();
-    expect(onSaved).not.toHaveBeenCalled();
   });
 
   it("저장 중에 생긴 변경은 앞 저장이 끝난 뒤 이어서 보낸다", async () => {
@@ -135,7 +131,7 @@ describe("createDraftSaver", () => {
     vi.mocked(saveCampaignStep).mockImplementationOnce(
       () => new Promise((resolve) => (finishFirst = () => resolve(undefined))),
     );
-    const saver = createDraftSaver(store, () => Promise.resolve());
+    const saver = createDraftSaver(store);
     store.getState().patchStepDraft("info", { name: "처음" });
 
     const first = saver.save();
@@ -159,7 +155,7 @@ describe("createDraftSaver", () => {
     vi.mocked(saveCampaignStep).mockRejectedValueOnce(
       new ApiError(409, { reason: "NOT_EDITABLE" }),
     );
-    const saver = createDraftSaver(store, () => Promise.resolve());
+    const saver = createDraftSaver(store);
     store.getState().patchStepDraft("info", { name: "캠페인" });
 
     await expect(saver.save()).resolves.toEqual({
@@ -171,7 +167,7 @@ describe("createDraftSaver", () => {
 
   it("저장된 유형을 바꿔 1단계를 저장하면 서버가 비운 2~6단계를 저장된 값에서도 비운다", async () => {
     const store = createStore();
-    const saver = createDraftSaver(store, () => Promise.resolve());
+    const saver = createDraftSaver(store);
     store
       .getState()
       .patchStepDraft("info", { campaignType: "PRODUCT_DELIVERY" });
@@ -201,7 +197,7 @@ describe("createDraftSaver", () => {
         mediaType: "IMAGE",
       });
       const store = createStore();
-      const saver = createDraftSaver(store, () => Promise.resolve());
+      const saver = createDraftSaver(store);
       store
         .getState()
         .patchStepDraft("intro", { mainImage: createPendingMedia(file) });
@@ -231,7 +227,7 @@ describe("createDraftSaver", () => {
         })
         .mockRejectedValueOnce(new ApiError(400, { reason: "FILE_TOO_LARGE" }));
       const store = createStore();
-      const saver = createDraftSaver(store, () => Promise.resolve());
+      const saver = createDraftSaver(store);
       store.getState().patchStepDraft("intro", {
         detailMedia: [createPendingMedia(file), createPendingMedia(second)],
       });
@@ -267,7 +263,7 @@ describe("createDraftSaver", () => {
     it("올리는 사이 파일을 지워 저장할 것이 없어지면 5단계를 보내지 않는다", async () => {
       vi.mocked(saveCampaignStep).mockClear();
       const store = createStore();
-      const saver = createDraftSaver(store, () => Promise.resolve());
+      const saver = createDraftSaver(store);
       vi.mocked(uploadCampaignFile).mockImplementation(async () => {
         store.getState().patchStepDraft("intro", { mainImage: null });
         return { attachmentIdx: 5, url: "u", mediaType: "IMAGE" as const };
@@ -305,7 +301,7 @@ describe("createDraftSaver", () => {
         detailMedia: Array.from({ length: 5 }, () => createPendingMedia(file)),
       });
 
-      await createDraftSaver(store, () => Promise.resolve()).save();
+      await createDraftSaver(store).save();
 
       expect(maxRunning).toBe(3);
       expect(progress).toContain(5);
@@ -345,5 +341,111 @@ describe("createDraftSaver", () => {
       expect(store.getState().draft.intro.mainImage).toBeNull();
       expect(store.getState().draft.intro.detailMedia).toEqual([]);
     });
+  });
+});
+
+describe("열지 않은 단계의 기본 선택 미루기", () => {
+  // 서버에 1단계만 저장된 새 캠페인. 3·4단계는 화면에서 기본 선택으로 채움.
+  function createNewCampaignStore() {
+    const draft = createEmptyDraft();
+    draft.info = {
+      name: "봄 체험단",
+      brandIdx: 1,
+      campaignType: "PRODUCT_DELIVERY",
+      startDate: "2026-12-01",
+    };
+    return createRegisterWizardStore({
+      campaignIdx: 9,
+      campaignCode: "PB-00000000000009",
+      serviceType: "PICK",
+      productType: "BRAND",
+      isDemo: false,
+      rawCampaignType: "PRODUCT_DELIVERY",
+      draft,
+    } as CampaignDetail);
+  }
+
+  // 서버에 3단계까지 저장된 캠페인(기본 선택과 다른 값).
+  function createSavedCreatorStore() {
+    return createStore(
+      applyDraftDefaults({
+        ...createEmptyDraft(),
+        creator: {
+          platform: "YOUTUBE",
+          gender: "MALE",
+          ageGroups: ["AGE_20S"],
+          topics: ["Food"],
+        },
+      }),
+    );
+  }
+
+  const savedSteps = () =>
+    vi.mocked(saveCampaignStep).mock.calls.map(([, step]) => step);
+
+  it("열지 않은 단계의 기본 선택은 이동 저장에서 미루고, 옵션 없는 저장(결제 쪽)에서는 보낸다", async () => {
+    const store = createNewCampaignStore();
+    const saver = createDraftSaver(store);
+    store.getState().patchStepDraft("product", { productName: "로션" });
+
+    await saver.save({ skipUnseenDefaults: true });
+    expect(savedSteps()).toEqual(["product"]);
+
+    vi.mocked(saveCampaignStep).mockClear();
+    await saver.save();
+    expect(savedSteps()).toEqual(["creator", "conditions"]);
+  });
+
+  it("연 단계와 고친 단계는 미루지 않는다", () => {
+    const store = createNewCampaignStore();
+    store.getState().markStepShown("creator");
+    store.getState().patchStepDraft("conditions", { postingPeriodMonths: 3 });
+
+    expect(
+      getChangedSteps(store.getState(), { skipUnseenDefaults: true }),
+    ).toEqual(["creator", "conditions"]);
+  });
+
+  it("미룬 단계만 남으면 떠날 때 바뀐 것이 없다고 본다", () => {
+    const saver = createDraftSaver(createNewCampaignStore());
+
+    expect(saver.hasChanges({ skipUnseenDefaults: true })).toBe(false);
+    expect(saver.hasChanges()).toBe(true);
+  });
+
+  it("유형을 바꾸면 서버가 단계를 비운 뒤에만 기본 선택을 미룬다", async () => {
+    const store = createSavedCreatorStore();
+    const saver = createDraftSaver(store);
+    store.getState().changeCampaignType("PRESS");
+
+    // 서버에는 아직 이전 값이 있어, 그 값과 다른 기본 선택은 미룰 수 없음.
+    expect(
+      getChangedSteps(store.getState(), { skipUnseenDefaults: true }),
+    ).toEqual(["info", "creator"]);
+
+    // 1단계 저장으로 서버가 2~6단계를 비우면 3단계 기본 선택은 다시 들어와도 같으므로 미룸.
+    await saver.save({ skipUnseenDefaults: true });
+    expect(savedSteps()).toEqual(["info"]);
+  });
+
+  it("유형을 바꿨다가 되돌리면 서버 값과 다른 기본 선택을 미루지 않는다", () => {
+    const store = createSavedCreatorStore();
+    store.getState().changeCampaignType("PRESS");
+    store.getState().changeCampaignType("PRODUCT_DELIVERY");
+
+    expect(
+      getChangedSteps(store.getState(), { skipUnseenDefaults: true }),
+    ).toEqual(["creator"]);
+  });
+
+  it("이전 캠페인 불러오기로 다시 채운 기본 선택도 미룬다", () => {
+    const store = createNewCampaignStore();
+    store
+      .getState()
+      .replaceDraft(createNewCampaignStore().getState().savedDraft);
+
+    expect(
+      getChangedSteps(store.getState(), { skipUnseenDefaults: true }),
+    ).toEqual([]);
   });
 });

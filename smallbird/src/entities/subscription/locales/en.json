@@ -36,7 +36,8 @@
     "badge": {
       "brand": "Brand",
       "groupBuy": "Group Buy",
-      "undecided": "TBD"
+      "undecided": "TBD",
+      "inUse": "In use"
     },
     "recruit": {
       "features": {

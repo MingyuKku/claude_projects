@@ -2,6 +2,7 @@ import { ChevronDown, ChevronUp, TriangleAlert } from "lucide-react";
 
 import { EmptyIllustration } from "@/shared/components/empty-state";
 import { cn } from "@/shared/lib/utils";
+import { Badge } from "@/shared/ui/badge";
 import { Button } from "@/shared/ui/button";
 import { Card } from "@/shared/ui/card";
 import { Separator } from "@/shared/ui/separator";
@@ -9,7 +10,7 @@ import { Separator } from "@/shared/ui/separator";
 import type { ComponentProps, ReactNode } from "react";
 
 // Figma Card / Button(6897:43929): Type(Default/Subscribe/Disabled) × State(Default/Hover/Focus/More).
-// Subscribe는 primary 1px 외곽선과 비활성 "구독 중" 버튼, Disabled는 준비중 안내와 비활성 버튼.
+// Subscribe는 primary 링(개설 서비스 카드 선택과 같은 ring-2 + offset-2)과 비활성 "구독 중" 버튼, Disabled는 준비중 안내와 비활성 버튼.
 export type PlanCardType = "default" | "subscribed" | "disabled";
 
 export interface PlanCardFeature {
@@ -23,6 +24,8 @@ interface PlanCardProps extends Omit<ComponentProps<"div">, "title"> {
   price: ReactNode;
   /** 가격 위에 줄을 그어 보이는 할인 전 가격 */
   originalPrice?: ReactNode;
+  /** 카드 우상단에 겹쳐 보이는 상태 딱지 문구(예: "이용 중") */
+  statusBadge?: ReactNode;
   /** 가격 아래 배지 묶음(`<Badge>` 여러 개) */
   badges?: ReactNode;
   features?: PlanCardFeature[];
@@ -42,6 +45,7 @@ export function PlanCard({
   title,
   price,
   originalPrice,
+  statusBadge,
   badges,
   features = [],
   comingSoonText,
@@ -76,9 +80,22 @@ export function PlanCard({
   return (
     <Card
       interactive={!isDisabled}
-      className={cn(type === "subscribed" && "ring-1 ring-primary", className)}
+      className={cn(
+        "transition-[color,background-color,box-shadow]",
+        statusBadge && "relative",
+        type === "subscribed" && "ring-2 ring-primary ring-offset-2",
+        className,
+      )}
       {...props}
     >
+      {statusBadge && (
+        <Badge
+          size="sm"
+          className="absolute top-3 right-3 bg-slate-700/70 ds-text-xs-5-medium text-white"
+        >
+          {statusBadge}
+        </Badge>
+      )}
       <div className="flex flex-col items-center gap-3 px-4 pt-4 tablet:gap-4 tablet:px-5 tablet:pt-5">
         {originalPrice ? (
           // 할인 전 가격이 있는 시안(11755:97086)은 제목과 가격 묶음 사이가 12px로 좁음.

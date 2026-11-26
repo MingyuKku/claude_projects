@@ -90,7 +90,7 @@ export async function fetchCreatorSearchPage(
   offset: number,
 ): Promise<OffsetPage<CreatorViewModel>> {
   const response = creatorSearchSchema.parse(
-    await serverApiV3.get("/matching/influencer/search", {
+    await serverApiV3.get("/matching/influencer/merged/search", {
       params: {
         ...toSearchQueryParams(filters, allCategoryIdx),
         offset,

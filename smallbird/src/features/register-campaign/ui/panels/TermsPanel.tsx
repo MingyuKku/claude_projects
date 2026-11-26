@@ -18,6 +18,7 @@ export function TermsPanel() {
     <PanelLayout
       title={t(`policy.terms.${termsKind}`)}
       onClose={closePanel}
+      isBodyFixed
       footer={
         <div className="flex gap-2">
           <Button variant="outline" className="flex-1" onClick={closePanel}>

@@ -1,7 +1,7 @@
 import { StepSidebar } from "@/shared/components/step-sidebar";
 import { useTranslation } from "@/shared/i18n";
 
-import { getStepLabelKey } from "../model/step-labels";
+import { STEP_LABEL_KEYS } from "../model/step-labels";
 import { getStepStatuses } from "../model/step-status";
 import { useLeaveToOverview } from "../model/use-leave-to-overview";
 import { useWizardNavigation } from "../model/use-wizard-navigation";
@@ -68,7 +68,7 @@ export function RegisterStepNav({
       items={statuses.map((status, index) => ({
         id: status.step,
         number: index + 1,
-        label: t(getStepLabelKey(status.step, productType)),
+        label: t(STEP_LABEL_KEYS[status.step]),
         state: status.state,
         indicator: status.indicator,
       }))}

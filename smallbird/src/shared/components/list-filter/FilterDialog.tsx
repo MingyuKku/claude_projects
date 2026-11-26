@@ -2,6 +2,7 @@ import { RefreshCcw, X } from "lucide-react";
 import { useId, useState } from "react";
 
 import { SubHeader } from "@/shared/components/app-header";
+import { ScrollPanel } from "@/shared/components/scroll-panel";
 import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
@@ -124,49 +125,51 @@ export function FilterDialogBody({
     });
   }
 
+  const renderedFields = fields.map((field) => {
+    const labelId = `${idPrefix}-${field.id}`;
+    return (
+      <div key={field.id} className="flex flex-col gap-2 text-sm">
+        <span id={labelId} className="font-medium">
+          {field.label}
+        </span>
+        {field.type === "date" ? (
+          <DateField
+            field={field}
+            from={draft[`${field.id}From`]}
+            to={draft[`${field.id}To`]}
+            placeholder={field.placeholder}
+            labelledBy={labelId}
+            onChange={(from, to) => {
+              setValue(`${field.id}From`, from);
+              setValue(`${field.id}To`, to);
+            }}
+          />
+        ) : (
+          <SelectField
+            field={field}
+            value={draft[field.id]}
+            placeholder={field.placeholder}
+            labelledBy={labelId}
+            onChange={(value) => setValue(field.id, value)}
+          />
+        )}
+      </div>
+    );
+  });
+
   return (
     <>
-      <div
-        className={cn(
-          "flex flex-1 flex-col",
-          // TAB 화면은 <main>이 스크롤하므로 overflow를 두지 않음. overflow-y-auto는 가로도 auto로 바꿔
-          // 좌우 여백이 없는 이 화면에서 셀렉트·날짜 입력의 포커스 링을 잘라 냄.
-          // MO 모달 시안(빅버드 머니 `11224:105649`): 본문 16/16/12/16, 하단 16 여백에 구분선 없음.
-          isScreen ? "gap-3 py-5" : "gap-4 overflow-y-auto px-4 pt-4 pb-3",
-        )}
-      >
-        {fields.map((field) => {
-          const labelId = `${idPrefix}-${field.id}`;
-          return (
-            <div key={field.id} className="flex flex-col gap-2 text-sm">
-              <span id={labelId} className="font-medium">
-                {field.label}
-              </span>
-              {field.type === "date" ? (
-                <DateField
-                  field={field}
-                  from={draft[`${field.id}From`]}
-                  to={draft[`${field.id}To`]}
-                  placeholder={field.placeholder}
-                  labelledBy={labelId}
-                  onChange={(from, to) => {
-                    setValue(`${field.id}From`, from);
-                    setValue(`${field.id}To`, to);
-                  }}
-                />
-              ) : (
-                <SelectField
-                  field={field}
-                  value={draft[field.id]}
-                  placeholder={field.placeholder}
-                  labelledBy={labelId}
-                  onChange={(value) => setValue(field.id, value)}
-                />
-              )}
-            </div>
-          );
-        })}
-      </div>
+      {/* TAB 화면은 <main>이 스크롤함. MO 모달만 안에서 스크롤함. */}
+      {isScreen ? (
+        <div className="flex flex-1 flex-col gap-3 py-5">{renderedFields}</div>
+      ) : (
+        <ScrollPanel
+          className="flex-1"
+          contentClassName="flex flex-col gap-4 px-4 pt-4 pb-3"
+        >
+          {renderedFields}
+        </ScrollPanel>
+      )}
       <div className={cn("flex gap-2", isScreen ? "pt-5" : "p-4")}>
         <Button
           type="button"

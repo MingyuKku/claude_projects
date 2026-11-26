@@ -19,6 +19,7 @@ import {
   DrawerTrigger,
 } from "@/shared/ui/drawer";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
+import { ScrollArea } from "@/shared/ui/scroll-area";
 
 import { useRegisterWizardStore } from "../../../model/wizard-context";
 
@@ -88,31 +89,32 @@ export function BrandSelect({ onClickManage }: BrandSelectProps) {
           {t("info.brand.manage")}
         </Button>
       )}
-      <div
-        role="listbox"
-        aria-label={label}
+      <ScrollArea
+        type="auto"
         // 항목 높이 36 × 8개. 넘으면 목록 안에서 스크롤함.
-        className="flex max-h-72 flex-col overflow-y-auto"
+        className="*:data-[slot=scroll-area-viewport]:max-h-72 [&>[data-slot=scroll-area-viewport]>div]:block!"
       >
-        {brands?.map((brand) => {
-          const isSelected = brand.brandIdx === brandIdx;
-          return (
-            <button
-              key={brand.brandIdx}
-              type="button"
-              role="option"
-              aria-selected={isSelected}
-              className={cn(
-                "flex h-9 w-full shrink-0 items-center truncate rounded-sm px-2 text-left text-sm leading-5 text-foreground outline-none hover:bg-accent focus-visible:bg-accent",
-                isSelected && "bg-accent",
-              )}
-              onClick={() => handleSelect(brand.brandIdx)}
-            >
-              <span className="truncate">{brand.name}</span>
-            </button>
-          );
-        })}
-      </div>
+        <div role="listbox" aria-label={label} className="flex flex-col">
+          {brands?.map((brand) => {
+            const isSelected = brand.brandIdx === brandIdx;
+            return (
+              <button
+                key={brand.brandIdx}
+                type="button"
+                role="option"
+                aria-selected={isSelected}
+                className={cn(
+                  "flex h-9 w-full shrink-0 items-center truncate rounded-sm px-2 text-left text-sm leading-5 text-foreground outline-none hover:bg-accent focus-visible:bg-accent",
+                  isSelected && "bg-accent",
+                )}
+                onClick={() => handleSelect(brand.brandIdx)}
+              >
+                <span className="truncate">{brand.name}</span>
+              </button>
+            );
+          })}
+        </div>
+      </ScrollArea>
     </div>
   );
 

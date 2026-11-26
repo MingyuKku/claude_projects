@@ -4,7 +4,6 @@ import { useState } from "react";
 import { toast } from "sonner";
 
 import {
-  CreatorScrollArea,
   LoadError,
   CreatorPanel,
   isInteractiveTarget,
@@ -17,6 +16,7 @@ import {
 } from "@/entities/creator";
 import { ButtonList } from "@/shared/components/button-list";
 import { Inform } from "@/shared/components/inform";
+import { ScrollPanel } from "@/shared/components/scroll-panel";
 import { SkeletonGroup } from "@/shared/components/skeleton-presets";
 import { formatNumber, useTranslation } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
@@ -144,7 +144,7 @@ export function MoveBookmarkPanel({
         </Button>
       </div>
       {/* 새 폴더 카드의 바깥 링이 스크롤 영역에 잘리지 않게 위로 링 폭만큼 여백을 둠. */}
-      <CreatorScrollArea
+      <ScrollPanel
         className="-mt-1 flex-1"
         contentClassName="flex flex-col ds-gap-3 ds-px-5 pt-1"
         role="group"
@@ -152,7 +152,7 @@ export function MoveBookmarkPanel({
       >
         {isCreating && <NewFolderCard onCreated={handleCreated} />}
         {renderFolders()}
-      </CreatorScrollArea>
+      </ScrollPanel>
       <footer className="shrink-0 ds-p-5">
         <Button
           className="w-full"

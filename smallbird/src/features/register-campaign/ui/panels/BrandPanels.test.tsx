@@ -162,15 +162,20 @@ describe("BrandManagePanel", () => {
 });
 
 describe("AddBrandPanel", () => {
-  it("브랜드명을 넣어야 저장할 수 있고, 저장하면 새 브랜드를 고른 채 닫는다", async () => {
+  it("브랜드명과 이미지를 넣어야 저장할 수 있고, 저장하면 새 브랜드를 고른 채 닫는다", async () => {
     const user = userEvent.setup();
-    renderPanel("add-brand", null);
+    const { container } = renderPanel("add-brand", null);
     const save = screen.getByRole("button", { name: "저장" });
     expect(save).toBeDisabled();
 
     await user.type(
       screen.getByRole("textbox", { name: /브랜드명/ }),
       "새 브랜드",
+    );
+    expect(save).toBeDisabled();
+    await user.upload(
+      container.querySelector<HTMLInputElement>('input[type="file"]')!,
+      new File(["x"], "logo.png", { type: "image/png" }),
     );
     await user.click(save);
 
@@ -187,10 +192,14 @@ describe("AddBrandPanel", () => {
   it("저장이 실패하면 토스트를 띄우고 입력값을 그대로 둔다", async () => {
     const user = userEvent.setup();
     vi.mocked(addBrand).mockRejectedValueOnce(new Error("fail"));
-    renderPanel("add-brand", null);
+    const { container } = renderPanel("add-brand", null);
 
     const name = screen.getByRole("textbox", { name: /브랜드명/ });
     await user.type(name, "새 브랜드");
+    await user.upload(
+      container.querySelector<HTMLInputElement>('input[type="file"]')!,
+      new File(["x"], "logo.png", { type: "image/png" }),
+    );
     await user.click(screen.getByRole("button", { name: "저장" }));
 
     await waitFor(() =>

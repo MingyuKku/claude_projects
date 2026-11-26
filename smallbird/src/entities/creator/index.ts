@@ -78,7 +78,6 @@ export { CreatorChannelButton } from "./ui/CreatorChannelButton";
 export { CreatorFullScreen } from "./ui/CreatorFullScreen";
 export { CreatorKeywordSearch } from "./ui/CreatorKeywordSearch";
 export { CreatorList } from "./ui/CreatorList";
-export { CreatorScrollArea } from "./ui/CreatorScrollArea";
 export { CreatorPanel } from "./ui/CreatorPanel";
 export { CreatorSelectionBar } from "./ui/CreatorSelectionBar";
 export { CreatorSheet } from "./ui/CreatorSheet";

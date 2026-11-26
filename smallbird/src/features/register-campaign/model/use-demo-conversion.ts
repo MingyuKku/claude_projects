@@ -39,8 +39,6 @@ export function useDemoConversion(campaignIdx: number) {
       void mutate(campaignDetailKey(campaignIdx));
       return;
     }
-    // 작성 화면이 실제 등록 중 캠페인으로 읽어야 열리므로 다시 읽은 뒤 옮김.
-    await mutate(campaignDetailKey(campaignIdx));
     void navigate(getCampaignRegisterPath(campaignIdx, "campaign-info"), {
       replace: true,
     });

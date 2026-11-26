@@ -3,7 +3,6 @@ import { useOutletContext } from "react-router";
 
 import {
   CreatorFullScreen,
-  CreatorScrollArea,
   CreatorSelectionBar,
   isSameTargets,
   useBookmarkFolders,
@@ -31,6 +30,7 @@ import {
   RecommendAssistantButton,
   RecommendAssistantFullScreen,
 } from "@/features/recommend-creators";
+import { ScrollPanel } from "@/shared/components/scroll-panel";
 import { MEDIA_QUERY } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery } from "@/shared/lib";
@@ -299,12 +299,12 @@ export function CreatorManagePage() {
             <div className="flex min-h-0 flex-1 flex-col gap-6">{content}</div>
           ) : (
             // 스크롤바가 화면 끝에 오도록 본문 좌우 여백까지 넓힘.
-            <CreatorScrollArea
+            <ScrollPanel
               className="-mx-(--ds-p-5) flex-1"
               contentClassName="flex flex-col gap-3 px-(--ds-p-5) tablet:gap-5"
             >
               {content}
-            </CreatorScrollArea>
+            </ScrollPanel>
           )}
           {!isDesktop && (
             <RecommendAssistantButton

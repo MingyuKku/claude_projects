@@ -89,6 +89,7 @@ export function SubscriptionPlanCard({
       // 클릭 동작이 없는 카드라 포인터 커서는 쓰지 않음. 호버는 공용 Card의 연한 회색 배경(accent/50)을 그대로 씀.
       className={cn(className, "cursor-default")}
       title={t(`productType.${activeType}`)}
+      statusBadge={isSubscribed ? t("plan.badge.inUse") : undefined}
       price={t(`plan.price.${period}`, { price: formatNumber(price) })}
       originalPrice={
         hasYearlyDiscount

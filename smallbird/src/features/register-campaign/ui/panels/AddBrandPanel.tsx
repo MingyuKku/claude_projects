@@ -53,7 +53,7 @@ export function AddBrandPanel() {
     [],
   );
 
-  const canSave = name.trim().length > 0 && !isSaving;
+  const canSave = name.trim().length > 0 && image !== null && !isSaving;
 
   function handlePickFile(file: File) {
     const ruleError = checkImageFile(file);
@@ -75,9 +75,10 @@ export function AddBrandPanel() {
   }
 
   async function handleSave() {
+    if (!image) return;
     setIsSaving(true);
     let attachmentIdx = uploaded?.attachmentIdx ?? null;
-    if (image && !uploaded) {
+    if (!uploaded) {
       const [uploadError, result] = await tryit(uploadCampaignFile)(image.file);
       if (uploadError) {
         setIsSaving(false);
@@ -136,12 +137,14 @@ export function AddBrandPanel() {
             className="text-sm leading-5 font-medium"
           >
             {t("brands.image.label")}
+            <span aria-hidden="true" className="font-semibold text-primary">
+              {" *"}
+            </span>
           </p>
           <ThumbnailUpload
             aria-labelledby={imageLabelId}
             imageUrl={image?.previewUrl}
             title={t("brands.image.title")}
-            description={t("brands.image.description")}
             accept={IMAGE_ACCEPT}
             removeLabel={t("brands.image.remove")}
             disabled={isSaving}

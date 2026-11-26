@@ -1,6 +1,7 @@
 import { ChevronLeft, XIcon } from "lucide-react";
 
 import { SubHeader } from "@/shared/components/app-header";
+import { ScrollPanel } from "@/shared/components/scroll-panel";
 import { useTranslation } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
 
@@ -11,6 +12,8 @@ interface PanelLayoutProps {
   /** 넘기면 제목 앞에 "<"(한 단계 위 하위 화면으로). */
   onBack?: () => void;
   onClose: () => void;
+  /** 본문이 남은 높이를 채우고 안쪽에서 따로 스크롤함. */
+  isBodyFixed?: boolean;
   /** 하단 고정 버튼 영역. */
   footer?: ReactNode;
   children: ReactNode;
@@ -21,6 +24,7 @@ export function PanelLayout({
   title,
   onBack,
   onClose,
+  isBodyFixed = false,
   footer,
   children,
 }: PanelLayoutProps) {
@@ -56,7 +60,13 @@ export function PanelLayout({
           </Button>
         }
       />
-      <div className="min-h-0 flex-1 overflow-y-auto">{children}</div>
+      {isBodyFixed ? (
+        <div className="min-h-0 flex-1">{children}</div>
+      ) : (
+        <ScrollPanel className="flex-1" contentClassName="flex flex-col">
+          {children}
+        </ScrollPanel>
+      )}
       {footer && <div className="shrink-0 ds-p-5">{footer}</div>}
     </div>
   );

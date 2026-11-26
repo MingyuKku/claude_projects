@@ -1,9 +1,11 @@
-import { useOutletContext } from "react-router";
+import { useNavigate, useOutletContext } from "react-router";
 
-import { CampaignDemoTag } from "@/entities/campaign";
+import {
+  CampaignDemoTag,
+  useCampaignStatusReturnStore,
+} from "@/entities/campaign";
 import { ROUTES } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
-import { useGoBack } from "@/shared/lib";
 import { FocusShell } from "@/widgets/app-shell";
 
 import type { SessionViewModel } from "@/entities/session";
@@ -15,7 +17,7 @@ interface RegisterShellProps {
   children?: ReactNode;
 }
 
-// 등록 화면 셸: 헤더 "<" + "캠페인 등록". "<"는 브라우저 뒤로가기이고 앱 안 기록이 없으면 캠페인 현황으로 감(스펙 §3 셸).
+// 등록 화면 셸: 헤더 "<" + "캠페인 등록". "<"는 늘 캠페인 현황으로 가고(마지막에 보던 탭·검색·쪽 유지), 브라우저 뒤로가기는 기록을 따름(스펙 §3 셸).
 export function RegisterShell({
   isDemo = false,
   sidebar,
@@ -23,7 +25,8 @@ export function RegisterShell({
 }: RegisterShellProps) {
   const { t } = useTranslation("pages/campaign-register");
   const session = useOutletContext<SessionViewModel>();
-  const goBack = useGoBack(ROUTES.campaign);
+  const navigate = useNavigate();
+  const statusSearch = useCampaignStatusReturnStore((state) => state.search);
 
   return (
     <>
@@ -33,7 +36,7 @@ export function RegisterShell({
         title={t("title")}
         titleBadge={isDemo ? <CampaignDemoTag /> : undefined}
         sidebar={sidebar}
-        onBack={goBack}
+        onBack={() => void navigate(`${ROUTES.campaign}${statusSearch}`)}
       >
         {children}
       </FocusShell>

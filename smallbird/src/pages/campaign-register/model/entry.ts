@@ -4,6 +4,7 @@ import {
   CAMPAIGN_REGISTER_PRODUCT_PARAM,
   CAMPAIGN_REGISTER_TYPE_PARAM,
   getCampaignDetailPath,
+  getCampaignRegisterPath,
 } from "@/entities/campaign";
 
 import type { CampaignDetail, CampaignProductType } from "@/entities/campaign";
@@ -40,7 +41,15 @@ export function parseRegisterEntry(
  * 반려 캠페인은 등록 내역의 "수정"으로 들어와 수정 모드로 엶.
  */
 export function getRegisterRedirectPath(detail: CampaignDetail) {
-  const isDraft = detail.stage === "DRAFT" && !detail.isDemoCompleted;
-  const isWritable = isDraft || detail.stage === "REJECTED";
+  const isWritable = isDraft(detail) || detail.stage === "REJECTED";
   return isWritable ? null : getCampaignDetailPath(detail.campaignIdx);
+}
+
+/** 등록 내역 경로에서 보여 줄 수 없는 캠페인이면 보낼 곳. 아직 작성 중인 캠페인은 작성 화면에서 이어 씀. */
+export function getDetailRedirectPath(detail: CampaignDetail) {
+  return isDraft(detail) ? getCampaignRegisterPath(detail.campaignIdx) : null;
+}
+
+function isDraft(detail: CampaignDetail) {
+  return detail.stage === "DRAFT" && !detail.isDemoCompleted;
 }

@@ -1,8 +1,9 @@
-import { tryit } from "radash";
+import { isEqual, tryit } from "radash";
 
 import { saveCampaignStep } from "@/entities/campaign";
 import { readApiErrorReason } from "@/shared/api";
 
+import { applyDraftDefaults } from "./draft-defaults";
 import { uploadPendingIntroMedia } from "./pending-media";
 import { getRegisterSteps } from "./steps";
 import { isStepChanged } from "./store";
@@ -37,36 +38,51 @@ const STEPS_CLEARED_BY_TYPE_CHANGE: readonly CampaignDraftStep[] = [
 export function getChangedSteps(
   state: Pick<
     RegisterWizardState,
-    "draft" | "savedDraft" | "serviceType" | "productType"
+    "draft" | "savedDraft" | "serviceType" | "productType" | "shownSteps"
   >,
+  { skipUnseenDefaults = false }: SaveOptions = {},
 ): CampaignDraftStep[] {
+  // 저장한 값에 기본 선택을 채운 것과 같으면 다시 들어와도 같은 화면이 되므로, 열지 않은 단계는 미뤄도 보이는 값이 같음.
+  const savedWithDefaults = skipUnseenDefaults
+    ? applyDraftDefaults(state.savedDraft, { productType: state.productType })
+    : null;
   return getRegisterSteps(state.serviceType, state.productType).flatMap(
-    ({ draftStep }) =>
-      draftStep !== null &&
-      draftStep !== "policy" &&
-      isStepChanged(state, draftStep)
-        ? [draftStep]
-        : [],
+    ({ draftStep }) => {
+      if (draftStep === null || draftStep === "policy") return [];
+      if (!isStepChanged(state, draftStep)) return [];
+      const isUnseenDefault =
+        savedWithDefaults !== null &&
+        !state.shownSteps.includes(draftStep) &&
+        isEqual(state.draft[draftStep], savedWithDefaults[draftStep]);
+      return isUnseenDefault ? [] : [draftStep];
+    },
   );
 }
 
-export interface DraftSaver {
-  save: () => Promise<SaveResult>;
-  hasChanges: () => boolean;
+export interface SaveOptions {
+  /**
+   * 열지 않은 단계의 기본 선택은 보내지 않음. 단계 이동·임시저장·떠날 때 사용자가 보지 않은 단계를 미리 저장하느라 늦어지지
+   * 않게 하려고 씀. 결제 쪽 저장은 이 옵션 없이 모두 보냄.
+   */
+  skipUnseenDefaults?: boolean;
 }
 
-/** `onSaved`(상세 캐시 갱신)가 끝난 뒤에 저장 완료로 알림. 저장 직후 화면을 옮기는 쪽이 새 값을 읽게 하려고. */
-export function createDraftSaver(
-  store: RegisterWizardStoreApi,
-  onSaved: () => Promise<unknown>,
-): DraftSaver {
+export interface DraftSaver {
+  save: (options?: SaveOptions) => Promise<SaveResult>;
+  hasChanges: (options?: SaveOptions) => boolean;
+}
+
+/**
+ * 저장한 뒤 상세를 다시 읽지 않음. 작성 중 원본은 store이고, 상세 캐시로 그리는 화면(작성 화면·등록 내역)은 들어올 때마다
+ * loader가 새로 읽으므로 작성 화면의 상세 캐시는 저장 전 값일 수 있음(초안 값은 store에서 읽음).
+ */
+export function createDraftSaver(store: RegisterWizardStoreApi): DraftSaver {
   let queue: Promise<SaveResult> = Promise.resolve({ ok: true });
 
-  async function saveChangedSteps(): Promise<SaveResult> {
-    let hasSaved = false;
+  async function saveChangedSteps(options: SaveOptions): Promise<SaveResult> {
     for (;;) {
       let state = store.getState();
-      const [step] = getChangedSteps(state);
+      const [step] = getChangedSteps(state, options);
       if (!step) break;
       if (step === "intro") {
         const uploaded = await uploadPendingIntroMedia(store);
@@ -86,21 +102,21 @@ export function createDraftSaver(
         snapshot,
       );
       if (error) return { ok: false, reason: readApiErrorReason(error) };
-      hasSaved = true;
       store.getState().markSaved(step, snapshot[step]);
       if (isTypeChanged) {
         store.getState().markServerCleared(STEPS_CLEARED_BY_TYPE_CHANGE);
       }
     }
-    if (hasSaved) await onSaved();
     return { ok: true };
   }
 
   return {
-    save: () => {
-      queue = queue.then(saveChangedSteps, saveChangedSteps);
+    save: (options = {}) => {
+      const run = () => saveChangedSteps(options);
+      queue = queue.then(run, run);
       return queue;
     },
-    hasChanges: () => getChangedSteps(store.getState()).length > 0,
+    hasChanges: (options) =>
+      getChangedSteps(store.getState(), options).length > 0,
   };
 }

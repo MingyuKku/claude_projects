@@ -41,7 +41,7 @@ export interface CreatorViewModel extends CreatorTarget {
   categoryIdx: number;
   nickname: string;
   profileImageUrl: string | null;
-  followerCount: number;
+  followerCount: number | null;
   brandIndex: number | null;
   groupBuyIndex: number | null;
   avgCommentWriterCount: number | null;

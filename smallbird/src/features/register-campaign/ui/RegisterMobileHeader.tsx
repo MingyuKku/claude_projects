@@ -3,12 +3,14 @@ import { useState } from "react";
 
 import { SubHeader } from "@/shared/components/app-header";
 import { AlignJustifyIcon } from "@/shared/components/icons";
+import { ScrollPanel } from "@/shared/components/scroll-panel";
 import { useTranslation } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
 import { Sheet, SheetClose, SheetContent, SheetTitle } from "@/shared/ui/sheet";
 
 import { RegisterStepNav } from "./RegisterStepNav";
 
+import type { PendingSaveAction } from "../model/store";
 import type { RegisterPreviewButtonState } from "./RegisterBottomBar";
 
 interface RegisterMobileHeaderProps {
@@ -17,6 +19,8 @@ interface RegisterMobileHeaderProps {
   preview: RegisterPreviewButtonState | null;
   /** 없으면 "임시저장"을 그리지 않음(반려 뒤 수정 모드). */
   onClickSave?: () => void;
+  /** 저장을 기다리는 동작. "임시저장"이면 Loading, 그 밖의 저장 중에는 막음. */
+  pendingSave: PendingSaveAction | null;
 }
 
 // 드로어는 왼쪽 222px(Figma `Sidebar / Sub / Mobile`), 단계를 고르면 닫힘.
@@ -24,6 +28,7 @@ export function RegisterMobileHeader({
   title,
   preview,
   onClickSave,
+  pendingSave,
 }: RegisterMobileHeaderProps) {
   const { t } = useTranslation("features/register-campaign");
   const { t: tCommon } = useTranslation();
@@ -53,6 +58,8 @@ export function RegisterMobileHeader({
               <Button
                 variant="outline-foreground"
                 size="sm"
+                isLoading={pendingSave === "saveDraft"}
+                disabled={pendingSave !== null}
                 onClick={onClickSave}
               >
                 {t("action.saveDraft")}
@@ -89,12 +96,12 @@ export function RegisterMobileHeader({
                 </Button>
               </SheetClose>
             </div>
-            <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
+            <ScrollPanel className="flex-1" contentClassName="px-4 pb-4">
               <RegisterStepNav
                 size="sm"
                 onSelected={() => setIsDrawerOpen(false)}
               />
-            </div>
+            </ScrollPanel>
           </div>
         </SheetContent>
       </Sheet>

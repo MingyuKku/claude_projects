@@ -57,7 +57,7 @@ export function useCopyPrevious({ onCopied }: { onCopied: () => void }) {
     const { startDate } = detail.draft.info;
     if (startDate !== null && startDate < today) {
       patchStepDraft("info", { startDate: today });
-      void saver.save();
+      void saver.save({ skipUnseenDefaults: true });
     }
     onCopied();
   }

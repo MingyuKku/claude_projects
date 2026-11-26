@@ -2,6 +2,7 @@ import { cva } from "class-variance-authority";
 import { PanelLeft, Plus } from "lucide-react";
 
 import logo from "@/shared/assets/img/brand/logo.svg";
+import { ScrollPanel } from "@/shared/components/scroll-panel";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 
@@ -50,14 +51,11 @@ const sidebarVariants = cva(
   },
 );
 
-const sidebarBodyVariants = cva(
-  "flex min-h-0 flex-1 flex-col gap-2 overflow-y-auto",
-  {
-    variants: {
-      isCollapsed: { true: "p-2", false: "px-2.5" },
-    },
+const sidebarBodyVariants = cva("flex flex-col gap-2", {
+  variants: {
+    isCollapsed: { true: "p-2", false: "px-2.5" },
   },
-);
+});
 
 export function SidebarNav({
   items,
@@ -137,7 +135,10 @@ export function SidebarNav({
   return (
     <aside className={cn(sidebarVariants({ isCollapsed }), className)}>
       {header}
-      <div className={sidebarBodyVariants({ isCollapsed })}>
+      <ScrollPanel
+        className="flex-1"
+        contentClassName={sidebarBodyVariants({ isCollapsed })}
+      >
         {primaryActionLabel && primaryAction}
         <nav aria-label={navLabel}>
           <ul className="flex flex-col">
@@ -156,7 +157,7 @@ export function SidebarNav({
             ))}
           </ul>
         </nav>
-      </div>
+      </ScrollPanel>
       {(footerActions || footerSwitch) && !isCollapsed && (
         <div className="flex flex-col gap-3 px-2.5 pt-2.5 pb-4">
           {footerActions && (

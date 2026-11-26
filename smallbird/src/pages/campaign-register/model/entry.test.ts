@@ -1,4 +1,8 @@
-import { getRegisterRedirectPath, parseRegisterEntry } from "./entry";
+import {
+  getDetailRedirectPath,
+  getRegisterRedirectPath,
+  parseRegisterEntry,
+} from "./entry";
 
 import type { CampaignDetail } from "@/entities/campaign";
 
@@ -72,4 +76,37 @@ describe("getRegisterRedirectPath", () => {
       ),
     ).toBe("/campaign/7");
   });
+});
+
+describe("getDetailRedirectPath", () => {
+  function detailOf(
+    patch: Pick<CampaignDetail, "stage" | "isDemoCompleted">,
+  ): CampaignDetail {
+    return { campaignIdx: 7, ...patch } as CampaignDetail;
+  }
+
+  it("등록 중이면 작성 화면으로 보낸다", () => {
+    expect(
+      getDetailRedirectPath(
+        detailOf({ stage: "DRAFT", isDemoCompleted: false }),
+      ),
+    ).toBe("/campaign/register/7");
+  });
+
+  it("작성을 마친 데모는 등록 내역에 머문다", () => {
+    expect(
+      getDetailRedirectPath(
+        detailOf({ stage: "DRAFT", isDemoCompleted: true }),
+      ),
+    ).toBeNull();
+  });
+
+  it.each(["REVIEWING", "REJECTED", "IN_PROGRESS", "ENDED"] as const)(
+    "%s면 등록 내역에 머문다",
+    (stage) => {
+      expect(
+        getDetailRedirectPath(detailOf({ stage, isDemoCompleted: false })),
+      ).toBeNull();
+    },
+  );
 });
