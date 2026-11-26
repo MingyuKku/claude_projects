@@ -28,16 +28,35 @@ export function BankAccountView({
   return (
     <Card>
       <div className="flex flex-col px-4 pt-4 pb-3 tablet:px-5 tablet:pt-5">
-        <InfoRow label={t("form.bank")}>
+        <InfoRow
+          labelWidth="contentOnMobile"
+          isTruncated
+          isMuted
+          label={t("form.bank")}
+        >
           {account?.bankName || EMPTY_VALUE}
         </InfoRow>
-        <InfoRow label={t("form.accountNumber")}>
+        <InfoRow
+          labelWidth="contentOnMobile"
+          isTruncated
+          isMuted
+          label={t("form.accountNumber")}
+        >
           {account?.accountNumber || EMPTY_VALUE}
         </InfoRow>
-        <InfoRow label={t("form.accountHolder")}>
+        <InfoRow
+          labelWidth="contentOnMobile"
+          isTruncated
+          isMuted
+          label={t("form.accountHolder")}
+        >
           {account?.accountHolder || EMPTY_VALUE}
         </InfoRow>
-        <InfoRow label={t("form.bankBook")} isMuted={false}>
+        <InfoRow
+          label={t("form.bankBook")}
+          labelWidth="contentOnMobile"
+          valueType="control"
+        >
           <BankBookValue account={account} />
         </InfoRow>
       </div>

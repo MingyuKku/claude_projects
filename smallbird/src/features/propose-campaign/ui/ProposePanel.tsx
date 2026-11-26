@@ -14,6 +14,7 @@ import {
 } from "@/entities/creator";
 import { isApiError } from "@/shared/api";
 import { ScrollPanel } from "@/shared/components/scroll-panel";
+import { SkeletonGroup } from "@/shared/components/skeleton-presets";
 import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
@@ -91,9 +92,9 @@ export function ProposePanel({
     }
     if (!panel) {
       return (
-        <div role="status" aria-label={tCommon("status.loading")}>
+        <SkeletonGroup>
           <Skeleton className="h-60 w-full" />
-        </div>
+        </SkeletonGroup>
       );
     }
     return (

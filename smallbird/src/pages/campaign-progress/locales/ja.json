@@ -1,0 +1,21 @@
+{
+  "title": "キャンペーン進行",
+  "nav": {
+    "label": "進行ステップ",
+    "open": "進行ステップを開く"
+  },
+  "step": {
+    "overview": "基本情報",
+    "guide": "投稿ガイド作成",
+    "search": "クリエイター探索",
+    "matching": "マッチング",
+    "delivery": "製品配送管理",
+    "visit": "店舗訪問管理",
+    "manuscript": "원고 컨펌",
+    "posting": "投稿確認",
+    "result": "キャンペーン結果"
+  },
+  "overview": {
+    "title": "基本情報"
+  }
+}

@@ -29,7 +29,8 @@ export {
   PROFILE_FILTER_KEYS,
   RANGE_FILTER_KEYS,
   RANGE_FILTER_RULES,
-  SEARCH_SORTS,
+  DEFAULT_SEARCH_SORT,
+  toggleSearchSort,
 } from "./model/search-query";
 export type {
   BookmarkListFilters,
@@ -42,6 +43,7 @@ export type {
   RangeFilters,
   RangeValue,
   SearchSort,
+  SearchSortKey,
 } from "./model/search-query";
 export type {
   BookmarkFolder,

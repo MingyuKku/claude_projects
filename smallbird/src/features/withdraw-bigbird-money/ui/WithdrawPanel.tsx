@@ -165,6 +165,7 @@ export function WithdrawPanel({
         <WithdrawInputStep
           balanceAmount={balance?.amount}
           banks={banks}
+          isBankListLoading={bankList.isLoading}
           isBankListError={bankList.isError}
           onRetryBankList={() => void bankList.mutate()}
           values={values}

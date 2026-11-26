@@ -64,7 +64,14 @@ function SocialLinkSection() {
     preloadAppleSdk().catch(() => undefined);
   }, []);
 
-  if (isLoading) return <SocialLinkCardSkeleton />;
+  // 그리드 칸을 채워야 왼쪽 카드와 높이가 맞음.
+  if (isLoading) {
+    return (
+      <SkeletonGroup className="grid min-w-0">
+        <SocialLinkCardSkeleton />
+      </SkeletonGroup>
+    );
+  }
 
   if (isError || !links) {
     return <LoadFailedState onRetry={() => void mutate()} />;

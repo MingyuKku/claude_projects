@@ -5,7 +5,7 @@ description: "Interview the user about a new feature and write a self-contained 
 다음 기능의 스펙을 작성합니다: $ARGUMENTS
 
 1. 코드를 쓰지 않습니다. 먼저 관련 코드(인접 슬라이스, 기존 패턴)와 Figma/OpenAPI 명세를 읽어 질문거리를 줄입니다.
-2. `AskUserQuestion`으로 인터뷰합니다. 뻔한 질문은 건너뛰고 사용자가 놓쳤을 어려운 부분(엣지 케이스, 에러·빈 상태, 레이어/슬라이스 경계, 상태 소유자, 범위 밖 항목)을 묻습니다. 더 물을 것이 없을 때까지 반복합니다.
+2. `AskUserQuestion`으로 인터뷰합니다. 뻔한 질문은 건너뛰고 사용자가 놓쳤을 어려운 부분(엣지 케이스, 에러·빈·로딩 상태(기준은 `.claude/rules/loading-states.md`), 레이어/슬라이스 경계, 상태 소유자, 범위 밖 항목)을 묻습니다. 더 물을 것이 없을 때까지 반복합니다.
 3. `specs/[<그룹>/]<feature-slug>.md`에 스펙을 씁니다(LNB 메뉴 그룹이 있으면 `mypage/`·`customer-center/` 같은 폴더, 로그인·가입 등은 `auth/`, 공통·홈은 루트). 스펙은 그 문서만 읽고 새 세션에서 구현할 수 있어야 합니다:
    - 목적과 사용자 시나리오
    - 배치할 슬라이스와 Public API(`index.ts`)의 시그니처, 새 인터페이스 (구현 전이므로 코드에 아직 없는 설계만 적습니다)

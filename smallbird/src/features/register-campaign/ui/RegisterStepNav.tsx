@@ -25,7 +25,6 @@ export function RegisterStepNav({
   const { t } = useTranslation("features/register-campaign");
   const { steps, currentStep, goToStep } = useWizardNavigation();
   const draft = useRegisterWizardStore((state) => state.draft);
-  const productType = useRegisterWizardStore((state) => state.productType);
   const hasVisitedPayment = useRegisterWizardStore(
     (state) => state.hasVisitedPayment,
   );
@@ -36,7 +35,6 @@ export function RegisterStepNav({
   const statuses = getStepStatuses({
     steps,
     draft,
-    productType,
     currentStep,
     hasVisitedPayment,
   });

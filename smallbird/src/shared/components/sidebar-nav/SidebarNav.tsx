@@ -57,6 +57,12 @@ const sidebarBodyVariants = cva("flex flex-col gap-2", {
   },
 });
 
+const primaryActionWrapperVariants = cva("shrink-0 pb-2", {
+  variants: {
+    isCollapsed: { true: "px-2 pt-2", false: "px-2.5" },
+  },
+});
+
 export function SidebarNav({
   items,
   logoAlt,
@@ -135,11 +141,19 @@ export function SidebarNav({
   return (
     <aside className={cn(sidebarVariants({ isCollapsed }), className)}>
       {header}
+      {/* 높이가 모자라 메뉴가 스크롤돼도 주요 버튼은 고정 */}
+      {primaryActionLabel && (
+        <div className={primaryActionWrapperVariants({ isCollapsed })}>
+          {primaryAction}
+        </div>
+      )}
       <ScrollPanel
         className="flex-1"
-        contentClassName={sidebarBodyVariants({ isCollapsed })}
+        contentClassName={cn(
+          sidebarBodyVariants({ isCollapsed }),
+          primaryActionLabel && isCollapsed && "pt-0",
+        )}
       >
-        {primaryActionLabel && primaryAction}
         <nav aria-label={navLabel}>
           <ul className="flex flex-col">
             {items.map((item) => (

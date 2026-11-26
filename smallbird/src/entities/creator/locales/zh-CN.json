@@ -7,9 +7,12 @@
     "basicFilter": "基础筛选"
   },
   "column": {
+    "creator": "创作者",
     "brandIndex": "品牌指数",
     "groupBuyIndex": "团购指数",
-    "actions": "操作"
+    "actions": "操作",
+    "predictedCost": "预测费用",
+    "sortBy": "按{{name}}排序"
   },
   "select": {
     "all": "全选",
@@ -46,6 +49,7 @@
     "category": "类别",
     "profile": "资料",
     "followerCount": "粉丝数",
+    "subscriberCount": "订阅数",
     "avgViewCount": "平均播放量",
     "avgLikeCount": "平均点赞数",
     "avgCommentCount": "平均评论数",

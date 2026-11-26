@@ -1,4 +1,7 @@
-import { InfiniteScrollSentinel } from "@/shared/components/infinite-list";
+import {
+  InfiniteScrollSentinel,
+  LoadMoreSpinner,
+} from "@/shared/components/infinite-list";
 import { PlatformIcon } from "@/shared/components/platform-icon";
 import { formatNumericDate, useTranslation } from "@/shared/i18n";
 import { fromIsoDate } from "@/shared/lib";
@@ -17,6 +20,7 @@ interface CopySourceListProps {
   /** PC(드로어 798)는 표, TAB·MO(서브 화면)는 카드. */
   variant: "table" | "cards";
   hasMore: boolean;
+  isLoadingMore: boolean;
   onSelect: (campaignIdx: number) => void;
   onReachEnd: () => void;
 }
@@ -28,6 +32,7 @@ export function CopySourceList({
   selectedIdx,
   variant,
   hasMore,
+  isLoadingMore,
   onSelect,
   onReachEnd,
 }: CopySourceListProps) {
@@ -57,8 +62,13 @@ export function CopySourceList({
     return date ? formatNumericDate(date) : "-";
   }
 
-  const sentinel = hasMore && (
-    <InfiniteScrollSentinel key={records.length} onReach={onReachEnd} />
+  const footer = (
+    <>
+      {isLoadingMore && <LoadMoreSpinner />}
+      {hasMore && (
+        <InfiniteScrollSentinel key={records.length} onReach={onReachEnd} />
+      )}
+    </>
   );
 
   if (variant === "table") {
@@ -119,7 +129,7 @@ export function CopySourceList({
             })}
           </tbody>
         </table>
-        {sentinel}
+        {footer}
       </div>
     );
   }
@@ -160,7 +170,7 @@ export function CopySourceList({
           );
         })}
       </ul>
-      {sentinel}
+      {footer}
     </>
   );
 }

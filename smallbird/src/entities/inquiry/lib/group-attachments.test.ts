@@ -94,6 +94,32 @@ describe("groupAttachments", () => {
     expect(rows[0]!.type === "files" && rows[0]!.messages).toHaveLength(3);
   });
 
+  it("사진·영상과 문서가 바뀌는 곳에서 묶음을 끊어 보낸 순서를 지킨다", () => {
+    const doc = () =>
+      file({
+        kind: "file",
+        body: "https://cdn/a.pdf",
+        attachment: {
+          attachmentIdx: 2,
+          fileName: "a.pdf",
+          fileSize: 1,
+          fileType: "file",
+        },
+      });
+    const rows = groupAttachments([
+      file(),
+      file({ kind: "video" }),
+      doc(),
+      doc(),
+      file(),
+    ]);
+    expect(
+      rows.map((row) =>
+        row.type === "files" ? row.messages.map((item) => item.kind) : [],
+      ),
+    ).toEqual([["image", "video"], ["file", "file"], ["image"]]);
+  });
+
   it("바로 앞에서 같은 쪽이 보낸 텍스트는 첨부와 한 묶음으로 합친다", () => {
     const text = message({ body: "확인 부탁드립니다" });
     const rows = groupAttachments([text, file(), file()]);

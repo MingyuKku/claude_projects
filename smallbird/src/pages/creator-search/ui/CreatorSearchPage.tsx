@@ -6,7 +6,8 @@ import {
   CreatorList,
   CreatorSelectionBar,
   CreatorToolbar,
-  SEARCH_SORTS,
+  DEFAULT_SEARCH_SORT,
+  toggleSearchSort,
   useCreatorSearch,
   useMatchingCategories,
   useMatchingPlatforms,
@@ -37,7 +38,11 @@ import { CreatorOverlays, useCreatorOverlays } from "@/widgets/creator-detail";
 
 import { useSearchPageParams } from "../model/use-search-params";
 
-import type { CreatorListView, MatchingPlatform } from "@/entities/creator";
+import type {
+  CreatorListView,
+  MatchingPlatform,
+  SearchSort,
+} from "@/entities/creator";
 import type { SessionViewModel } from "@/entities/session";
 import type {
   BasicFilterValue,
@@ -45,9 +50,6 @@ import type {
 } from "@/features/filter-creators";
 
 type FilterPanel = "basic" | "detail" | "assistant";
-
-// 정렬 화면이 시안에 없어 서버 기본(팔로워 많은 순)으로 고정함.
-const DEFAULT_SORT = SEARCH_SORTS[0];
 
 // 검색어·플랫폼·카테고리는 주소 쿼리가 소유하고, 상세 필터는 화면 상태로 둠.
 export function CreatorSearchPage() {
@@ -63,10 +65,20 @@ export function CreatorSearchPage() {
     useState<DetailFilterValue>(EMPTY_DETAIL_FILTER);
   const [cost, setCost] = useState(EMPTY_COST_FILTER);
   const [openPanel, setOpenPanel] = useState<FilterPanel | null>(null);
+  // 플랫폼마다 칸이 달라 정렬하던 칸이 사라질 수 있으므로, 고른 플랫폼이 바뀌면 어느 경로든 기본 정렬로 봄.
+  const [sortState, setSortState] = useState<{
+    platformCode: string | null;
+    sort: SearchSort;
+  }>({ platformCode: null, sort: DEFAULT_SEARCH_SORT });
 
   const platforms = sortPlatformsByMenu(platformOptions.platforms);
   // 주소에 없거나 모르는 값이면 전체 플랫폼.
   const platform = platforms.find((item) => item.code === params.platformCode);
+  const platformCode = platform?.code ?? null;
+  const sort =
+    sortState.platformCode === platformCode
+      ? sortState.sort
+      : DEFAULT_SEARCH_SORT;
   const categoryIdxs = params.categoryIdxs.filter((idx) =>
     categoryOptions.categories.some((category) => category.categoryIdx === idx),
   );
@@ -81,7 +93,7 @@ export function CreatorSearchPage() {
           keyword: params.keyword,
           platformIdx: platform?.platformIdx,
           categoryIdxs,
-          sort: DEFAULT_SORT,
+          sort,
         },
     categoryOptions.allCategoryIdx,
   );
@@ -163,6 +175,12 @@ export function CreatorSearchPage() {
         />
       }
       isProfileCompact
+      layout="search"
+      platformCode={platform?.code ?? undefined}
+      sort={sort}
+      onClickSort={(key) =>
+        setSortState({ platformCode, sort: toggleSearchSort(sort, key) })
+      }
       selectedKeys={selection.selectedKeys}
       onChangeSelected={selection.select}
       onChangeAllSelected={selection.selectAll}
@@ -213,9 +231,14 @@ export function CreatorSearchPage() {
               />
             }
           />
-          {isDesktop ? (
-            creatorList
-          ) : (
+          {isDesktop && creatorList}
+          {/* TAB은 표가 스스로 스크롤해 머리글을 고정함. */}
+          {isTabletUp && !isDesktop && (
+            <div className="mt-(--ds-gap-3) flex min-h-0 flex-1 flex-col">
+              {creatorList}
+            </div>
+          )}
+          {!isTabletUp && (
             // 스크롤바가 화면 끝에 오도록 본문 좌우 여백까지 넓힘. 툴바와의 간격은 스크롤해도 남도록 스크롤 영역 밖에 둠.
             <ScrollPanel
               className="-mx-(--ds-p-5) mt-(--ds-gap-3) flex-1"

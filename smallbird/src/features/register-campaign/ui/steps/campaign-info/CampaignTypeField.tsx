@@ -44,7 +44,7 @@ export function CampaignTypeField() {
 
   function handleValueChange(value: string) {
     if (!isCampaignType(value) || value === campaignType) return;
-    if (hasInputAfterInfo(draft, productType)) {
+    if (hasInputAfterInfo(draft)) {
       setPendingType(value);
       return;
     }

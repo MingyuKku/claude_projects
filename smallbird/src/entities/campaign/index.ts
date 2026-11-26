@@ -110,6 +110,12 @@ export {
   toCampaignRegisterStep,
 } from "./model/register-steps";
 export type { CampaignRegisterStep } from "./model/register-steps";
+export {
+  CAMPAIGN_PROGRESS_STEPS,
+  getCampaignProgressPath,
+  toCampaignProgressStep,
+} from "./model/progress-steps";
+export type { CampaignProgressStep } from "./model/progress-steps";
 export { toDraftStep } from "./model/server-steps";
 export { useCampaignStatusReturnStore } from "./model/status-return-store";
 export type {

@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import {
   getCampaignDetailPath,
+  getCampaignProgressPath,
   getCampaignRegisterPath,
   useCampaignPage,
   useCampaignScrollList,
@@ -77,7 +78,6 @@ export function CampaignStatusPage() {
     void navigate(ROUTES.campaignCreate);
   }
 
-  // 캠페인 관리·결과 확인이 갈 진행 화면은 아직 없어 "준비 중" 토스트.
   function handleClickShortcut(campaign: CampaignSummary, kind: ShortcutKind) {
     switch (kind) {
       case "write":
@@ -96,8 +96,19 @@ export function CampaignStatusPage() {
       case "rejectReason":
         void navigate(getCampaignDetailPath(campaign.campaignIdx));
         return;
-      default:
-        toast(tCommon("status.comingSoon"));
+      case "manage":
+      case "result":
+        // 진행 화면은 PICK형 브랜드형만 있음. 나머지 유형은 아직 준비 중.
+        if (campaign.type !== "pickBrand") {
+          toast(tCommon("status.comingSoon"));
+          return;
+        }
+        void navigate(
+          getCampaignProgressPath(
+            campaign.campaignIdx,
+            kind === "result" ? "result" : undefined,
+          ),
+        );
     }
   }
 

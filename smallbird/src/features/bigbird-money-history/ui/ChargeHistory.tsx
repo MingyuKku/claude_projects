@@ -61,7 +61,9 @@ export function ChargeHistory({
       height="fill"
     />
   );
-  const skeleton = <ChargeListSkeleton isTable={isDesktop} />;
+  const skeleton = (
+    <ChargeListSkeleton isTable={isDesktop} rowCount={params.pageSize} />
+  );
 
   return (
     <section

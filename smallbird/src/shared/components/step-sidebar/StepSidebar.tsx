@@ -46,6 +46,8 @@ interface StepSidebarProps {
   label: string;
   items: readonly StepSidebarItem[];
   overviewItem?: StepSidebarOverviewItem;
+  /** 단계 목록 아래에 구분선과 함께 붙는 항목(종료된 캠페인 진행의 "캠페인 결과"). 모양은 `overviewItem`과 같음. */
+  footerItem?: StepSidebarOverviewItem;
   size?: "md" | "sm";
   /** 오른쪽 표시 아이콘의 스크린 리더 문구. */
   indicatorLabels: Record<StepSidebarIndicator, string>;
@@ -57,6 +59,7 @@ export function StepSidebar({
   label,
   items,
   overviewItem,
+  footerItem,
   size = "md",
   indicatorLabels,
   onSelect,
@@ -66,19 +69,7 @@ export function StepSidebar({
     <nav aria-label={label} className={className}>
       {overviewItem && (
         <>
-          <button
-            type="button"
-            aria-current={overviewItem.isCurrent ? "page" : undefined}
-            className={itemVariants({
-              size,
-              isCurrent: overviewItem.isCurrent,
-            })}
-            onClick={() => onSelect(overviewItem.id)}
-          >
-            <span className="min-w-0 flex-1 truncate ds-text-sm-5-medium text-foreground">
-              {overviewItem.label}
-            </span>
-          </button>
+          <OverviewButton item={overviewItem} size={size} onSelect={onSelect} />
           <hr className="my-4 border-border" />
         </>
       )}
@@ -131,6 +122,35 @@ export function StepSidebar({
           );
         })}
       </ol>
+      {footerItem && (
+        <>
+          <hr className="my-4 border-border" />
+          <OverviewButton item={footerItem} size={size} onSelect={onSelect} />
+        </>
+      )}
     </nav>
+  );
+}
+
+function OverviewButton({
+  item,
+  size,
+  onSelect,
+}: {
+  item: StepSidebarOverviewItem;
+  size: "md" | "sm";
+  onSelect: (id: string) => void;
+}) {
+  return (
+    <button
+      type="button"
+      aria-current={item.isCurrent ? "page" : undefined}
+      className={itemVariants({ size, isCurrent: item.isCurrent })}
+      onClick={() => onSelect(item.id)}
+    >
+      <span className="min-w-0 flex-1 truncate ds-text-sm-5-medium text-foreground">
+        {item.label}
+      </span>
+    </button>
   );
 }

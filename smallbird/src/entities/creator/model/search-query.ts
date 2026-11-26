@@ -70,9 +70,28 @@ export const COST_FILTER_RULE: RangeFilterRule = {
   isBounded: false,
 };
 
-export const SEARCH_SORTS = ["FOLLOWER_DESC", "FOLLOWER_ASC"] as const;
+/** 검색 표에서 정렬할 수 있는 칸. 서버는 지금 `FOLLOWER`만 받고 나머지는 무시함(백엔드 추가 예정). */
+export type SearchSortKey =
+  | "NICKNAME"
+  | "PLATFORM"
+  | "CATEGORY"
+  | "BRAND_INDEX"
+  | "GROUP_BUY_INDEX"
+  | "FOLLOWER"
+  | "EXPECTED_COST"
+  | "DESIRED_COST";
 
-export type SearchSort = (typeof SEARCH_SORTS)[number];
+export type SearchSort = `${SearchSortKey}_${"DESC" | "ASC"}`;
+
+export const DEFAULT_SEARCH_SORT: SearchSort = "FOLLOWER_DESC";
+
+/** 같은 칸을 다시 누르면 내림 ↔ 오름, 다른 칸은 내림부터. */
+export function toggleSearchSort(
+  current: SearchSort,
+  key: SearchSortKey,
+): SearchSort {
+  return current === `${key}_DESC` ? `${key}_ASC` : `${key}_DESC`;
+}
 
 /** 검색과 즐겨찾기 목록이 같이 쓰는 조건. */
 export interface DetailFilters {

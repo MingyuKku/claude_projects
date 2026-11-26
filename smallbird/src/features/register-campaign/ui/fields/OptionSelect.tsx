@@ -2,6 +2,7 @@ import { ChevronDown } from "lucide-react";
 import { useState } from "react";
 
 import { FormField } from "@/shared/components/form-field";
+import { SkeletonGroup } from "@/shared/components/skeleton-presets";
 import { MEDIA_QUERY } from "@/shared/config";
 import {
   fieldFocusRingClassName,
@@ -17,6 +18,7 @@ import {
 } from "@/shared/ui/drawer";
 import { Popover, PopoverContent, PopoverTrigger } from "@/shared/ui/popover";
 import { ScrollArea } from "@/shared/ui/scroll-area";
+import { Skeleton } from "@/shared/ui/skeleton";
 
 import type { FormFieldControlProps } from "@/shared/components/form-field";
 
@@ -32,6 +34,8 @@ interface OptionSelectProps {
   value: number | null;
   onChangeValue: (value: number) => void;
   disabled?: boolean;
+  /** 선택지를 불러오는 중. 라벨은 두고 선택 칸 자리에 스켈레톤을 그림. */
+  isLoading?: boolean;
 }
 
 // 항목 하나를 고르는 선택 칸(브랜드 선택과 같은 모양). PC·TAB은 입력 아래 팝오버, MO는 바텀시트.
@@ -42,6 +46,7 @@ export function OptionSelect({
   value,
   onChangeValue,
   disabled = false,
+  isLoading = false,
 }: OptionSelectProps) {
   const isTabletUp = useMediaQuery(MEDIA_QUERY.tabletUp);
   const [isOpen, setIsOpen] = useState(false);
@@ -109,29 +114,41 @@ export function OptionSelect({
     </ScrollArea>
   );
 
+  function renderControl(control: FormFieldControlProps) {
+    if (isLoading) {
+      return (
+        <SkeletonGroup>
+          <Skeleton className="h-10 w-full" />
+        </SkeletonGroup>
+      );
+    }
+    if (isTabletUp) {
+      return (
+        <Popover open={isOpen} onOpenChange={setIsOpen}>
+          <PopoverTrigger asChild>{renderTrigger(control)}</PopoverTrigger>
+          <PopoverContent
+            align="start"
+            className="w-(--radix-popover-trigger-width) p-1"
+          >
+            {menu}
+          </PopoverContent>
+        </Popover>
+      );
+    }
+    return (
+      <Drawer open={isOpen} onOpenChange={setIsOpen}>
+        <DrawerTrigger asChild>{renderTrigger(control)}</DrawerTrigger>
+        <DrawerContent className="px-4 pt-4 pb-6">
+          <DrawerTitle className="sr-only">{label}</DrawerTitle>
+          {menu}
+        </DrawerContent>
+      </Drawer>
+    );
+  }
+
   return (
     <FormField label={label} isRequired>
-      {(control) =>
-        isTabletUp ? (
-          <Popover open={isOpen} onOpenChange={setIsOpen}>
-            <PopoverTrigger asChild>{renderTrigger(control)}</PopoverTrigger>
-            <PopoverContent
-              align="start"
-              className="w-(--radix-popover-trigger-width) p-1"
-            >
-              {menu}
-            </PopoverContent>
-          </Popover>
-        ) : (
-          <Drawer open={isOpen} onOpenChange={setIsOpen}>
-            <DrawerTrigger asChild>{renderTrigger(control)}</DrawerTrigger>
-            <DrawerContent className="px-4 pt-4 pb-6">
-              <DrawerTitle className="sr-only">{label}</DrawerTitle>
-              {menu}
-            </DrawerContent>
-          </Drawer>
-        )
-      }
+      {renderControl}
     </FormField>
   );
 }

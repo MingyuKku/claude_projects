@@ -44,7 +44,7 @@ export function getChangedSteps(
 ): CampaignDraftStep[] {
   // 저장한 값에 기본 선택을 채운 것과 같으면 다시 들어와도 같은 화면이 되므로, 열지 않은 단계는 미뤄도 보이는 값이 같음.
   const savedWithDefaults = skipUnseenDefaults
-    ? applyDraftDefaults(state.savedDraft, { productType: state.productType })
+    ? applyDraftDefaults(state.savedDraft)
     : null;
   return getRegisterSteps(state.serviceType, state.productType).flatMap(
     ({ draftStep }) => {

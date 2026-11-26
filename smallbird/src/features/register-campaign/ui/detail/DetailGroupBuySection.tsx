@@ -6,7 +6,7 @@ import { DetailRow, DetailSection } from "./DetailSection";
 import type { CampaignDetail } from "@/entities/campaign";
 
 interface DetailGroupBuySectionProps {
-  number: number;
+  number?: number;
   detail: CampaignDetail;
   onClickEdit?: () => void;
 }

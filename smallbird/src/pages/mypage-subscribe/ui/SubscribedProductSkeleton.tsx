@@ -16,7 +16,11 @@ const COLUMN_CLASS_NAMES = [
 export function SubscribedProductSkeleton() {
   return (
     <SkeletonGroup>
-      <TableSkeleton columnClassNames={COLUMN_CLASS_NAMES} rowCount={2} />
+      <TableSkeleton
+        columnClassNames={COLUMN_CLASS_NAMES}
+        rowCount={2}
+        size="xs"
+      />
     </SkeletonGroup>
   );
 }

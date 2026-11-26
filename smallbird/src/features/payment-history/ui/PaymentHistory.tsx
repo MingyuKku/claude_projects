@@ -14,7 +14,6 @@ import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery } from "@/shared/lib";
 import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
-import { Skeleton } from "@/shared/ui/skeleton";
 
 import { countPages } from "../lib/count-pages";
 import { toPaymentItemQuery } from "../lib/payment-item";
@@ -22,6 +21,7 @@ import { useListParams } from "../lib/use-list-params";
 import { usePaymentFilterFields } from "../lib/use-payment-filter-fields";
 import { PAGE_SIZE_OPTIONS } from "../model/constants";
 import { PaymentCardList } from "./PaymentCardList";
+import { PaymentListSkeleton } from "./PaymentListSkeleton";
 import { PaymentTable } from "./PaymentTable";
 
 // 쪽 나누기·필터는 서버가 하고, 쪽·필터는 URL 쿼리가 소유함. 검색창은 두지 않음.
@@ -103,11 +103,7 @@ export function PaymentHistory() {
           }}
         />
         {isLoading ? (
-          <div className="flex flex-col gap-2">
-            {Array.from({ length: 5 }, (_, index) => (
-              <Skeleton key={index} className="h-12 w-full" />
-            ))}
-          </div>
+          <PaymentListSkeleton isTable={isDesktop} rowCount={params.pageSize} />
         ) : isError || !list ? (
           <EmptyState
             type="alarm"

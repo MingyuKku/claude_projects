@@ -1,5 +1,6 @@
 import { PayCard } from "@/shared/components/cards";
 import { SectionCard } from "@/shared/components/section-card";
+import { SkeletonGroup } from "@/shared/components/skeleton-presets";
 import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
 import { Badge } from "@/shared/ui/badge";
@@ -95,10 +96,10 @@ export function PaymentMethodSection({
             </Button>
           </div>
         ) : cards === undefined ? (
-          <div className="grid grid-cols-1 gap-4 tablet:grid-cols-2 tablet:gap-5">
+          <SkeletonGroup className="grid grid-cols-1 gap-4 tablet:grid-cols-2 tablet:gap-5">
             <Skeleton className="h-33 w-full" />
             <Skeleton className="h-33 w-full" />
-          </div>
+          </SkeletonGroup>
         ) : (
           <RadioGroup
             value={selectedCardId}

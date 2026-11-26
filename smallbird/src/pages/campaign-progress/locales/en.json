@@ -1,0 +1,21 @@
+{
+  "title": "Campaign progress",
+  "nav": {
+    "label": "Progress steps",
+    "open": "Open progress steps"
+  },
+  "step": {
+    "overview": "Overview",
+    "guide": "Posting guide",
+    "search": "Find creators",
+    "matching": "Matching",
+    "delivery": "Product delivery",
+    "visit": "Store visits",
+    "manuscript": "원고 컨펌",
+    "posting": "Posting review",
+    "result": "Campaign results"
+  },
+  "overview": {
+    "title": "Overview"
+  }
+}

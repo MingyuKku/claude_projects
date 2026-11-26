@@ -57,7 +57,12 @@ export function groupAttachments(
       continue;
     }
     const last = rows.at(-1);
-    if (last?.type === "files" && last.isMine === message.isMine) {
+    // 한 줄 안에서는 사진·영상을 먼저, 문서를 아래에 그리므로 둘이 바뀌는 곳에서 끊어야 보낸 순서가 유지됨(QA_23-035).
+    if (
+      last?.type === "files" &&
+      last.isMine === message.isMine &&
+      (last.messages.at(-1)?.kind === "file") === (message.kind === "file")
+    ) {
       last.messages.push(message);
       last.createdAt = message.createdAt;
     } else if (

@@ -28,7 +28,7 @@ export function ProfileImageField({
       <p className="text-sm leading-5 font-medium text-foreground tablet:min-h-12 tablet:px-4 tablet:font-semibold">
         {t("form.profileImage.label")}
       </p>
-      <div className="flex justify-center tablet:justify-start tablet:px-4">
+      <div className="flex justify-center tablet:justify-end tablet:px-4">
         <AvatarEdit
           src={src}
           alt={t("form.profileImage.alt")}

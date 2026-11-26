@@ -270,7 +270,7 @@ describe("CreatorStep", () => {
     ).toBeInTheDocument();
   });
 
-  it("서버에 값이 없으면 시안의 기본 선택(인스타그램·여성·10대·뷰티)으로 보인다", () => {
+  it("서버에 값이 없으면 기본 선택(인스타그램·여성·연령대 무관·주제 무관)으로 보인다", () => {
     render(
       <RegisterWizardProvider detail={createDetail()}>
         <CreatorStep />
@@ -285,17 +285,25 @@ describe("CreatorStep", () => {
       "aria-checked",
       "true",
     );
+    for (const name of [
+      "선호 연령대(복수선택 가능)",
+      "포스팅 주제(복수선택 가능)",
+    ]) {
+      expect(
+        getGroup(name).getByRole("button", { name: "무관" }),
+      ).toHaveAttribute("aria-pressed", "true");
+    }
     expect(screen.getByRole("button", { name: "10대" })).toHaveAttribute(
       "aria-pressed",
-      "true",
+      "false",
     );
     expect(screen.getByRole("button", { name: "뷰티" })).toHaveAttribute(
       "aria-pressed",
-      "true",
+      "false",
     );
   });
 
-  it("공구형은 서버에 값이 없으면 연령대·주제 기본 선택이 '무관'이다", () => {
+  it("공구형도 서버에 값이 없으면 연령대·주제 기본 선택이 '무관'이다", () => {
     render(
       <RegisterWizardProvider detail={createDetail(undefined, "GROUP_BUY")}>
         <CreatorStep />

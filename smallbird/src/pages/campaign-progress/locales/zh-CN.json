@@ -1,0 +1,21 @@
+{
+  "title": "活动进行",
+  "nav": {
+    "label": "进行步骤",
+    "open": "打开进行步骤"
+  },
+  "step": {
+    "overview": "基本信息",
+    "guide": "撰写发布指南",
+    "search": "探索创作者",
+    "matching": "创作者匹配",
+    "delivery": "产品配送管理",
+    "visit": "到店管理",
+    "manuscript": "원고 컨펌",
+    "posting": "发布确认",
+    "result": "活动结果"
+  },
+  "overview": {
+    "title": "基本信息"
+  }
+}

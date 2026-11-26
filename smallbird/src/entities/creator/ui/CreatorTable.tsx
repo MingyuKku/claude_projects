@@ -1,8 +1,10 @@
+import { ArrowDownUpIcon } from "lucide-react";
+
 import { EmptyTableFrame } from "@/shared/components/list-filter";
 import { useTranslation } from "@/shared/i18n";
-import { EMPTY_VALUE } from "@/shared/lib";
 import { cn } from "@/shared/lib/utils";
 import { Avatar, AvatarImage, AvatarPlaceholder } from "@/shared/ui/avatar";
+import { Button } from "@/shared/ui/button";
 import { Checkbox } from "@/shared/ui/checkbox";
 import { ScrollArea, ScrollBar } from "@/shared/ui/scroll-area";
 import {
@@ -14,18 +16,19 @@ import {
   TableRow,
 } from "@/shared/ui/table";
 
-import { useCreatorLabels } from "../api/use-creator-labels";
 import { isInteractiveTarget } from "../lib/is-interactive-target";
-import { useCreatorMetricTexts } from "../lib/use-creator-metric-texts";
 import { useCreatorTerms } from "../lib/use-creator-terms";
-import { CreatorPlatform } from "./CreatorPlatform";
 import { CreatorRowActions } from "./CreatorRowActions";
 
+import type { SearchSort, SearchSortKey } from "../model/search-query";
 import type { CreatorViewModel } from "../model/types";
+import type { CreatorColumn } from "./use-creator-columns";
 import type { ReactNode } from "react";
 
 interface CreatorTableProps {
   items: CreatorViewModel[];
+  /** 프로필과 버튼 사이 칸. */
+  columns: CreatorColumn[];
   selectedKeys: ReadonlySet<string>;
   onChangeSelected: (key: string, isSelected: boolean) => void;
   onChangeAllSelected: (isSelected: boolean) => void;
@@ -40,6 +43,9 @@ interface CreatorTableProps {
   footer?: ReactNode;
   /** 프로필 열 최소 폭을 줄임(표가 좁은 화면). */
   isProfileCompact?: boolean;
+  /** 둘 다 있으면 머리글을 눌러 정렬함(크리에이터 검색). */
+  sort?: SearchSort;
+  onClickSort?: (key: SearchSortKey) => void;
   className?: string;
 }
 
@@ -48,11 +54,6 @@ const COLUMN_CLASS_NAMES = {
   checkbox: "w-12 min-w-12",
   profile: "w-full min-w-63",
   compactProfile: "w-full min-w-32",
-  platform: "min-w-17.25",
-  category: "min-w-35.75",
-  metric: "min-w-24",
-  commentWriters: "min-w-35",
-  expectedCost: "min-w-30",
   actions: "min-w-27",
 };
 
@@ -66,6 +67,7 @@ const SCROLL_BAR_STYLE = { top: "3rem" };
 // 표 바깥 스크롤 상자가 세로·가로 스크롤을 맡아 머리글을 위에 고정함(표 자체 컨테이너는 스크롤하지 않음).
 export function CreatorTable({
   items,
+  columns,
   selectedKeys,
   onChangeSelected,
   onChangeAllSelected,
@@ -75,12 +77,12 @@ export function CreatorTable({
   emptyContent,
   footer,
   isProfileCompact = false,
+  sort,
+  onClickSort,
   className,
 }: CreatorTableProps) {
   const { t } = useTranslation("entities/creator");
   const { term } = useCreatorTerms();
-  const { findPlatform, findCategoryName } = useCreatorLabels();
-  const getMetricTexts = useCreatorMetricTexts();
 
   const selectedCount = items.filter((item) =>
     selectedKeys.has(item.key),
@@ -100,36 +102,29 @@ export function CreatorTable({
             onCheckedChange={(state) => onChangeAllSelected(state === true)}
           />
         </TableHead>
-        <TableHead
+        <SortableHead
           className={
             isProfileCompact
               ? COLUMN_CLASS_NAMES.compactProfile
               : COLUMN_CLASS_NAMES.profile
           }
+          sortKey={onClickSort && "NICKNAME"}
+          sort={sort}
+          onClickSort={onClickSort}
         >
-          {term("profile")}
-        </TableHead>
-        <TableHead className={COLUMN_CLASS_NAMES.platform}>
-          {term("platform")}
-        </TableHead>
-        <TableHead className={COLUMN_CLASS_NAMES.category}>
-          {term("category")}
-        </TableHead>
-        <TableHead className={COLUMN_CLASS_NAMES.metric}>
-          {term("followerCount")}
-        </TableHead>
-        <TableHead className={COLUMN_CLASS_NAMES.metric}>
-          {t("column.brandIndex")}
-        </TableHead>
-        <TableHead className={COLUMN_CLASS_NAMES.metric}>
-          {t("column.groupBuyIndex")}
-        </TableHead>
-        <TableHead className={COLUMN_CLASS_NAMES.commentWriters}>
-          {term("avgCommentWriterCount")}
-        </TableHead>
-        <TableHead className={COLUMN_CLASS_NAMES.expectedCost}>
-          {term("expectedCost")}
-        </TableHead>
+          {onClickSort ? t("column.creator") : term("profile")}
+        </SortableHead>
+        {columns.map((column) => (
+          <SortableHead
+            key={column.id}
+            className={column.className}
+            sortKey={column.sortKey}
+            sort={sort}
+            onClickSort={onClickSort}
+          >
+            {column.header}
+          </SortableHead>
+        ))}
         <TableHead className={COLUMN_CLASS_NAMES.actions}>
           <span className="sr-only">{t("column.actions")}</span>
         </TableHead>
@@ -169,82 +164,117 @@ export function CreatorTable({
       >
         {header}
         <TableBody>
-          {items.map((item) => {
-            const metrics = getMetricTexts(item);
-
-            return (
-              <TableRow
-                key={item.key}
-                data-state={selectedKeys.has(item.key) ? "selected" : undefined}
-                className="cursor-pointer"
-                onClick={(event) => {
-                  if (!isInteractiveTarget(event)) onClickItem(item);
-                }}
-              >
-                <TableCell>
-                  <Checkbox
-                    className="block"
-                    aria-label={t("select.row", { name: item.nickname })}
-                    checked={selectedKeys.has(item.key)}
-                    onCheckedChange={(state) =>
-                      onChangeSelected(item.key, state === true)
-                    }
+          {items.map((item) => (
+            <TableRow
+              key={item.key}
+              data-state={selectedKeys.has(item.key) ? "selected" : undefined}
+              className="cursor-pointer"
+              onClick={(event) => {
+                if (!isInteractiveTarget(event)) onClickItem(item);
+              }}
+            >
+              <TableCell>
+                <Checkbox
+                  className="block"
+                  aria-label={t("select.row", { name: item.nickname })}
+                  checked={selectedKeys.has(item.key)}
+                  onCheckedChange={(state) =>
+                    onChangeSelected(item.key, state === true)
+                  }
+                />
+              </TableCell>
+              <TableCell className="max-w-0">
+                <div className="flex items-center ds-gap-3">
+                  <Avatar size="sm">
+                    <AvatarImage
+                      src={item.profileImageUrl ?? undefined}
+                      alt=""
+                    />
+                    <AvatarPlaceholder />
+                  </Avatar>
+                  <div className="flex min-w-0 flex-1 flex-col gap-0.5">
+                    <button
+                      type="button"
+                      className="-mb-1 truncate pb-1 text-left ds-text-sm-none-medium text-foreground outline-none focus-visible:underline"
+                      onClick={() => onClickItem(item)}
+                    >
+                      {item.nickname}
+                    </button>
+                    <p className="truncate ds-text-xs-4-normal text-muted-foreground">
+                      @{item.platformId}
+                    </p>
+                  </div>
+                </div>
+              </TableCell>
+              {columns.map((column) => (
+                <TableCell key={column.id} className={column.cellClassName}>
+                  {column.render(item)}
+                </TableCell>
+              ))}
+              <TableCell>
+                <div className="flex items-center justify-center gap-1">
+                  <CreatorRowActions
+                    creator={item}
+                    onClickBookmark={onClickBookmark}
+                    onClickPropose={onClickPropose}
                   />
-                </TableCell>
-                <TableCell className="max-w-0">
-                  <div className="flex items-center ds-gap-3">
-                    <Avatar size="sm">
-                      <AvatarImage
-                        src={item.profileImageUrl ?? undefined}
-                        alt=""
-                      />
-                      <AvatarPlaceholder />
-                    </Avatar>
-                    <div className="flex min-w-0 flex-1 flex-col gap-0.5">
-                      <button
-                        type="button"
-                        className="-mb-1 truncate pb-1 text-left ds-text-sm-none-medium text-foreground outline-none focus-visible:underline"
-                        onClick={() => onClickItem(item)}
-                      >
-                        {item.nickname}
-                      </button>
-                      <p className="truncate ds-text-xs-4-normal text-muted-foreground">
-                        @{item.platformId}
-                      </p>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell>
-                  <div className="flex items-center justify-center">
-                    <CreatorPlatform
-                      platform={findPlatform(item.platformIdx)}
-                    />
-                  </div>
-                </TableCell>
-                <TableCell className="max-w-0 truncate">
-                  {findCategoryName(item.categoryIdx) ?? EMPTY_VALUE}
-                </TableCell>
-                <TableCell>{metrics.followers}</TableCell>
-                <TableCell>{metrics.brandIndex}</TableCell>
-                <TableCell>{metrics.groupBuyIndex}</TableCell>
-                <TableCell>{metrics.commentWriters}</TableCell>
-                <TableCell>{metrics.expectedCost}</TableCell>
-                <TableCell>
-                  <div className="flex items-center justify-center gap-1">
-                    <CreatorRowActions
-                      creator={item}
-                      onClickBookmark={onClickBookmark}
-                      onClickPropose={onClickPropose}
-                    />
-                  </div>
-                </TableCell>
-              </TableRow>
-            );
-          })}
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
         </TableBody>
       </Table>
       {footer}
       <ScrollBar orientation="horizontal" className="z-2" />
     </ScrollArea>
+  );
+}
+
+interface SortableHeadProps {
+  className?: string;
+  sortKey?: SearchSortKey;
+  sort?: SearchSort;
+  onClickSort?: (key: SearchSortKey) => void;
+  children: string;
+}
+
+// 정렬 칸 머리글은 공용 DataTable 정렬 머리글과 같은 모양(왼쪽 여백 없는 Ghost 버튼 + 화살표). 정렬 중인 칸만 글자를 강조함.
+function SortableHead({
+  className,
+  sortKey,
+  sort,
+  onClickSort,
+  children,
+}: SortableHeadProps) {
+  const { t } = useTranslation("entities/creator");
+
+  if (!sortKey || !onClickSort) {
+    return <TableHead className={className}>{children}</TableHead>;
+  }
+
+  const direction = sort?.startsWith(`${sortKey}_`)
+    ? sort.slice(sortKey.length + 1)
+    : null;
+  const ariaSort = direction === "ASC" ? "ascending" : "descending";
+
+  return (
+    <TableHead
+      // 표 공통 머리글 여백(py-0)보다 앞서도록 important로 둠.
+      className={cn("py-1! pr-1! pl-0", className)}
+      aria-sort={direction ? ariaSort : "none"}
+    >
+      <Button
+        variant="ghost-muted"
+        className={cn(
+          "hover:bg-transparent hover:text-primary",
+          direction && "text-primary",
+        )}
+        aria-label={t("column.sortBy", { name: children })}
+        onClick={() => onClickSort(sortKey)}
+      >
+        {children}
+        <ArrowDownUpIcon />
+      </Button>
+    </TableHead>
   );
 }

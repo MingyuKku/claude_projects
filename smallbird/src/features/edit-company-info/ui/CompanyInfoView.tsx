@@ -36,19 +36,38 @@ export function CompanyInfoView({
   return (
     <Card>
       <div className="flex flex-col px-4 pt-4 pb-3 tablet:px-5 tablet:pt-5">
-        <InfoRow label={t("form.companyName")} isRequired>
+        <InfoRow
+          labelWidth="contentOnMobile"
+          isTruncated
+          isMuted
+          label={t("form.companyName")}
+          isRequired
+        >
           {text(company?.companyName)}
         </InfoRow>
-        <InfoRow label={t("form.contact")} isRequired>
+        <InfoRow
+          labelWidth="contentOnMobile"
+          isTruncated
+          isMuted
+          label={t("form.contact")}
+          isRequired
+        >
           {text(company?.contact)}
         </InfoRow>
-        <InfoRow label={t("form.businessNumber")} isRequired>
+        <InfoRow
+          labelWidth="contentOnMobile"
+          isTruncated
+          isMuted
+          label={t("form.businessNumber")}
+          isRequired
+        >
           {text(company?.businessNumber)}
         </InfoRow>
         <InfoRow
           label={t("form.businessFile")}
           isRequired
-          isMuted={false}
+          labelWidth="contentOnMobile"
+          valueType="control"
           isStackedOnMobile
         >
           <DocumentButton
@@ -57,13 +76,20 @@ export function CompanyInfoView({
             name={company?.businessRegistrationFileName ?? null}
           />
         </InfoRow>
-        <InfoRow label={t("form.mailorderNumber")} isRequired>
+        <InfoRow
+          labelWidth="contentOnMobile"
+          isTruncated
+          isMuted
+          label={t("form.mailorderNumber")}
+          isRequired
+        >
           {text(company?.mailorderNumber)}
         </InfoRow>
         <InfoRow
           label={t("form.mailorderFile")}
           isRequired
-          isMuted={false}
+          labelWidth="contentOnMobile"
+          valueType="control"
           isStackedOnMobile
         >
           <DocumentButton
@@ -72,10 +98,22 @@ export function CompanyInfoView({
             name={company?.mailorderFileName ?? null}
           />
         </InfoRow>
-        <InfoRow label={t("form.category")}>
+        <InfoRow
+          labelWidth="contentOnMobile"
+          isTruncated
+          isMuted
+          label={t("form.category")}
+        >
           {text(company?.categoryName)}
         </InfoRow>
-        <InfoRow label={t("form.url")}>{text(company?.companyUrl)}</InfoRow>
+        <InfoRow
+          labelWidth="contentOnMobile"
+          isTruncated
+          isMuted
+          label={t("form.url")}
+        >
+          {text(company?.companyUrl)}
+        </InfoRow>
       </div>
       <div className="flex justify-end p-4 tablet:p-5">
         <Button

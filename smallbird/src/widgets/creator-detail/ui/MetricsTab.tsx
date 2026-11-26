@@ -4,6 +4,7 @@ import {
   useCreatorTerms,
 } from "@/entities/creator";
 import { CountCard } from "@/shared/components/cards";
+import { SkeletonGroup } from "@/shared/components/skeleton-presets";
 import { formatNumber, useTranslation } from "@/shared/i18n";
 import { EMPTY_VALUE } from "@/shared/lib";
 import { Skeleton } from "@/shared/ui/skeleton";
@@ -33,22 +34,17 @@ interface MetricsTabProps {
 export function MetricsTab({ target }: MetricsTabProps) {
   const { t } = useTranslation("widgets/creator-detail");
   const { term } = useCreatorTerms();
-  const { t: tCommon } = useTranslation();
   const { metrics, isLoading, isError, reload } = useCreatorMetrics(target);
 
   if (isError) return <LoadError onClickRetry={() => void reload()} />;
 
   if (isLoading || !metrics) {
     return (
-      <div
-        role="status"
-        aria-label={tCommon("status.loading")}
-        className="grid grid-cols-2 gap-3 tablet:grid-cols-4 tablet:gap-4"
-      >
+      <SkeletonGroup className="grid grid-cols-2 gap-3 tablet:grid-cols-4 tablet:gap-4">
         {[...COUNT_KEYS, ...COST_KEYS].map((key) => (
           <Skeleton key={key} className="h-24 w-full" />
         ))}
-      </div>
+      </SkeletonGroup>
     );
   }
 

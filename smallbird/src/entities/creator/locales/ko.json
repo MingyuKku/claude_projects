@@ -7,9 +7,12 @@
     "basicFilter": "기본 필터"
   },
   "column": {
+    "creator": "크리에이터",
     "brandIndex": "브랜드 지수",
     "groupBuyIndex": "공구 지수",
-    "actions": "동작"
+    "actions": "동작",
+    "predictedCost": "예측비용",
+    "sortBy": "{{name}} 정렬"
   },
   "select": {
     "all": "전체 선택",
@@ -46,6 +49,7 @@
     "category": "카테고리",
     "profile": "프로필",
     "followerCount": "팔로워 수",
+    "subscriberCount": "구독자 수",
     "avgViewCount": "평균 조회수",
     "avgLikeCount": "평균 좋아요 수",
     "avgCommentCount": "평균 댓글 수",

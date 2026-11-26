@@ -1,6 +1,7 @@
 import { ChevronLeft, X } from "lucide-react";
 
 import { SubHeader } from "@/shared/components/app-header";
+import { InfoRow } from "@/shared/components/info-row";
 import { useTranslation } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
 import { ScrollArea } from "@/shared/ui/scroll-area";
@@ -66,22 +67,13 @@ export function DetailPanel({
         }
       />
       <ScrollArea className="min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:block!">
-        <dl className="flex flex-col tablet:px-5 tablet:pt-4 tablet:pb-3">
+        <div className="flex flex-col tablet:px-5 tablet:pt-4 tablet:pb-3">
           {rows.map(({ key, label, value }) => (
-            <div
-              key={key}
-              className="flex min-h-12 items-center px-4 py-1.5 text-sm leading-5"
-            >
-              {/* PC·TAB 시안은 라벨·값 칸이 반씩이라 긴 값(캠페인 명)은 값 칸 안에서 줄바꿈함. */}
-              <dt className="shrink-0 pr-4 font-semibold text-foreground tablet:w-1/2">
-                {label}
-              </dt>
-              <dd className="flex min-w-0 flex-1 justify-end text-right wrap-anywhere text-foreground ko:break-keep">
-                {value}
-              </dd>
-            </div>
+            <InfoRow key={key} label={label} labelWidth="contentOnMobile">
+              {value}
+            </InfoRow>
           ))}
-        </dl>
+        </div>
       </ScrollArea>
       {footer && <div className="p-4 tablet:p-5">{footer}</div>}
     </div>

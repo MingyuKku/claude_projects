@@ -3,6 +3,7 @@ import { useState } from "react";
 import { useBillingCards, useSubscriptions } from "@/entities/subscription";
 import { PayCard, PayCardAddButton } from "@/shared/components/cards";
 import { EmptyState } from "@/shared/components/empty-state";
+import { SkeletonGroup } from "@/shared/components/skeleton-presets";
 import { useTranslation } from "@/shared/i18n";
 import { useDialogTarget } from "@/shared/lib/useDialogTarget";
 import { cn } from "@/shared/lib/utils";
@@ -54,10 +55,10 @@ export function BillingCardList() {
         {t("title")}
       </h2>
       {isLoading ? (
-        <div className="grid grid-cols-2 gap-4 tablet:flex tablet:gap-5">
+        <SkeletonGroup className="grid grid-cols-2 gap-4 tablet:flex tablet:gap-5">
           <Skeleton className="h-28 w-full tablet:w-46.5" />
           <Skeleton className="h-28 w-full tablet:w-46.5" />
-        </div>
+        </SkeletonGroup>
       ) : isError || !cards ? (
         <EmptyState
           type="alarm"

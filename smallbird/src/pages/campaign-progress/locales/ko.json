@@ -1,0 +1,21 @@
+{
+  "title": "캠페인 진행",
+  "nav": {
+    "label": "진행 단계",
+    "open": "진행 단계 열기"
+  },
+  "step": {
+    "overview": "기본정보",
+    "guide": "포스팅 가이드 작성",
+    "search": "크리에이터 탐색",
+    "matching": "크리에이터 매칭",
+    "delivery": "제품 배송 관리",
+    "visit": "매장 방문 관리",
+    "manuscript": "원고 컨펌",
+    "posting": "포스팅 확인",
+    "result": "캠페인 결과"
+  },
+  "overview": {
+    "title": "기본 정보"
+  }
+}

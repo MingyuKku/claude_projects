@@ -10,10 +10,12 @@ import { FileUploadInput } from "@/shared/components/file-upload-input";
 import { FormField } from "@/shared/components/form-field";
 import { Inform } from "@/shared/components/inform";
 import { OptionSelect } from "@/shared/components/option-select";
+import { SkeletonGroup } from "@/shared/components/skeleton-presets";
 import { useTranslation } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
 import { Input } from "@/shared/ui/input";
 import { ScrollArea } from "@/shared/ui/scroll-area";
+import { Skeleton } from "@/shared/ui/skeleton";
 
 import { sanitizeAccountNumber } from "../lib/withdraw-form";
 
@@ -29,6 +31,8 @@ interface WithdrawInputStepProps {
   /** 보유 금액. 아직 불러오지 못했거나 실패했으면 undefined. */
   balanceAmount: number | undefined;
   banks: BankOption[];
+  /** 은행 목록을 불러오는 중. 은행 Select 자리에 스켈레톤을 그림. */
+  isBankListLoading: boolean;
   /** 은행 목록을 불러오지 못함. 은행 Select를 막고 안내와 다시 시도를 보임. */
   isBankListError: boolean;
   onRetryBankList: () => void;
@@ -47,6 +51,7 @@ interface WithdrawInputStepProps {
 export function WithdrawInputStep({
   balanceAmount,
   banks,
+  isBankListLoading,
   isBankListError,
   onRetryBankList,
   values,
@@ -97,21 +102,27 @@ export function WithdrawInputStep({
               }
               disabled={isBankListError}
             >
-              {(control) => (
-                <OptionSelect
-                  {...control}
-                  value={values.bankIdx}
-                  placeholder={t("field.bank.placeholder")}
-                  options={banks.map((bank) => ({
-                    value: String(bank.idx),
-                    label: bank.name,
-                  }))}
-                  onChangeValue={(bankIdx) => {
-                    onEditField("bank");
-                    onChangeValues({ ...values, bankIdx });
-                  }}
-                />
-              )}
+              {(control) =>
+                isBankListLoading ? (
+                  <SkeletonGroup>
+                    <Skeleton className="h-10 w-full" />
+                  </SkeletonGroup>
+                ) : (
+                  <OptionSelect
+                    {...control}
+                    value={values.bankIdx}
+                    placeholder={t("field.bank.placeholder")}
+                    options={banks.map((bank) => ({
+                      value: String(bank.idx),
+                      label: bank.name,
+                    }))}
+                    onChangeValue={(bankIdx) => {
+                      onEditField("bank");
+                      onChangeValues({ ...values, bankIdx });
+                    }}
+                  />
+                )
+              }
             </FormField>
             {isBankListError && (
               <Button

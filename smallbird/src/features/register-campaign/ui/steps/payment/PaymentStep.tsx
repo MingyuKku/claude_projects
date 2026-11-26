@@ -5,6 +5,7 @@ import {
   toCampaignTypeFilter,
   useCampaignTypeLabel,
 } from "@/entities/campaign";
+import { InfoRow } from "@/shared/components/info-row";
 import { Inform } from "@/shared/components/inform";
 import { formatNumber, formatNumericDate, useTranslation } from "@/shared/i18n";
 import { fromIsoDate } from "@/shared/lib";
@@ -85,22 +86,15 @@ interface SummaryRowProps {
 
 function SummaryRow({ label, children, isEmphasized }: SummaryRowProps) {
   return (
-    <div
-      className={cn(
-        "flex min-h-12 items-center gap-8 px-4",
-        isEmphasized ? "ds-text-base-6-semibold" : "ds-text-sm-5-normal",
-      )}
+    <InfoRow
+      label={label}
+      emphasis={isEmphasized ? "total" : "none"}
+      className={
+        isEmphasized ? "ds-text-base-6-semibold" : "ds-text-sm-5-normal"
+      }
     >
-      <dt
-        className={cn(
-          "flex-1 whitespace-nowrap",
-          !isEmphasized && "font-semibold",
-        )}
-      >
-        {label}
-      </dt>
-      <dd className="min-w-0 flex-1 text-right">{children}</dd>
-    </div>
+      {children}
+    </InfoRow>
   );
 }
 
@@ -121,7 +115,7 @@ function CampaignSummaryCard() {
 
   return (
     <PaymentCard title="campaignSummary">
-      <dl className="flex flex-col ds-px-5 ds-pb-5">
+      <div className="flex flex-col ds-px-5 ds-pb-5">
         <SummaryRow label={t("payment.campaignSummary.serviceType")}>
           {typeFilter ? typeLabel(typeFilter) : "-"}
         </SummaryRow>
@@ -149,7 +143,7 @@ function CampaignSummaryCard() {
               })
             : "-"}
         </SummaryRow>
-      </dl>
+      </div>
     </PaymentCard>
   );
 }
@@ -168,7 +162,7 @@ function PaymentSummaryCard({ className }: { className?: string }) {
   return (
     <PaymentCard title="paymentSummary" className={className}>
       <div className="flex flex-col gap-1.5 ds-px-5 pb-3">
-        <dl className="flex flex-col">
+        <div className="flex flex-col">
           <SummaryRow label={t("payment.paymentSummary.addOnItems")}>
             {addOnItems.length > 0
               ? addOnItems
@@ -182,7 +176,7 @@ function PaymentSummaryCard({ className }: { className?: string }) {
           <SummaryRow label={t("payment.paymentSummary.total")} isEmphasized>
             {won(totalAmount)}
           </SummaryRow>
-        </dl>
+        </div>
         <Inform
           hasLineTop
           items={[

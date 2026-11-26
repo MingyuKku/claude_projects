@@ -9,7 +9,6 @@ import type {
   CampaignDraft,
   CampaignDraftStep,
   CampaignPlatform,
-  CampaignProductType,
 } from "@/entities/campaign";
 
 // 단계별 필수값 검사. 사이드바 표시(입력 중·미입력 경고)와 1단계 "다음", 결제 전 검사가 같은 규칙을 씀.
@@ -155,21 +154,11 @@ export function isStepComplete(step: CampaignDraftStep, draft: CampaignDraft) {
 }
 
 // 기본 선택만 채워진 초안. 기본 선택은 사용자가 입력한 값이 아니라서 "입력을 시작함"의 기준으로 씀.
-// 기본 선택이 상품 유형마다 달라 유형별로 둠.
-const EMPTY_DRAFTS: Record<CampaignProductType, CampaignDraft> = {
-  BRAND: applyDraftDefaults(createEmptyDraft(), { productType: "BRAND" }),
-  GROUP_BUY: applyDraftDefaults(createEmptyDraft(), {
-    productType: "GROUP_BUY",
-  }),
-};
+const EMPTY_DRAFT = applyDraftDefaults(createEmptyDraft());
 
 /** 한 칸이라도 입력을 시작한 단계(기본 선택만 있는 초안과 다름). */
-export function isStepStarted(
-  step: CampaignDraftStep,
-  draft: CampaignDraft,
-  productType: CampaignProductType,
-) {
-  return !isEqual(draft[step], EMPTY_DRAFTS[productType][step]);
+export function isStepStarted(step: CampaignDraftStep, draft: CampaignDraft) {
+  return !isEqual(draft[step], EMPTY_DRAFT[step]);
 }
 
 /** 유형을 바꾸면 비우는 단계(2~7단계). */
@@ -183,23 +172,15 @@ const STEPS_RESET_BY_TYPE_CHANGE: readonly CampaignDraftStep[] = [
 ];
 
 /** 입력한 값이 하나라도 있는지. 있을 때만 이전 캠페인 불러오기 덮어쓰기 알럿을 띄움(P-33 답 전 처리). */
-export function hasAnyInput(
-  draft: CampaignDraft,
-  productType: CampaignProductType,
-) {
+export function hasAnyInput(draft: CampaignDraft) {
   return (
-    isStepStarted("info", draft, productType) ||
-    isStepStarted("groupBuy", draft, productType) ||
-    hasInputAfterInfo(draft, productType)
+    isStepStarted("info", draft) ||
+    isStepStarted("groupBuy", draft) ||
+    hasInputAfterInfo(draft)
   );
 }
 
 /** 2~7단계에 입력한 값이 하나라도 있는지. 있을 때만 유형 변경 확인 알럿을 띄움. */
-export function hasInputAfterInfo(
-  draft: CampaignDraft,
-  productType: CampaignProductType,
-) {
-  return STEPS_RESET_BY_TYPE_CHANGE.some((step) =>
-    isStepStarted(step, draft, productType),
-  );
+export function hasInputAfterInfo(draft: CampaignDraft) {
+  return STEPS_RESET_BY_TYPE_CHANGE.some((step) => isStepStarted(step, draft));
 }

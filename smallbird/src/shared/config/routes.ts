@@ -27,6 +27,8 @@ export const ROUTES = {
   campaignRegisterEdit: "/campaign/register/:campaignIdx",
   // 등록 내역(기본 정보). 결제 뒤 승인 상태를 봄.
   campaignDetail: "/campaign/:campaignIdx",
+  // 캠페인 진행(승인 뒤). 단계가 없으면 기본정보.
+  campaignProgress: "/campaign/:campaignIdx/progress/:step?",
   mypageSubscribe: "/mypage/subscribe",
   mypageMoney: "/mypage/money",
   mypageAccount: "/mypage/account",

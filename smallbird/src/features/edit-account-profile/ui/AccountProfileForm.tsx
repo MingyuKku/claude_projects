@@ -162,22 +162,62 @@ export function AccountProfileForm({
             {/* MO는 읽기 전용 값을 회색 박스로 묶음. */}
             <div className="flex flex-col rounded-lg bg-muted/40 p-2.5 tablet:hidden">
               {!isMaster && (
-                <InfoRow label={labels.name}>{profile.name}</InfoRow>
+                <InfoRow
+                  labelWidth="contentOnMobile"
+                  isTruncated
+                  isMuted
+                  label={labels.name}
+                >
+                  {profile.name}
+                </InfoRow>
               )}
-              <InfoRow label={labels.id}>{idValue}</InfoRow>
+              <InfoRow
+                labelWidth="contentOnMobile"
+                isTruncated
+                isMuted
+                label={labels.id}
+              >
+                {idValue}
+              </InfoRow>
               {isMaster && (
-                <InfoRow label={labels.name}>{profile.name}</InfoRow>
+                <InfoRow
+                  labelWidth="contentOnMobile"
+                  isTruncated
+                  isMuted
+                  label={labels.name}
+                >
+                  {profile.name}
+                </InfoRow>
               )}
-              <InfoRow label={labels.joinedAt}>{joinedAtValue}</InfoRow>
+              <InfoRow
+                labelWidth="contentOnMobile"
+                isTruncated
+                isMuted
+                label={labels.joinedAt}
+              >
+                {joinedAtValue}
+              </InfoRow>
             </div>
 
             <div className="flex flex-col gap-3 tablet:gap-0">
               {!isMaster && (
-                <InfoRow label={labels.name} className={rowClassName}>
+                <InfoRow
+                  labelWidth="contentOnMobile"
+                  isTruncated
+                  isMuted
+                  label={labels.name}
+                  className={rowClassName}
+                >
                   {profile.name}
                 </InfoRow>
               )}
-              <InfoRow label={labels.id} className={rowClassName}>
+              <InfoRow
+                labelWidth="contentOnMobile"
+                isTruncated
+                isMuted
+                label={labels.id}
+                className={rowClassName}
+              >
                 {idValue}
               </InfoRow>
               <ProfilePasswordFields
@@ -187,7 +227,13 @@ export function AccountProfileForm({
               />
               {isMaster && (
                 <>
-                  <InfoRow label={labels.name} className={rowClassName}>
+                  <InfoRow
+                    labelWidth="contentOnMobile"
+                    isTruncated
+                    isMuted
+                    label={labels.name}
+                    className={rowClassName}
+                  >
                     {profile.name}
                   </InfoRow>
                   <PhoneVerifyRow
@@ -216,7 +262,13 @@ export function AccountProfileForm({
                   />
                 )}
               </FormRow>
-              <InfoRow label={labels.joinedAt} className={rowClassName}>
+              <InfoRow
+                labelWidth="contentOnMobile"
+                isTruncated
+                isMuted
+                label={labels.joinedAt}
+                className={rowClassName}
+              >
                 {joinedAtValue}
               </InfoRow>
             </div>

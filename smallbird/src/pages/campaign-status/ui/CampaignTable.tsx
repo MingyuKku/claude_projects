@@ -105,7 +105,7 @@ export function CampaignTable({
                   <div className="flex min-w-0 flex-1 flex-col gap-1">
                     <FullTextHint
                       text={campaign.name}
-                      className="ds-text-sm-none-medium"
+                      className="ds-text-sm-5-medium"
                     />
                     {campaign.productName && (
                       <FullTextHint

@@ -50,4 +50,26 @@ describe("StepSidebar", () => {
     await user.click(screen.getByRole("button", { name: /둘째 단계/ }));
     expect(onSelect).toHaveBeenCalledWith("b");
   });
+
+  it("아래 항목은 단계 목록 뒤에 그리고 현재 화면이면 표시한다", async () => {
+    const user = userEvent.setup();
+    const onSelect = vi.fn();
+    render(
+      <StepSidebar
+        label="진행 단계"
+        indicatorLabels={LABELS}
+        onSelect={onSelect}
+        items={[{ id: "a", number: 1, label: "첫 단계", state: "disabled" }]}
+        footerItem={{ id: "result", label: "결과", isCurrent: true }}
+      />,
+    );
+
+    const buttons = screen.getAllByRole("button");
+    const footer = screen.getByRole("button", { name: "결과" });
+    expect(buttons.at(-1)).toBe(footer);
+    expect(footer).toHaveAttribute("aria-current", "page");
+
+    await user.click(footer);
+    expect(onSelect).toHaveBeenCalledWith("result");
+  });
 });

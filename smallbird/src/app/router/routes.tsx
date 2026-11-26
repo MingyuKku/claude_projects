@@ -131,6 +131,17 @@ export const routes: RouteObject[] = [
             };
           },
         },
+        // 승인 뒤 캠페인 진행. 열 수 있는 캠페인·단계인지는 loader가 정함(단계 사이 이동도 다시 확인).
+        {
+          path: ROUTES.campaignProgress,
+          lazy: async () => {
+            const m = await import("@/pages/campaign-progress");
+            return {
+              Component: m.CampaignProgressPage,
+              loader: m.campaignProgressLoader,
+            };
+          },
+        },
         {
           path: ROUTES.campaignDetail,
           lazy: async () => {

@@ -8,7 +8,8 @@ import { Button } from "@/shared/ui/button";
 import type { ReactNode } from "react";
 
 interface DetailSectionProps {
-  number: number;
+  /** 없으면 번호 배지 없이 제목만 크게(캠페인 진행 기본정보, 시안 13288:433793). */
+  number?: number;
   title: string;
   /** 넘기면 오른쪽 아래 "수정"(반려 상태의 1·2·3·5·6번). */
   onClickEdit?: () => void;
@@ -26,10 +27,20 @@ export function DetailSection({
   return (
     <section className="flex flex-col rounded-lg border bg-card ds-p-5">
       <div className="flex flex-col ds-gap-5 desktop:flex-row">
-        <h3 className="flex h-12 shrink-0 items-center gap-2 px-4 ds-text-sm-5-medium desktop:w-75">
-          <Badge size="sm" className="size-5 justify-center">
-            {number}
-          </Badge>
+        <h3
+          className={cn(
+            "flex shrink-0 items-center gap-2 px-4 desktop:w-75",
+            // 번호 없을 때 줄 높이: MO 22 · PC 24(시안 13288:433453 · 433793)
+            number === undefined
+              ? "py-3.5 ds-text-base-6-semibold leading-5.5 desktop:self-start desktop:leading-6"
+              : "h-12 ds-text-sm-5-medium",
+          )}
+        >
+          {number !== undefined && (
+            <Badge size="sm" className="size-5 justify-center">
+              {number}
+            </Badge>
+          )}
           {title}
         </h3>
         <dl className="grid min-w-0 flex-1 desktop:grid-cols-2">{children}</dl>

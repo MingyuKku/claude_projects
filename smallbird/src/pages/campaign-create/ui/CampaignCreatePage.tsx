@@ -9,6 +9,7 @@ import {
 } from "@/entities/subscription";
 import { EmptyState } from "@/shared/components/empty-state";
 import { Inform } from "@/shared/components/inform";
+import { SkeletonGroup } from "@/shared/components/skeleton-presets";
 import { ROUTES } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
@@ -105,14 +106,14 @@ export function CampaignCreatePage() {
       <div className={`${CONTENT_WIDTH_CLASS_NAME} flex flex-col ds-gap-6`}>
         <div className={SECTION_CLASS_NAME}>
           <p className={SECTION_TITLE_CLASS_NAME}>{t("section.service")}</p>
-          <div className="grid ds-gap-5 tablet:grid-cols-2 desktop:grid-cols-4">
+          <SkeletonGroup className="grid ds-gap-5 tablet:grid-cols-2 desktop:grid-cols-4">
             {SERVICE_CARDS.map((card) => (
               <Skeleton
                 key={card.type}
                 className="h-72 rounded-lg tablet:h-96"
               />
             ))}
-          </div>
+          </SkeletonGroup>
         </div>
         {notice}
       </div>

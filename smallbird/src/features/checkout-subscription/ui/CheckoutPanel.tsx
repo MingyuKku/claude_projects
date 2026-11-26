@@ -2,6 +2,7 @@ import { CreditCard } from "lucide-react";
 import { useId, useState } from "react";
 
 import { useBillingCards, useProductTypeLabel } from "@/entities/subscription";
+import { InfoRow } from "@/shared/components/info-row";
 import { SectionCard } from "@/shared/components/section-card";
 import { formatNumber, useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib/utils";
@@ -44,25 +45,10 @@ interface RowProps {
 }
 
 function Row({ label, value, emphasis }: RowProps) {
-  const isTotal = emphasis === "total";
-
   return (
-    <div
-      className={cn(
-        "flex min-h-12 items-center text-sm leading-5",
-        isTotal && "text-base leading-6 font-semibold",
-      )}
-    >
-      <dt className="flex-1 px-4 font-semibold">{label}</dt>
-      <dd
-        className={cn(
-          "flex-1 px-4 text-right ko:break-keep",
-          emphasis && "font-semibold",
-        )}
-      >
-        {value}
-      </dd>
-    </div>
+    <InfoRow label={label} emphasis={emphasis}>
+      {value}
+    </InfoRow>
   );
 }
 
@@ -117,7 +103,7 @@ export function CheckoutPanel({
             <CardHeader className={cn("py-4", CARD_SIDE_CLASS)}>
               <CardTitle>{productLabel}</CardTitle>
             </CardHeader>
-            <dl className={cn("pb-4 tablet:pb-5", CARD_SIDE_CLASS)}>
+            <div className={cn("pb-4 tablet:pb-5", CARD_SIDE_CLASS)}>
               <Row label={t("product.serviceType")} value={productLabel} />
               <Row
                 label={t("product.fee")}
@@ -128,7 +114,7 @@ export function CheckoutPanel({
                 label={t("product.start")}
                 value={t(`product.startValue.${period}`)}
               />
-            </dl>
+            </div>
           </SectionCard>
           <PaymentMethodSection
             cards={cards}
@@ -177,14 +163,14 @@ export function CheckoutPanel({
               {t("summary.title")}
             </CardTitle>
           </CardHeader>
-          <dl className={cn("pb-3", CARD_SIDE_CLASS)}>
+          <div className={cn("pb-3", CARD_SIDE_CLASS)}>
             <Row label={t("summary.product")} value={productLabel} />
             <Row
               label={t("summary.amount")}
               value={t("price.won", { amount })}
               emphasis="total"
             />
-          </dl>
+          </div>
           <div className="flex flex-col gap-2 p-4 tablet:p-5">
             <Button
               type="button"

@@ -20,6 +20,7 @@ export function CampaignListSkeleton({ isTable }: CampaignListSkeletonProps) {
         <TableSkeleton
           columnClassNames={["w-16", "w-72", "w-28", "w-40", "w-20", "w-8"]}
           rowCount={CAMPAIGN_PAGE_SIZE}
+          size="md"
         />
       </SkeletonGroup>
     );

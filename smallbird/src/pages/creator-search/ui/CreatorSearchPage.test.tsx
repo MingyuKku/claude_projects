@@ -141,6 +141,24 @@ function mockMediaQuery(matches: boolean) {
   }));
 }
 
+// TAB: 태블릿 이상만 맞고 데스크톱은 아님.
+function mockTabletQuery() {
+  window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+    matches: query.includes("min-width: 768px"),
+    media: query,
+    addEventListener: vi.fn(),
+    removeEventListener: vi.fn(),
+  }));
+}
+
+// 체크박스·프로필 다음부터의 머리글.
+function columnHeaders() {
+  return screen
+    .getAllByRole("columnheader")
+    .slice(2)
+    .map((header) => header.textContent);
+}
+
 function bookmarkPosts() {
   return vi
     .mocked(serverApiV3.post)
@@ -201,9 +219,9 @@ describe("CreatorSearchPage", () => {
       offset: 0,
     });
     expect(lastSearchParams().platformIdx).toBeUndefined();
-    expect(screen.getByRole("button", { name: /^플랫폼/ })).toHaveTextContent(
-      "플랫폼",
-    );
+    expect(
+      screen.getByRole("button", { name: /^플랫폼(?! 정렬)/ }),
+    ).toHaveTextContent("플랫폼");
   });
 
   it("수집 전이라 지표가 모두 null인 크리에이터도 -로 보여 준다", async () => {
@@ -230,7 +248,7 @@ describe("CreatorSearchPage", () => {
     const user = setup();
     await screen.findByText("하루뷰티");
 
-    await user.click(screen.getByRole("button", { name: /^플랫폼/ }));
+    await user.click(screen.getByRole("button", { name: /^플랫폼(?! 정렬)/ }));
     const options = await screen.findAllByRole("menuitemcheckbox");
     expect(options.map((option) => option.textContent)).toEqual([
       "인스타그램",
@@ -249,13 +267,13 @@ describe("CreatorSearchPage", () => {
     await waitFor(() => expect(lastSearchParams().platformIdx).toBe(3));
 
     // 하나만 고름: 다른 플랫폼을 고르면 바뀜.
-    await user.click(screen.getByRole("button", { name: /^플랫폼/ }));
+    await user.click(screen.getByRole("button", { name: /^플랫폼(?! 정렬)/ }));
     await user.click(
       await screen.findByRole("menuitemcheckbox", { name: "틱톡" }),
     );
     await waitFor(() => expect(lastSearchParams().platformIdx).toBe(5));
 
-    await user.click(screen.getByRole("button", { name: /^플랫폼/ }));
+    await user.click(screen.getByRole("button", { name: /^플랫폼(?! 정렬)/ }));
     const tiktok = await screen.findByRole("menuitemcheckbox", {
       name: "틱톡",
     });
@@ -291,7 +309,9 @@ describe("CreatorSearchPage", () => {
     const user = setup();
     await screen.findByText("하루뷰티");
 
-    await user.click(screen.getByRole("button", { name: /^카테고리/ }));
+    await user.click(
+      screen.getByRole("button", { name: /^카테고리(?! 정렬)/ }),
+    );
     await user.click(
       await screen.findByRole("menuitemcheckbox", { name: "뷰티" }),
     );
@@ -310,7 +330,7 @@ describe("CreatorSearchPage", () => {
     );
     // 메뉴가 열려 있는 동안 바깥은 접근성 트리에서 가려짐.
     expect(
-      screen.getByRole("button", { name: /^카테고리/, hidden: true }),
+      screen.getByRole("button", { name: /^카테고리(?! 정렬)/, hidden: true }),
     ).toHaveTextContent("뷰티 외 1");
 
     await user.click(screen.getByRole("menuitemcheckbox", { name: "뷰티" }));
@@ -323,7 +343,7 @@ describe("CreatorSearchPage", () => {
       expect(screen.getByTestId("search")).toHaveTextContent(/^$/),
     );
     expect(
-      screen.getByRole("button", { name: /^카테고리/, hidden: true }),
+      screen.getByRole("button", { name: /^카테고리(?! 정렬)/, hidden: true }),
     ).toHaveTextContent("카테고리");
   });
 
@@ -331,7 +351,9 @@ describe("CreatorSearchPage", () => {
     const user = setup(`/creators/search?category=${BEAUTY_IDX},${HOME_IDX}`);
     await screen.findByText("하루뷰티");
 
-    await user.click(screen.getByRole("button", { name: /^카테고리/ }));
+    await user.click(
+      screen.getByRole("button", { name: /^카테고리(?! 정렬)/ }),
+    );
     const all = await screen.findByRole("menuitemcheckbox", { name: "전체" });
     expect(all).toHaveAttribute("aria-checked", "false");
     await user.click(all);
@@ -394,6 +416,103 @@ describe("CreatorSearchPage", () => {
     expect(
       within(assistant).queryByRole("button", { name: "닫기" }),
     ).not.toBeInTheDocument();
+  });
+
+  it("PC 표는 브랜드 지수·공구 지수·팔로워 수·예상 비용·희망비용 칸을 보이고 희망비용은 -로 둔다", async () => {
+    setup();
+
+    await screen.findByText("하루뷰티");
+    expect(columnHeaders()).toEqual([
+      "플랫폼",
+      "카테고리",
+      "브랜드 지수",
+      "공구 지수",
+      "팔로워 수",
+      "예측비용",
+      "희망비용",
+      "동작",
+    ]);
+  });
+
+  it.each([
+    ["youtube", "구독자 수"],
+    ["naver", "구독자 수"],
+    ["tiktok", "구독자 수"],
+    ["instagram", "팔로워 수"],
+    ["x", "팔로워 수"],
+  ])(
+    "플랫폼을 고르면(%s) 칸은 그대로 두고 팔로워 칸 이름만 바꾼다",
+    async (platform, followerHeader) => {
+      setup(`/creators/search?platform=${platform}`);
+
+      await screen.findByText("하루뷰티");
+      expect(columnHeaders()).toEqual([
+        "플랫폼",
+        "카테고리",
+        "브랜드 지수",
+        "공구 지수",
+        followerHeader,
+        "예측비용",
+        "희망비용",
+        "동작",
+      ]);
+    },
+  );
+
+  it("머리글을 누르면 그 칸 내림차순, 다시 누르면 오름차순으로 읽는다", async () => {
+    const user = setup();
+    await screen.findByText("하루뷰티");
+    expect(lastSearchParams().sort).toBe("FOLLOWER_DESC");
+
+    await user.click(screen.getByRole("button", { name: "브랜드 지수 정렬" }));
+    await waitFor(() =>
+      expect(lastSearchParams().sort).toBe("BRAND_INDEX_DESC"),
+    );
+    expect(
+      screen.getByRole("columnheader", { name: "브랜드 지수" }),
+    ).toHaveAttribute("aria-sort", "descending");
+
+    await user.click(screen.getByRole("button", { name: "브랜드 지수 정렬" }));
+    await waitFor(() =>
+      expect(lastSearchParams().sort).toBe("BRAND_INDEX_ASC"),
+    );
+
+    await user.click(screen.getByRole("button", { name: "크리에이터 정렬" }));
+    await waitFor(() => expect(lastSearchParams().sort).toBe("NICKNAME_DESC"));
+
+    // 플랫폼을 바꾸면 정렬하던 칸이 없어질 수 있어 기본 정렬로 돌아감.
+    await user.click(screen.getByRole("button", { name: /^플랫폼(?! 정렬)/ }));
+    await user.click(
+      await screen.findByRole("menuitemcheckbox", { name: "유튜브" }),
+    );
+    await waitFor(() => expect(lastSearchParams().sort).toBe("FOLLOWER_DESC"));
+  });
+
+  it("TAB은 플랫폼·브랜드 지수·공구 지수만 한 줄 표로 보인다", async () => {
+    mockTabletQuery();
+    setup();
+
+    await screen.findByText("하루뷰티");
+    expect(columnHeaders()).toEqual([
+      "플랫폼",
+      "브랜드 지수",
+      "공구 지수",
+      "동작",
+    ]);
+  });
+
+  it("MO는 두 줄 카드에 플랫폼·브랜드 지수·공구 지수를 보인다", async () => {
+    mockMediaQuery(false);
+    setup();
+
+    const card = within(
+      (await screen.findByText("하루뷰티")).closest("li") as HTMLElement,
+    );
+    expect(card.getByText("브랜드 지수")).toBeInTheDocument();
+    expect(card.getByText("41.2")).toBeInTheDocument();
+    expect(card.getByText("공구 지수")).toBeInTheDocument();
+    expect(card.queryByText("팔로워 수")).not.toBeInTheDocument();
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
   });
 
   it("TAB·MO는 둥근 버튼으로 AI 추천 도우미를 열고 닫는다", async () => {
@@ -867,7 +986,9 @@ describe("CreatorSearchPage 상세 필터", () => {
     expect(await screen.findByText("기본 필터 설정")).toBeInTheDocument();
     const apply = screen.getByRole("button", { name: "적용하기" });
     expect(apply).toBeDisabled();
-    await user.click(screen.getByRole("button", { name: /^카테고리/ }));
+    await user.click(
+      screen.getByRole("button", { name: /^카테고리(?! 정렬)/ }),
+    );
     await user.click(
       await screen.findByRole("menuitemcheckbox", { name: "뷰티" }),
     );

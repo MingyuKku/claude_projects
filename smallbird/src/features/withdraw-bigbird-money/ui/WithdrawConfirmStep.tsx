@@ -1,9 +1,9 @@
 import { Download } from "lucide-react";
 
+import { InfoRow } from "@/shared/components/info-row";
 import { Inform } from "@/shared/components/inform";
 import { formatNumber, useTranslation } from "@/shared/i18n";
 import { saveFile } from "@/shared/lib";
-import { cn } from "@/shared/lib/utils";
 import { Button } from "@/shared/ui/button";
 import { ScrollArea } from "@/shared/ui/scroll-area";
 
@@ -20,27 +20,24 @@ interface WithdrawConfirmStepProps {
   onSubmit: () => void;
 }
 
-function Row({
-  label,
-  children,
-  isStrong = false,
-}: {
+interface RowProps {
   label: string;
   children: ReactNode;
   isStrong?: boolean;
-}) {
+  valueType?: "text" | "control";
+}
+
+function Row({ label, children, isStrong = false, valueType }: RowProps) {
   return (
-    <div
-      className={cn(
-        "flex min-h-12 items-center justify-between gap-4 border-b px-4 text-sm leading-5",
-        isStrong && "text-base leading-6 font-semibold",
-      )}
+    <InfoRow
+      label={label}
+      labelWidth="content"
+      valueType={valueType}
+      emphasis={isStrong ? "total" : "none"}
+      hasDivider
     >
-      <dt className="shrink-0 font-semibold text-foreground">{label}</dt>
-      <dd className="flex min-w-0 justify-end text-right break-all text-foreground">
-        {children}
-      </dd>
-    </div>
+      {children}
+    </InfoRow>
   );
 }
 
@@ -66,7 +63,7 @@ export function WithdrawConfirmStep({
     >
       <ScrollArea className="min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:block!">
         <div className="flex flex-col gap-4 p-4 tablet:px-5 tablet:pt-4 tablet:pb-3">
-          <dl className="flex flex-col gap-2">
+          <div className="flex flex-col gap-2">
             <Row label={t("confirm.amount")}>
               {t("won", { amount: formatNumber(amount) })}
             </Row>
@@ -74,7 +71,7 @@ export function WithdrawConfirmStep({
             <Row label={t("confirm.accountNumber")}>{accountNumber}</Row>
             <Row label={t("confirm.accountHolder")}>{accountHolder}</Row>
             <Row label={t("confirm.method")}>{t("confirm.methodValue")}</Row>
-            <Row label={t("confirm.bankBook")}>
+            <Row label={t("confirm.bankBook")} valueType="control">
               <Button
                 type="button"
                 variant="outline-foreground"
@@ -92,7 +89,7 @@ export function WithdrawConfirmStep({
             <Row label={t("confirm.expected")} isStrong>
               {t("won", { amount: formatNumber(0) })}
             </Row>
-          </dl>
+          </div>
           <Inform items={[{ id: "notice", text: t("confirm.notice") }]} />
         </div>
       </ScrollArea>

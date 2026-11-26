@@ -4,7 +4,7 @@ import { Badge } from "@/shared/ui/badge";
 import type { CampaignStage } from "../model/codes";
 
 const STAGE_VARIANTS = {
-  DRAFT: "green",
+  DRAFT: "blue",
   REVIEWING: "blue",
   REJECTED: "red",
   IN_PROGRESS: "green",
@@ -17,7 +17,7 @@ interface CampaignStageBadgeProps {
   rawStatus: string;
 }
 
-// 진행 단계 배지(Figma Badge Size=sm). 등록 중·진행 중은 초록, 승인 대기는 파랑, 승인 반려는 빨강, 종료는 회색.
+// 진행 단계 배지(Figma Badge Size=sm). 진행 중은 초록, 등록 중·승인 대기는 파랑, 승인 반려는 빨강, 종료는 회색.
 export function CampaignStageBadge({
   stage,
   rawStatus,

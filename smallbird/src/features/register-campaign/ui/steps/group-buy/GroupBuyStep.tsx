@@ -16,7 +16,7 @@ import { TextInputField } from "../../fields/TextInputField";
 // 분류 이름은 서버 값을 그대로 보여 주고(번역하지 않음), 대분류를 바꾸면 중분류를 비움.
 export function GroupBuyStep() {
   const { t } = useTranslation("features/register-campaign");
-  const { categories, error } = useProductCategories();
+  const { categories, error, isLoading } = useProductCategories();
   const groupBuy = useRegisterWizardStore((state) => state.draft.groupBuy);
   const patchStepDraft = useRegisterWizardStore(
     (state) => state.patchStepDraft,
@@ -60,6 +60,7 @@ export function GroupBuyStep() {
           options={categoryOptions}
           value={groupBuy.categoryIdx}
           onChangeValue={handleChangeCategory}
+          isLoading={isLoading}
         />
         <OptionSelect
           label={t("groupBuy.middleCategory.label")}
@@ -67,6 +68,7 @@ export function GroupBuyStep() {
           options={middleCategoryOptions}
           value={groupBuy.middleCategoryIdx}
           disabled={selectedCategory === undefined}
+          isLoading={isLoading}
           onChangeValue={(middleCategoryIdx) =>
             patchStepDraft("groupBuy", { middleCategoryIdx })
           }

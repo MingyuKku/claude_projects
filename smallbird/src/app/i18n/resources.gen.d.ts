@@ -41,6 +41,7 @@ import type featuresViewSubscriptionUsage from "../../features/view-subscription
 import type featuresWithdrawAccount from "../../features/withdraw-account/locales/ko.json";
 import type featuresWithdrawBigbirdMoney from "../../features/withdraw-bigbird-money/locales/ko.json";
 import type pagesCampaignCreate from "../../pages/campaign-create/locales/ko.json";
+import type pagesCampaignProgress from "../../pages/campaign-progress/locales/ko.json";
 import type pagesCampaignRegister from "../../pages/campaign-register/locales/ko.json";
 import type pagesCampaignStatus from "../../pages/campaign-status/locales/ko.json";
 import type pagesCertSuccess from "../../pages/cert-success/locales/ko.json";
@@ -117,6 +118,7 @@ declare module "i18next" {
       "features/withdraw-account": typeof featuresWithdrawAccount;
       "features/withdraw-bigbird-money": typeof featuresWithdrawBigbirdMoney;
       "pages/campaign-create": typeof pagesCampaignCreate;
+      "pages/campaign-progress": typeof pagesCampaignProgress;
       "pages/campaign-register": typeof pagesCampaignRegister;
       "pages/campaign-status": typeof pagesCampaignStatus;
       "pages/cert-success": typeof pagesCertSuccess;

@@ -1,7 +1,9 @@
-import { InfiniteScrollSentinel } from "@/shared/components/infinite-list";
+import {
+  InfiniteScrollSentinel,
+  LoadMoreSpinner,
+} from "@/shared/components/infinite-list";
 import { useTranslation } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
-import { Spinner } from "@/shared/ui/spinner";
 
 import type { LoadMoreView } from "../model/types";
 
@@ -15,15 +17,7 @@ export function LoadMoreFooter({ list }: LoadMoreFooterProps) {
 
   return (
     <>
-      {list.isLoadingMore && (
-        <div className="flex justify-center py-4">
-          <Spinner
-            aria-label={t("status.loading")}
-            className="size-4 text-foreground"
-            strokeWidth={1.5}
-          />
-        </div>
-      )}
+      {list.isLoadingMore && <LoadMoreSpinner />}
       {list.isLoadMoreError && (
         <div className="flex justify-center py-4">
           <Button variant="outline" onClick={() => void list.reload()}>

@@ -5,7 +5,7 @@ import { DetailRow, DetailSection, StatusBadge } from "./DetailSection";
 import type { CampaignAddress, CampaignDetail } from "@/entities/campaign";
 
 interface DetailProductSectionProps {
-  number: number;
+  number?: number;
   detail: CampaignDetail;
   /** 캠페인 유형 표시 문구(협찬 유형). */
   typeLabel: string;

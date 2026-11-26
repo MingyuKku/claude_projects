@@ -55,24 +55,95 @@ export function AccountProfileView({
         </dl>
         {isMaster ? (
           <>
-            <InfoRow label={t("info.id")}>{profile.identifier}</InfoRow>
-            <InfoRow label={t("info.password")}>{PASSWORD_MASK}</InfoRow>
-            <InfoRow label={t("info.name")}>{profile.name}</InfoRow>
-            <InfoRow label={t("info.phone")}>
+            <InfoRow
+              labelWidth="contentOnMobile"
+              isTruncated
+              isMuted
+              label={t("info.id")}
+            >
+              {profile.identifier}
+            </InfoRow>
+            <InfoRow
+              labelWidth="contentOnMobile"
+              isTruncated
+              isMuted
+              label={t("info.password")}
+            >
+              {PASSWORD_MASK}
+            </InfoRow>
+            <InfoRow
+              labelWidth="contentOnMobile"
+              isTruncated
+              isMuted
+              label={t("info.name")}
+            >
+              {profile.name}
+            </InfoRow>
+            <InfoRow
+              labelWidth="contentOnMobile"
+              isTruncated
+              isMuted
+              label={t("info.phone")}
+            >
               {formatPhoneNumber(profile.phone)}
             </InfoRow>
-            <InfoRow label={t("info.email")}>{profile.email}</InfoRow>
-            <InfoRow label={t("info.joinedAt")}>
+            <InfoRow
+              labelWidth="contentOnMobile"
+              isTruncated
+              isMuted
+              label={t("info.email")}
+            >
+              {profile.email}
+            </InfoRow>
+            <InfoRow
+              labelWidth="contentOnMobile"
+              isTruncated
+              isMuted
+              label={t("info.joinedAt")}
+            >
               {formatJoinedAt(profile.joinedAt)}
             </InfoRow>
           </>
         ) : (
           <>
-            <InfoRow label={t("sub.name")}>{profile.name}</InfoRow>
-            <InfoRow label={t("sub.id")}>{profile.identifier}</InfoRow>
-            <InfoRow label={t("info.password")}>{PASSWORD_MASK}</InfoRow>
-            <InfoRow label={t("sub.email")}>{profile.email}</InfoRow>
-            <InfoRow label={t("sub.joinedAt")}>
+            <InfoRow
+              labelWidth="contentOnMobile"
+              isTruncated
+              isMuted
+              label={t("sub.name")}
+            >
+              {profile.name}
+            </InfoRow>
+            <InfoRow
+              labelWidth="contentOnMobile"
+              isTruncated
+              isMuted
+              label={t("sub.id")}
+            >
+              {profile.identifier}
+            </InfoRow>
+            <InfoRow
+              labelWidth="contentOnMobile"
+              isTruncated
+              isMuted
+              label={t("info.password")}
+            >
+              {PASSWORD_MASK}
+            </InfoRow>
+            <InfoRow
+              labelWidth="contentOnMobile"
+              isTruncated
+              isMuted
+              label={t("sub.email")}
+            >
+              {profile.email}
+            </InfoRow>
+            <InfoRow
+              labelWidth="contentOnMobile"
+              isTruncated
+              isMuted
+              label={t("sub.joinedAt")}
+            >
               {formatJoinedAt(profile.joinedAt)}
             </InfoRow>
           </>

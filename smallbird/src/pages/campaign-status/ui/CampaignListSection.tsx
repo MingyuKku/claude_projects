@@ -3,12 +3,12 @@ import { useEffect } from "react";
 import { EmptyState } from "@/shared/components/empty-state";
 import {
   InfiniteScrollSentinel,
+  LoadMoreSpinner,
   ScrollToTopButton,
 } from "@/shared/components/infinite-list";
 import { ListPagination } from "@/shared/components/list-filter";
 import { useTranslation } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
-import { Skeleton } from "@/shared/ui/skeleton";
 
 import { CampaignCardList } from "./CampaignCardList";
 import { CampaignListSkeleton } from "./CampaignListSkeleton";
@@ -144,11 +144,7 @@ export function CampaignListSection({
   return (
     <div className="flex flex-col gap-5">
       <CampaignCardList records={scroll.records} {...rowHandlers} />
-      {scroll.isLoadingMore && (
-        <div role="status" aria-label={tCommon("status.loading")}>
-          <Skeleton className="h-12 w-full" />
-        </div>
-      )}
+      {scroll.isLoadingMore && <LoadMoreSpinner />}
       {scroll.isLoadMoreError && (
         <div className="flex justify-center">
           <Button variant="outline" onClick={() => void scroll.reload()}>

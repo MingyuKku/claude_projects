@@ -42,10 +42,7 @@ function createDetail({ hasSavedDefaults = true } = {}): CampaignDetail {
     },
   };
   const draft = hasSavedDefaults
-    ? applyDraftDefaults(saved, {
-        hasServerCampaignType: true,
-        productType: "BRAND",
-      })
+    ? applyDraftDefaults(saved, { hasServerCampaignType: true })
     : saved;
   return {
     campaignIdx: 15,

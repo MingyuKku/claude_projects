@@ -1,15 +1,13 @@
-import { useTranslation } from "@/shared/i18n";
+import { SkeletonGroup } from "@/shared/components/skeleton-presets";
 import { Skeleton } from "@/shared/ui/skeleton";
 
 import type { ReactNode } from "react";
 
 export function TabLoading({ className }: { className: string }) {
-  const { t } = useTranslation();
-
   return (
-    <div role="status" aria-label={t("status.loading")}>
+    <SkeletonGroup>
       <Skeleton className={className} />
-    </div>
+    </SkeletonGroup>
   );
 }
 

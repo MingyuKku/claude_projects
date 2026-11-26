@@ -180,8 +180,6 @@ export function AppShell({
     logoLinkLabel: isAdmin ? t("logo.adminLinkLabel") : t("logo.homeLinkLabel"),
     linkAs: ShellLink,
     primaryActionLabel: isSubAccount ? undefined : t("registerCampaign"),
-    // 캠페인 기능은 개발 서버에서만 켬(API가 나오면 함께 공개).
-    isPrimaryActionDisabled: !import.meta.env.DEV,
     onClickPrimaryAction: handleClickRegisterCampaign,
     // 로그인하면 이용 가이드·언어 메뉴가 LNB 하단에 있고, 비로그인은 헤더에 있음.
     footerActions: session ? (

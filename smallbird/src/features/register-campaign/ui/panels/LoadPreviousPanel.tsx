@@ -24,6 +24,7 @@ import { useCopyPrevious } from "../../model/use-copy-previous";
 import { useRegisterPanel } from "../../model/use-register-panel";
 import { useRegisterWizardStore } from "../../model/wizard-context";
 import { CopySourceList } from "./CopySourceList";
+import { CopySourceListSkeleton } from "./CopySourceListSkeleton";
 import { PanelLayout } from "./PanelLayout";
 
 // 이전 캠페인 불러오기(시안 13320:115656, 빈 상태 115789·115800, 덮어쓰기 알럿 133198).
@@ -52,6 +53,7 @@ export function LoadPreviousPanel() {
   const { copyFrom, isCopying } = useCopyPrevious({ onCopied: closePanel });
 
   const isEmpty = !list.isLoading && !list.isError && list.records.length === 0;
+  const listVariant = isDesktop ? "table" : "cards";
 
   function handleSearch() {
     setKeyword(searchInput.trim());
@@ -64,7 +66,7 @@ export function LoadPreviousPanel() {
 
   function handleClickLoad() {
     if (selectedIdx === null) return;
-    if (hasAnyInput(draft, productType)) {
+    if (hasAnyInput(draft)) {
       setIsOverwriteAlertOpen(true);
       return;
     }
@@ -114,14 +116,19 @@ export function LoadPreviousPanel() {
         <h3 className="text-sm leading-5 font-medium">
           {t("loadPrevious.listTitle")}
         </h3>
-        <CopySourceList
-          records={list.records}
-          selectedIdx={selectedIdx}
-          variant={isDesktop ? "table" : "cards"}
-          hasMore={list.hasMore}
-          onSelect={handleSelect}
-          onReachEnd={list.loadMore}
-        />
+        {list.isLoading ? (
+          <CopySourceListSkeleton variant={listVariant} />
+        ) : (
+          <CopySourceList
+            records={list.records}
+            selectedIdx={selectedIdx}
+            variant={listVariant}
+            hasMore={list.hasMore}
+            isLoadingMore={list.isLoadingMore}
+            onSelect={handleSelect}
+            onReachEnd={list.loadMore}
+          />
+        )}
       </div>
     );
   }

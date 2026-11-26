@@ -1,0 +1,56 @@
+import {
+  SkeletonGroup,
+  TableSkeleton,
+} from "@/shared/components/skeleton-presets";
+import { Skeleton } from "@/shared/ui/skeleton";
+
+const CARD_SKELETON_COUNT = 3;
+const CARD_ROW_COUNT = 5;
+
+interface PaymentListSkeletonProps {
+  /** PC는 표, TAB·MO는 카드. */
+  isTable: boolean;
+  /** 표 행 수. 실제 표가 그릴 쪽 크기와 같게 넘김. */
+  rowCount: number;
+}
+
+/** PaymentHistory의 표·카드 자리. 제목·툴바는 실제 화면이 그대로 그림. */
+export function PaymentListSkeleton({
+  isTable,
+  rowCount,
+}: PaymentListSkeletonProps) {
+  if (isTable) {
+    return (
+      <SkeletonGroup>
+        <TableSkeleton
+          columnClassNames={["w-32", "w-40", "w-20", "w-24", "w-14", "w-9"]}
+          rowCount={rowCount}
+          size="xs"
+        />
+      </SkeletonGroup>
+    );
+  }
+
+  return (
+    <SkeletonGroup className="grid grid-cols-1 gap-4 tablet:grid-cols-2 tablet:gap-3">
+      {Array.from({ length: CARD_SKELETON_COUNT }, (_, card) => (
+        <div key={card} className="flex flex-col gap-2">
+          <div className="flex justify-end">
+            <Skeleton className="h-8.5 w-28 tablet:h-9" />
+          </div>
+          <div className="overflow-hidden rounded-lg border">
+            {Array.from({ length: CARD_ROW_COUNT }, (_, row) => (
+              <div
+                key={row}
+                className="flex h-12 items-center gap-4 border-b px-4 last:border-b-0"
+              >
+                <Skeleton className="h-4 w-14" />
+                <Skeleton className="h-4 w-28" />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
+    </SkeletonGroup>
+  );
+}

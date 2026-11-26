@@ -7,9 +7,12 @@
     "basicFilter": "Basic filters"
   },
   "column": {
+    "creator": "Creator",
     "brandIndex": "Brand index",
     "groupBuyIndex": "Group buy index",
-    "actions": "Actions"
+    "actions": "Actions",
+    "predictedCost": "Est. cost",
+    "sortBy": "Sort by {{name}}"
   },
   "select": {
     "all": "Select all",
@@ -48,6 +51,7 @@
     "category": "Category",
     "profile": "Profile",
     "followerCount": "Followers",
+    "subscriberCount": "Subscribers",
     "avgViewCount": "Avg. views",
     "avgLikeCount": "Avg. likes",
     "avgCommentCount": "Avg. comments",

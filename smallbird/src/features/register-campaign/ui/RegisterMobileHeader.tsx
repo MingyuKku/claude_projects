@@ -85,7 +85,7 @@ export function RegisterMobileHeader({
         >
           <SheetTitle className="sr-only">{t("nav.label")}</SheetTitle>
           <div className="flex h-full flex-col bg-muted/40">
-            <div className="flex h-12 shrink-0 items-center justify-end pt-1 pr-0.5 pb-1">
+            <div className="flex h-11 shrink-0 items-center justify-end pt-1 pr-0.5">
               <SheetClose asChild>
                 <Button
                   variant="ghost-muted"
@@ -96,7 +96,7 @@ export function RegisterMobileHeader({
                 </Button>
               </SheetClose>
             </div>
-            <ScrollPanel className="flex-1" contentClassName="px-4 pb-4">
+            <ScrollPanel className="flex-1" contentClassName="px-4 pt-1 pb-4">
               <RegisterStepNav
                 size="sm"
                 onSelected={() => setIsDrawerOpen(false)}

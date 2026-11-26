@@ -62,7 +62,9 @@ export function UsageHistory({
       height="fill"
     />
   );
-  const skeleton = <UsageListSkeleton isTable={isDesktop} />;
+  const skeleton = (
+    <UsageListSkeleton isTable={isDesktop} rowCount={params.pageSize} />
+  );
   const refresh = () => {
     params.reset();
     void (isTabletUp ? paged.mutate() : scroll.reload());

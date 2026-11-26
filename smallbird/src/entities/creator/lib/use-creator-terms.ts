@@ -6,6 +6,7 @@ export type CreatorTerm =
   | "category"
   | "profile"
   | "followerCount"
+  | "subscriberCount"
   | "avgViewCount"
   | "avgLikeCount"
   | "avgCommentCount"

@@ -4,18 +4,21 @@ import {
 } from "@/shared/components/skeleton-presets";
 import { Skeleton } from "@/shared/ui/skeleton";
 
-import { LIST_PAGE_SIZE } from "../model/constants";
-
 const CARD_SKELETON_COUNT = 3;
 const CARD_ROW_COUNT = 6;
 
 interface UsageListSkeletonProps {
   /** PC는 표, TAB·MO는 카드. */
   isTable: boolean;
+  /** 표 행 수. 실제 표가 그릴 쪽 크기와 같게 넘김. */
+  rowCount: number;
 }
 
 /** UsageHistory의 표·카드 자리. 제목·툴바는 실제 화면이 그대로 그림. */
-export function UsageListSkeleton({ isTable }: UsageListSkeletonProps) {
+export function UsageListSkeleton({
+  isTable,
+  rowCount,
+}: UsageListSkeletonProps) {
   if (isTable) {
     return (
       <SkeletonGroup>
@@ -29,7 +32,7 @@ export function UsageListSkeleton({ isTable }: UsageListSkeletonProps) {
             "w-20",
             "w-8",
           ]}
-          rowCount={LIST_PAGE_SIZE}
+          rowCount={rowCount}
         />
       </SkeletonGroup>
     );

@@ -70,6 +70,8 @@ interface DetailSectionsProps {
   detail: CampaignDetail;
   /** 넘기면 수정할 수 있는 섹션에 "수정"을 붙임(반려 상태). */
   onEditStep?: (step: CampaignRegisterStep) => void;
+  /** false면 섹션 번호를 빼고 제목을 크게 보임(캠페인 진행 기본정보). */
+  isNumbered?: boolean;
 }
 
 function formatDateText(value: string | null) {
@@ -77,7 +79,11 @@ function formatDateText(value: string | null) {
   return date ? formatNumericDate(date) : "-";
 }
 
-export function DetailSections({ detail, onEditStep }: DetailSectionsProps) {
+export function DetailSections({
+  detail,
+  onEditStep,
+  isNumbered = true,
+}: DetailSectionsProps) {
   const { t } = useTranslation("features/register-campaign");
   const { draft } = detail;
   const { info, creator, conditions, policy } = draft;
@@ -98,7 +104,7 @@ export function DetailSections({ detail, onEditStep }: DetailSectionsProps) {
         })
       : t("detail.addOns.applied");
 
-  const renderers: Record<SectionKey, (number: number) => ReactNode> = {
+  const renderers: Record<SectionKey, (number?: number) => ReactNode> = {
     info: (number) => (
       <DetailSection
         number={number}
@@ -259,7 +265,9 @@ export function DetailSections({ detail, onEditStep }: DetailSectionsProps) {
   return (
     <>
       {SECTION_ORDER[productType].map((key, index) => (
-        <Fragment key={key}>{renderers[key](index + 1)}</Fragment>
+        <Fragment key={key}>
+          {renderers[key](isNumbered ? index + 1 : undefined)}
+        </Fragment>
       ))}
     </>
   );

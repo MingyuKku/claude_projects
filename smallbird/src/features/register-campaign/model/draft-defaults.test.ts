@@ -10,25 +10,12 @@ describe("applyDraftDefaults", () => {
     expect(draft.creator).toEqual({
       platform: "INSTAGRAM",
       gender: "FEMALE",
-      ageGroups: ["AGE_10S"],
-      topics: ["Beauty"],
+      ageGroups: ["ALL"],
+      topics: ["All"],
     });
     expect(draft.conditions).toMatchObject({
       postingPeriodMonths: 1,
       secondaryCopyright: true,
-    });
-  });
-
-  it("공구형은 연령대·주제 기본 선택이 시안대로 '무관'이다", () => {
-    const draft = applyDraftDefaults(createEmptyDraft(), {
-      productType: "GROUP_BUY",
-    });
-
-    expect(draft.creator).toEqual({
-      platform: "INSTAGRAM",
-      gender: "FEMALE",
-      ageGroups: ["ALL"],
-      topics: ["All"],
     });
   });
 
@@ -51,7 +38,7 @@ describe("applyDraftDefaults", () => {
       platform: "YOUTUBE",
       gender: "FEMALE",
       ageGroups: ["AGE_40S"],
-      topics: ["Beauty"],
+      topics: ["All"],
     });
     expect(draft.conditions.secondaryCopyright).toBe(false);
     expect(draft.conditions.postingPeriodMonths).toBe(12);
