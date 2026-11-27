@@ -113,12 +113,18 @@ export const routes: RouteObject[] = [
       ]),
       // 등록 마법사는 LNB 없이 FocusShell을 화면이 직접 그림.
       requireSessionRoute(SessionLayout, [
-        page(
-          ROUTES.campaignRegister,
-          async () =>
-            (await import("@/pages/campaign-register"))
-              .CampaignRegisterEntryPage,
-        ),
+        // 새 캠페인은 loader가 만들고 작성 경로로 보내, 그동안 이전 화면이 남음.
+        {
+          path: ROUTES.campaignRegister,
+          lazy: async () => {
+            const m = await import("@/pages/campaign-register");
+            return {
+              Component: m.CampaignRegisterEntryPage,
+              loader: m.campaignRegisterEntryLoader,
+              shouldRevalidate: m.neverRevalidate,
+            };
+          },
+        },
         // 작성 화면과 등록 내역 중 어디서 보여 줄지는 그리기 전에 loader가 정함.
         {
           path: ROUTES.campaignRegisterEdit,
@@ -131,6 +137,13 @@ export const routes: RouteObject[] = [
             };
           },
         },
+        // 포스팅 가이드 미리보기(새 탭). 고정 경로라 진행 화면의 `:step?`보다 우선함. 열 수 있는지는 서버 응답(404·403)을 따름.
+        page(
+          ROUTES.campaignGuidePreview,
+          async () =>
+            (await import("@/pages/campaign-guide-preview"))
+              .PostingGuidePreviewPage,
+        ),
         // 승인 뒤 캠페인 진행. 열 수 있는 캠페인·단계인지는 loader가 정함(단계 사이 이동도 다시 확인).
         {
           path: ROUTES.campaignProgress,

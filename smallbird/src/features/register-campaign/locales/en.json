@@ -13,10 +13,7 @@
   "nav": {
     "label": "Registration steps",
     "open": "Open steps",
-    "indicator": {
-      "editing": "In progress",
-      "warning": "Required fields missing"
-    }
+    "warning": "Required fields missing"
   },
   "action": {
     "saveDraft": "Save draft",

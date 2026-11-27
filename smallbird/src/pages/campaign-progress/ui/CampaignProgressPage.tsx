@@ -1,16 +1,18 @@
 import { useNavigate, useOutletContext, useParams } from "react-router";
 
 import {
+  getCampaignProgressPath,
   isUnreadableCampaignError,
   parseCampaignIdx,
   toCampaignProgressStep,
   useCampaignDetail,
-  useCampaignStatusReturnStore,
+  useBackToCampaignStatus,
 } from "@/entities/campaign";
+import { MatchingStep } from "@/features/campaign-matching";
 import { DetailSections } from "@/features/register-campaign";
+import { PostingGuideStep } from "@/features/write-posting-guide";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ScrollPanel } from "@/shared/components/scroll-panel";
-import { ROUTES } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { NotFoundError } from "@/shared/lib";
 import { FocusShell } from "@/widgets/app-shell";
@@ -30,7 +32,7 @@ export function CampaignProgressPage() {
   const currentStep = toCampaignProgressStep(params.step);
   const session = useOutletContext<SessionViewModel>();
   const navigate = useNavigate();
-  const statusSearch = useCampaignStatusReturnStore((state) => state.search);
+  const backToStatus = useBackToCampaignStatus();
   const { detail, error } = useCampaignDetail(campaignIdx, {
     isFilledByLoader: true,
   });
@@ -65,35 +67,72 @@ export function CampaignProgressPage() {
             </ScrollPanel>
           )
         }
-        // "<"는 등록 화면처럼 늘 캠페인 현황으로(마지막에 보던 탭·검색·쪽 유지).
-        onBack={() => void navigate(`${ROUTES.campaign}${statusSearch}`)}
+        onBack={backToStatus}
       >
         {detail && (
           <div className="flex min-h-0 flex-1 flex-col">
-            <ProgressMobileHeader
-              detail={detail}
-              currentStep={currentStep}
-              title={stepTitle}
-            />
-            {currentStep === null ? (
-              <ScrollPanel
-                className="flex-1"
-                contentClassName="px-4 pb-4 tablet:ds-p-5"
-              >
-                <section className="flex flex-col ds-gap-4">
-                  <h2 className="hidden ds-text-base-none-semibold tablet:block">
-                    {stepTitle}
-                  </h2>
-                  <DetailSections detail={detail} isNumbered={false} />
-                </section>
-              </ScrollPanel>
+            {currentStep === "matching" ? (
+              <MatchingStep
+                campaignIdx={detail.campaignIdx}
+                myName={session.displayName}
+                isReadOnly={detail.stage === "ENDED"}
+                renderMobileHeader={(actions) => (
+                  <ProgressMobileHeader
+                    detail={detail}
+                    currentStep={currentStep}
+                    title={stepTitle}
+                    actions={actions}
+                  />
+                )}
+              />
+            ) : currentStep === "guide" ? (
+              <PostingGuideStep
+                campaignIdx={detail.campaignIdx}
+                isReadOnly={detail.stage === "ENDED"}
+                // 메뉴 이동처럼 기록을 쌓지 않음.
+                onSkipped={() =>
+                  void navigate(
+                    getCampaignProgressPath(detail.campaignIdx, "search"),
+                    { replace: true },
+                  )
+                }
+                renderMobileHeader={(actions) => (
+                  <ProgressMobileHeader
+                    detail={detail}
+                    currentStep={currentStep}
+                    title={stepTitle}
+                    actions={actions}
+                  />
+                )}
+              />
             ) : (
-              <div className="flex flex-1 items-center justify-center">
-                <EmptyState
-                  type="construction"
-                  title={tCommon("status.comingSoon")}
+              <>
+                <ProgressMobileHeader
+                  detail={detail}
+                  currentStep={currentStep}
+                  title={stepTitle}
                 />
-              </div>
+                {currentStep === null ? (
+                  <ScrollPanel
+                    className="flex-1"
+                    contentClassName="px-4 pb-4 tablet:ds-p-5"
+                  >
+                    <section className="flex flex-col ds-gap-4">
+                      <h2 className="hidden ds-text-base-none-semibold tablet:block">
+                        {stepTitle}
+                      </h2>
+                      <DetailSections detail={detail} isNumbered={false} />
+                    </section>
+                  </ScrollPanel>
+                ) : (
+                  <div className="flex flex-1 items-center justify-center">
+                    <EmptyState
+                      type="construction"
+                      title={tCommon("status.comingSoon")}
+                    />
+                  </div>
+                )}
+              </>
             )}
           </div>
         )}

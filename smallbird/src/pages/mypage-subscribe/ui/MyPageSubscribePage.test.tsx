@@ -171,18 +171,15 @@ describe("MyPageSubscribePage 결제 화면", () => {
     ).toBeInTheDocument();
   });
 
-  it("구독 중인 상품 카드는 비활성 '구독 중'이다", async () => {
+  it("구독 중인 상품 카드는 '이용 중' 뱃지만 있고 구독 버튼이 없다", async () => {
     setup("/mypage/subscribe");
-    expect(
-      await screen.findByRole("button", { name: "구독 중" }),
-    ).toBeDisabled();
+    expect(await screen.findByText("이용 중")).toBeInTheDocument();
+    expect(screen.queryByRole("button", { name: "구독 중" })).toBeNull();
   });
 
   it("구독 중인 상품의 결제 화면 주소로 들어오면 결제 화면 대신 구독 탭을 보인다", async () => {
     setup("/mypage/subscribe?panel=checkout&plan=recruit");
-    expect(
-      await screen.findByRole("button", { name: "구독 중" }),
-    ).toBeDisabled();
+    expect(await screen.findByText("이용 중")).toBeInTheDocument();
     expect(screen.queryByText("결제 즉시 1개월 이용 시작")).toBeNull();
     expect(screen.queryByRole("button", { name: "결제" })).toBeNull();
   });
@@ -200,9 +197,7 @@ describe("MyPageSubscribePage 결제 화면", () => {
     shouldFail = false;
     await user.click(retry);
 
-    expect(
-      await screen.findByRole("button", { name: "구독 중" }),
-    ).toBeDisabled();
+    expect(await screen.findByText("이용 중")).toBeInTheDocument();
     expect(serverApiV3.get).toHaveBeenCalledWith(
       "/mypage/subscription/subscriptions",
     );
@@ -229,7 +224,7 @@ describe("MyPageSubscribePage 카드 없음", () => {
   it("구독하기를 누르면 결제 화면 대신 카드 등록 안내를 띄운다", async () => {
     const user = setup("/mypage/subscribe");
     // 카드를 다 읽은 뒤에 눌러야 안내가 뜸.
-    await screen.findByRole("button", { name: "구독 중" });
+    await screen.findByText("이용 중");
     await user.click(screen.getByRole("button", { name: "구독하기" }));
 
     expect(
@@ -245,7 +240,7 @@ describe("MyPageSubscribePage 카드 없음", () => {
 
   it("취소하면 안내가 닫히고 결제 쿼리가 지워진다", async () => {
     const user = setup("/mypage/subscribe");
-    await screen.findByRole("button", { name: "구독 중" });
+    await screen.findByText("이용 중");
     await user.click(screen.getByRole("button", { name: "구독하기" }));
     await screen.findByRole("alertdialog", { name: "결제 카드 등록" });
 
@@ -257,7 +252,7 @@ describe("MyPageSubscribePage 카드 없음", () => {
 
   it("구독 중인 상품의 결제 화면 주소면 결제할 일이 없어 카드 등록 안내도 띄우지 않는다", async () => {
     setup("/mypage/subscribe?panel=checkout&plan=recruit");
-    await screen.findByRole("button", { name: "구독 중" });
+    await screen.findByText("이용 중");
     await waitFor(() =>
       expect(serverApiV3.get).toHaveBeenCalledWith(
         "/mypage/subscription/billing-cards",

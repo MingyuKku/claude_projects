@@ -10,7 +10,7 @@ import { Separator } from "@/shared/ui/separator";
 import type { ComponentProps, ReactNode } from "react";
 
 // Figma Card / Button(6897:43929): Type(Default/Subscribe/Disabled) × State(Default/Hover/Focus/More).
-// Subscribe는 primary 링(개설 서비스 카드 선택과 같은 ring-2 + offset-2)과 비활성 "구독 중" 버튼, Disabled는 준비중 안내와 비활성 버튼.
+// Subscribe는 1px primary 링(개설 서비스 카드의 이용 중과 같은 효과)에 상세보기 버튼만 있고, 상세를 펼친(State=More) 카드는 2px 링+흰 간격이 1px 링을 대신함. Disabled는 준비중 안내와 비활성 버튼.
 export type PlanCardType = "default" | "subscribed" | "disabled";
 
 export interface PlanCardFeature {
@@ -83,7 +83,9 @@ export function PlanCard({
       className={cn(
         "transition-[color,background-color,box-shadow]",
         statusBadge && "relative",
-        type === "subscribed" && "ring-2 ring-primary ring-offset-2",
+        isExpanded && !isDisabled
+          ? "ring-2 ring-primary ring-offset-2"
+          : type === "subscribed" && "ring-1 ring-primary",
         className,
       )}
       {...props}
@@ -173,14 +175,16 @@ export function PlanCard({
             <DetailIcon aria-hidden />
           </Button>
         )}
-        <Button
-          className="w-full"
-          disabled={type !== "default"}
-          onClick={onClickAction}
-        >
-          {isDisabled && <TriangleAlert aria-hidden />}
-          {actionLabel}
-        </Button>
+        {type !== "subscribed" && (
+          <Button
+            className="w-full"
+            disabled={isDisabled}
+            onClick={onClickAction}
+          >
+            {isDisabled && <TriangleAlert aria-hidden />}
+            {actionLabel}
+          </Button>
+        )}
       </div>
     </Card>
   );

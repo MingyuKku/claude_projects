@@ -8,6 +8,8 @@ export { useSetDefaultBillingCard } from "./api/use-set-default-billing-card";
 export {
   useBillingCards,
   usePaymentRecords,
+  usePaymentScrollList,
+  useRevalidatePaymentsOnReturn,
   useRevalidateSubscriptionData,
   useSubscriptionPlans,
   useSubscriptions,

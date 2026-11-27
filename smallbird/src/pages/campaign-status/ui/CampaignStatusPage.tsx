@@ -23,6 +23,7 @@ import { FILTER_PANEL_PARAM, MEDIA_QUERY, ROUTES } from "@/shared/config";
 import { useTranslation } from "@/shared/i18n";
 import { useMediaQuery } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
+import { ShellTopSlot } from "@/widgets/app-shell";
 
 import { isSubscriptionExpiredForWrite } from "../lib/subscription-guard";
 import { TAB_STAGES } from "../model/constants";
@@ -36,13 +37,13 @@ import type { CampaignSummary } from "@/entities/campaign";
 import type { SessionViewModel } from "@/entities/session";
 import type { ReactNode } from "react";
 
-// 캠페인 현황: 진행 단계 탭·검색·유형 필터·표(PC)/카드(TAB·MO). 탭·검색·유형·쪽은 주소 쿼리가 소유함.
+// 캠페인 현황: 진행 단계 탭·검색·유형 필터·표(PC)/카드(TAB·MO). 탭·검색·유형은 주소 쿼리가 소유함.
 // 셸(헤더·LNB)은 app 레이어의 CampaignLayout이 감쌈.
 export function CampaignStatusPage() {
   const { t } = useTranslation("pages/campaign-status");
   const { t: tCommon } = useTranslation();
   const navigate = useNavigate();
-  const { search } = useLocation();
+  const { search, key: locationKey } = useLocation();
   const rememberSearch = useCampaignStatusReturnStore(
     (state) => state.remember,
   );
@@ -50,24 +51,25 @@ export function CampaignStatusPage() {
   const isTabletUp = useMediaQuery(MEDIA_QUERY.tabletUp);
   const isDesktop = useMediaQuery(MEDIA_QUERY.desktop);
   const params = useStatusParams();
-  const paged = useCampaignPage(
-    isTabletUp ? { ...params.baseQuery, page: params.page } : null,
-  );
-  const scroll = useCampaignScrollList(params.baseQuery, !isTabletUp);
+  const scroll = useCampaignScrollList(params.baseQuery);
 
-  // 등록 화면의 헤더 "<"가 탭·검색·쪽을 되살려 돌아오도록 마지막 쿼리를 알려 둠(열려 있던 필터 화면은 제외).
+  // 등록 화면의 헤더 "<"가 탭·검색을 되살려 돌아오도록 마지막 쿼리와 기록 항목을 알려 둠(열려 있던 필터 화면은 제외).
   useEffect(() => {
     const params = new URLSearchParams(search);
     params.delete(FILTER_PANEL_PARAM);
     const rest = params.toString();
-    rememberSearch(rest ? `?${rest}` : "");
-  }, [search, rememberSearch]);
+    rememberSearch(rest ? `?${rest}` : "", locationKey);
+  }, [search, locationKey, rememberSearch]);
 
   // 할당된 Sub ID는 "+ 캠페인 등록하기"·"작성하기"·삭제를 쓰지 못함(스펙 P-3).
   const isSubAccount = session.authority === "SUB";
   const [isSubscribeAlertOpen, setIsSubscribeAlertOpen] = useState(false);
   // Sub ID는 구독 API가 403이라 읽지 않음("작성하기"도 못 씀).
-  const subscriptions = useSubscriptions({ isEnabled: !isSubAccount });
+  // "작성하기"를 누를 때만 쓰므로 돌아올 때마다 다시 읽지 않고, 캐시로 막힐 때만 새로 읽어 확인함.
+  const subscriptions = useSubscriptions({
+    isEnabled: !isSubAccount,
+    revalidateIfStale: false,
+  });
   const subscribedTypes = subscriptions.data
     ? getSubscribedTypes(subscriptions.data)
     : null;
@@ -78,10 +80,24 @@ export function CampaignStatusPage() {
     void navigate(ROUTES.campaignCreate);
   }
 
-  function handleClickShortcut(campaign: CampaignSummary, kind: ShortcutKind) {
+  // 캐시가 다른 탭·기기에서 구독하기 전 값일 수 있어, 막아야 할 때는 새로 읽은 구독으로 다시 판단함.
+  // 인자 없는 `mutate()`는 요청이 실패해도 reject하지 않고 갖고 있던 캐시 값을 돌려줘, 실패하면 캐시로 판단함.
+  async function isWriteBlocked(campaign: CampaignSummary) {
+    if (!isSubscriptionExpiredForWrite(campaign, subscribedTypes)) return false;
+    const fresh = await subscriptions.mutate();
+    return isSubscriptionExpiredForWrite(
+      campaign,
+      fresh ? getSubscribedTypes(fresh) : null,
+    );
+  }
+
+  async function handleClickShortcut(
+    campaign: CampaignSummary,
+    kind: ShortcutKind,
+  ) {
     switch (kind) {
       case "write":
-        if (isSubscriptionExpiredForWrite(campaign, subscribedTypes)) {
+        if (await isWriteBlocked(campaign)) {
           setIsSubscribeAlertOpen(true);
           return;
         }
@@ -117,7 +133,7 @@ export function CampaignStatusPage() {
   }
 
   function handleReload() {
-    void (isTabletUp ? paged.mutate() : scroll.reload());
+    void scroll.reload();
   }
 
   function handleRefresh() {
@@ -132,11 +148,7 @@ export function CampaignStatusPage() {
   // 계정에 캠페인이 하나도 없음: 조건 없는 전체 탭이 0건.
   const isAccountEmpty = emptyKind === "none" && params.tab === "all";
   // 검색·필터 결과가 0건이면 계정에 캠페인이 있는지 조건 없는 전체 목록으로 확인함(시안이 두 경우의 문구를 나눔).
-  const listTotalCount = isTabletUp
-    ? paged.list?.totalCount
-    : scroll.isLoading
-      ? undefined
-      : scroll.totalCount;
+  const listTotalCount = scroll.isLoading ? undefined : scroll.totalCount;
   const needsAccountCheck =
     params.tab === "all" && emptyKind !== "none" && listTotalCount === 0;
   const accountList = useCampaignPage(
@@ -187,9 +199,12 @@ export function CampaignStatusPage() {
 
   return (
     <div className="flex min-h-full flex-col">
-      <div className="ds-px-5 pt-2">
-        <StatusTabs value={params.tab} onChange={params.setTab} />
-      </div>
+      {/* 탭은 스크롤 영역 밖 고정 영역에 그려, 겹치는 스크롤 막대가 탭 아래에서 시작함. */}
+      <ShellTopSlot>
+        <div className="ds-px-5 pt-2">
+          <StatusTabs value={params.tab} onChange={params.setTab} />
+        </div>
+      </ShellTopSlot>
       <div className="flex flex-1 flex-col gap-4 ds-px-5 ds-pt-6 ds-pb-5 desktop:gap-3">
         {!isTabletUp && registerButton}
         <FilterToolbar
@@ -203,10 +218,8 @@ export function CampaignStatusPage() {
           search={{ keyword: params.keyword, onSubmit: params.setKeyword }}
         />
         <CampaignListSection
-          params={params}
           isTabletUp={isTabletUp}
           isDesktop={isDesktop}
-          paged={paged}
           scroll={scroll}
           emptyContent={emptyContent}
           isSubAccount={isSubAccount}

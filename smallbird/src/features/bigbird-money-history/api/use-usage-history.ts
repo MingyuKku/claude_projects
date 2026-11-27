@@ -1,11 +1,12 @@
 import useSWR from "swr";
 
 import { MEDIA_QUERY } from "@/shared/config";
-import { useInfinitePages, useMediaQuery } from "@/shared/lib";
+import { useInfinitePages, useListSync, useMediaQuery } from "@/shared/lib";
 
 import { useKeepDetail } from "../lib/use-keep-detail";
 import { useUsageListParams } from "../lib/use-usage-list-params";
 import { fetchUsageList } from "./usage-api";
+import { USAGE_SYNC } from "./use-history-sync";
 
 import type { UsageQuery } from "../model/usage-types";
 
@@ -28,8 +29,7 @@ export function useUsageHistory(
   return { list: data, isLoading, isError: Boolean(error), mutate };
 }
 
-/** 사용 내역을 쪽 나눔 없이 이어 읽는 스크롤 목록(MO). 조건이 바뀌면 처음부터 다시 읽음. */
-export function useUsageScrollList(
+function useUsageScrollPages(
   baseQuery: UsageBaseQuery,
   isEnabled: boolean,
   { revalidateIfStale = true }: { revalidateIfStale?: boolean } = {},
@@ -39,6 +39,24 @@ export function useUsageScrollList(
     (page) => fetchUsageList({ ...baseQuery, page }),
     { isEnabled, revalidateIfStale },
   );
+}
+
+/**
+ * 사용 내역을 쪽 나눔 없이 이어 읽는 스크롤 목록(MO). 조건이 바뀌면 처음부터 다시 읽음.
+ * 캐시가 있으면 다시 보일 때 읽지 않고, 빅버드 머니 화면에 다시 들어왔을 때만 읽어 둔 쪽을 모두 다시 읽음(`useListSync`).
+ * 충전·운영자 출금처럼 이 앱 밖에서도 내역이 생겨 바뀐 것만 골라 읽을 수 없음.
+ */
+export function useUsageScrollList(
+  baseQuery: UsageBaseQuery,
+  isEnabled: boolean,
+) {
+  const list = useUsageScrollPages(baseQuery, isEnabled);
+  useListSync(USAGE_SYNC, JSON.stringify(baseQuery), {
+    isEnabled,
+    hasData: list.hasData,
+    reload: list.reload,
+  });
+  return list;
 }
 
 /**
@@ -54,7 +72,8 @@ export function useUsageRecord(id: string | null) {
     isReady && isTabletUp ? { ...baseQuery, page: params.page } : null,
     { revalidateIfStale: false },
   );
-  const scroll = useUsageScrollList(baseQuery, isReady && !isTabletUp, {
+  // 목록의 다시 읽기(`useListSync`)는 목록이 맡고, 상세는 캐시만 씀.
+  const scroll = useUsageScrollPages(baseQuery, isReady && !isTabletUp, {
     revalidateIfStale: false,
   });
   const records = isTabletUp ? (paged.list?.records ?? []) : scroll.records;

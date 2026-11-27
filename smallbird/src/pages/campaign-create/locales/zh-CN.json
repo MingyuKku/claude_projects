@@ -39,7 +39,7 @@
   "action": {
     "demo": "体验演示",
     "subscribe": "订阅",
-    "inUse": "使用中",
+    "register": "注册活动",
     "comingSoonButton": "筹备中",
     "demoRegister": "注册演示活动"
   },

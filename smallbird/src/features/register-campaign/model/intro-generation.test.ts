@@ -1,6 +1,5 @@
 import { createEmptyDraft } from "@/entities/campaign";
 
-import { addHashtag } from "./hashtags";
 import { createRegisterWizardStore } from "./store";
 
 import type { CampaignDetail, CampaignDraft } from "@/entities/campaign";
@@ -96,16 +95,5 @@ describe("AI 소개서 생성", () => {
 
     expect(store.getState().draft.intro).toEqual(createEmptyDraft().intro);
     expect(store.getState().introAi.hasResult).toBe(false);
-  });
-});
-
-describe("addHashtag", () => {
-  it("앞뒤 공백과 #을 떼고 더한다", () => {
-    expect(addHashtag(["협찬"], "  #체험단 ")).toEqual(["협찬", "체험단"]);
-  });
-
-  it("빈 값이나 같은 칸에 있는 값은 더하지 않는다", () => {
-    expect(addHashtag(["협찬"], "협찬")).toEqual(["협찬"]);
-    expect(addHashtag(["협찬"], " # ")).toEqual(["협찬"]);
   });
 });

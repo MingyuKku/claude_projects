@@ -1,0 +1,28 @@
+{
+  "title": "Posting guide preview",
+  "notice": "This is the posting guide that will be sent to the selected creators.",
+  "campaign": {
+    "title": "Campaign info",
+    "name": "Campaign name",
+    "type": "Campaign type",
+    "period": "Period",
+    "code": "Campaign code",
+    "brandName": "Brand name",
+    "brandImage": "Brand image"
+  },
+  "basic": {
+    "title": "Basic conditions",
+    "photoCount": "Photos (min.)",
+    "photoUnit": "or more",
+    "videoCount": "Videos (min.)",
+    "videoUnit": "or more",
+    "keywords": "Required keywords",
+    "hashtags": "Required hashtags",
+    "notice": "Notes",
+    "referenceUrl": "Reference URL"
+  },
+  "examples": {
+    "title": "Example images/videos",
+    "contentGuide": "Content overview"
+  }
+}

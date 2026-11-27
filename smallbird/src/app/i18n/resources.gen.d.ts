@@ -6,6 +6,7 @@ import type entitiesCreator from "../../entities/creator/locales/ko.json";
 import type entitiesSubscription from "../../entities/subscription/locales/ko.json";
 import type featuresBigbirdMoneyHistory from "../../features/bigbird-money-history/locales/ko.json";
 import type featuresBrowseSubscriptionPlans from "../../features/browse-subscription-plans/locales/ko.json";
+import type featuresCampaignMatching from "../../features/campaign-matching/locales/ko.json";
 import type featuresChangePassword from "../../features/change-password/locales/ko.json";
 import type featuresChargeBigbirdMoney from "../../features/charge-bigbird-money/locales/ko.json";
 import type featuresCheckoutSubscription from "../../features/checkout-subscription/locales/ko.json";
@@ -40,7 +41,9 @@ import type featuresSwitchAccount from "../../features/switch-account/locales/ko
 import type featuresViewSubscriptionUsage from "../../features/view-subscription-usage/locales/ko.json";
 import type featuresWithdrawAccount from "../../features/withdraw-account/locales/ko.json";
 import type featuresWithdrawBigbirdMoney from "../../features/withdraw-bigbird-money/locales/ko.json";
+import type featuresWritePostingGuide from "../../features/write-posting-guide/locales/ko.json";
 import type pagesCampaignCreate from "../../pages/campaign-create/locales/ko.json";
+import type pagesCampaignGuidePreview from "../../pages/campaign-guide-preview/locales/ko.json";
 import type pagesCampaignProgress from "../../pages/campaign-progress/locales/ko.json";
 import type pagesCampaignRegister from "../../pages/campaign-register/locales/ko.json";
 import type pagesCampaignStatus from "../../pages/campaign-status/locales/ko.json";
@@ -83,6 +86,7 @@ declare module "i18next" {
       "entities/subscription": typeof entitiesSubscription;
       "features/bigbird-money-history": typeof featuresBigbirdMoneyHistory;
       "features/browse-subscription-plans": typeof featuresBrowseSubscriptionPlans;
+      "features/campaign-matching": typeof featuresCampaignMatching;
       "features/change-password": typeof featuresChangePassword;
       "features/charge-bigbird-money": typeof featuresChargeBigbirdMoney;
       "features/checkout-subscription": typeof featuresCheckoutSubscription;
@@ -117,7 +121,9 @@ declare module "i18next" {
       "features/view-subscription-usage": typeof featuresViewSubscriptionUsage;
       "features/withdraw-account": typeof featuresWithdrawAccount;
       "features/withdraw-bigbird-money": typeof featuresWithdrawBigbirdMoney;
+      "features/write-posting-guide": typeof featuresWritePostingGuide;
       "pages/campaign-create": typeof pagesCampaignCreate;
+      "pages/campaign-guide-preview": typeof pagesCampaignGuidePreview;
       "pages/campaign-progress": typeof pagesCampaignProgress;
       "pages/campaign-register": typeof pagesCampaignRegister;
       "pages/campaign-status": typeof pagesCampaignStatus;

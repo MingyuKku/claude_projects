@@ -174,8 +174,6 @@ export function CreatorSearchPage() {
           className="flex-1 py-10"
         />
       }
-      isProfileCompact
-      layout="search"
       platformCode={platform?.code ?? undefined}
       sort={sort}
       onClickSort={(key) =>

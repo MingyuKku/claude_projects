@@ -11,6 +11,10 @@ import {
   campaignPaymentErrorSchema,
   campaignReapprovalRequestedSchema,
 } from "../model/detail-schema";
+import {
+  markCampaignContentChanged,
+  markCampaignListChanged,
+} from "../model/list-changes";
 import { SERVER_STEP_PATHS } from "../model/server-steps";
 
 import type { CampaignProductType, CampaignServiceType } from "../model/codes";
@@ -21,15 +25,17 @@ import type {
   CampaignPolicyAgreements,
 } from "../model/draft";
 
-/** A-1 `POST /v3/campaign`. 등록 화면에 들어올 때 한 번 부름(서버가 중복 생성을 막지 않음). */
+/** A-1 `POST /v3/campaign`. 등록 진입 주소의 loader가 부름. */
 export async function createCampaign(input: {
   serviceType: CampaignServiceType;
   productType: CampaignProductType;
   demo: boolean;
 }) {
-  return campaignCreatedSchema.parse(
+  const created = campaignCreatedSchema.parse(
     await serverApiV3.post("/campaign", input),
   );
+  markCampaignListChanged();
+  return created;
 }
 
 /** A-3 `GET /v3/campaign/{campaignIdx}`. 이어 쓰기·등록 내역이 함께 씀. */
@@ -58,6 +64,7 @@ export async function saveCampaignStep(
     `/campaign/${campaignIdx}/${SERVER_STEP_PATHS[step]}`,
     toStepRequest(step, draft),
   );
+  markCampaignContentChanged(campaignIdx);
   if (step === "info") campaignInfoSavedSchema.parse(response);
 }
 
@@ -69,6 +76,7 @@ export async function copyCampaign(
   await serverApiV3.post(`/campaign/${campaignIdx}/copy`, {
     sourceCampaignIdx,
   });
+  markCampaignContentChanged(campaignIdx);
 }
 
 /**
@@ -79,9 +87,11 @@ export async function payCampaign(
   campaignIdx: number,
   body: { expectedTotalAmount: number; agreements: CampaignPolicyAgreements },
 ) {
-  return campaignPaidSchema.parse(
+  const paid = campaignPaidSchema.parse(
     await serverApiV3.post(`/campaign/${campaignIdx}/payment`, body),
   );
+  markCampaignListChanged();
+  return paid;
 }
 
 /** 결제 실패 본문의 오류 코드와 빈 단계(서버 경로 이름). API 오류가 아니거나 모양이 다르면 null. */
@@ -97,9 +107,11 @@ export function readCampaignPaymentError(error: unknown) {
 
 /** `POST /v3/campaign/{campaignIdx}/payment/cancel`. 결제 금액 전액을 빅버드 머니로 환불하고 등록 중으로 돌림. */
 export async function cancelCampaignApproval(campaignIdx: number) {
-  return campaignApprovalCanceledSchema.parse(
+  const canceled = campaignApprovalCanceledSchema.parse(
     await serverApiV3.post(`/campaign/${campaignIdx}/payment/cancel`),
   );
+  markCampaignListChanged();
+  return canceled;
 }
 
 /**
@@ -110,11 +122,13 @@ export async function requestCampaignReapproval(
   campaignIdx: number,
   agreements: CampaignPolicyAgreements,
 ) {
-  return campaignReapprovalRequestedSchema.parse(
+  const requested = campaignReapprovalRequestedSchema.parse(
     await serverApiV3.post(`/campaign/${campaignIdx}/approval`, {
       agreements,
     }),
   );
+  markCampaignListChanged();
+  return requested;
 }
 
 /**
@@ -127,19 +141,22 @@ export async function reviewCampaignForDev(
 ) {
   if (decision.type === "approve") {
     await serverApiV3.post(`/campaign/${campaignIdx}/test/approve`);
-    return;
+  } else {
+    await serverApiV3.post(`/campaign/${campaignIdx}/test/reject`, {
+      rejectReason: decision.reason,
+    });
   }
-  await serverApiV3.post(`/campaign/${campaignIdx}/test/reject`, {
-    rejectReason: decision.reason,
-  });
+  markCampaignListChanged();
 }
 
 /** `POST /v3/campaign/{campaignIdx}/demo/complete`. 데모 작성을 마침(결제·승인 요청 없음). 이후 수정할 수 없음. */
 export async function completeCampaignDemo(campaignIdx: number) {
   await serverApiV3.post(`/campaign/${campaignIdx}/demo/complete`);
+  markCampaignContentChanged(campaignIdx);
 }
 
 /** `POST /v3/campaign/{campaignIdx}/demo/convert`. 작성을 마친 데모를 실제 등록 중 캠페인으로 바꿈(구독 필요). */
 export async function convertCampaignDemo(campaignIdx: number) {
   await serverApiV3.post(`/campaign/${campaignIdx}/demo/convert`);
+  markCampaignListChanged();
 }

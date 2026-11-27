@@ -39,7 +39,7 @@
   "action": {
     "demo": "デモを体験する",
     "subscribe": "サブスク申込",
-    "inUse": "利用中",
+    "register": "キャンペーンを登録",
     "comingSoonButton": "準備中",
     "demoRegister": "デモキャンペーンを登録"
   },

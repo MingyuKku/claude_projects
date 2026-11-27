@@ -29,6 +29,7 @@ export const ROUTES = {
   campaignDetail: "/campaign/:campaignIdx",
   // 캠페인 진행(승인 뒤). 단계가 없으면 기본정보.
   campaignProgress: "/campaign/:campaignIdx/progress/:step?",
+  campaignGuidePreview: "/campaign/:campaignIdx/progress/guide/preview",
   mypageSubscribe: "/mypage/subscribe",
   mypageMoney: "/mypage/money",
   mypageAccount: "/mypage/account",

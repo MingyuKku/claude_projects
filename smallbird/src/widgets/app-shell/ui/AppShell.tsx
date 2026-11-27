@@ -15,6 +15,7 @@ import { Sheet, SheetContent, SheetTitle } from "@/shared/ui/sheet";
 import { CLIENT_GUIDE_URL } from "../model/navigation";
 import { NavigationContext } from "../model/navigation-context";
 import { useSidebarStore } from "../model/sidebar-store";
+import { TopSlotContext } from "../model/top-slot-context";
 import { useKeyboardAwareShell } from "../model/useKeyboardAwareShell";
 import { useMobileMenu } from "../model/useMobileMenu";
 import { useScrollRestoration } from "../model/useScrollRestoration";
@@ -98,6 +99,8 @@ export function AppShell({
     isFittedToViewport,
   } = useKeyboardAwareShell(isKeyboardAware);
   const mainRef = useRef<HTMLElement>(null);
+  // 본문 위 고정 영역(ShellTopSlot). 노드가 붙으면 상태로 알려 자식이 같은 커밋 안에서 옮겨 그려짐.
+  const [topSlot, setTopSlot] = useState<HTMLElement | null>(null);
   useScrollRestoration(mainRef);
   useWebPush(session);
   const [isLoginAlertOpen, setIsLoginAlertOpen] = useState(false);
@@ -212,114 +215,119 @@ export function AppShell({
 
   return (
     <NavigationContext value={navigationContextValue}>
-      <div
-        {...keyboardRootProps}
-        className={cn(
-          // --keyboard-anchor-gap: 키보드가 열릴 때 [data-keyboard-anchor]를 키보드 위로 띄우는 여백. 본문이 scroll-margin-bottom이나 아래 패딩으로 씀.
-          "flex h-dvh overflow-hidden bg-background [--keyboard-anchor-gap:--spacing(4)]",
-          // 본문 아래 끝이 흐려질 때 비치는 셸 배경을 셸 아래 블록과 같게 해 이음매 없이 이어지게 함.
-          isFittedToViewport && keyboardGapClassName,
-          className,
-        )}
-      >
-        <div className="hidden shrink-0 desktop:block">
-          {isSidebarOverlay ? (
+      <TopSlotContext value={topSlot}>
+        <div
+          {...keyboardRootProps}
+          className={cn(
+            // --keyboard-anchor-gap: 키보드가 열릴 때 [data-keyboard-anchor]를 키보드 위로 띄우는 여백. 본문이 scroll-margin-bottom이나 아래 패딩으로 씀.
+            "flex h-dvh overflow-hidden bg-background [--keyboard-anchor-gap:--spacing(4)]",
+            // 본문 아래 끝이 흐려질 때 비치는 셸 배경을 셸 아래 블록과 같게 해 이음매 없이 이어지게 함.
+            isFittedToViewport && keyboardGapClassName,
+            className,
+          )}
+        >
+          <div className="hidden shrink-0 desktop:block">
+            {isSidebarOverlay ? (
+              <SidebarNav
+                {...sidebarProps}
+                navLabel={t("menu.main")}
+                isCollapsed
+                toggleLabel={t("menu.openFull")}
+                onClickRailGroup={handleClickOverlayRailGroup}
+                onClickToggle={handleOpenFullMenu}
+              />
+            ) : (
+              <SidebarNav
+                {...sidebarProps}
+                navLabel={t("menu.main")}
+                isCollapsed={isCollapsed}
+                toggleLabel={
+                  isCollapsed ? t("menu.expand") : t("menu.collapse")
+                }
+                onClickRailGroup={handleClickDesktopRailGroup}
+                onClickToggle={handleToggleDesktopSidebar}
+              />
+            )}
+          </div>
+          <div className="hidden shrink-0 tablet:block desktop:hidden">
             <SidebarNav
               {...sidebarProps}
-              navLabel={t("menu.main")}
+              navLabel={t("menu.collapsed")}
+              // Figma TAB 프레임의 Sidebar는 57px(11315:49878). 디자인 시스템 접힘 레일(PC)은 56이라 TAB 레일에서만 맞춤.
+              className="w-14.25"
               isCollapsed
               toggleLabel={t("menu.openFull")}
               onClickRailGroup={handleClickOverlayRailGroup}
               onClickToggle={handleOpenFullMenu}
             />
-          ) : (
-            <SidebarNav
-              {...sidebarProps}
-              navLabel={t("menu.main")}
-              isCollapsed={isCollapsed}
-              toggleLabel={isCollapsed ? t("menu.expand") : t("menu.collapse")}
-              onClickRailGroup={handleClickDesktopRailGroup}
-              onClickToggle={handleToggleDesktopSidebar}
-            />
-          )}
-        </div>
-        <div className="hidden shrink-0 tablet:block desktop:hidden">
-          <SidebarNav
-            {...sidebarProps}
-            navLabel={t("menu.collapsed")}
-            // Figma TAB 프레임의 Sidebar는 57px(11315:49878). 디자인 시스템 접힘 레일(PC)은 56이라 TAB 레일에서만 맞춤.
-            className="w-14.25"
-            isCollapsed
-            toggleLabel={t("menu.openFull")}
-            onClickRailGroup={handleClickOverlayRailGroup}
-            onClickToggle={handleOpenFullMenu}
-          />
-        </div>
-        <div className="flex min-w-0 flex-1 flex-col">
-          <AppHeader
-            title={headerTitle}
-            icon={icon ?? <currentNavItem.icon />}
-            isTitleVisibleOnMobile={isTitleVisibleOnMobile}
-            menuLabel={t("menu.open")}
-            onClickMenu={handleOpenFullMenu}
-          >
-            <ShellHeaderActions
-              session={session}
-              onClickGuide={handleClickGuide}
-            />
-          </AppHeader>
-          <div className="relative flex min-h-0 flex-1 flex-col">
-            <main
-              ref={mainRef}
-              className={cn(
-                "scrollbar-hidden min-h-0 flex-1 overflow-auto",
-                mainClassName ?? "p-5",
-                isCustomerCenterPath && CUSTOMER_CENTER_MAIN_CLASS,
-                isFittedToViewport && KEYBOARD_FITTED_MAIN_CLASS,
-              )}
-            >
-              {children}
-            </main>
-            <OverlayScrollbar scrollerRef={mainRef} />
           </div>
+          <div className="flex min-w-0 flex-1 flex-col">
+            <AppHeader
+              title={headerTitle}
+              icon={icon ?? <currentNavItem.icon />}
+              isTitleVisibleOnMobile={isTitleVisibleOnMobile}
+              menuLabel={t("menu.open")}
+              onClickMenu={handleOpenFullMenu}
+            >
+              <ShellHeaderActions
+                session={session}
+                onClickGuide={handleClickGuide}
+              />
+            </AppHeader>
+            <div ref={setTopSlot} className="shrink-0 empty:hidden" />
+            <div className="relative flex min-h-0 flex-1 flex-col">
+              <main
+                ref={mainRef}
+                className={cn(
+                  "scrollbar-hidden min-h-0 flex-1 overflow-auto",
+                  mainClassName ?? "p-5",
+                  isCustomerCenterPath && CUSTOMER_CENTER_MAIN_CLASS,
+                  isFittedToViewport && KEYBOARD_FITTED_MAIN_CLASS,
+                )}
+              >
+                {children}
+              </main>
+              <OverlayScrollbar scrollerRef={mainRef} />
+            </div>
+          </div>
+          <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
+            <SheetContent
+              side="left"
+              overlayClassName="bg-foreground/10"
+              showCloseButton={false}
+              // 오른쪽 선은 SidebarNav 안쪽 그림자 1px 이 그림(Figma Sidebar: 선 1px, 그림자 없음).
+              className="w-57.5 border-r-0 shadow-none"
+              aria-describedby={undefined}
+              onCloseAutoFocus={handleCloseAutoFocus}
+            >
+              <SheetTitle className="sr-only">{t("menu.full")}</SheetTitle>
+              <SidebarNav
+                {...sidebarProps}
+                navLabel={t("menu.full")}
+                className="w-full"
+                toggleLabel={t("menu.close")}
+                onClickToggle={closeMenu}
+              />
+            </SheetContent>
+          </Sheet>
         </div>
-        <Sheet open={isMenuOpen} onOpenChange={setIsMenuOpen}>
-          <SheetContent
-            side="left"
-            overlayClassName="bg-foreground/10"
-            showCloseButton={false}
-            // 오른쪽 선은 SidebarNav 안쪽 그림자 1px 이 그림(Figma Sidebar: 선 1px, 그림자 없음).
-            className="w-57.5 border-r-0 shadow-none"
-            aria-describedby={undefined}
-            onCloseAutoFocus={handleCloseAutoFocus}
-          >
-            <SheetTitle className="sr-only">{t("menu.full")}</SheetTitle>
-            <SidebarNav
-              {...sidebarProps}
-              navLabel={t("menu.full")}
-              className="w-full"
-              toggleLabel={t("menu.close")}
-              onClickToggle={closeMenu}
-            />
-          </SheetContent>
-        </Sheet>
-      </div>
-      <LoginRequiredAlert
-        open={isLoginAlertOpen}
-        onCancel={() => setIsLoginAlertOpen(false)}
-        onLogin={() => {
-          setIsLoginAlertOpen(false);
-          closeMenu();
-          void navigate(ROUTES.login);
-        }}
-      />
-      {gapPaintStyle && (
-        <div
-          aria-hidden
-          className={keyboardGapClassName}
-          style={gapPaintStyle}
+        <LoginRequiredAlert
+          open={isLoginAlertOpen}
+          onCancel={() => setIsLoginAlertOpen(false)}
+          onLogin={() => {
+            setIsLoginAlertOpen(false);
+            closeMenu();
+            void navigate(ROUTES.login);
+          }}
         />
-      )}
+        {gapPaintStyle && (
+          <div
+            aria-hidden
+            className={keyboardGapClassName}
+            style={gapPaintStyle}
+          />
+        )}
+      </TopSlotContext>
     </NavigationContext>
   );
 }

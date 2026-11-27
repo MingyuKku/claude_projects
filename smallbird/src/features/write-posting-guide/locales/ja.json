@@ -1,0 +1,65 @@
+{
+  "title": "投稿ガイド作成",
+  "method": {
+    "label": "作成方法",
+    "ai": {
+      "title": "AI投稿ガイド作成",
+      "description": "入力した情報をもとにAIが投稿ガイドを自動で作成します。"
+    },
+    "manual": {
+      "title": "自分で作成",
+      "description": "内容を直接入力して投稿ガイドを作成します。"
+    },
+    "inUse": "利用中",
+    "needsPayment": "決済が必要",
+    "serviceInUse": "AIサービス利用中"
+  },
+  "tab": {
+    "basic": "基本条件設定",
+    "examples": "例の画像/動画添付"
+  },
+  "basic": {
+    "title": "基本条件設定",
+    "photoCount": "写真数(最小)",
+    "photoUnit": "枚以上",
+    "videoCount": "動画数(最小)",
+    "videoUnit": "本以上",
+    "keywords": "必須キーワード",
+    "keywordsPlaceholder": "キーワードを入力してください。",
+    "hashtags": "必須ハッシュタグ",
+    "hashtagsPlaceholder": "ハッシュタグを入力してください。",
+    "removeKeyword": "{{keyword}}を削除",
+    "notice": "注意事項",
+    "noticePlaceholder": "注意事項を入力してください。",
+    "referenceUrl": "参考URL",
+    "referenceUrlPlaceholder": "参考URLを入力してください。",
+    "addUrl": "追加",
+    "removeUrl": "削除"
+  },
+  "action": {
+    "skip": "スキップ",
+    "preview": "プレビュー",
+    "saveDraft": "一時保存",
+    "confirm": "ガイド確定",
+    "generateAi": "AI投稿ガイドを作成"
+  },
+  "toast": {
+    "saved": "一時保存しました。",
+    "saveFailed": "保存できませんでした。もう一度お試しください。"
+  },
+  "dialog": {
+    "skip": {
+      "title": "投稿ガイドをスキップ",
+      "description": "ガイド作成は任意です。ガイドがないとクリエイターの投稿の質が下がる場合があります。また、AI投稿ガイドを既に利用した場合、その利用料金は返金されません。",
+      "action": "スキップ"
+    },
+    "confirm": {
+      "title": "投稿ガイド登録完了",
+      "description": "作成した投稿ガイドが登録されました。"
+    }
+  },
+  "examples": {
+    "contentGuide": "コンテンツ概要",
+    "contentGuidePlaceholder": "コンテンツの概要を入力してください。"
+  }
+}

@@ -48,8 +48,15 @@ export {
 } from "./kmc";
 export type { KmcRequestToken, KmcResult } from "./kmc";
 export { fromIsoDate, toDateRange, toIsoDate } from "./date-range";
-export { infinitePagesCacheKey, useInfinitePages } from "./useInfinitePages";
+export { getStepsBackTo, trackHistoryTrail } from "./history-trail";
+export { useInfinitePages } from "./useInfinitePages";
 export type { PagedResult } from "./useInfinitePages";
+export {
+  markListsStale,
+  resetListSync,
+  useListSync,
+  useMarkListsStaleOnLeave,
+} from "./list-sync";
 export { registerMockFile } from "./mock-files";
 export type { MockFile } from "./mock-files";
 export { NotFoundError } from "./not-found-error";

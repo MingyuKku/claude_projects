@@ -1,0 +1,28 @@
+{
+  "title": "投稿ガイドのプレビュー",
+  "notice": "以下は選択したクリエイターに届く投稿ガイドです。",
+  "campaign": {
+    "title": "キャンペーン情報",
+    "name": "キャンペーン名",
+    "type": "キャンペーン種類",
+    "period": "実施期間",
+    "code": "キャンペーンコード",
+    "brandName": "ブランド名",
+    "brandImage": "ブランド画像"
+  },
+  "basic": {
+    "title": "基本条件設定",
+    "photoCount": "写真数(最小)",
+    "photoUnit": "枚以上",
+    "videoCount": "動画数(最小)",
+    "videoUnit": "本以上",
+    "keywords": "必須キーワード",
+    "hashtags": "必須ハッシュタグ",
+    "notice": "注意事項",
+    "referenceUrl": "参考URL"
+  },
+  "examples": {
+    "title": "例の画像/動画",
+    "contentGuide": "コンテンツ概要"
+  }
+}

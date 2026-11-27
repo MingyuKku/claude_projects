@@ -1,0 +1,28 @@
+{
+  "title": "포스팅 가이드 미리보기",
+  "notice": "아래 내용은 선택한 크리에이터에게 전달될 포스팅 가이드입니다.",
+  "campaign": {
+    "title": "캠페인 정보",
+    "name": "캠페인명",
+    "type": "캠페인 유형",
+    "period": "진행 기간",
+    "code": "캠페인 코드",
+    "brandName": "브랜드 명",
+    "brandImage": "브랜드 이미지"
+  },
+  "basic": {
+    "title": "기본 조건 설정",
+    "photoCount": "사진 수 (최소)",
+    "photoUnit": "장 이상",
+    "videoCount": "영상 수 (최소)",
+    "videoUnit": "개 이상",
+    "keywords": "필수 키워드",
+    "hashtags": "필수 해시태그",
+    "notice": "유의사항",
+    "referenceUrl": "참고 URL"
+  },
+  "examples": {
+    "title": "예시 이미지/영상 첨부",
+    "contentGuide": "콘텐츠 개요"
+  }
+}

@@ -3,14 +3,16 @@ import useSWR, { useSWRConfig } from "swr";
 
 import { MEDIA_QUERY } from "@/shared/config";
 import {
-  infinitePagesCacheKey,
+  markListsStale,
   useInfinitePages,
+  useListSync,
   useMediaQuery,
 } from "@/shared/lib";
 
 import { useChargeListParams } from "../lib/use-charge-list-params";
 import { useKeepDetail } from "../lib/use-keep-detail";
 import { fetchChargeList } from "./charge-api";
+import { CHARGE_SYNC } from "./use-history-sync";
 
 import type { ChargeQuery } from "../model/charge-types";
 
@@ -33,8 +35,7 @@ export function useChargeHistory(
   return { list: data, isLoading, isError: Boolean(error), mutate };
 }
 
-/** 충전/출금 내역을 쪽 나눔 없이 이어 읽는 스크롤 목록(MO). 조건이 바뀌면 처음부터 다시 읽음. */
-export function useChargeScrollList(
+function useChargeScrollPages(
   baseQuery: ChargeBaseQuery,
   isEnabled: boolean,
   { revalidateIfStale = true }: { revalidateIfStale?: boolean } = {},
@@ -44,6 +45,24 @@ export function useChargeScrollList(
     (page) => fetchChargeList({ ...baseQuery, page }),
     { isEnabled, revalidateIfStale },
   );
+}
+
+/**
+ * 충전/출금 내역을 쪽 나눔 없이 이어 읽는 스크롤 목록(MO). 조건이 바뀌면 처음부터 다시 읽음.
+ * 캐시가 있으면 다시 보일 때 읽지 않고, 빅버드 머니 화면에 다시 들어왔을 때와 `useReloadChargeHistory`를 불렀을 때
+ * 읽어 둔 쪽을 모두 다시 읽음(`useListSync`). 입금·운영자 출금처럼 이 앱 밖에서 바뀌어 바뀐 것만 골라 읽을 수 없음.
+ */
+export function useChargeScrollList(
+  baseQuery: ChargeBaseQuery,
+  isEnabled: boolean,
+) {
+  const list = useChargeScrollPages(baseQuery, isEnabled);
+  useListSync(CHARGE_SYNC, JSON.stringify(baseQuery), {
+    isEnabled,
+    hasData: list.hasData,
+    reload: list.reload,
+  });
+  return list;
 }
 
 /**
@@ -58,7 +77,8 @@ export function useChargeRecord(id: string | null) {
     id !== null && isTabletUp ? { ...baseQuery, page: params.page } : null,
     { revalidateIfStale: false },
   );
-  const scroll = useChargeScrollList(baseQuery, id !== null && !isTabletUp, {
+  // 목록의 다시 읽기(`useListSync`)는 목록이 맡고, 상세는 캐시만 씀.
+  const scroll = useChargeScrollPages(baseQuery, id !== null && !isTabletUp, {
     revalidateIfStale: false,
   });
   const records = isTabletUp ? (paged.list?.records ?? []) : scroll.records;
@@ -68,26 +88,18 @@ export function useChargeRecord(id: string | null) {
 }
 
 /**
- * 충전·출금 요청이 접수된 뒤 충전/출금 내역을 다시 읽음. 쪽 나눔 목록은 조건과 관계없이 모두, MO 스크롤 목록은 지금 조건의 것
- * (SWR의 키 골라 갱신은 스크롤 목록 키를 건너뛰어 지금 조건의 키를 직접 지정함).
+ * 충전·출금 요청이 접수된 뒤 충전/출금 내역을 다시 읽음. 쪽 나눔 목록은 조건과 관계없이 모두 전역 `mutate`로 읽음.
+ * MO 스크롤 목록은 전역 `mutate`로는 이어 읽은 쪽을 다시 읽지 못해, 낡았다고 표시해 보이는 목록이 읽어 둔 쪽을 모두 다시 읽게 함
+ * (보이지 않는 조건의 목록은 다음에 보일 때).
  */
 export function useReloadChargeHistory() {
   const { mutate } = useSWRConfig();
-  const { baseQuery } = useChargeListParams();
-  const scrollCacheKey = infinitePagesCacheKey([
-    ...CHARGE_SCROLL_KEY,
-    baseQuery,
-  ]);
-  return useCallback(
-    () =>
-      Promise.all([
-        mutate(
-          (key) =>
-            Array.isArray(key) &&
-            CHARGE_KEY.every((part, index) => key[index] === part),
-        ),
-        mutate(scrollCacheKey),
-      ]),
-    [mutate, scrollCacheKey],
-  );
+  return useCallback(() => {
+    markListsStale(CHARGE_SYNC);
+    return mutate(
+      (key) =>
+        Array.isArray(key) &&
+        CHARGE_KEY.every((part, index) => key[index] === part),
+    );
+  }, [mutate]);
 }

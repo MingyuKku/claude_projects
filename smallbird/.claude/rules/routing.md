@@ -18,7 +18,7 @@ React Router는 **data mode**(`createBrowserRouter` + `RouterProvider`)로 `app`
 
 ## 데이터
 
-서버 데이터는 route `loader`/`action`이 아니라 각 슬라이스의 SWR 훅이 가져옵니다. 데이터의 소유자를 `entities`/`features` 한 곳으로 두고 캐시를 SWR 하나로 통일하기 위해서입니다. `loader`는 리다이렉트나 **화면 진입 여부를 정하는 값(세션)을 화면에 넘기는 용도**에만 씁니다. 리다이렉트 판단에 서버 데이터가 필요하면 loader가 슬라이스의 fetcher로 읽되, 화면 캐시를 둘로 만들지 않게 읽은 값은 SWR 캐시로 넘깁니다. URL 상태(페이지, 검색어, 탭)는 `useSearchParams`입니다.
+서버 데이터는 route `loader`/`action`이 아니라 각 슬라이스의 SWR 훅이 가져옵니다. 데이터의 소유자를 `entities`/`features` 한 곳으로 두고 캐시를 SWR 하나로 통일하기 위해서입니다. `loader`는 리다이렉트나 **화면 진입 여부를 정하는 값(세션)을 화면에 넘기는 용도**에만 씁니다. 리다이렉트 판단에 서버 데이터가 필요하면 loader가 슬라이스의 fetcher로 읽되, 화면 캐시를 둘로 만들지 않게 읽은 값은 SWR 캐시로 넘깁니다. 예외로, 주소로 들어오면 서버에 새로 만들고 바로 그 화면으로 보내는 진입 라우트(캠페인 등록 `?type=`)는 loader가 만들고 리다이렉트합니다. 렌더 뒤 effect로 만들면 그동안 빈 화면이 보이고 떠난 뒤에도 끌려오기 때문이며, 이런 loader는 다시 돌면 하나가 더 생기므로 `shouldRevalidate`로 막습니다. URL 상태(페이지, 검색어, 탭)는 `useSearchParams`입니다.
 
 ## 인증·권한 가드
 

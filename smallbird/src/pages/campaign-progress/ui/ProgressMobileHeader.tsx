@@ -11,11 +11,14 @@ import { Sheet, SheetClose, SheetContent, SheetTitle } from "@/shared/ui/sheet";
 import { ProgressStepNav } from "./ProgressStepNav";
 
 import type { CampaignDetail, CampaignProgressStep } from "@/entities/campaign";
+import type { ReactNode } from "react";
 
 interface ProgressMobileHeaderProps {
   detail: CampaignDetail;
   currentStep: CampaignProgressStep | null;
   title: string;
+  /** 오른쪽 버튼(단계마다 다름, 예: 가이드의 건너뛰기·미리보기). */
+  actions?: ReactNode;
 }
 
 // MO 헤더(시안 13288:433453): 햄버거 + 지금 단계 이름. 드로어는 왼쪽 222px(13288:433622), 단계를 고르면 닫힘.
@@ -23,6 +26,7 @@ export function ProgressMobileHeader({
   detail,
   currentStep,
   title,
+  actions,
 }: ProgressMobileHeaderProps) {
   const { t } = useTranslation("pages/campaign-progress");
   const { t: tCommon } = useTranslation();
@@ -46,6 +50,7 @@ export function ProgressMobileHeader({
             <h2 className="truncate">{title}</h2>
           </span>
         }
+        actions={actions}
       />
       <Sheet open={isDrawerOpen} onOpenChange={setIsDrawerOpen}>
         <SheetContent

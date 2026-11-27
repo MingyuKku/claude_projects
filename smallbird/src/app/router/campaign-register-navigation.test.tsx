@@ -71,8 +71,29 @@ function createInfoCompleteCampaign(name: string, status = "DRAFT") {
   });
 }
 
+function subscription(productType: string) {
+  return {
+    id: "s1",
+    productType,
+    productName: productType,
+    startedAt: "2026-11-01",
+    endsAt: "2026-12-01",
+    amount: 100000,
+    paymentMethod: "card",
+    isCancelScheduled: false,
+  };
+}
+
+function mockSubscriptions(productTypes: string[]) {
+  mockV3Get((path, ...rest) =>
+    path === "/mypage/subscription/subscriptions"
+      ? Promise.resolve(productTypes.map(subscription))
+      : fake.get(path, rest[0]),
+  );
+}
+
 beforeEach(() => {
-  useCampaignStatusReturnStore.getState().remember("");
+  useCampaignStatusReturnStore.setState({ search: "", entryKey: null });
   resetSession(session);
   fake = createCampaignServerFake(FIRST_NEW_IDX);
   fake.seed(createFilledDetailResponse(3, { demo: true, demoCompleted: true }));
@@ -124,6 +145,106 @@ describe("캠페인 등록 진입", () => {
       expect(
         screen.getByRole("heading", { name: "캠페인 등록" }),
       ).toBeInTheDocument(),
+    );
+    expect(fake.created()).toEqual([FIRST_NEW_IDX]);
+  });
+
+  // 생성 요청을 붙잡아 두고, 돌려주는 함수를 부르면 응답함.
+  function holdCreate() {
+    let release = () => {};
+    const gate = new Promise<void>((resolve) => {
+      release = resolve;
+    });
+    vi.mocked(serverApiV3.post).mockImplementation((async (
+      path: string,
+      body?: never,
+    ) => {
+      if (path === "/campaign") await gate;
+      return fake.post(path, body);
+    }) as never);
+    return release;
+  }
+
+  async function openPickProducts() {
+    mockSubscriptions(["pick"]);
+    const router = await renderRoute(`${ROUTES.campaignCreate}?service=pick`);
+    const heading = await screen.findByRole("heading", {
+      name: "캠페인 상품 선택",
+    });
+    const section = heading.closest("section");
+    if (!section) throw new Error("product section not found");
+    return { router, products: within(section) };
+  }
+
+  async function waitForCreateRequest() {
+    await waitFor(() =>
+      expect(serverApiV3.post).toHaveBeenCalledWith(
+        "/campaign",
+        expect.anything(),
+      ),
+    );
+  }
+
+  it("개설 화면에서 고르면 만드는 동안 개설 화면을 두고, 작성 화면이 열린 뒤 뒤로가기는 개설 화면으로 간다", async () => {
+    const user = userEvent.setup();
+    const { router, products } = await openPickProducts();
+    const release = holdCreate();
+
+    await user.click(products.getByRole("button", { name: /브랜드형/ }));
+    await waitForCreateRequest();
+
+    expect(router.state.location.pathname).toBe(ROUTES.campaignCreate);
+    expect(
+      screen.getByRole("heading", { name: "캠페인 상품 선택" }),
+    ).toBeInTheDocument();
+
+    release();
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(
+        `${ROUTES.campaignRegister}/${FIRST_NEW_IDX}`,
+      ),
+    );
+    expect(router.state.location.search).toBe("?step=campaign-info");
+
+    // 진입 주소는 기록에 남지 않음(헤더 "<"가 현황까지의 기록 칸 수에 기대지 않게).
+    await router.navigate(-1);
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(ROUTES.campaignCreate),
+    );
+  });
+
+  it("만드는 중에 다른 화면으로 옮기면 작성 화면으로 끌고 오지 않는다", async () => {
+    const user = userEvent.setup();
+    const { router, products } = await openPickProducts();
+    const release = holdCreate();
+
+    await user.click(products.getByRole("button", { name: /브랜드형/ }));
+    await waitForCreateRequest();
+    await router.navigate(ROUTES.campaign);
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(ROUTES.campaign),
+    );
+
+    release();
+    await waitFor(() => expect(fake.created()).toEqual([FIRST_NEW_IDX]));
+    await new Promise((resolve) => setTimeout(resolve, 50));
+    expect(router.state.location.pathname).toBe(ROUTES.campaign);
+  });
+
+  it("만드는 동안 다른 상품을 눌러도 한 번만 만든다", async () => {
+    const user = userEvent.setup();
+    const { router, products } = await openPickProducts();
+    const release = holdCreate();
+
+    await user.click(products.getByRole("button", { name: /브랜드형/ }));
+    await waitForCreateRequest();
+    await user.click(products.getByRole("button", { name: /공구형/ }));
+
+    release();
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(
+        `${ROUTES.campaignRegister}/${FIRST_NEW_IDX}`,
+      ),
     );
     expect(fake.created()).toEqual([FIRST_NEW_IDX]);
   });
@@ -541,9 +662,30 @@ describe("등록 화면의 헤더 뒤로가기", () => {
     );
   });
 
-  it("들어온 길(개설 화면)과 상관없이 기억한 쿼리의 현황으로 가고, 브라우저 뒤로가기는 기록을 따른다", async () => {
+  it("현황에서 개설 화면을 거쳐 들어왔으면 현황 기록으로 되돌아가 탭·검색 기록을 그대로 연다", async () => {
     const user = userEvent.setup();
-    useCampaignStatusReturnStore.getState().remember("?tab=draft");
+    fake.seed(createFilledDetailResponse(90, { policy: ALL_AGREED }));
+    const router = await renderRoute(`${ROUTES.campaign}?tab=draft`);
+    await screen.findByText("비글로우 신제품 런칭 캠페인");
+    const statusKey = router.state.location.key;
+    await router.navigate(ROUTES.campaignCreate);
+    await router.navigate(`${ROUTES.campaignRegister}/90?step=payment`);
+
+    await screen.findByRole("button", { name: /결제하기/ });
+    await user.click(screen.getByRole("button", { name: "뒤로가기" }));
+
+    // 같은 기록으로 돌아가야(POP) 스크롤 복원이 떠날 때 위치를 되돌림.
+    await waitFor(() => expect(router.state.location.key).toBe(statusKey));
+    expect(router.state.historyAction).toBe("POP");
+    expect(router.state.location.search).toBe("?tab=draft");
+  });
+
+  it("현황 기록이 이 탭에 없으면(주소로 바로 들어옴·새로고침) 기억한 쿼리의 현황을 새로 열고, 브라우저 뒤로가기는 기록을 따른다", async () => {
+    const user = userEvent.setup();
+    useCampaignStatusReturnStore.setState({
+      search: "?tab=draft",
+      entryKey: null,
+    });
     fake.seed(createFilledDetailResponse(90, { policy: ALL_AGREED }));
     const router = await renderRoute([
       ROUTES.campaign,
@@ -570,24 +712,12 @@ describe("등록 화면의 헤더 뒤로가기", () => {
 });
 
 describe("현황 바로 가기의 구독 만료 안내", () => {
-  const subscription = (productType: string) => ({
-    id: "s1",
-    productType,
-    productName: productType,
-    startedAt: "2026-11-01",
-    endsAt: "2026-12-01",
-    amount: 100000,
-    paymentMethod: "card",
-    isCancelScheduled: false,
-  });
+  const SWR_DEDUPING_MS = 2100;
+  const SUBSCRIPTIONS_PATH = "/mypage/subscription/subscriptions";
 
-  function mockSubscriptions(productTypes: string[]) {
-    mockV3Get((path, ...rest) =>
-      path === "/mypage/subscription/subscriptions"
-        ? Promise.resolve(productTypes.map(subscription))
-        : fake.get(path, rest[0]),
-    );
-  }
+  afterEach(() => {
+    vi.useRealTimers();
+  });
 
   // 구독 목록을 요청하고 응답이 화면에 반영될 때까지 기다림(도착 전에는 막지 않아 알럿이 안 뜸).
   async function waitForSubscriptions() {
@@ -639,6 +769,64 @@ describe("현황 바로 가기의 구독 만료 안내", () => {
       ),
     );
     expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+  });
+
+  it("다른 곳에서 구독해 캐시가 낡았으면 새로 읽은 구독으로 판단해 작성 화면으로 간다", async () => {
+    mockSubscriptions(["pick"]);
+    const router = await renderRoute(`${ROUTES.campaign}?tab=draft`);
+    await screen.findByText("비글로우 신제품 런칭 캠페인");
+    await waitForSubscriptions();
+    mockSubscriptions(["recruit"]);
+    await clickWriteOnRecruitDraft();
+
+    await waitFor(() =>
+      expect(router.state.location.pathname).toMatch(
+        new RegExp(`^${ROUTES.campaignRegister}/\\d+$`),
+      ),
+    );
+    expect(screen.queryByRole("alertdialog")).not.toBeInTheDocument();
+  });
+
+  it("구독을 새로 읽다 실패하면 갖고 있던 구독으로 판단해 구독 안내를 띄운다", async () => {
+    mockSubscriptions(["pick"]);
+    const router = await renderRoute(`${ROUTES.campaign}?tab=draft`);
+    await screen.findByText("비글로우 신제품 런칭 캠페인");
+    await waitForSubscriptions();
+    mockV3Get((path, ...rest) =>
+      path === SUBSCRIPTIONS_PATH
+        ? Promise.reject(new Error("network"))
+        : fake.get(path, rest[0]),
+    );
+    await clickWriteOnRecruitDraft();
+
+    const dialog = await screen.findByRole("alertdialog");
+    expect(within(dialog).getByText("구독이 필요합니다")).toBeInTheDocument();
+    expect(router.state.location.pathname).toBe(ROUTES.campaign);
+  });
+
+  it("다른 화면에 갔다가 돌아와도 구독 목록을 다시 읽지 않는다", async () => {
+    // SWR은 2초 안에 같은 키를 다시 부르지 않아(중복 제거 타이머), 그 시간을 넘겨 돌아온 상황을 만듦.
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    mockSubscriptions(["recruit"]);
+    const router = await renderRoute(`${ROUTES.campaign}?tab=draft`);
+    await screen.findByText("비글로우 신제품 런칭 캠페인");
+    await waitForSubscriptions();
+    const countReads = (target: string) =>
+      vi.mocked(serverApiV3.get).mock.calls.filter(([path]) => path === target)
+        .length;
+    const subscriptionReadsBefore = countReads(SUBSCRIPTIONS_PATH);
+    vi.advanceTimersByTime(SWR_DEDUPING_MS);
+
+    await router.navigate(ROUTES.home);
+    await waitFor(() =>
+      expect(router.state.location.pathname).toBe(ROUTES.home),
+    );
+    await router.navigate(-1);
+    await screen.findByText("비글로우 신제품 런칭 캠페인");
+    // 캐시가 있는 키는 SWR이 그린 다음 프레임에 다시 읽으므로 몇 프레임을 넘겨 확인함.
+    await new Promise((resolve) => setTimeout(resolve, 100));
+
+    expect(countReads(SUBSCRIPTIONS_PATH)).toBe(subscriptionReadsBefore);
   });
 
   it("작성을 마친 데모의 작성하기는 작성 화면을 거치지 않고 기본 정보로 간다", async () => {

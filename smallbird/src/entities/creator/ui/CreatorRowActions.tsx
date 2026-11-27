@@ -26,22 +26,13 @@ export function CreatorRowActions({
   onClickPropose,
 }: CreatorRowActionsProps) {
   const { t } = useTranslation("entities/creator");
-  const { bookmarkLabel } = useCreatorTerms();
 
   return (
     <>
-      <Toggle
-        variant="outline"
-        size="sm"
-        className={BOOKMARK_TOGGLE_CLASS_NAME}
-        aria-label={bookmarkLabel(creator.nickname)}
-        pressed={creator.isBookmarked}
-        onPressedChange={() => onClickBookmark(creator)}
-      >
-        <Bookmark
-          className={cn(creator.isBookmarked && "fill-current text-primary")}
-        />
-      </Toggle>
+      <CreatorBookmarkToggle
+        creator={creator}
+        onClickBookmark={onClickBookmark}
+      />
       <Toggle
         variant="outline"
         size="sm"
@@ -53,5 +44,33 @@ export function CreatorRowActions({
         <Mail />
       </Toggle>
     </>
+  );
+}
+
+type CreatorBookmarkToggleProps = Pick<
+  CreatorRowActionsProps,
+  "creator" | "onClickBookmark"
+>;
+
+// 저장된 크리에이터는 채운 아이콘. 누르면 저장 창 또는 해제 알럿을 엶(부르는 쪽이 정함).
+export function CreatorBookmarkToggle({
+  creator,
+  onClickBookmark,
+}: CreatorBookmarkToggleProps) {
+  const { bookmarkLabel } = useCreatorTerms();
+
+  return (
+    <Toggle
+      variant="outline"
+      size="sm"
+      className={BOOKMARK_TOGGLE_CLASS_NAME}
+      aria-label={bookmarkLabel(creator.nickname)}
+      pressed={creator.isBookmarked}
+      onPressedChange={() => onClickBookmark(creator)}
+    >
+      <Bookmark
+        className={cn(creator.isBookmarked && "fill-current text-primary")}
+      />
+    </Toggle>
   );
 }

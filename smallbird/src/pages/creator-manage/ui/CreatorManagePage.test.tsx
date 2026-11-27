@@ -1,4 +1,10 @@
-import { render, screen, waitFor, within } from "@testing-library/react";
+import {
+  cleanup,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { MemoryRouter, Outlet, Route, Routes, useLocation } from "react-router";
 import { toast } from "sonner";
@@ -168,8 +174,12 @@ describe("CreatorManagePage", () => {
     expect(cells.getByText("뷰티")).toBeInTheDocument();
     expect(cells.getByText("1.2K")).toBeInTheDocument();
     expect(cells.getByText("41.2")).toBeInTheDocument();
-    // 공구 지수·예상 비용은 값이 없어 대시.
-    expect(cells.getAllByText("-")).toHaveLength(2);
+    // 공구 지수·예측 비용·희망 비용은 값이 없어 대시.
+    expect(cells.getAllByText("-")).toHaveLength(3);
+    // 관리 목록 API에 정렬이 없어 머리글은 정렬 버튼이 아님.
+    expect(
+      screen.queryByRole("button", { name: "플랫폼 정렬" }),
+    ).not.toBeInTheDocument();
     expect(screen.getByText("125K")).toBeInTheDocument();
     expect(await findParagraph("총2개")).toBeInTheDocument();
     expect(screen.getByRole("button", { name: /^전체/ })).toHaveAttribute(
@@ -394,6 +404,44 @@ describe("CreatorManagePage", () => {
     expect(screen.getByTestId("search").textContent).toBe(
       `?folder=${BEAUTY_FOLDER_IDX}`,
     );
+  });
+
+  it("TAB은 검색과 같은 한 줄 표, MO는 플랫폼·지수 칸과 제안 버튼이 있는 카드", async () => {
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: query.includes("min-width: 768px"),
+      media: query,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    }));
+    setup();
+    await screen.findByText("하루뷰티");
+    expect(
+      screen
+        .getAllByRole("columnheader")
+        .slice(1, -1)
+        .map((header) => header.textContent),
+    ).toEqual(["크리에이터", "플랫폼", "브랜드 지수", "공구 지수"]);
+    cleanup();
+
+    window.matchMedia = vi.fn().mockImplementation((query: string) => ({
+      matches: false,
+      media: query,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    }));
+    setup();
+    const card = (await screen.findByText("하루뷰티")).closest("li");
+    expect(card).not.toBeNull();
+    const inCard = within(card as HTMLElement);
+    expect(inCard.getByText("유튜브")).toBeInTheDocument();
+    expect(inCard.getByText("41.2")).toBeInTheDocument();
+    expect(inCard.getByText("공구 지수")).toBeInTheDocument();
+    expect(
+      inCard.getByRole("button", { name: "하루뷰티 즐겨찾기" }),
+    ).toBeInTheDocument();
+    expect(
+      inCard.getByRole("button", { name: "캠페인 제안" }),
+    ).toBeInTheDocument();
   });
 
   it("TAB·MO는 둥근 버튼으로 AI 추천 도우미를 열고 닫는다", async () => {

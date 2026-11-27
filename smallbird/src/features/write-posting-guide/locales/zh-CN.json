@@ -1,0 +1,65 @@
+{
+  "title": "撰写发帖指南",
+  "method": {
+    "label": "撰写方式",
+    "ai": {
+      "title": "AI发帖指南",
+      "description": "AI根据输入的信息自动生成发帖指南。"
+    },
+    "manual": {
+      "title": "自行撰写",
+      "description": "直接输入内容撰写发帖指南。"
+    },
+    "inUse": "使用中",
+    "needsPayment": "需付款",
+    "serviceInUse": "AI服务使用中"
+  },
+  "tab": {
+    "basic": "基本条件设置",
+    "examples": "示例图片/视频"
+  },
+  "basic": {
+    "title": "基本条件设置",
+    "photoCount": "照片数(最少)",
+    "photoUnit": "张以上",
+    "videoCount": "视频数(最少)",
+    "videoUnit": "个以上",
+    "keywords": "必填关键词",
+    "keywordsPlaceholder": "请输入关键词。",
+    "hashtags": "必填话题标签",
+    "hashtagsPlaceholder": "请输入话题标签。",
+    "removeKeyword": "删除{{keyword}}",
+    "notice": "注意事项",
+    "noticePlaceholder": "请填写注意事项。",
+    "referenceUrl": "参考URL",
+    "referenceUrlPlaceholder": "请输入参考URL。",
+    "addUrl": "添加",
+    "removeUrl": "删除"
+  },
+  "action": {
+    "skip": "跳过",
+    "preview": "预览",
+    "saveDraft": "暂存",
+    "confirm": "确定指南",
+    "generateAi": "生成AI发帖指南"
+  },
+  "toast": {
+    "saved": "已暂存。",
+    "saveFailed": "保存失败,请重试。"
+  },
+  "dialog": {
+    "skip": {
+      "title": "跳过发帖指南",
+      "description": "指南为可选项。没有指南时,创作者的发帖质量可能下降。若已使用AI发帖指南,其费用不予退还。",
+      "action": "跳过"
+    },
+    "confirm": {
+      "title": "发帖指南登记完成",
+      "description": "您撰写的发帖指南已成功登记。"
+    }
+  },
+  "examples": {
+    "contentGuide": "内容概要",
+    "contentGuidePlaceholder": "请简要描述内容。"
+  }
+}

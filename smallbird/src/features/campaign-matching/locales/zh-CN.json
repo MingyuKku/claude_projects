@@ -1,0 +1,138 @@
+{
+  "title": "创作者匹配",
+  "notice": {
+    "payment": "匹配确定后需完成付款，才算最终匹配。",
+    "fee": "付款时加收5%比格伯德手续费及增值税，使用比格伯德币付款。"
+  },
+  "metric": {
+    "total": "已发提案",
+    "proposed": "提案中",
+    "negotiating": "重新协商",
+    "pendingPayment": "待付款",
+    "matched": "匹配完成",
+    "rejectedOrExpired": "拒绝/过期",
+    "unit": "件"
+  },
+  "filter": {
+    "search": "请输入条件。",
+    "status": "状态"
+  },
+  "column": {
+    "profile": "资料",
+    "platform": "平台",
+    "amount": "提案金额",
+    "status": "状态",
+    "respondedAt": "回复时间",
+    "remaining": "剩余时间",
+    "detail": "匹配记录",
+    "pay": "付款"
+  },
+  "status": {
+    "PROPOSED": "提案中",
+    "NEGOTIATING": "重新协商",
+    "ACCEPTED": "待付款",
+    "PAID": "匹配完成",
+    "REJECTED": "拒绝",
+    "EXPIRED": "过期"
+  },
+  "remaining": {
+    "day": "{{days}}天{{hours}}小时",
+    "hour": "{{hours}}小时{{minutes}}分"
+  },
+  "won": "{{amount}}韩元",
+  "action": {
+    "detail": "查看{{name}}的匹配记录",
+    "pay": "付款",
+    "paySelected": "为所选创作者付款",
+    "selectRow": "选择{{name}}",
+    "selectAll": "全选待付款"
+  },
+  "selection": {
+    "count": "个已选"
+  },
+  "list": {
+    "label": "创作者匹配列表",
+    "empty": "还没有提案的创作者。"
+  },
+  "unit": {
+    "won": "韩元"
+  },
+  "offer": {
+    "badge": {
+      "PROPOSED": "活动提案",
+      "NEGOTIATING": "重新协商",
+      "ACCEPTED": "待付款",
+      "PAID": "匹配完成",
+      "REJECTED": "已拒绝",
+      "EXPIRED": "已过期"
+    },
+    "amount": "提案金额",
+    "fee": "手续费",
+    "content": "进行内容",
+    "schedule": "期望上传日期",
+    "rejected": "提案已被拒绝。"
+  },
+  "counter": {
+    "action": "重新提案",
+    "title": "重新提出金额",
+    "close": "关闭重新提出金额",
+    "current": "当前请求金额",
+    "amount": "提案金额",
+    "placeholder": "请输入金额。",
+    "submit": "提出金额"
+  },
+  "decision": {
+    "accept": {
+      "action": "接受",
+      "title": "确认接受提案",
+      "description": "接受后在付款前为待付款状态，\n需在3天内完成付款才能确定匹配。",
+      "cancel": "取消",
+      "confirm": "接受"
+    },
+    "payNow": {
+      "title": "继续付款",
+      "description": "为刚接受的提案付款后即确定匹配。\n付款后不可退款，稍后付款请在期限内完成。",
+      "cancel": "稍后付款",
+      "confirm": "立即付款"
+    },
+    "reject": {
+      "action": "拒绝",
+      "title": "拒绝提案",
+      "description": "确定要拒绝吗？拒绝后将无法再次向该创作者发送匹配请求。",
+      "cancel": "取消",
+      "confirm": "拒绝"
+    },
+    "conflict": "已处理或当前无法执行，已刷新页面。"
+  },
+  "detail": {
+    "title": "匹配详情",
+    "close": "关闭匹配详情",
+    "loading": "加载中",
+    "tab": {
+      "chat": "创作者聊天",
+      "info": "创作者信息"
+    },
+    "notice": {
+      "title": "活动提案与协商阶段",
+      "description": "目前为提案/协商阶段，匹配完成后才可自由聊天。",
+      "caption": "协调内容、日程、条件后双方接受，活动即确定。"
+    }
+  },
+  "info": {
+    "title": "创作者信息",
+    "campaign": "活动信息",
+    "type": "活动类型",
+    "progress": "进行状态",
+    "period": "进行期间",
+    "code": "活动代码",
+    "copied": "已复制活动代码。",
+    "copyFailed": "复制失败。",
+    "offer": "提案信息",
+    "initialAmount": "首次提案金额",
+    "currentAmount": "当前提案金额",
+    "schedule": "期望上传日",
+    "memo": "备忘",
+    "memoPlaceholder": "为该创作者留下备忘。",
+    "memoFailed": "备忘保存失败，请稍后重新输入。"
+  }
+}

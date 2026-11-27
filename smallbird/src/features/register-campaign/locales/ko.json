@@ -13,10 +13,7 @@
   "nav": {
     "label": "등록 단계",
     "open": "등록 단계 열기",
-    "indicator": {
-      "editing": "입력 중",
-      "warning": "필수 항목 미입력"
-    }
+    "warning": "필수 항목 미입력"
   },
   "action": {
     "saveDraft": "임시저장",

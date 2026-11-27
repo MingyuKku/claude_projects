@@ -1,0 +1,65 @@
+{
+  "title": "Write posting guide",
+  "method": {
+    "label": "Writing method",
+    "ai": {
+      "title": "AI Posting Guide",
+      "description": "AI creates a posting guide from the details you enter."
+    },
+    "manual": {
+      "title": "Write it myself",
+      "description": "Enter the details yourself to write the posting guide."
+    },
+    "inUse": "In use",
+    "needsPayment": "Payment needed",
+    "serviceInUse": "Using AI service"
+  },
+  "tab": {
+    "basic": "Basic conditions",
+    "examples": "Example images/videos"
+  },
+  "basic": {
+    "title": "Basic conditions",
+    "photoCount": "Photos (min.)",
+    "photoUnit": "or more",
+    "videoCount": "Videos (min.)",
+    "videoUnit": "or more",
+    "keywords": "Required keywords",
+    "keywordsPlaceholder": "Enter a keyword.",
+    "hashtags": "Required hashtags",
+    "hashtagsPlaceholder": "Enter a hashtag.",
+    "removeKeyword": "Remove {{keyword}}",
+    "notice": "Notes",
+    "noticePlaceholder": "Write any notes.",
+    "referenceUrl": "Reference URL",
+    "referenceUrlPlaceholder": "Enter a reference URL.",
+    "addUrl": "Add",
+    "removeUrl": "Delete"
+  },
+  "action": {
+    "skip": "Skip",
+    "preview": "Preview",
+    "saveDraft": "Save draft",
+    "confirm": "Confirm guide",
+    "generateAi": "Generate AI posting guide"
+  },
+  "toast": {
+    "saved": "Draft saved.",
+    "saveFailed": "Couldn't save. Please try again."
+  },
+  "dialog": {
+    "skip": {
+      "title": "Skip posting guide",
+      "description": "The guide is optional. Without it, creators' posts may be lower quality. If you already used the AI Posting Guide, its fee won't be refunded.",
+      "action": "Skip"
+    },
+    "confirm": {
+      "title": "Posting guide registered",
+      "description": "Your posting guide has been registered."
+    }
+  },
+  "examples": {
+    "contentGuide": "Content overview",
+    "contentGuidePlaceholder": "Briefly describe the content."
+  }
+}

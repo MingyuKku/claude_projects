@@ -11,7 +11,6 @@ import { Card } from "@/shared/ui/card";
 import { Skeleton } from "@/shared/ui/skeleton";
 
 import { CreatorCardList } from "./CreatorCardList";
-import { CreatorCompactList } from "./CreatorCompactList";
 import { CreatorTable } from "./CreatorTable";
 import { LoadMoreFooter } from "./LoadMoreFooter";
 import { useCreatorColumns } from "./use-creator-columns";
@@ -37,10 +36,7 @@ interface CreatorListProps {
   onClickPropose?: (creator: CreatorViewModel) => void;
   /** 행·카드를 누르면 상세를 엶. */
   onClickItem: (creator: CreatorViewModel) => void;
-  isProfileCompact?: boolean;
-  /** `search`는 검색 화면 칸 구성(PC 표, TAB 한 줄 표, MO 두 줄 카드). */
-  layout?: "default" | "search";
-  /** 고른 플랫폼. 검색 PC 표의 칸이 바뀜. */
+  /** 고른 플랫폼. PC 표의 팔로워 칸 이름이 바뀜. */
   platformCode?: MatchingPlatformCode;
   /** 둘 다 있으면 표 머리글로 정렬함. */
   sort?: SearchSort;
@@ -65,8 +61,6 @@ export function CreatorList({
   onClickBookmark,
   onClickPropose,
   onClickItem,
-  isProfileCompact,
-  layout = "default",
   platformCode,
   sort,
   onClickSort,
@@ -74,10 +68,9 @@ export function CreatorList({
   const { t } = useTranslation("entities/creator");
   const { t: tCommon } = useTranslation();
   const isTabletUp = useMediaQuery(MEDIA_QUERY.tabletUp);
-  const isSearch = layout === "search";
-  const isTable = isDesktop || (isSearch && isTabletUp);
+  const isTable = isDesktop || isTabletUp;
   const columns = useCreatorColumns(
-    isSearch && !isDesktop ? "searchTablet" : layout,
+    isDesktop ? "desktop" : "tablet",
     platformCode,
   );
 
@@ -106,20 +99,10 @@ export function CreatorList({
       );
     }
 
-    if (isSearch) {
-      return (
-        <SkeletonGroup className="flex flex-col gap-3">
-          {Array.from({ length: SKELETON_CARD_COUNT }, (_, card) => (
-            <CreatorCompactSkeleton key={card} />
-          ))}
-        </SkeletonGroup>
-      );
-    }
-
     return (
-      <SkeletonGroup className="grid grid-cols-1 gap-3 tablet:grid-cols-2 tablet:gap-4">
+      <SkeletonGroup className="flex flex-col gap-3">
         {Array.from({ length: SKELETON_CARD_COUNT }, (_, card) => (
-          <Skeleton key={card} className="h-60 w-full" />
+          <CreatorCardSkeleton key={card} />
         ))}
       </SkeletonGroup>
     );
@@ -158,7 +141,6 @@ export function CreatorList({
         onClickItem={onClickItem}
         emptyContent={isEmpty ? emptyContent : undefined}
         footer={footer}
-        isProfileCompact={isProfileCompact}
         sort={sort}
         onClickSort={onClickSort}
       />
@@ -166,20 +148,6 @@ export function CreatorList({
   }
 
   if (isEmpty) return emptyContent;
-
-  if (isSearch) {
-    return (
-      <CreatorCompactList
-        items={list.items}
-        selectedKeys={selectedKeys}
-        onChangeSelected={onChangeSelected}
-        onClickBookmark={onClickBookmark}
-        onClickPropose={onClickPropose}
-        onClickItem={onClickItem}
-        footer={footer}
-      />
-    );
-  }
 
   return (
     <CreatorCardList
@@ -194,28 +162,30 @@ export function CreatorList({
   );
 }
 
-// CreatorCompactList 카드 한 장과 같은 치수
-function CreatorCompactSkeleton() {
+// CreatorCardList 카드 한 장과 같은 치수
+function CreatorCardSkeleton() {
   return (
     <Card>
-      <div className="flex items-center pt-4 pr-4">
-        <div className="flex h-12 items-center px-4">
+      <div className="flex items-center p-4">
+        <div className="flex h-12 items-center pr-4">
           <Skeleton className="size-4" />
         </div>
         <div className="flex min-w-0 flex-1 items-center gap-3">
           <Skeleton className="size-10 shrink-0 rounded-full" />
-          <div className="flex min-w-0 flex-1 flex-col gap-2">
+          <div className="flex min-w-0 flex-1 flex-col gap-1">
             <Skeleton className="h-4 w-24" />
             <Skeleton className="h-4 w-20" />
           </div>
           <Skeleton className="size-9" />
-          <Skeleton className="size-9" />
         </div>
       </div>
-      <div className="flex h-12 items-center gap-4 px-4 pb-4">
-        <Skeleton className="size-6" />
-        <Skeleton className="h-4 w-24" />
-        <Skeleton className="h-4 w-24" />
+      <div className="flex flex-col gap-2 px-3 pb-3">
+        <div className="flex gap-2">
+          <Skeleton className="h-16 flex-1" />
+          <Skeleton className="h-16 flex-1" />
+          <Skeleton className="h-16 flex-1" />
+        </div>
+        <Skeleton className="h-9.5 w-full" />
       </div>
     </Card>
   );

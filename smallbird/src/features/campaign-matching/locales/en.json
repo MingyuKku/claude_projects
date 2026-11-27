@@ -1,0 +1,138 @@
+{
+  "title": "Creator matching",
+  "notice": {
+    "payment": "Matching is final only after payment is complete.",
+    "fee": "A 5% Bigbird fee and VAT are added, and payment is made with Bigbird Money."
+  },
+  "metric": {
+    "total": "Sent",
+    "proposed": "Proposed",
+    "negotiating": "Renegotiation",
+    "pendingPayment": "Awaiting payment",
+    "matched": "Matched",
+    "rejectedOrExpired": "Declined/expired",
+    "unit": "items"
+  },
+  "filter": {
+    "search": "Search by condition.",
+    "status": "Status"
+  },
+  "column": {
+    "profile": "Profile",
+    "platform": "Platform",
+    "amount": "Offer",
+    "status": "Status",
+    "respondedAt": "Responded",
+    "remaining": "Time left",
+    "detail": "Details",
+    "pay": "Payment"
+  },
+  "status": {
+    "PROPOSED": "Proposed",
+    "NEGOTIATING": "Renegotiation",
+    "ACCEPTED": "Awaiting payment",
+    "PAID": "Matched",
+    "REJECTED": "Declined",
+    "EXPIRED": "Expired"
+  },
+  "remaining": {
+    "day": "{{days}}d {{hours}}h",
+    "hour": "{{hours}}h {{minutes}}m"
+  },
+  "won": "₩{{amount}}",
+  "action": {
+    "detail": "View {{name}} matching details",
+    "pay": "Pay",
+    "paySelected": "Pay selected creators",
+    "selectRow": "Select {{name}}",
+    "selectAll": "Select all awaiting payment"
+  },
+  "selection": {
+    "count": " selected"
+  },
+  "list": {
+    "label": "Creator matching list",
+    "empty": "No creators proposed yet."
+  },
+  "unit": {
+    "won": "KRW"
+  },
+  "offer": {
+    "badge": {
+      "PROPOSED": "Proposal",
+      "NEGOTIATING": "Renegotiation",
+      "ACCEPTED": "Awaiting payment",
+      "PAID": "Matched",
+      "REJECTED": "Declined",
+      "EXPIRED": "Expired"
+    },
+    "amount": "Offer amount",
+    "fee": "Fee",
+    "content": "Type",
+    "schedule": "Preferred upload",
+    "rejected": "The proposal was declined."
+  },
+  "counter": {
+    "action": "Counter",
+    "title": "Counter offer",
+    "close": "Close counter offer",
+    "current": "Requested",
+    "amount": "Offer amount",
+    "placeholder": "Enter an amount.",
+    "submit": "Send offer"
+  },
+  "decision": {
+    "accept": {
+      "action": "Accept",
+      "title": "Accept proposal",
+      "description": "Once accepted, it waits for payment.\nComplete payment within 3 days to confirm the match.",
+      "cancel": "Cancel",
+      "confirm": "Accept"
+    },
+    "payNow": {
+      "title": "Continue to payment",
+      "description": "Pay for the accepted proposal to confirm the match.\nPayments are non-refundable. If you pay later, do so before the deadline.",
+      "cancel": "Pay later",
+      "confirm": "Pay now"
+    },
+    "reject": {
+      "action": "Decline",
+      "title": "Decline proposal",
+      "description": "Decline this proposal? You won't be able to send this creator a match request again.",
+      "cancel": "Cancel",
+      "confirm": "Decline"
+    },
+    "conflict": "This was already handled or can't be done now. The view was refreshed."
+  },
+  "detail": {
+    "title": "Matching details",
+    "close": "Close matching details",
+    "loading": "Loading",
+    "tab": {
+      "chat": "Chat",
+      "info": "Creator info"
+    },
+    "notice": {
+      "title": "Proposal and negotiation",
+      "description": "Free chat opens only after the match is complete.",
+      "caption": "The campaign is confirmed once both sides accept the terms."
+    }
+  },
+  "info": {
+    "title": "Creator info",
+    "campaign": "Campaign",
+    "type": "Type",
+    "progress": "Status",
+    "period": "Period",
+    "code": "Campaign code",
+    "copied": "Campaign code copied.",
+    "copyFailed": "Couldn't copy.",
+    "offer": "Offer",
+    "initialAmount": "First offer",
+    "currentAmount": "Current offer",
+    "schedule": "Preferred upload",
+    "memo": "Memo",
+    "memoPlaceholder": "Leave a note about this creator.",
+    "memoFailed": "Couldn't save the memo. Please try again shortly."
+  }
+}

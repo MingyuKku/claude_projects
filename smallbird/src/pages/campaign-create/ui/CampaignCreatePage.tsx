@@ -1,4 +1,4 @@
-import { useNavigate, useSearchParams } from "react-router";
+import { useNavigate, useNavigation, useSearchParams } from "react-router";
 import { toast } from "sonner";
 
 import { getNewCampaignRegisterPath } from "@/entities/campaign";
@@ -43,9 +43,14 @@ export function CampaignCreatePage() {
   const { t } = useTranslation("pages/campaign-create");
   const { t: tCommon } = useTranslation();
   const navigate = useNavigate();
+  const navigation = useNavigation();
   const [searchParams, setSearchParams] = useSearchParams();
   const { data, isLoading, isError, mutate } = useSubscriptions();
 
+  // 등록 진입은 캠페인을 만들고 작성 화면으로 넘어갈 때까지 이 화면을 둠. 그사이 다시 누르면 하나를 더 만듦.
+  // 만든 뒤에는 목적지가 작성 경로로 바뀌므로 등록 경로 전체로 봄.
+  const isEnteringRegister =
+    navigation.location?.pathname.startsWith(ROUTES.campaignRegister) ?? false;
   const serviceParam = searchParams.get(SERVICE_PARAM);
   const selectedService = isActiveProductType(serviceParam)
     ? serviceParam
@@ -66,6 +71,7 @@ export function CampaignCreatePage() {
   }
 
   function handleClickProduct(product: ProductType) {
+    if (isEnteringRegister) return;
     // 모집형 공구형은 아직 없음.
     if (
       selectedService === null ||

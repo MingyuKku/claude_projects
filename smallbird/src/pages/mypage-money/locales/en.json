@@ -4,9 +4,10 @@
     "charge": "Charge/Withdraw",
     "usage": "Usage"
   },
-  "views": {
-    "balance": "Charge",
-    "history": "Details"
+  "mobileTabs": {
+    "charge": "Charge",
+    "history": "Charge History",
+    "usage": "Payment History"
   },
   "charge": {
     "action": "Charge"

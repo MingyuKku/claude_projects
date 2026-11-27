@@ -47,6 +47,33 @@ describe("알림 목록", () => {
     expect(api.get).not.toHaveBeenCalled();
   });
 
+  it("헤더가 다시 그려져도(셸이 바뀌는 이동) 캐시가 있으면 다시 읽지 않는다", async () => {
+    api.get.mockResolvedValue(listResponse(1, false));
+    const cache = new Map();
+
+    function sharedCacheWrapper({ children }: { children: ReactNode }) {
+      return (
+        <SWRConfig value={{ provider: () => cache, dedupingInterval: 0 }}>
+          {children}
+        </SWRConfig>
+      );
+    }
+
+    const first = renderHook(() => useNotifications(true), {
+      wrapper: sharedCacheWrapper,
+    });
+    await waitFor(() => expect(first.result.current.data).toBeDefined());
+    first.unmount();
+
+    const second = renderHook(() => useNotifications(true), {
+      wrapper: sharedCacheWrapper,
+    });
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    expect(second.result.current.data?.unreadCount).toBe(1);
+    expect(api.get).toHaveBeenCalledTimes(1);
+  });
+
   it("읽음 처리하면 요청한 뒤 목록을 다시 읽어 개수를 맞춘다", async () => {
     api.get
       .mockResolvedValueOnce(listResponse(1, false))

@@ -24,7 +24,7 @@ interface ServiceCardProps {
 
 // 모집형·PICK형 서비스 카드. 구독 중이면 카드(머리글·설명)를 누르면 선택되고, 미구독이면 "데모 체험하기" 버튼으로만 선택됨(카드 영역은 hover 효과만 있고 포인터는 기본 모양, 눌러도 반응 없음).
 // 선택 시 제목 위 파란 서비스명은 시안 오류라 표시하지 않고 링만 둠.
-// 구독 중이면 "서비스 이용 중" 비활성 버튼과 "이용 중" 뱃지, 아니면 데모 체험하기·구독하기.
+// 구독 중이면 1px 파란 링과 "이용 중" 뱃지, "캠페인 등록하기" 버튼(카드를 누른 것과 같이 선택), 아니면 데모 체험하기·구독하기.
 export function ServiceCard({
   type,
   badges,
@@ -61,6 +61,7 @@ export function ServiceCard({
         "relative transition-[color,background-color,box-shadow] focus-visible:ring-0 focus-visible:ring-offset-0 tablet:min-h-96",
         "has-[[data-slot=card-select]:focus-visible]:ring-2 has-[[data-slot=card-select]:focus-visible]:ring-primary has-[[data-slot=card-select]:focus-visible]:ring-offset-2",
         !isSubscribed && "cursor-default",
+        isSubscribed && "ring-1 ring-primary",
         isSelected && "ring-2 ring-primary ring-offset-2",
       )}
     >
@@ -80,24 +81,24 @@ export function ServiceCard({
         </div>
       )}
       <div className="flex flex-col gap-2 ds-p-5">
-        {!isSubscribed && (
-          <Button
-            variant="outline"
-            className="w-full"
-            onClick={() => onSelect(type)}
-          >
-            {t("action.demo")}
-            <ChevronRight aria-hidden />
-          </Button>
-        )}
         {isSubscribed ? (
-          <Button className="w-full" disabled>
-            {t("action.inUse")}
+          <Button className="w-full" onClick={() => onSelect(type)}>
+            {t("action.register")}
           </Button>
         ) : (
-          <Button className="w-full" onClick={onClickSubscribe}>
-            {t("action.subscribe")}
-          </Button>
+          <>
+            <Button
+              variant="outline"
+              className="w-full"
+              onClick={onClickSubscribe}
+            >
+              {t("action.subscribe")}
+              <ChevronRight aria-hidden />
+            </Button>
+            <Button className="w-full" onClick={() => onSelect(type)}>
+              {t("action.demo")}
+            </Button>
+          </>
         )}
       </div>
       {isSubscribed && (

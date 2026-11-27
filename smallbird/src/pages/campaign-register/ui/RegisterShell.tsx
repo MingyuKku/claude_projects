@@ -1,10 +1,6 @@
-import { useNavigate, useOutletContext } from "react-router";
+import { useOutletContext } from "react-router";
 
-import {
-  CampaignDemoTag,
-  useCampaignStatusReturnStore,
-} from "@/entities/campaign";
-import { ROUTES } from "@/shared/config";
+import { CampaignDemoTag, useBackToCampaignStatus } from "@/entities/campaign";
 import { useTranslation } from "@/shared/i18n";
 import { FocusShell } from "@/widgets/app-shell";
 
@@ -25,8 +21,7 @@ export function RegisterShell({
 }: RegisterShellProps) {
   const { t } = useTranslation("pages/campaign-register");
   const session = useOutletContext<SessionViewModel>();
-  const navigate = useNavigate();
-  const statusSearch = useCampaignStatusReturnStore((state) => state.search);
+  const backToStatus = useBackToCampaignStatus();
 
   return (
     <>
@@ -36,7 +31,7 @@ export function RegisterShell({
         title={t("title")}
         titleBadge={isDemo ? <CampaignDemoTag /> : undefined}
         sidebar={sidebar}
-        onBack={() => void navigate(`${ROUTES.campaign}${statusSearch}`)}
+        onBack={backToStatus}
       >
         {children}
       </FocusShell>

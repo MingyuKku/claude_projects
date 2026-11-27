@@ -4,9 +4,10 @@
     "charge": "충전/출금 내역",
     "usage": "사용 내역"
   },
-  "views": {
-    "balance": "충전",
-    "history": "상세 내역"
+  "mobileTabs": {
+    "charge": "충전",
+    "history": "충전 내역",
+    "usage": "결제 내역"
   },
   "charge": {
     "action": "충전하기"

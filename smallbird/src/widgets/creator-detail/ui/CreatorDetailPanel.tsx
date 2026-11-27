@@ -14,6 +14,7 @@ import {
 } from "@/entities/creator";
 import { EmptyState } from "@/shared/components/empty-state";
 import { ScrollPanel } from "@/shared/components/scroll-panel";
+import { ScrollableTabsList } from "@/shared/components/scrollable-tabs-list";
 import { useTranslation } from "@/shared/i18n";
 import { cn } from "@/shared/lib";
 import { Button } from "@/shared/ui/button";
@@ -233,23 +234,17 @@ export function CreatorDetailPanel({
               value={String(target.platformIdx)}
               onValueChange={handleChangePlatform}
             >
-              <div className="scrollbar-hidden overflow-x-auto">
-                <TabsList
-                  variant="line"
-                  aria-label={term("platform")}
-                  className="w-full min-w-max justify-start"
-                >
-                  {platforms.map((item) => (
-                    <TabsTrigger
-                      key={item.platformIdx}
-                      value={String(item.platformIdx)}
-                      className="flex-none"
-                    >
-                      {renderPlatformName(item)}
-                    </TabsTrigger>
-                  ))}
-                </TabsList>
-              </div>
+              <ScrollableTabsList variant="line" aria-label={term("platform")}>
+                {platforms.map((item) => (
+                  <TabsTrigger
+                    key={item.platformIdx}
+                    value={String(item.platformIdx)}
+                    className="flex-none"
+                  >
+                    {renderPlatformName(item)}
+                  </TabsTrigger>
+                ))}
+              </ScrollableTabsList>
             </Tabs>
             <div className="flex shrink-0 grow flex-col ds-gap-6 pb-5">
               {renderBody()}

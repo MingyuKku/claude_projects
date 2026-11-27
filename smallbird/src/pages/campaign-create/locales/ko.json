@@ -39,7 +39,7 @@
   "action": {
     "demo": "데모 체험하기",
     "subscribe": "구독하기",
-    "inUse": "서비스 이용 중",
+    "register": "캠페인 등록하기",
     "comingSoonButton": "준비중",
     "demoRegister": "데모 캠페인 등록"
   },

@@ -6,6 +6,7 @@ import {
 } from "../lib/to-list-params";
 import { transformCampaignList } from "../lib/transform-campaigns";
 import { transformCopySources } from "../lib/transform-copy-sources";
+import { markCampaignListChanged } from "../model/list-changes";
 import { campaignListSchema } from "../model/schema";
 
 import type { CampaignListParams } from "../lib/to-list-params";
@@ -34,4 +35,5 @@ export async function fetchCopySources(query: CopySourceQuery, page: number) {
 /** A-4 `DELETE /v3/campaign/{campaignIdx}`. 등록 중(`DRAFT`)만(데모 포함), 아니면 409 `NOT_DELETABLE`, Sub ID는 403. */
 export async function deleteCampaign(campaignIdx: number) {
   await serverApiV3.delete(`/campaign/${campaignIdx}`);
+  markCampaignListChanged();
 }

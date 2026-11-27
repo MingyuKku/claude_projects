@@ -2,8 +2,9 @@ import { render } from "@testing-library/react";
 import { createMemoryRouter, RouterProvider } from "react-router";
 import { SWRConfig } from "swr";
 
+import { resetCampaignListChanges } from "@/entities/campaign";
 import { serverApiV3 } from "@/shared/api";
-import { trackRouterInitialized } from "@/shared/lib";
+import { trackHistoryTrail, trackRouterInitialized } from "@/shared/lib";
 
 import { routes } from "./routes";
 import { resetSessionMiddleware } from "./session-middleware";
@@ -30,6 +31,7 @@ export async function renderRoute(
     initialIndex: initialEntries.length - 1,
   });
   trackRouterInitialized(router);
+  trackHistoryTrail(router);
   // CI의 첫 모듈 로딩 시간을 요소 조회 제한 시간에 포함하지 않는다.
   // 실제 라우트의 lazy를 실행하고 초기화가 끝난 뒤 화면 동작을 검증한다.
   if (shouldWaitForLoad && !router.state.initialized) {
@@ -80,6 +82,8 @@ function installV3Get() {
 export function resetSession(session: unknown) {
   // 세션 middleware가 직전 결과와 지금 화면을 기억하므로 앞 테스트의 상태가 남지 않게 비움.
   resetSessionMiddleware();
+  // 캠페인 목록 변경 기록도 모듈에 남으므로 함께 비움.
+  resetCampaignListChanges();
   sessionOutcome = { kind: "value", value: session };
   sessionQueue = [];
   otherHandler = () => Promise.reject(new Error("unmocked"));

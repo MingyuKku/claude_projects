@@ -842,17 +842,27 @@ describe("마이페이지 · 빅버드 머니", () => {
     );
   });
 
-  it("MO는 세그먼트로 충전과 상세 내역을 나눈다", async () => {
+  it("MO는 상단 탭을 충전·충전 내역·결제 내역으로 나누고 보기 선택은 없다", async () => {
     const user = userEvent.setup();
-    await renderRoute(ROUTES.mypageMoney);
+    const router = await renderRoute(ROUTES.mypageMoney);
 
     expect(await screen.findByText("보유 빅버드 머니")).toBeInTheDocument();
     expect(screen.queryByRole("heading", { name: "상세 내역" })).toBeNull();
+    expect(screen.getAllByRole("tab").map((tab) => tab.textContent)).toEqual([
+      "충전",
+      "충전 내역",
+      "결제 내역",
+    ]);
 
-    await user.click(screen.getByRole("tab", { name: "상세 내역" }));
+    await user.click(screen.getByRole("tab", { name: "충전 내역" }));
     expect(
       await screen.findByRole("heading", { name: "상세 내역" }),
     ).toBeInTheDocument();
+    expect(router.state.location.search).toContain("view=history");
+
+    await user.click(screen.getByRole("tab", { name: "결제 내역" }));
+    expect(router.state.location.search).toContain("tab=usage");
+    expect(router.state.location.search).not.toContain("view");
   });
 
   it("출금하기를 누르면 ?panel=withdraw로 출금 패널을 열고 X로 닫는다(PC)", async () => {

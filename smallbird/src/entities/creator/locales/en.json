@@ -12,6 +12,7 @@
     "groupBuyIndex": "Group buy index",
     "actions": "Actions",
     "predictedCost": "Est. cost",
+    "desiredCost": "Desired cost",
     "sortBy": "Sort by {{name}}"
   },
   "select": {

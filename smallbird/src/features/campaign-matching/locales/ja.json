@@ -1,0 +1,138 @@
+{
+  "title": "クリエイターマッチング",
+  "notice": {
+    "payment": "マッチング確定後、決済を完了すると最終マッチングになります。",
+    "fee": "決済時にビッグバード手数料5%とVATが加算され、決済はビッグバードマネーで行います。"
+  },
+  "metric": {
+    "total": "提案送信",
+    "proposed": "提案中",
+    "negotiating": "再交渉依頼",
+    "pendingPayment": "決済待ち",
+    "matched": "マッチング完了",
+    "rejectedOrExpired": "拒否/期限切れ",
+    "unit": "件"
+  },
+  "filter": {
+    "search": "条件を入力してください。",
+    "status": "状態"
+  },
+  "column": {
+    "profile": "プロフィール",
+    "platform": "プラットフォーム",
+    "amount": "提案金額",
+    "status": "状態",
+    "respondedAt": "応答日時",
+    "remaining": "残り時間",
+    "detail": "マッチング履歴",
+    "pay": "決済"
+  },
+  "status": {
+    "PROPOSED": "提案中",
+    "NEGOTIATING": "再交渉依頼",
+    "ACCEPTED": "決済待ち",
+    "PAID": "マッチング完了",
+    "REJECTED": "拒否",
+    "EXPIRED": "期限切れ"
+  },
+  "remaining": {
+    "day": "{{days}}日{{hours}}時間",
+    "hour": "{{hours}}時間{{minutes}}分"
+  },
+  "won": "{{amount}}ウォン",
+  "action": {
+    "detail": "{{name}}のマッチング履歴を見る",
+    "pay": "決済する",
+    "paySelected": "選択したクリエイターを決済",
+    "selectRow": "{{name}}を選択",
+    "selectAll": "決済待ちをすべて選択"
+  },
+  "selection": {
+    "count": "件選択"
+  },
+  "list": {
+    "label": "クリエイターマッチング一覧",
+    "empty": "まだ提案したクリエイターがいません。"
+  },
+  "unit": {
+    "won": "ウォン"
+  },
+  "offer": {
+    "badge": {
+      "PROPOSED": "キャンペーン提案",
+      "NEGOTIATING": "再交渉依頼",
+      "ACCEPTED": "決済待ち",
+      "PAID": "マッチング完了",
+      "REJECTED": "辞退",
+      "EXPIRED": "期限切れ"
+    },
+    "amount": "提案金額",
+    "fee": "手数料",
+    "content": "進行内容",
+    "schedule": "希望アップロード日程",
+    "rejected": "提案が辞退されました。"
+  },
+  "counter": {
+    "action": "再提案",
+    "title": "金額を再提案",
+    "close": "金額の再提案を閉じる",
+    "current": "現在の依頼金額",
+    "amount": "提案金額",
+    "placeholder": "金額を入力してください。",
+    "submit": "金額を提案"
+  },
+  "decision": {
+    "accept": {
+      "action": "承諾",
+      "title": "提案の承諾確定",
+      "description": "承諾すると決済までは決済待ちになり、\n3日以内に決済するとマッチングが確定します。",
+      "cancel": "キャンセル",
+      "confirm": "承諾"
+    },
+    "payNow": {
+      "title": "続けて決済",
+      "description": "承諾した提案を決済するとマッチングが確定します。\n決済後の返金はできません。後で決済する場合は期限内に完了してください。",
+      "cancel": "後で決済",
+      "confirm": "今すぐ決済"
+    },
+    "reject": {
+      "action": "辞退",
+      "title": "提案を辞退",
+      "description": "本当に辞退しますか？辞退するとこのクリエイターにマッチング依頼を再送できません。",
+      "cancel": "キャンセル",
+      "confirm": "辞退"
+    },
+    "conflict": "すでに処理済みか、今は実行できません。画面を更新しました。"
+  },
+  "detail": {
+    "title": "マッチング詳細",
+    "close": "マッチング詳細を閉じる",
+    "loading": "読み込み中",
+    "tab": {
+      "chat": "チャット",
+      "info": "クリエイター情報"
+    },
+    "notice": {
+      "title": "提案・交渉段階",
+      "description": "自由チャットはマッチング完了後に利用できます。",
+      "caption": "内容・日程・条件を調整し、双方が承諾するとキャンペーンが確定します。"
+    }
+  },
+  "info": {
+    "title": "クリエイター情報",
+    "campaign": "キャンペーン情報",
+    "type": "キャンペーン種類",
+    "progress": "進行状態",
+    "period": "進行期間",
+    "code": "キャンペーンコード",
+    "copied": "キャンペーンコードをコピーしました。",
+    "copyFailed": "コピーできませんでした。",
+    "offer": "提案情報",
+    "initialAmount": "初回提案金額",
+    "currentAmount": "現在の提案金額",
+    "schedule": "希望アップロード日",
+    "memo": "メモ",
+    "memoPlaceholder": "クリエイターのメモを残しましょう。",
+    "memoFailed": "メモを保存できませんでした。しばらくしてから再入力してください。"
+  }
+}

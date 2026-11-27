@@ -1,0 +1,65 @@
+{
+  "title": "포스팅 가이드 작성",
+  "method": {
+    "label": "작성 방식",
+    "ai": {
+      "title": "AI 포스팅 가이드 작성",
+      "description": "입력한 정보를 바탕으로 AI가 포스팅 가이드를 자동으로 생성해줍니다."
+    },
+    "manual": {
+      "title": "직접 작성하기",
+      "description": "직접 내용을 입력하여 포스팅 가이드를 작성합니다."
+    },
+    "inUse": "이용 중",
+    "needsPayment": "결제 필요",
+    "serviceInUse": "AI 서비스 이용 중"
+  },
+  "tab": {
+    "basic": "기본 조건 설정",
+    "examples": "예시 이미지/영상 첨부"
+  },
+  "basic": {
+    "title": "기본 조건 설정",
+    "photoCount": "사진 수 (최소)",
+    "photoUnit": "장 이상",
+    "videoCount": "영상 수 (최소)",
+    "videoUnit": "개 이상",
+    "keywords": "필수 키워드",
+    "keywordsPlaceholder": "키워드를 입력해주세요.",
+    "hashtags": "필수 해시태그",
+    "hashtagsPlaceholder": "해시태그를 입력해주세요.",
+    "removeKeyword": "{{keyword}} 삭제",
+    "notice": "유의 사항",
+    "noticePlaceholder": "유의사항을 작성해주세요.",
+    "referenceUrl": "참고 URL",
+    "referenceUrlPlaceholder": "참고할 URL을 작성해주세요.",
+    "addUrl": "추가",
+    "removeUrl": "삭제"
+  },
+  "action": {
+    "skip": "건너뛰기",
+    "preview": "미리보기",
+    "saveDraft": "임시저장",
+    "confirm": "가이드 확정",
+    "generateAi": "AI 포스팅 가이드 생성하기"
+  },
+  "toast": {
+    "saved": "임시 저장이 완료되었습니다.",
+    "saveFailed": "저장에 실패했습니다. 다시 시도해 주세요."
+  },
+  "dialog": {
+    "skip": {
+      "title": "포스팅 가이드 건너뛰기",
+      "description": "가이드 작성은 선택 사항입니다. 가이드 부재 시 크리에이터의 포스팅 퀄리티가 저하될 수 있습니다. 또한, AI 포스팅 가이드 기능을 이미 이용한 경우 해당 기능의 이용 금액은 환불되지 않습니다.",
+      "action": "건너뛰기"
+    },
+    "confirm": {
+      "title": "포스팅 가이드 등록 완료",
+      "description": "작성한 포스팅 가이드가 정상적으로 등록 되었습니다."
+    }
+  },
+  "examples": {
+    "contentGuide": "콘텐츠 개요",
+    "contentGuidePlaceholder": "콘텐츠에 대한 간략한 설명을 작성해주세요."
+  }
+}

@@ -12,6 +12,7 @@
     "groupBuyIndex": "共同購入指数",
     "actions": "操作",
     "predictedCost": "予測費用",
+    "desiredCost": "希望費用",
     "sortBy": "{{name}}で並べ替え"
   },
   "select": {

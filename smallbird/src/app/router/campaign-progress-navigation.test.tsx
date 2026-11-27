@@ -2,7 +2,7 @@ import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 
 import { useCampaignStatusReturnStore } from "@/entities/campaign";
-import { serverApiV3 } from "@/shared/api";
+import { ApiError, serverApiV3 } from "@/shared/api";
 import { ROUTES } from "@/shared/config";
 
 import { createFilledDetailResponse } from "./campaign-fixtures";
@@ -52,7 +52,7 @@ function withType(campaignType: string) {
 // 20 제품발송형 진행 중 · 21 매장방문형 진행 중 · 22 기자단형 진행 중 · 23 종료 · 24 승인 대기 · 25 공구형 진행 중
 beforeEach(() => {
   resetSession(session);
-  useCampaignStatusReturnStore.getState().remember("");
+  useCampaignStatusReturnStore.setState({ search: "", entryKey: null });
   const fake = createCampaignServerFake();
   fake.seed(createFilledDetailResponse(20, { ...PAID, status: "IN_PROGRESS" }));
   fake.seed(
@@ -79,7 +79,19 @@ beforeEach(() => {
       productType: "GROUP_BUY",
     }),
   );
-  mockV3Get(fake.get);
+  // 가이드 단계는 아직 작성 전(404)·AI 미결제로 둠.
+  mockV3Get((path, config) => {
+    if (/\/posting-guide\/payment$/.test(path))
+      return Promise.resolve({
+        cost: 10000,
+        balance: 0,
+        shortfallAmount: 10000,
+        alreadyPaid: false,
+      });
+    if (/\/posting-guide$/.test(path))
+      return Promise.reject(new ApiError(404, { result: false }));
+    return fake.get(path, config);
+  });
   vi.mocked(serverApiV3.post).mockReset();
 });
 
@@ -178,9 +190,12 @@ describe("캠페인 진행", () => {
     );
   });
 
-  it('헤더 "<"는 들어온 길과 상관없이 기억한 쿼리의 캠페인 현황으로 간다', async () => {
+  it('헤더 "<"는 현황 기록이 이 탭에 없으면 기억한 쿼리의 캠페인 현황을 새로 연다', async () => {
     const user = userEvent.setup();
-    useCampaignStatusReturnStore.getState().remember("?tab=active");
+    useCampaignStatusReturnStore.setState({
+      search: "?tab=active",
+      entryKey: null,
+    });
     const router = await renderRoute([
       ROUTES.home,
       "/campaign/20/progress/guide",

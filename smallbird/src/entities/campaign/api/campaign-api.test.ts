@@ -60,7 +60,7 @@ describe("목록", () => {
         productType: "BRAND",
         keyword: "톤업",
         page: 2,
-        entrySize: 6,
+        entrySize: 15,
       },
     });
     expect(page.records[0]).toMatchObject({

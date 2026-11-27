@@ -15,7 +15,8 @@ import type { ChargeRecord } from "../model/charge-types";
  * - 탭이 다시 보이거나 창이 포커스를 되찾을 때(은행 앱에 다녀온 직후): 항상.
  * - "대기 중" 건이 보이는 동안 `CHARGE_PENDING_REFRESH_INTERVAL_MS`마다: 숨은 탭에서는 읽지 않음.
  * 잔액(헤더·보유 금액)이 입금·출금 처리로 바뀌므로 내역과 함께 읽음.
- * SWR의 `revalidateOnFocus`·`refreshInterval`은 이어 읽는 목록(`revalidateFirstPage: false`)의 읽은 쪽을 다시 읽지 않아 쓰지 않음.
+ * SWR의 `revalidateOnFocus`·`refreshInterval`은 이어 읽는 목록(`revalidateFirstPage: false`)의 읽은 쪽을 다시 읽지 않아 쓰지 않고,
+ * MO 목록은 `useReloadChargeHistory`가 낡았다고 표시해 읽어 둔 쪽을 모두 다시 읽음.
  */
 export function useChargeAutoRefresh(records: readonly ChargeRecord[]) {
   const reloadHistory = useReloadChargeHistory();

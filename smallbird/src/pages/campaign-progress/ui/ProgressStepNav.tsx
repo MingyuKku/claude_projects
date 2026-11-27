@@ -52,8 +52,8 @@ export function ProgressStepNav({
       label={t("nav.label")}
       size={size}
       className={className}
-      // 진행 단계에는 입력 중·미입력 표시가 없음.
-      indicatorLabels={{ editing: "", warning: "" }}
+      // 진행 단계에는 미입력 표시가 없어 `hasWarning`을 넘기지 않으므로 문구도 쓰이지 않음.
+      warningLabel=""
       overviewItem={{
         id: OVERVIEW_ID,
         label: t("step.overview"),

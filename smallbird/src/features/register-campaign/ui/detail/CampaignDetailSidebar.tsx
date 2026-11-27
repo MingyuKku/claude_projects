@@ -47,10 +47,7 @@ export function CampaignDetailSidebar({
       <StepSidebar
         label={t("nav.label")}
         size="md"
-        indicatorLabels={{
-          editing: t("nav.indicator.editing"),
-          warning: t("nav.indicator.warning"),
-        }}
+        warningLabel={t("nav.warning")}
         overviewItem={{
           id: OVERVIEW_ID,
           label: t("detail.title"),

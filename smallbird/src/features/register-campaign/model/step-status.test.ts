@@ -9,7 +9,7 @@ import {
 } from "./step-status";
 import { getRegisterSteps } from "./steps";
 
-import type { CampaignDraft } from "@/entities/campaign";
+import type { CampaignDraft, CampaignRegisterStep } from "@/entities/campaign";
 
 const steps = getRegisterSteps("PICK", "BRAND");
 
@@ -145,7 +145,6 @@ describe("사이드바 단계 상태", () => {
       steps,
       draft: createEmptyDraft(),
       currentStep: "campaign-info",
-      hasVisitedPayment: false,
     });
 
     expect(statuses.map((status) => status.state)).toEqual([
@@ -154,45 +153,49 @@ describe("사이드바 단계 상태", () => {
     ]);
   });
 
-  it("현재 단계가 아닌 일부만 입력한 단계에 입력 중 표시를 한다", () => {
-    const draft = draftWithInfo((value) => {
-      value.creator.platform = "INSTAGRAM";
-    });
-
-    const byStep = (currentStep: "product" | "creator") =>
+  it("현재 단계까지 필수값이 빠진 단계에 경고하고, 뒤 단계와 선택 단계는 표시하지 않는다", () => {
+    const warnings = (currentStep: CampaignRegisterStep) =>
       Object.fromEntries(
         getStepStatuses({
           steps,
-          draft,
+          draft: applyDraftDefaults(draftWithInfo()),
           currentStep,
-          hasVisitedPayment: false,
-        }).map((status) => [status.step, status.indicator]),
+        }).map((status) => [status.step, status.hasWarning]),
       );
 
-    expect(byStep("product").creator).toBe("editing");
-    expect(byStep("creator").creator).toBeNull();
-    expect(byStep("product").product).toBeNull();
+    expect(warnings("conditions")).toMatchObject({
+      "campaign-info": false,
+      product: true,
+      conditions: false,
+      intro: false,
+      "add-ons": false,
+      policy: false,
+    });
+    expect(warnings("payment")).toMatchObject({
+      product: true,
+      "add-ons": false,
+      policy: true,
+      payment: false,
+    });
+    expect(warnings("campaign-info").product).toBe(false);
   });
 
-  it("결제 단계에 들어온 뒤에는 필수값이 빠진 단계에 경고하고 선택 단계는 빼며, 채우면 풀린다", () => {
-    const draft = draftWithInfo();
-    const statuses = getStepStatuses({
-      steps,
-      draft,
-      currentStep: "payment",
-      hasVisitedPayment: true,
-    });
-    const indicators = Object.fromEntries(
-      statuses.map((status) => [status.step, status.indicator]),
-    );
+  it("현재 단계는 일부라도 입력했을 때만 경고하고, 채우면 풀린다", () => {
+    const warning = (draft: CampaignDraft) =>
+      getStepStatuses({ steps, draft, currentStep: "product" }).find(
+        (status) => status.step === "product",
+      )?.hasWarning;
 
-    expect(indicators).toMatchObject({
-      "campaign-info": null,
-      product: "warning",
-      "add-ons": null,
-      policy: "warning",
-      payment: null,
-    });
+    expect(warning(applyDraftDefaults(draftWithInfo()))).toBe(false);
+    expect(
+      warning(
+        applyDraftDefaults(
+          draftWithInfo((value) => {
+            value.product.productName = "앰플";
+          }),
+        ),
+      ),
+    ).toBe(true);
   });
 });
 

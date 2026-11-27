@@ -91,7 +91,7 @@ describe("transformCampaignList", () => {
     expect(transformCampaignList(response([], 0)).totalPages).toBe(0);
   });
 
-  it("한 쪽 개수가 0으로 오면 기본 6개로 계산한다", () => {
-    expect(transformCampaignList(response([], 13, 0)).totalPages).toBe(3);
+  it("한 쪽 개수가 0으로 오면 기본 15개로 계산한다", () => {
+    expect(transformCampaignList(response([], 31, 0)).totalPages).toBe(3);
   });
 });

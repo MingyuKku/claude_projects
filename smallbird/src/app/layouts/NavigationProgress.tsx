@@ -39,7 +39,7 @@ export function NavigationProgress() {
       data-slot="navigation-progress"
       data-state={isFinishing ? "finishing" : "loading"}
       className={cn(
-        "pointer-events-none fixed top-0 left-0 z-50 h-1 bg-primary",
+        "pointer-events-none fixed top-0 left-0 z-50 h-0.5 bg-primary tablet:h-1",
         isFinishing
           ? "w-full opacity-0 [transition:width_200ms_ease-out,opacity_200ms_ease-out_200ms]"
           : "w-[90%] transition-[width] duration-[10s] ease-out starting:w-0",

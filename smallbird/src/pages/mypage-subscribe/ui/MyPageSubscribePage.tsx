@@ -7,6 +7,7 @@ import {
   isBillingPeriod,
   isActiveProductType,
   useBillingCards,
+  useRevalidatePaymentsOnReturn,
   useSubscriptions,
 } from "@/entities/subscription";
 import { SubscriptionPlanList } from "@/features/browse-subscription-plans";
@@ -78,6 +79,7 @@ export function MyPageSubscribePage() {
     tabs: SUBSCRIBE_TABS,
     defaultTab: "plans",
     resetParams: RESET_PARAMS,
+    history: "replace",
   });
   const { panel, openPanel, closePanel } = usePanelParam({
     param: PANEL_PARAM,
@@ -92,6 +94,8 @@ export function MyPageSubscribePage() {
   const { data: cards } = useBillingCards({ isEnabled: !isGuest });
   // 결제 화면 주소로 바로 들어왔을 때 이미 구독 중인 상품인지 확인함(구독 탭·결제내역과 같은 키라 한 번만 요청함).
   const { data: subscriptions } = useSubscriptions({ isEnabled: !isGuest });
+  // MO 결제 내역은 캐시가 있으면 스스로 다시 읽지 않아, 이 화면을 떠날 때 낡았다고 표시해 다시 들어오면 한 번 읽게 함.
+  useRevalidatePaymentsOnReturn();
 
   const checkoutParam = searchParams.get(CHECKOUT_PLAN_PARAM);
   const checkoutType = isActiveProductType(checkoutParam)
@@ -244,6 +248,7 @@ export function MyPageSubscribePage() {
         {!isTabletFilter && (
           // 탭 줄은 스크롤해도 화면 위에 고정함. 위 여백은 고정 영역이 직접 가져 스크롤 내용이 그 위로 비치지 않게 함.
           <StickyTabBar
+            gutter="var(--mypage-gutter)"
             className="desktop:pt-5"
             tabs={SUBSCRIBE_TABS.map((subscribeTab) => ({
               value: subscribeTab,

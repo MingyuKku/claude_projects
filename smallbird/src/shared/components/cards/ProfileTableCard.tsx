@@ -22,6 +22,8 @@ interface ProfileTableCardProps extends ComponentProps<"div"> {
   rows: ProfileTableCardRow[];
   isChecked?: boolean;
   onCheckedChange?: (isChecked: boolean) => void;
+  /** 고를 수 없는 행(예: 결제 대기가 아닌 매칭 행)의 체크박스를 끔. */
+  isCheckDisabled?: boolean;
   checkboxLabel: string;
 }
 
@@ -33,6 +35,7 @@ export function ProfileTableCard({
   rows,
   isChecked = false,
   onCheckedChange,
+  isCheckDisabled = false,
   checkboxLabel,
   className,
   ...props
@@ -44,6 +47,7 @@ export function ProfileTableCard({
           <Checkbox
             aria-label={checkboxLabel}
             checked={isChecked}
+            disabled={isCheckDisabled}
             onCheckedChange={(state) => onCheckedChange?.(state === true)}
           />
         </div>

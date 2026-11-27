@@ -13,10 +13,7 @@
   "nav": {
     "label": "登録ステップ",
     "open": "ステップを開く",
-    "indicator": {
-      "editing": "入力中",
-      "warning": "必須項目未入力"
-    }
+    "warning": "必須項目未入力"
   },
   "action": {
     "saveDraft": "一時保存",

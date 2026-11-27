@@ -23,9 +23,10 @@ export const TAB_STAGES: Record<StatusTab, readonly CampaignStage[]> = {
 export const TAB_PARAM = "tab";
 export const TYPE_PARAM = "type";
 export const KEYWORD_PARAM = "q";
+/** 쪽 이동을 쓰던 때의 쪽 번호. 읽지 않고, 예전 주소로 들어와도 조건을 바꿀 때 지움. */
 export const PAGE_PARAM = "page";
 
-/** 탭을 바꾸면 쪽은 1로 돌아가고 검색어·유형은 유지함(REQ-5-0008). 열어 둔 필터 화면은 닫음. */
+/** 탭을 바꾸면 검색어·유형은 유지함(REQ-5-0008). 열어 둔 필터 화면은 닫음. */
 export const RESET_ON_TAB_CHANGE = [PAGE_PARAM, "panel"] as const;
 
 /** PC·TAB 툴바의 유형 선택 폭(px). */

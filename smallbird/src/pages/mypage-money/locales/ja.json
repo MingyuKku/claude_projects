@@ -4,9 +4,10 @@
     "charge": "チャージ/出金履歴",
     "usage": "利用履歴"
   },
-  "views": {
-    "balance": "チャージ",
-    "history": "履歴詳細"
+  "mobileTabs": {
+    "charge": "チャージ",
+    "history": "チャージ履歴",
+    "usage": "決済履歴"
   },
   "charge": {
     "action": "チャージする"

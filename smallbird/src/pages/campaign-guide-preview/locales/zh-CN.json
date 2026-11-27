@@ -1,0 +1,28 @@
+{
+  "title": "发帖指南预览",
+  "notice": "以下是将发送给所选创作者的发帖指南。",
+  "campaign": {
+    "title": "活动信息",
+    "name": "活动名称",
+    "type": "活动类型",
+    "period": "进行期间",
+    "code": "活动代码",
+    "brandName": "品牌名",
+    "brandImage": "品牌图片"
+  },
+  "basic": {
+    "title": "基本条件设置",
+    "photoCount": "照片数(最少)",
+    "photoUnit": "张以上",
+    "videoCount": "视频数(最少)",
+    "videoUnit": "个以上",
+    "keywords": "必填关键词",
+    "hashtags": "必填话题标签",
+    "notice": "注意事项",
+    "referenceUrl": "参考URL"
+  },
+  "examples": {
+    "title": "示例图片/视频",
+    "contentGuide": "内容概要"
+  }
+}

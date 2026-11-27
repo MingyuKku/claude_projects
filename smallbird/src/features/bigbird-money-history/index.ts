@@ -3,6 +3,7 @@ export {
   useChargeRecord,
   useReloadChargeHistory,
 } from "./api/use-charge-history";
+export { useRevalidateHistoryOnReturn } from "./api/use-history-sync";
 export { useUsageRecord } from "./api/use-usage-history";
 export { ChargeDetail } from "./ui/ChargeDetail";
 export { ChargeHistory } from "./ui/ChargeHistory";

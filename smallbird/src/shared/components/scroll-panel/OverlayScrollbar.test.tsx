@@ -1,4 +1,4 @@
-import { fireEvent, render } from "@testing-library/react";
+import { act, fireEvent, render } from "@testing-library/react";
 import { useRef } from "react";
 import { afterEach, describe, expect, it, vi } from "vitest";
 
@@ -60,5 +60,23 @@ describe("OverlayScrollbar", () => {
     main.scrollBy = vi.fn();
     fireEvent.wheel(thumb, { deltaY: 40 });
     expect(main.scrollBy).toHaveBeenCalledWith({ top: 40 });
+  });
+
+  it("처음에는 보였다가 잠시 뒤 숨김 상태가 되고, 스크롤하면 다시 보인다", () => {
+    vi.useFakeTimers();
+    try {
+      const { main, track } = setup(400);
+      expect(track).toHaveAttribute("data-idle", "false");
+
+      act(() => {
+        vi.advanceTimersByTime(1500);
+      });
+      expect(track).toHaveAttribute("data-idle", "true");
+
+      fireEvent.scroll(main);
+      expect(track).toHaveAttribute("data-idle", "false");
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });

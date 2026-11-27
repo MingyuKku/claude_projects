@@ -1,6 +1,7 @@
 import { CircleHelp, Handshake } from "lucide-react";
 import { useId, useState, type CSSProperties, type ReactNode } from "react";
 
+import { ChoiceCardGroup } from "@/shared/components/choice-card-group";
 import { EmptyState } from "@/shared/components/empty-state";
 import { useTranslation } from "@/shared/i18n";
 import { Button } from "@/shared/ui/button";
@@ -19,7 +20,6 @@ import {
   CAMPAIGN_TABLE_HEADER_HEIGHT,
   CAMPAIGN_TABLE_MAX_HEIGHT,
 } from "../model/constants";
-import { InquiryChoiceGroup } from "./InquiryChoiceGroup";
 
 // 화면 입력 모델. 기간은 `c-client-campaign`의 진행기간을 시안 표기로 바꾼 값.
 export interface InquiryCampaignOption {
@@ -87,7 +87,7 @@ export function NewBigbirdInquiryForm({
       }}
     >
       <div className="customer-center-form-scroll min-h-0 flex-1 space-y-4 overflow-y-auto p-4 tablet:space-y-5 desktop:space-y-6 desktop:p-5">
-        <InquiryChoiceGroup
+        <ChoiceCardGroup
           label={t("typeLabel")}
           value={type}
           onValueChange={(value) => {

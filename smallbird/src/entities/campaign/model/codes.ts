@@ -64,8 +64,8 @@ export function isCampaignTypeFilter(
   return CAMPAIGN_TYPE_FILTERS.some((filter) => filter === value);
 }
 
-/** 현황 목록 한 쪽의 개수(REQ-5-0014). */
-export const CAMPAIGN_PAGE_SIZE = 6;
+/** 현황 목록을 한 번에 이어 읽는 개수. PC 표가 한 번에 화면을 채우는 수로 둠. */
+export const CAMPAIGN_PAGE_SIZE = 15;
 
 /** 이전 캠페인 불러오기 목록 한 번에 읽는 개수(A-2 기본값). 끝에 닿으면 이어 읽음. */
 export const COPY_SOURCE_PAGE_SIZE = 20;

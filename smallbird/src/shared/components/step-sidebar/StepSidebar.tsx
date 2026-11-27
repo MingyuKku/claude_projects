@@ -1,21 +1,21 @@
 import { cva } from "class-variance-authority";
-import { CircleAlert, FilePenLine } from "lucide-react";
+import { CircleAlert } from "lucide-react";
 
 import { cn } from "@/shared/lib/utils";
 import { Badge } from "@/shared/ui/badge";
 
 // Figma `Sidebar Sub Base / Toggle`(단계 메뉴 한 칸, md 48 · sm 40)의 목록. 캠페인 등록 사이드바 상태 모음(13320:132889) 기준.
-// 현재 단계는 파란 링(포커스 모양), 비활성은 번호·이름만 흐리게, 오른쪽 표시는 입력 중(연필)·필수 미입력(빨간 느낌표) 두 가지.
+// 현재 단계는 파란 링(포커스 모양), 비활성은 번호·이름만 흐리게, 오른쪽 표시는 필수 미입력(빨간 느낌표) 하나.
 
 export type StepSidebarItemState = "default" | "current" | "disabled";
-export type StepSidebarIndicator = "editing" | "warning";
 
 export interface StepSidebarItem {
   id: string;
   number: number;
   label: string;
   state: StepSidebarItemState;
-  indicator?: StepSidebarIndicator | null;
+  /** 필수값이 빠진 단계에 빨간 느낌표를 붙임. */
+  hasWarning?: boolean;
 }
 
 const itemVariants = cva(
@@ -49,8 +49,8 @@ interface StepSidebarProps {
   /** 단계 목록 아래에 구분선과 함께 붙는 항목(종료된 캠페인 진행의 "캠페인 결과"). 모양은 `overviewItem`과 같음. */
   footerItem?: StepSidebarOverviewItem;
   size?: "md" | "sm";
-  /** 오른쪽 표시 아이콘의 스크린 리더 문구. */
-  indicatorLabels: Record<StepSidebarIndicator, string>;
+  /** 필수 미입력 아이콘의 스크린 리더 문구. */
+  warningLabel: string;
   onSelect: (id: string) => void;
   className?: string;
 }
@@ -61,7 +61,7 @@ export function StepSidebar({
   overviewItem,
   footerItem,
   size = "md",
-  indicatorLabels,
+  warningLabel,
   onSelect,
   className,
 }: StepSidebarProps) {
@@ -103,17 +103,10 @@ export function StepSidebar({
                 >
                   {item.label}
                 </span>
-                {item.indicator === "editing" && (
-                  <FilePenLine
-                    className="size-4 shrink-0 text-muted-foreground"
-                    aria-label={indicatorLabels.editing}
-                    role="img"
-                  />
-                )}
-                {item.indicator === "warning" && (
+                {item.hasWarning && (
                   <CircleAlert
                     className="size-4 shrink-0 text-destructive"
-                    aria-label={indicatorLabels.warning}
+                    aria-label={warningLabel}
                     role="img"
                   />
                 )}

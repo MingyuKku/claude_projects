@@ -90,9 +90,10 @@ describe("SubscriptionPlanList", () => {
     expect(screen.getByText("연 2,399,988원")).toHaveClass("line-through");
   });
 
-  it("구독 중인 상품은 비활성 '구독 중'이고 다른 상품의 '구독하기'는 눌린다", async () => {
+  it("구독 중인 상품은 구독 버튼이 없고 다른 상품의 '구독하기'는 눌린다", async () => {
     const { user, onSubscribe } = setup();
-    expect(screen.getByRole("button", { name: "구독 중" })).toBeDisabled();
+    expect(screen.queryByRole("button", { name: "구독 중" })).toBeNull();
+    expect(screen.getAllByRole("button", { name: "구독하기" })).toHaveLength(1);
     expect(screen.getAllByText("이용 중")).toHaveLength(1);
 
     await user.click(screen.getByRole("button", { name: "구독하기" }));

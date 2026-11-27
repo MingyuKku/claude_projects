@@ -1,0 +1,138 @@
+{
+  "title": "크리에이터 매칭",
+  "notice": {
+    "payment": "매칭이 확정되면 결제를 완료해야 최종 매칭이 완료됩니다.",
+    "fee": "결제 시 빅버드 수수료 5%와 VAT가 추가되며, 결제는 빅버드머니로 진행됩니다."
+  },
+  "metric": {
+    "total": "제안 발송",
+    "proposed": "제안 중",
+    "negotiating": "재협상 요청",
+    "pendingPayment": "결제 대기",
+    "matched": "매칭 완료",
+    "rejectedOrExpired": "거절/만료",
+    "unit": "건"
+  },
+  "filter": {
+    "search": "원하는 조건을 입력해 보세요.",
+    "status": "상태"
+  },
+  "column": {
+    "profile": "프로필",
+    "platform": "플랫폼",
+    "amount": "제안 금액",
+    "status": "상태",
+    "respondedAt": "응답 일시",
+    "remaining": "남은 시간",
+    "detail": "매칭 내역",
+    "pay": "결제"
+  },
+  "status": {
+    "PROPOSED": "제안 중",
+    "NEGOTIATING": "재협상 요청",
+    "ACCEPTED": "결제 대기",
+    "PAID": "매칭 완료",
+    "REJECTED": "거절",
+    "EXPIRED": "만료"
+  },
+  "remaining": {
+    "day": "{{days}}일 {{hours}}시간",
+    "hour": "{{hours}}시간 {{minutes}}분"
+  },
+  "won": "{{amount}}원",
+  "action": {
+    "detail": "{{name}} 매칭 내역 보기",
+    "pay": "결제하기",
+    "paySelected": "선택된 크리에이터 결제하기",
+    "selectRow": "{{name}} 선택",
+    "selectAll": "결제 대기 크리에이터 모두 선택"
+  },
+  "selection": {
+    "count": "개 선택 됨"
+  },
+  "list": {
+    "label": "크리에이터 매칭 목록",
+    "empty": "아직 제안한 크리에이터가 없습니다."
+  },
+  "unit": {
+    "won": "원"
+  },
+  "offer": {
+    "badge": {
+      "PROPOSED": "캠페인 제안",
+      "NEGOTIATING": "재협상 요청",
+      "ACCEPTED": "결제 대기",
+      "PAID": "매칭 완료",
+      "REJECTED": "거절",
+      "EXPIRED": "만료"
+    },
+    "amount": "제안 금액",
+    "fee": "수수료",
+    "content": "진행 내용",
+    "schedule": "희망 업로드 일정",
+    "rejected": "제안이 거절되었습니다."
+  },
+  "counter": {
+    "action": "다시 제안",
+    "title": "금액 다시 제안하기",
+    "close": "금액 다시 제안하기 닫기",
+    "current": "현재 요청 금액",
+    "amount": "제안 금액",
+    "placeholder": "금액을 입력하세요.",
+    "submit": "금액 제안하기"
+  },
+  "decision": {
+    "accept": {
+      "action": "수락",
+      "title": "제안 수락 확정",
+      "description": "제안을 수락하면 결제 전까지 결제 대기 상태가 되며,\n3일 이내에 결제를 완료해야 매칭이 확정됩니다.",
+      "cancel": "취소",
+      "confirm": "수락"
+    },
+    "payNow": {
+      "title": "이어서 결제 진행",
+      "description": "직전 수락한 제안을 결제하면 매칭이 확정됩니다.\n결제 후에 환불은 불가능하며, 나중에 결제 시 기한 내에 완료해주세요.",
+      "cancel": "나중에 결제",
+      "confirm": "지금 결제하기"
+    },
+    "reject": {
+      "action": "거절",
+      "title": "제안 거절",
+      "description": "정말 거절하시겠습니까? 거절하시면 해당 크리에이터에게 매칭 요청을 다시 보낼 수 없습니다.",
+      "cancel": "취소",
+      "confirm": "거절"
+    },
+    "conflict": "이미 처리됐거나 지금은 할 수 없는 요청입니다. 화면을 새로 고쳤습니다."
+  },
+  "detail": {
+    "title": "매칭 상세보기",
+    "close": "매칭 상세보기 닫기",
+    "loading": "불러오는 중",
+    "tab": {
+      "chat": "크리에이터 채팅",
+      "info": "크리에이터 정보"
+    },
+    "notice": {
+      "title": "캠페인 제안 및 협상 단계",
+      "description": "현재는 제안/협상 단계로, 자유채팅은 매칭 완료 후에만 가능합니다.",
+      "caption": "제안 내용, 일정, 조건 등을 조율한 뒤 서로 수락하면 캠페인이 확정됩니다."
+    }
+  },
+  "info": {
+    "title": "크리에이터 정보",
+    "campaign": "캠페인 정보",
+    "type": "캠페인 유형",
+    "progress": "진행 상태",
+    "period": "진행 기간",
+    "code": "캠페인 코드",
+    "copied": "캠페인 코드를 복사했습니다.",
+    "copyFailed": "복사하지 못했습니다.",
+    "offer": "제안 정보",
+    "initialAmount": "최초 제안 금액",
+    "currentAmount": "현재 제안 금액",
+    "schedule": "희망 업로드일",
+    "memo": "메모",
+    "memoPlaceholder": "크리에이터에 대한 메모를 남겨 보세요.",
+    "memoFailed": "메모를 저장하지 못했습니다. 잠시 후 다시 입력해 주세요."
+  }
+}

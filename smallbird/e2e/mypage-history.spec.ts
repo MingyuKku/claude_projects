@@ -52,9 +52,10 @@ test("전체 메뉴로 다른 화면에 가면 맨 위에서 시작하고, 뒤�
   await expect(page.getByRole("dialog")).toBeHidden();
 });
 
-test("탭을 바꾸면 맨 위에서 시작하고, 뒤로가기로 이전 탭과 위치로 돌아온다", async ({
+test("탭을 바꾸면 맨 위에서 시작하고, 탭 전환은 기록에 남지 않아 뒤로가기로 이전 화면에 간다", async ({
   page,
 }) => {
+  await page.goto("/mypage/money");
   await page.goto("/mypage/account");
   await expect(page.getByText("홍길동")).toBeVisible();
   await scrollMain(page, SCROLLED);
@@ -67,11 +68,7 @@ test("탭을 바꾸면 맨 위에서 시작하고, 뒤로가기로 이전 탭과
   await expect.poll(() => mainScrollTop(page)).toBe(0);
 
   await page.goBack();
-  await expect(page).toHaveURL("/mypage/account");
-  await expect(
-    page.getByRole("tab", { name: "Master ID 관리", selected: true }),
-  ).toBeVisible();
-  await expect.poll(() => mainScrollTop(page)).toBe(SCROLLED);
+  await expect(page).toHaveURL("/mypage/money");
 });
 
 test("MO에서 하위 화면을 열면 맨 위에서 시작하고, 뒤로가기로 닫으면 열기 전 위치로 돌아온다", async ({

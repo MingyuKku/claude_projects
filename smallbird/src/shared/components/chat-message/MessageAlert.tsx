@@ -34,6 +34,8 @@ interface MessageAlertProps {
   title: string;
   description: string;
   caption?: string;
+  /** 상태 아이콘 대신 쓸 아이콘(예: 매칭 협상 안내의 악수). 색은 상태 글자색을 따름. */
+  icon?: ReactNode;
   /** 오른쪽 아래 버튼 묶음(예: 재시도, 문의 메시지로 남기기). */
   actions?: ReactNode;
   /** 제목 줄 오른쪽 끝 X 버튼(Figma 11315:50280 완료 카드). 넘기면 버튼을 그림. */
@@ -47,6 +49,7 @@ export function MessageAlert({
   title,
   description,
   caption,
+  icon,
   actions,
   onClickClose,
   closeLabel,
@@ -65,7 +68,7 @@ export function MessageAlert({
       <div className="flex min-w-65.5 flex-1 flex-col gap-2">
         <div className="flex items-start justify-between gap-2">
           <p className={titleVariants({ status })}>
-            {STATUS_ICON[status]}
+            {icon ?? STATUS_ICON[status]}
             {title}
           </p>
           {onClickClose && (

@@ -9,7 +9,7 @@ describe("toCampaignListParams", () => {
         keyword: "  ",
         page: 2,
       }),
-    ).toEqual({ page: 2, entrySize: 6 });
+    ).toEqual({ page: 2, entrySize: 15 });
   });
 
   it("상태는 콤마로 잇고 유형 필터는 서비스·상품 코드로 나눈다", () => {
@@ -26,7 +26,7 @@ describe("toCampaignListParams", () => {
       productType: "BRAND",
       keyword: "톤업",
       page: 1,
-      entrySize: 6,
+      entrySize: 15,
     });
   });
 });

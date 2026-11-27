@@ -50,6 +50,7 @@ export function MyPageAccountPage() {
     tabs,
     defaultTab: tabs[0],
     resetParams: ["panel", "subId", "keyword", "page"],
+    history: "replace",
   });
 
   // Sub ID 생성·권한 부여·수정 하위 화면은 URL 쿼리(panel, subId)가 소유함(뒤로 가기로 닫히고 새로고침해도 유지).
@@ -155,6 +156,7 @@ export function MyPageAccountPage() {
             화면 가장자리가 되도록 스크롤 영역을 레이아웃 좌우 여백(--mypage-gutter)만큼 넓히고 첫 탭을 콘텐츠 선에 맞추는 여백은 목록이 가짐. */}
         {!hidesTabBar && (
           <StickyTabBar
+            gutter="var(--mypage-gutter)"
             scrollable
             className="desktop:pt-5"
             tabs={tabs.map((accountTab) => ({

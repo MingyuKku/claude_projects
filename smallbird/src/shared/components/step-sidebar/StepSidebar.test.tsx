@@ -3,32 +3,24 @@ import userEvent from "@testing-library/user-event";
 
 import { StepSidebar } from "./StepSidebar";
 
-const LABELS = { editing: "입력 중", warning: "필수 항목 미입력" };
-
 describe("StepSidebar", () => {
-  it("현재 단계를 표시하고, 비활성 단계는 누를 수 없으며, 오른쪽 표시를 읽어 준다", async () => {
+  it("현재 단계를 표시하고, 비활성 단계는 누를 수 없으며, 경고 표시를 읽어 준다", async () => {
     const user = userEvent.setup();
     const onSelect = vi.fn();
     render(
       <StepSidebar
         label="등록 단계"
-        indicatorLabels={LABELS}
+        warningLabel="필수 항목 미입력"
         onSelect={onSelect}
         items={[
           { id: "a", number: 1, label: "첫 단계", state: "current" },
-          {
-            id: "b",
-            number: 2,
-            label: "둘째 단계",
-            state: "default",
-            indicator: "editing",
-          },
+          { id: "b", number: 2, label: "둘째 단계", state: "default" },
           {
             id: "c",
             number: 3,
             label: "셋째 단계",
             state: "default",
-            indicator: "warning",
+            hasWarning: true,
           },
           { id: "d", number: 4, label: "넷째 단계", state: "disabled" },
         ]}
@@ -41,7 +33,6 @@ describe("StepSidebar", () => {
       "aria-current",
       "step",
     );
-    expect(screen.getByRole("img", { name: "입력 중" })).toBeInTheDocument();
     expect(
       screen.getByRole("img", { name: "필수 항목 미입력" }),
     ).toBeInTheDocument();
@@ -57,7 +48,7 @@ describe("StepSidebar", () => {
     render(
       <StepSidebar
         label="진행 단계"
-        indicatorLabels={LABELS}
+        warningLabel="필수 항목 미입력"
         onSelect={onSelect}
         items={[{ id: "a", number: 1, label: "첫 단계", state: "disabled" }]}
         footerItem={{ id: "result", label: "결과", isCurrent: true }}

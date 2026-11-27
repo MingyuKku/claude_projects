@@ -35,12 +35,19 @@ export function useListParams(
 
   // 목록 조건(검색어·필터·쪽·개수)이 바뀌어도 열어 둔 상세 보기(`panel`·`id`)는 그대로 둠. PC에서는 상세가 목록 옆에 떠 있어
   // 조건을 바꿔 가며 볼 수 있어야 하고, 대상이 새 목록에 없어도 상세는 열 때의 내용을 유지함(`useKeepDetail`).
-  function update(change: (params: URLSearchParams) => void) {
-    setSearchParams((prev) => {
-      const params = new URLSearchParams(prev);
-      change(params);
-      return params;
-    });
+  // 검색·필터·개수는 같은 화면 안의 조건이라 기록을 쌓지 않고(replace), 쪽 이동만 기록에 남겨 뒤로 가기가 이전 쪽으로 돌아가게 함.
+  function update(
+    change: (params: URLSearchParams) => void,
+    { replace = true }: { replace?: boolean } = {},
+  ) {
+    setSearchParams(
+      (prev) => {
+        const params = new URLSearchParams(prev);
+        change(params);
+        return params;
+      },
+      { replace },
+    );
   }
 
   return {
@@ -83,9 +90,12 @@ export function useListParams(
         params.delete(PAGE_PARAM);
       }),
     setPage: (next: number) =>
-      update((params) => {
-        params.set(PAGE_PARAM, String(next));
-      }),
+      update(
+        (params) => {
+          params.set(PAGE_PARAM, String(next));
+        },
+        { replace: false },
+      ),
     /** 마지막 쪽의 항목을 지웠거나 주소를 직접 고쳐 범위를 벗어난 쪽을 마지막 쪽으로 당김(기록은 쌓지 않음). */
     clampPage: (lastPage: number) =>
       setSearchParams(

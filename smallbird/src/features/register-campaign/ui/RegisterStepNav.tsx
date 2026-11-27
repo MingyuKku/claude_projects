@@ -25,9 +25,6 @@ export function RegisterStepNav({
   const { t } = useTranslation("features/register-campaign");
   const { steps, currentStep, goToStep } = useWizardNavigation();
   const draft = useRegisterWizardStore((state) => state.draft);
-  const hasVisitedPayment = useRegisterWizardStore(
-    (state) => state.hasVisitedPayment,
-  );
   const isRevisionMode = useRegisterWizardStore(
     (state) => state.isRevisionMode,
   );
@@ -36,7 +33,6 @@ export function RegisterStepNav({
     steps,
     draft,
     currentStep,
-    hasVisitedPayment,
   });
 
   function handleSelect(id: string) {
@@ -54,10 +50,7 @@ export function RegisterStepNav({
       label={t("nav.label")}
       size={size}
       className={className}
-      indicatorLabels={{
-        editing: t("nav.indicator.editing"),
-        warning: t("nav.indicator.warning"),
-      }}
+      warningLabel={t("nav.warning")}
       overviewItem={
         isRevisionMode
           ? { id: OVERVIEW_ID, label: t("detail.title"), isCurrent: false }
@@ -68,7 +61,7 @@ export function RegisterStepNav({
         number: index + 1,
         label: t(STEP_LABEL_KEYS[status.step]),
         state: status.state,
-        indicator: status.indicator,
+        hasWarning: status.hasWarning,
       }))}
       onSelect={handleSelect}
     />

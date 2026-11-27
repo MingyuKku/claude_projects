@@ -2,6 +2,7 @@ import { useId } from "react";
 import { toast } from "sonner";
 
 import { FormField } from "@/shared/components/form-field";
+import { KeywordInput } from "@/shared/components/keyword-input";
 import { TextField } from "@/shared/components/text-field";
 import { ThumbnailUpload } from "@/shared/components/thumbnail-upload";
 import { useTranslation } from "@/shared/i18n";
@@ -17,7 +18,6 @@ import {
 } from "../../../model/step-completion";
 import { useRegisterWizardStore } from "../../../model/wizard-context";
 import { DetailMediaField } from "./DetailMediaField";
-import { HashtagField } from "./HashtagField";
 
 import type { CampaignIntroDraft } from "@/entities/campaign";
 
@@ -130,24 +130,30 @@ export function IntroFields({ disabled }: IntroFieldsProps) {
       </FormField>
       {needsTitleHashtags(platform) ? (
         <>
-          <HashtagField
+          <KeywordInput
             label={t("intro.hashtag.title")}
             value={intro.titleHashtags}
             onChangeValue={(titleHashtags) => patch({ titleHashtags })}
+            placeholder={t("intro.hashtag.placeholder")}
+            removeLabel={(keyword) => t("intro.hashtag.remove", { keyword })}
             disabled={disabled}
           />
-          <HashtagField
+          <KeywordInput
             label={t("intro.hashtag.content")}
             value={intro.contentHashtags}
             onChangeValue={(contentHashtags) => patch({ contentHashtags })}
+            placeholder={t("intro.hashtag.placeholder")}
+            removeLabel={(keyword) => t("intro.hashtag.remove", { keyword })}
             disabled={disabled}
           />
         </>
       ) : (
-        <HashtagField
+        <KeywordInput
           label={t("intro.hashtag.single")}
           value={intro.contentHashtags}
           onChangeValue={(contentHashtags) => patch({ contentHashtags })}
+          placeholder={t("intro.hashtag.placeholder")}
+          removeLabel={(keyword) => t("intro.hashtag.remove", { keyword })}
           disabled={disabled}
         />
       )}

@@ -118,6 +118,8 @@ export {
 export type { CampaignProgressStep } from "./model/progress-steps";
 export { toDraftStep } from "./model/server-steps";
 export { useCampaignStatusReturnStore } from "./model/status-return-store";
+export { useBackToCampaignStatus } from "./model/use-back-to-status";
+export { resetCampaignListChanges } from "./model/list-changes";
 export type {
   CampaignListQuery,
   CampaignPage,

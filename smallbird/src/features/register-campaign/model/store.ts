@@ -71,8 +71,6 @@ export interface RegisterWizardState {
   savedDraft: CampaignDraft;
   /** 화면에 연 단계. 연 단계는 기본 선택만 있어도 사용자가 본 값이라 이동할 때 저장함(`getChangedSteps`). */
   shownSteps: CampaignDraftStep[];
-  /** 결제 단계에 들어온 뒤로는 필수값이 빠진 단계에 경고를 보임. 저장하지 않음. */
-  hasVisitedPayment: boolean;
   /** 저장 없이 나가도 되는 상태(수정 불가 안내 뒤 등록 내역으로 갈 때). */
   isLeaveAllowed: boolean;
   dialog: WizardDialog | null;
@@ -111,7 +109,6 @@ export interface RegisterWizardActions {
   endPendingSave: (action: PendingSaveAction) => void;
   /** 서버가 비운 단계(유형 변경, A-5.1)를 저장된 값에서도 비움. */
   markServerCleared: (steps: readonly CampaignDraftStep[]) => void;
-  markPaymentVisited: () => void;
   allowLeave: () => void;
   openDialog: (dialog: WizardDialog) => void;
   closeDialog: () => void;
@@ -154,7 +151,6 @@ export function createRegisterWizardStore(detail: CampaignDetail) {
         }),
         savedDraft: detail.draft,
         shownSteps: [],
-        hasVisitedPayment: false,
         isLeaveAllowed: false,
         dialog: null,
         introMode: getInitialIntroMode(detail.draft),
@@ -247,7 +243,6 @@ export function createRegisterWizardStore(detail: CampaignDetail) {
               Object.assign(savedDraft, { [step]: empty[step] });
             return { savedDraft };
           }),
-        markPaymentVisited: () => set({ hasVisitedPayment: true }),
         allowLeave: () => set({ isLeaveAllowed: true }),
         openDialog: (dialog) => set({ dialog }),
         closeDialog: () => set({ dialog: null }),

@@ -37,7 +37,7 @@ interface SubscriptionPlanCardProps {
   onSubscribe: (type: ActiveProductType) => void;
 }
 
-// 구독 탭의 상품 카드. 카드 자체는 클릭 동작이 없고, 호버는 연한 회색 배경으로 보이고 카드 단위 강조 링(포커스·펼침)은 쓰지 않음.
+// 구독 탭의 상품 카드. 카드 자체는 클릭 동작이 없고, 호버는 연한 회색 배경으로 보임. 구독 중이면 1px 링, 상세를 펼치면 2px 링으로 강조함.
 export function SubscriptionPlanCard({
   type,
   period,
@@ -110,7 +110,7 @@ export function SubscriptionPlanCard({
       detail={<PlanDetail type={activeType} />}
       detailLabel={t("plan.detail")}
       onClickDetail={onToggleDetail}
-      actionLabel={isSubscribed ? t("plan.subscribed") : t("plan.subscribe")}
+      actionLabel={t("plan.subscribe")}
       onClickAction={() => onSubscribe(activeType)}
     />
   );

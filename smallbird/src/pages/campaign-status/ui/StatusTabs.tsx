@@ -1,5 +1,6 @@
+import { ScrollableTabsList } from "@/shared/components/scrollable-tabs-list";
 import { useTranslation } from "@/shared/i18n";
-import { Tabs, TabsList, TabsTrigger } from "@/shared/ui/tabs";
+import { Tabs, TabsTrigger } from "@/shared/ui/tabs";
 
 import { STATUS_TABS } from "../model/constants";
 
@@ -10,21 +11,19 @@ interface StatusTabsProps {
   onChange: (tab: string) => void;
 }
 
-// 진행 단계 탭(Figma Tabs Type=Line). 좁은 화면에서는 탭이 줄어들지 않고 가로로 스크롤함.
+// 진행 단계 탭(Figma Tabs Type=Line). 좁은 화면에서는 탭이 줄어들지 않고 화면 끝까지 가로로 스크롤함(부모 여백 ds-px-5를 넘어감).
 export function StatusTabs({ value, onChange }: StatusTabsProps) {
   const { t } = useTranslation("pages/campaign-status");
 
   return (
     <Tabs value={value} onValueChange={onChange} className="gap-0">
-      <div className="scrollbar-hidden overflow-x-auto">
-        <TabsList variant="line" className="w-full min-w-max justify-start">
-          {STATUS_TABS.map((tab) => (
-            <TabsTrigger key={tab} value={tab} className="flex-none">
-              {t(`tab.${tab}`)}
-            </TabsTrigger>
-          ))}
-        </TabsList>
-      </div>
+      <ScrollableTabsList variant="line" bleed="mobile" gutter="var(--ds-p-5)">
+        {STATUS_TABS.map((tab) => (
+          <TabsTrigger key={tab} value={tab} className="flex-none">
+            {t(`tab.${tab}`)}
+          </TabsTrigger>
+        ))}
+      </ScrollableTabsList>
     </Tabs>
   );
 }

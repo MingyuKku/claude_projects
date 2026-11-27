@@ -7,10 +7,10 @@ import { cn } from "@/shared/lib/utils"
 // Figma 디자인 시스템 Data Table(4732:24967) 기준.
 // 셀 높이 = Figma Size(xs 48 / sm 56 / md 76 / lg 96), 헤더 톤 = Table Base / Header(기본) · Header Gray.
 // 크기·톤은 Table의 data 속성으로 내려 모든 셀이 따름.
-// Footer(End. Footer) = muted/50 배경 + font-medium, hover 시 muted.
+// Footer(End. Footer) = muted/50 배경 + font-medium. 행에 마우스를 올려도 색이 바뀌지 않음.
 //
 // 가로로 넘치면 첫 열은 고정(sticky)하고 나머지만 스크롤함. 고정 칸은 아래로 지나가는 내용을 가려야 해서 불투명 배경이
-// 필요한데, 행 배경(hover·선택)과 머리글 배경이 반투명이라 그대로 쓰면 비침. 그래서 배경을 바탕색과 섞은 불투명 색을
+// 필요한데, 행 배경(메뉴 열림·선택)과 머리글 배경이 반투명이라 그대로 쓰면 비침. 그래서 배경을 바탕색과 섞은 불투명 색을
 // CSS 변수로 두고, 행은 --table-row-bg를 바꾸며 고정 칸은 같은 변수를 읽어 행과 같은 색이 됨.
 const TABLE_COLOR_VARIABLES =
   "[--table-row-hover:color-mix(in_oklab,var(--color-muted)_50%,var(--color-background))] [--table-row-selected:var(--color-muted)] data-[header-tone=gray]:[--table-header-bg:color-mix(in_oklab,var(--color-muted)_40%,var(--color-background))]"
@@ -101,7 +101,7 @@ function TableFooter({ className, ...props }: React.ComponentProps<"tfoot">) {
       data-slot="table-footer"
       className={cn(
         // 행 배경을 --table-row-bg로 정해 고정 첫 칸도 같은 색을 씀(본문 행과 같은 방식). muted/50은 바탕색과 섞은 불투명 색.
-        "border-t font-medium [--table-row-bg:color-mix(in_oklab,var(--color-muted)_50%,var(--color-background))] [&>tr]:last:border-b-0 [&>tr]:hover:[--table-row-bg:var(--color-muted)]",
+        "border-t font-medium [--table-row-bg:color-mix(in_oklab,var(--color-muted)_50%,var(--color-background))] [&>tr]:last:border-b-0",
         className
       )}
       {...props}
@@ -115,7 +115,7 @@ function TableRow({ className, ...props }: React.ComponentProps<"tr">) {
       data-slot="table-row"
       className={cn(
         // 호버는 본문 행만(머리글 행은 누를 수 없음). 배경은 --table-row-bg로 정해 고정 첫 칸이 같은 색을 씀.
-        "border-b bg-(--table-row-bg) transition-colors in-data-[slot=table-body]:hover:[--table-row-bg:var(--table-row-hover)] has-aria-expanded:[--table-row-bg:var(--table-row-hover)] data-[state=selected]:[--table-row-bg:var(--table-row-selected)]",
+        "border-b bg-(--table-row-bg) transition-colors has-aria-expanded:[--table-row-bg:var(--table-row-hover)] data-[state=selected]:[--table-row-bg:var(--table-row-selected)]",
         className
       )}
       {...props}

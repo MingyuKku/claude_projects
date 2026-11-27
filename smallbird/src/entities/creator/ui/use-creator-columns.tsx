@@ -22,8 +22,8 @@ export interface CreatorColumn {
   render: (creator: CreatorViewModel) => ReactNode;
 }
 
-/** `default`는 관리 화면, `search`는 검색 PC, `searchTablet`은 검색 TAB 한 줄. */
-export type CreatorColumnLayout = "default" | "search" | "searchTablet";
+/** `desktop`은 PC 표, `tablet`은 TAB 한 줄 표(검색·관리 같음). */
+export type CreatorColumnLayout = "desktop" | "tablet";
 
 const SUBSCRIBER_PLATFORMS: ReadonlySet<MatchingPlatformCode> = new Set([
   "youtube",
@@ -31,14 +31,13 @@ const SUBSCRIBER_PLATFORMS: ReadonlySet<MatchingPlatformCode> = new Set([
   "tiktok",
 ]);
 
+// 칸은 시안 폭으로 두고 머리글이 길면 말줄임함(남는 폭은 크리에이터 칸이 가짐).
 const COLUMN_CLASS_NAMES = {
-  platform: "min-w-17.25",
-  category: "min-w-35.75",
-  metric: "min-w-24",
-  wideMetric: "min-w-35",
-  cost: "min-w-30",
-  searchCategory: "min-w-28",
-  searchCost: "min-w-27.5",
+  platform: "max-w-0 min-w-21.75",
+  category: "max-w-0 min-w-28",
+  brandIndex: "max-w-0 min-w-28.5",
+  metric: "max-w-0 min-w-25.5",
+  tabletMetric: "max-w-0 min-w-28",
 };
 
 export function useCreatorColumns(
@@ -49,6 +48,7 @@ export function useCreatorColumns(
   const { term } = useCreatorTerms();
   const { findPlatform, findCategoryName } = useCreatorLabels();
   const getMetricTexts = useCreatorMetricTexts();
+  const isTablet = layout === "tablet";
 
   const platform: CreatorColumn = {
     id: "platform",
@@ -61,96 +61,64 @@ export function useCreatorColumns(
       </div>
     ),
   };
-  const category: CreatorColumn = {
-    id: "category",
-    sortKey: "CATEGORY",
-    header: term("category"),
-    className: COLUMN_CLASS_NAMES.category,
-    cellClassName: "max-w-0 truncate",
-    render: (creator) => findCategoryName(creator.categoryIdx) ?? EMPTY_VALUE,
-  };
-  const followers: CreatorColumn = {
-    id: "followers",
-    sortKey: "FOLLOWER",
-    header:
-      platformCode && SUBSCRIBER_PLATFORMS.has(platformCode)
-        ? term("subscriberCount")
-        : term("followerCount"),
-    className: COLUMN_CLASS_NAMES.metric,
-    render: (creator) => getMetricTexts(creator).followers,
-  };
   const brandIndex: CreatorColumn = {
     id: "brandIndex",
     sortKey: "BRAND_INDEX",
     header: t("column.brandIndex"),
-    className: COLUMN_CLASS_NAMES.metric,
+    className: isTablet
+      ? COLUMN_CLASS_NAMES.tabletMetric
+      : COLUMN_CLASS_NAMES.brandIndex,
     render: (creator) => getMetricTexts(creator).brandIndex,
   };
   const groupBuyIndex: CreatorColumn = {
     id: "groupBuyIndex",
     sortKey: "GROUP_BUY_INDEX",
     header: t("column.groupBuyIndex"),
-    className: COLUMN_CLASS_NAMES.metric,
+    className: isTablet
+      ? COLUMN_CLASS_NAMES.tabletMetric
+      : COLUMN_CLASS_NAMES.metric,
     render: (creator) => getMetricTexts(creator).groupBuyIndex,
   };
-  const expectedCost: CreatorColumn = {
-    id: "expectedCost",
-    sortKey: "EXPECTED_COST",
-    header: term("expectedCost"),
-    className: COLUMN_CLASS_NAMES.cost,
-    render: (creator) => getMetricTexts(creator).expectedCost,
-  };
-  // 희망비용은 목록 응답에 아직 없어 항상 -.
-  const desiredCost: CreatorColumn = {
-    id: "desiredCost",
-    sortKey: "DESIRED_COST",
-    header: term("desiredCost"),
-    className: COLUMN_CLASS_NAMES.cost,
-    render: () => EMPTY_VALUE,
-  };
 
-  if (layout === "searchTablet") return [platform, brandIndex, groupBuyIndex];
-
-  // 검색 표는 정렬 머리글 시안이라 칸 폭이 관리 화면과 다름.
-  const searchCategory: CreatorColumn = {
-    ...category,
-    className: COLUMN_CLASS_NAMES.searchCategory,
-  };
-  const predictedCost: CreatorColumn = {
-    ...expectedCost,
-    header: t("column.predictedCost"),
-    className: COLUMN_CLASS_NAMES.searchCost,
-  };
-  const searchDesiredCost: CreatorColumn = {
-    ...desiredCost,
-    className: COLUMN_CLASS_NAMES.searchCost,
-  };
+  if (isTablet) return [platform, brandIndex, groupBuyIndex];
 
   // 통합지수 도입 전에는 플랫폼을 골라도 칸이 같고 팔로워 칸 이름만 바뀜.
-  if (layout === "search") {
-    return [
-      platform,
-      searchCategory,
-      brandIndex,
-      groupBuyIndex,
-      followers,
-      predictedCost,
-      searchDesiredCost,
-    ];
-  }
-
   return [
     platform,
-    category,
-    followers,
+    {
+      id: "category",
+      sortKey: "CATEGORY",
+      header: term("category"),
+      className: COLUMN_CLASS_NAMES.category,
+      cellClassName: "max-w-0 truncate",
+      render: (creator) => findCategoryName(creator.categoryIdx) ?? EMPTY_VALUE,
+    },
     brandIndex,
     groupBuyIndex,
     {
-      id: "commentWriters",
-      header: term("avgCommentWriterCount"),
-      className: COLUMN_CLASS_NAMES.wideMetric,
-      render: (creator) => getMetricTexts(creator).commentWriters,
+      id: "followers",
+      sortKey: "FOLLOWER",
+      header:
+        platformCode && SUBSCRIBER_PLATFORMS.has(platformCode)
+          ? term("subscriberCount")
+          : term("followerCount"),
+      className: COLUMN_CLASS_NAMES.metric,
+      render: (creator) => getMetricTexts(creator).followers,
     },
-    expectedCost,
+    {
+      id: "expectedCost",
+      sortKey: "EXPECTED_COST",
+      header: t("column.predictedCost"),
+      className: COLUMN_CLASS_NAMES.metric,
+      render: (creator) => getMetricTexts(creator).expectedCost,
+    },
+    // 희망비용은 목록 응답에 아직 없어 항상 -.
+    {
+      id: "desiredCost",
+      sortKey: "DESIRED_COST",
+      header: t("column.desiredCost"),
+      className: COLUMN_CLASS_NAMES.metric,
+      render: () => EMPTY_VALUE,
+    },
   ];
 }

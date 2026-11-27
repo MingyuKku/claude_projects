@@ -12,6 +12,7 @@
     "groupBuyIndex": "团购指数",
     "actions": "操作",
     "predictedCost": "预测费用",
+    "desiredCost": "期望费用",
     "sortBy": "按{{name}}排序"
   },
   "select": {

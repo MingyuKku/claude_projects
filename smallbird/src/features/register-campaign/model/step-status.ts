@@ -3,49 +3,45 @@ import { isStepComplete, isStepStarted } from "./step-completion";
 import type { RegisterStepDefinition } from "./steps";
 import type { CampaignDraft, CampaignRegisterStep } from "@/entities/campaign";
 
-// 사이드바 단계 상태(스펙 §3 단계 사이드바). 1단계를 통과하기 전에는 2~8단계를 막고, 오른쪽 표시는
-// 결제 단계에 들어온 뒤의 필수 미입력 경고 → 그 밖에 일부만 입력한(현재 단계가 아닌) 단계의 입력 중 순으로 정함.
+// 사이드바 단계 상태(스펙 §3 단계 사이드바). 1단계를 통과하기 전에는 2~8단계를 막고, 필수 미입력 경고는
+// 현재 단계와 그 이전 단계 중 필수값이 빠진 단계에 붙임. 현재 단계는 일부라도 입력했을 때만 붙여, 막 연 빈 단계가 오류처럼 보이지 않게 함.
 
 export type StepState = "default" | "current" | "disabled";
-export type StepIndicator = "editing" | "warning" | null;
 
 export interface StepStatus {
   step: CampaignRegisterStep;
   state: StepState;
-  indicator: StepIndicator;
+  hasWarning: boolean;
 }
 
 export function isInfoComplete(draft: CampaignDraft) {
   return isStepComplete("info", draft);
 }
 
-function getIndicator(
+function hasWarning(
   definition: RegisterStepDefinition,
   draft: CampaignDraft,
   isCurrent: boolean,
-  hasVisitedPayment: boolean,
-): StepIndicator {
+  isReached: boolean,
+): boolean {
   const { draftStep, isOptional } = definition;
-  if (draftStep === null || isOptional) return null;
-  if (isStepComplete(draftStep, draft)) return null;
-  if (hasVisitedPayment) return "warning";
-  if (!isCurrent && isStepStarted(draftStep, draft)) return "editing";
-  return null;
+  if (!isReached || draftStep === null || isOptional) return false;
+  if (isStepComplete(draftStep, draft)) return false;
+  return !isCurrent || isStepStarted(draftStep, draft);
 }
 
 export function getStepStatuses({
   steps,
   draft,
   currentStep,
-  hasVisitedPayment,
 }: {
   steps: readonly RegisterStepDefinition[];
   draft: CampaignDraft;
   currentStep: CampaignRegisterStep;
-  hasVisitedPayment: boolean;
 }): StepStatus[] {
   const isUnlocked = isInfoComplete(draft);
-  return steps.map((definition) => {
+  const currentIndex = steps.findIndex(({ step }) => step === currentStep);
+  return steps.map((definition, index) => {
     const isCurrent = definition.step === currentStep;
     const isLocked = !isUnlocked && definition.draftStep !== "info";
     let state: StepState = "default";
@@ -54,7 +50,12 @@ export function getStepStatuses({
     return {
       step: definition.step,
       state,
-      indicator: getIndicator(definition, draft, isCurrent, hasVisitedPayment),
+      hasWarning: hasWarning(
+        definition,
+        draft,
+        isCurrent,
+        index <= currentIndex,
+      ),
     };
   });
 }

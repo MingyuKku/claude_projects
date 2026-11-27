@@ -13,10 +13,7 @@
   "nav": {
     "label": "注册步骤",
     "open": "打开步骤",
-    "indicator": {
-      "editing": "填写中",
-      "warning": "必填项未填写"
-    }
+    "warning": "必填项未填写"
   },
   "action": {
     "saveDraft": "暂存",

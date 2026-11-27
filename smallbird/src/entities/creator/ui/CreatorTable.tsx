@@ -1,4 +1,4 @@
-import { ArrowDownUpIcon } from "lucide-react";
+import { ChevronsUpDown } from "lucide-react";
 
 import { EmptyTableFrame } from "@/shared/components/list-filter";
 import { useTranslation } from "@/shared/i18n";
@@ -17,7 +17,6 @@ import {
 } from "@/shared/ui/table";
 
 import { isInteractiveTarget } from "../lib/is-interactive-target";
-import { useCreatorTerms } from "../lib/use-creator-terms";
 import { CreatorRowActions } from "./CreatorRowActions";
 
 import type { SearchSort, SearchSortKey } from "../model/search-query";
@@ -41,8 +40,6 @@ interface CreatorTableProps {
   emptyContent?: ReactNode;
   /** 스크롤 영역 안, 표 아래(다음 쪽 표식·읽는 중·재시도). */
   footer?: ReactNode;
-  /** 프로필 열 최소 폭을 줄임(표가 좁은 화면). */
-  isProfileCompact?: boolean;
   /** 둘 다 있으면 머리글을 눌러 정렬함(크리에이터 검색). */
   sort?: SearchSort;
   onClickSort?: (key: SearchSortKey) => void;
@@ -52,9 +49,8 @@ interface CreatorTableProps {
 // 시안 폭은 최소 폭으로 둬, 문구가 긴 언어에서는 열이 넓어짐. 프로필 열이 남는 폭을 가짐.
 const COLUMN_CLASS_NAMES = {
   checkbox: "w-12 min-w-12",
-  profile: "w-full min-w-63",
-  compactProfile: "w-full min-w-32",
-  actions: "min-w-27",
+  profile: "w-full min-w-32",
+  actions: "min-w-27 desktop:min-w-25.5",
 };
 
 // 시안 머리글 높이·배경. 체크박스가 있는 공통 머리글은 여백이 커서 덮음.
@@ -76,13 +72,11 @@ export function CreatorTable({
   onClickItem,
   emptyContent,
   footer,
-  isProfileCompact = false,
   sort,
   onClickSort,
   className,
 }: CreatorTableProps) {
   const { t } = useTranslation("entities/creator");
-  const { term } = useCreatorTerms();
 
   const selectedCount = items.filter((item) =>
     selectedKeys.has(item.key),
@@ -103,16 +97,12 @@ export function CreatorTable({
           />
         </TableHead>
         <SortableHead
-          className={
-            isProfileCompact
-              ? COLUMN_CLASS_NAMES.compactProfile
-              : COLUMN_CLASS_NAMES.profile
-          }
-          sortKey={onClickSort && "NICKNAME"}
+          className={COLUMN_CLASS_NAMES.profile}
+          sortKey="NICKNAME"
           sort={sort}
           onClickSort={onClickSort}
         >
-          {onClickSort ? t("column.creator") : term("profile")}
+          {t("column.creator")}
         </SortableHead>
         {columns.map((column) => (
           <SortableHead
@@ -183,7 +173,7 @@ export function CreatorTable({
                   }
                 />
               </TableCell>
-              <TableCell className="max-w-0">
+              <TableCell className="max-w-0 desktop:px-3">
                 <div className="flex items-center ds-gap-3">
                   <Avatar size="sm">
                     <AvatarImage
@@ -207,11 +197,14 @@ export function CreatorTable({
                 </div>
               </TableCell>
               {columns.map((column) => (
-                <TableCell key={column.id} className={column.cellClassName}>
+                <TableCell
+                  key={column.id}
+                  className={cn("desktop:px-3", column.cellClassName)}
+                >
                   {column.render(item)}
                 </TableCell>
               ))}
-              <TableCell>
+              <TableCell className="desktop:pr-4 desktop:pl-2.5">
                 <div className="flex items-center justify-center gap-1">
                   <CreatorRowActions
                     creator={item}
@@ -249,7 +242,11 @@ function SortableHead({
   const { t } = useTranslation("entities/creator");
 
   if (!sortKey || !onClickSort) {
-    return <TableHead className={className}>{children}</TableHead>;
+    return (
+      <TableHead className={cn("desktop:px-3", className)}>
+        <span className="block truncate">{children}</span>
+      </TableHead>
+    );
   }
 
   const direction = sort?.startsWith(`${sortKey}_`)
@@ -266,14 +263,14 @@ function SortableHead({
       <Button
         variant="ghost-muted"
         className={cn(
-          "hover:bg-transparent hover:text-primary",
+          "max-w-full min-w-0 hover:bg-transparent hover:text-primary",
           direction && "text-primary",
         )}
         aria-label={t("column.sortBy", { name: children })}
         onClick={() => onClickSort(sortKey)}
       >
-        {children}
-        <ArrowDownUpIcon />
+        <span className="truncate">{children}</span>
+        <ChevronsUpDown />
       </Button>
     </TableHead>
   );

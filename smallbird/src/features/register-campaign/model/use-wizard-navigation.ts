@@ -122,15 +122,12 @@ export function useWizardNavigation() {
 }
 
 /**
- * 주소의 단계가 없거나 열 수 없으면 실제로 연 단계로 바꿔(replace) 새로고침해도 같은 단계가 열리게 하고, 결제 단계에
- * 들어오면 사이드바 경고를 켬. 연 단계는 기본 선택을 사용자가 본 것으로 보고 저장을 미루지 않음. 마법사 본문에서 한 번만 부름.
+ * 주소의 단계가 없거나 열 수 없으면 실제로 연 단계로 바꿔(replace) 새로고침해도 같은 단계가 열리게 함.
+ * 연 단계는 기본 선택을 사용자가 본 것으로 보고 저장을 미루지 않음. 마법사 본문에서 한 번만 부름.
  */
 export function useSyncCurrentStep() {
   const [, setSearchParams] = useSearchParams();
   const { steps, requested, currentStep } = useWizardNavigation();
-  const markPaymentVisited = useRegisterWizardStore(
-    (state) => state.markPaymentVisited,
-  );
   const markStepShown = useRegisterWizardStore((state) => state.markStepShown);
 
   useEffect(() => {
@@ -144,10 +141,6 @@ export function useSyncCurrentStep() {
       { replace: true },
     );
   }, [requested, currentStep, setSearchParams]);
-
-  useEffect(() => {
-    if (currentStep === "payment") markPaymentVisited();
-  }, [currentStep, markPaymentVisited]);
 
   const currentDraftStep =
     steps.find(({ step }) => step === currentStep)?.draftStep ?? null;

@@ -39,7 +39,7 @@
   "action": {
     "demo": "Try the demo",
     "subscribe": "Subscribe",
-    "inUse": "In use",
+    "register": "Register campaign",
     "comingSoonButton": "Coming soon",
     "demoRegister": "Register demo campaign"
   },
